@@ -1,0 +1,57 @@
+{
+  "reports.title": "Rapports financiers",
+  "reports.description": "Générez et analysez les rapports de revenus, dépenses et encaissements",
+  "reports.noData": "Aucune donnée disponible pour cette période",
+
+  "reports.actions.refresh": "Actualiser",
+  "reports.actions.export": "Exporter",
+
+  "reports.dateRange.thisMonth": "Ce mois-ci",
+  "reports.dateRange.lastMonth": "Mois dernier",
+  "reports.dateRange.thisQuarter": "Ce trimestre",
+  "reports.dateRange.thisYear": "Cette année",
+  "reports.dateRange.lastYear": "Année dernière",
+
+  "reports.tabs.incomeExpense": "Revenus et dépenses",
+  "reports.tabs.rentRoll": "État des loyers",
+  "reports.tabs.collections": "Encaissements",
+
+  "reports.table.property": "Propriété",
+  "reports.table.tenant": "Locataire",
+  "reports.table.leasePeriod": "Période du bail",
+  "reports.table.monthlyRent": "Loyer mensuel",
+  "reports.table.deposit": "Dépôt",
+  "reports.table.income": "Revenus",
+  "reports.table.transactions": "Transactions",
+
+  "reports.incomeExpense.totalIncome": "Revenus totaux",
+  "reports.incomeExpense.totalExpenses": "Dépenses totales",
+  "reports.incomeExpense.netIncome": "Revenu net",
+  "reports.incomeExpense.profitMargin": "Marge bénéficiaire",
+  "reports.incomeExpense.monthlyTrend": "Revenus vs dépenses mensuels",
+  "reports.incomeExpense.monthlyTrendDesc": "Comparaison des revenus et dépenses au fil du temps",
+  "reports.incomeExpense.income": "Revenus",
+  "reports.incomeExpense.expenses": "Dépenses",
+  "reports.incomeExpense.incomeByCategory": "Revenus par catégorie",
+  "reports.incomeExpense.expenseByCategory": "Dépenses par catégorie",
+  "reports.incomeExpense.incomeByProperty": "Revenus par propriété",
+
+  "reports.rentRoll.totalUnits": "Baux actifs",
+  "reports.rentRoll.monthlyRent": "Loyer mensuel total",
+  "reports.rentRoll.annualRent": "Loyer annualisé",
+  "reports.rentRoll.totalDeposits": "Dépôts de garantie",
+  "reports.rentRoll.activeLeases": "État des loyers — Baux actifs",
+  "reports.rentRoll.activeLeasesDesc": "Tous les baux actifs avec les détails des locataires et des loyers",
+
+  "reports.collections.totalDue": "Total dû",
+  "reports.collections.collected": "Encaissé",
+  "reports.collections.collectionRate": "Taux d'encaissement",
+  "reports.collections.overdue": "En retard",
+  "reports.collections.payments": "paiements",
+  "reports.collections.overdueAging": "Ancienneté des retards",
+  "reports.collections.overdueAgingDesc": "Répartition des montants en retard par ancienneté",
+  "reports.collections.noOverdue": "Aucun paiement en retard — excellent !",
+  "reports.collections.byProperty": "Taux d'encaissement par propriété",
+  "reports.collections.byPropertyDesc": "Comparez les performances d'encaissement entre les propriétés",
+  "reports.collections.detailTable": "Encaissements par propriété — Détail"
+}

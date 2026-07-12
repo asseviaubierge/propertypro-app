@@ -1,0 +1,57 @@
+{
+  "reports.title": "Financial Reports",
+  "reports.description": "Generate and analyze income, expenses, and collection reports",
+  "reports.noData": "No data available for this period",
+
+  "reports.actions.refresh": "Refresh",
+  "reports.actions.export": "Export",
+
+  "reports.dateRange.thisMonth": "This Month",
+  "reports.dateRange.lastMonth": "Last Month",
+  "reports.dateRange.thisQuarter": "This Quarter",
+  "reports.dateRange.thisYear": "This Year",
+  "reports.dateRange.lastYear": "Last Year",
+
+  "reports.tabs.incomeExpense": "Income & Expenses",
+  "reports.tabs.rentRoll": "Rent Roll",
+  "reports.tabs.collections": "Collections",
+
+  "reports.table.property": "Property",
+  "reports.table.tenant": "Tenant",
+  "reports.table.leasePeriod": "Lease Period",
+  "reports.table.monthlyRent": "Monthly Rent",
+  "reports.table.deposit": "Deposit",
+  "reports.table.income": "Income",
+  "reports.table.transactions": "Transactions",
+
+  "reports.incomeExpense.totalIncome": "Total Income",
+  "reports.incomeExpense.totalExpenses": "Total Expenses",
+  "reports.incomeExpense.netIncome": "Net Income",
+  "reports.incomeExpense.profitMargin": "Profit Margin",
+  "reports.incomeExpense.monthlyTrend": "Monthly Income vs Expenses",
+  "reports.incomeExpense.monthlyTrendDesc": "Side-by-side comparison of income and expenses over time",
+  "reports.incomeExpense.income": "Income",
+  "reports.incomeExpense.expenses": "Expenses",
+  "reports.incomeExpense.incomeByCategory": "Income by Category",
+  "reports.incomeExpense.expenseByCategory": "Expenses by Category",
+  "reports.incomeExpense.incomeByProperty": "Income by Property",
+
+  "reports.rentRoll.totalUnits": "Active Leases",
+  "reports.rentRoll.monthlyRent": "Total Monthly Rent",
+  "reports.rentRoll.annualRent": "Annualized Rent",
+  "reports.rentRoll.totalDeposits": "Security Deposits",
+  "reports.rentRoll.activeLeases": "Rent Roll — Active Leases",
+  "reports.rentRoll.activeLeasesDesc": "All currently active leases with tenant and rent details",
+
+  "reports.collections.totalDue": "Total Due",
+  "reports.collections.collected": "Collected",
+  "reports.collections.collectionRate": "Collection Rate",
+  "reports.collections.overdue": "Overdue",
+  "reports.collections.payments": "payments",
+  "reports.collections.overdueAging": "Overdue Aging",
+  "reports.collections.overdueAgingDesc": "Breakdown of overdue amounts by age",
+  "reports.collections.noOverdue": "No overdue payments — great job!",
+  "reports.collections.byProperty": "Collection Rate by Property",
+  "reports.collections.byPropertyDesc": "Compare collection performance across properties",
+  "reports.collections.detailTable": "Collections by Property — Detail"
+}

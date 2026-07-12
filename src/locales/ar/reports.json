@@ -1,0 +1,57 @@
+{
+  "reports.title": "التقارير المالية",
+  "reports.description": "إنشاء وتحليل تقارير الإيرادات والمصروفات والتحصيل",
+  "reports.noData": "لا توجد بيانات متاحة لهذه الفترة",
+
+  "reports.actions.refresh": "تحديث",
+  "reports.actions.export": "تصدير",
+
+  "reports.dateRange.thisMonth": "هذا الشهر",
+  "reports.dateRange.lastMonth": "الشهر الماضي",
+  "reports.dateRange.thisQuarter": "هذا الربع",
+  "reports.dateRange.thisYear": "هذا العام",
+  "reports.dateRange.lastYear": "العام الماضي",
+
+  "reports.tabs.incomeExpense": "الإيرادات والمصروفات",
+  "reports.tabs.rentRoll": "قائمة الإيجارات",
+  "reports.tabs.collections": "التحصيل",
+
+  "reports.table.property": "العقار",
+  "reports.table.tenant": "المستأجر",
+  "reports.table.leasePeriod": "فترة العقد",
+  "reports.table.monthlyRent": "الإيجار الشهري",
+  "reports.table.deposit": "التأمين",
+  "reports.table.income": "الدخل",
+  "reports.table.transactions": "المعاملات",
+
+  "reports.incomeExpense.totalIncome": "إجمالي الإيرادات",
+  "reports.incomeExpense.totalExpenses": "إجمالي المصروفات",
+  "reports.incomeExpense.netIncome": "صافي الدخل",
+  "reports.incomeExpense.profitMargin": "هامش الربح",
+  "reports.incomeExpense.monthlyTrend": "الإيرادات مقابل المصروفات الشهرية",
+  "reports.incomeExpense.monthlyTrendDesc": "مقارنة الإيرادات والمصروفات عبر الزمن",
+  "reports.incomeExpense.income": "الإيرادات",
+  "reports.incomeExpense.expenses": "المصروفات",
+  "reports.incomeExpense.incomeByCategory": "الإيرادات حسب الفئة",
+  "reports.incomeExpense.expenseByCategory": "المصروفات حسب الفئة",
+  "reports.incomeExpense.incomeByProperty": "الإيرادات حسب العقار",
+
+  "reports.rentRoll.totalUnits": "العقود النشطة",
+  "reports.rentRoll.monthlyRent": "إجمالي الإيجار الشهري",
+  "reports.rentRoll.annualRent": "الإيجار السنوي",
+  "reports.rentRoll.totalDeposits": "التأمينات",
+  "reports.rentRoll.activeLeases": "قائمة الإيجارات — العقود النشطة",
+  "reports.rentRoll.activeLeasesDesc": "جميع العقود النشطة مع تفاصيل المستأجرين والإيجارات",
+
+  "reports.collections.totalDue": "إجمالي المستحق",
+  "reports.collections.collected": "المحصّل",
+  "reports.collections.collectionRate": "نسبة التحصيل",
+  "reports.collections.overdue": "متأخر",
+  "reports.collections.payments": "مدفوعات",
+  "reports.collections.overdueAging": "تحليل المتأخرات",
+  "reports.collections.overdueAgingDesc": "توزيع المبالغ المتأخرة حسب العمر",
+  "reports.collections.noOverdue": "لا توجد مدفوعات متأخرة — عمل رائع!",
+  "reports.collections.byProperty": "نسبة التحصيل حسب العقار",
+  "reports.collections.byPropertyDesc": "مقارنة أداء التحصيل بين العقارات",
+  "reports.collections.detailTable": "التحصيل حسب العقار — تفاصيل"
+}

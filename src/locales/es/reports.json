@@ -1,0 +1,57 @@
+{
+  "reports.title": "Informes financieros",
+  "reports.description": "Genere y analice informes de ingresos, gastos y cobros",
+  "reports.noData": "No hay datos disponibles para este período",
+
+  "reports.actions.refresh": "Actualizar",
+  "reports.actions.export": "Exportar",
+
+  "reports.dateRange.thisMonth": "Este mes",
+  "reports.dateRange.lastMonth": "Mes pasado",
+  "reports.dateRange.thisQuarter": "Este trimestre",
+  "reports.dateRange.thisYear": "Este año",
+  "reports.dateRange.lastYear": "Año pasado",
+
+  "reports.tabs.incomeExpense": "Ingresos y gastos",
+  "reports.tabs.rentRoll": "Lista de alquileres",
+  "reports.tabs.collections": "Cobros",
+
+  "reports.table.property": "Propiedad",
+  "reports.table.tenant": "Inquilino",
+  "reports.table.leasePeriod": "Período del contrato",
+  "reports.table.monthlyRent": "Alquiler mensual",
+  "reports.table.deposit": "Depósito",
+  "reports.table.income": "Ingresos",
+  "reports.table.transactions": "Transacciones",
+
+  "reports.incomeExpense.totalIncome": "Ingresos totales",
+  "reports.incomeExpense.totalExpenses": "Gastos totales",
+  "reports.incomeExpense.netIncome": "Ingreso neto",
+  "reports.incomeExpense.profitMargin": "Margen de beneficio",
+  "reports.incomeExpense.monthlyTrend": "Ingresos vs gastos mensuales",
+  "reports.incomeExpense.monthlyTrendDesc": "Comparación de ingresos y gastos a lo largo del tiempo",
+  "reports.incomeExpense.income": "Ingresos",
+  "reports.incomeExpense.expenses": "Gastos",
+  "reports.incomeExpense.incomeByCategory": "Ingresos por categoría",
+  "reports.incomeExpense.expenseByCategory": "Gastos por categoría",
+  "reports.incomeExpense.incomeByProperty": "Ingresos por propiedad",
+
+  "reports.rentRoll.totalUnits": "Contratos activos",
+  "reports.rentRoll.monthlyRent": "Alquiler mensual total",
+  "reports.rentRoll.annualRent": "Alquiler anualizado",
+  "reports.rentRoll.totalDeposits": "Depósitos de seguridad",
+  "reports.rentRoll.activeLeases": "Lista de alquileres — Contratos activos",
+  "reports.rentRoll.activeLeasesDesc": "Todos los contratos activos con detalles de inquilinos y alquileres",
+
+  "reports.collections.totalDue": "Total adeudado",
+  "reports.collections.collected": "Cobrado",
+  "reports.collections.collectionRate": "Tasa de cobro",
+  "reports.collections.overdue": "Vencido",
+  "reports.collections.payments": "pagos",
+  "reports.collections.overdueAging": "Antigüedad de vencidos",
+  "reports.collections.overdueAgingDesc": "Desglose de montos vencidos por antigüedad",
+  "reports.collections.noOverdue": "Sin pagos vencidos — ¡excelente!",
+  "reports.collections.byProperty": "Tasa de cobro por propiedad",
+  "reports.collections.byPropertyDesc": "Compare el rendimiento de cobro entre propiedades",
+  "reports.collections.detailTable": "Cobros por propiedad — Detalle"
+}

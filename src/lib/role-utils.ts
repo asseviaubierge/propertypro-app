@@ -1,0 +1,27 @@
+export {
+  SYSTEM_ROLE_PERMISSIONS,
+  canAccessRoleConfiguration,
+  canManageRoles,
+  canManageTargetRole,
+  canManageTargetUser,
+  canManageUsers,
+  canViewTargetUser,
+  canViewUsers,
+  createAccessProfile,
+  formatRoleLabel,
+  getAccessLevel,
+  getAccessLevelRank,
+  getSystemRolePermissions,
+  hasAllPermissions,
+  hasAnyPermission,
+  hasPermission,
+  hasRequiredRole,
+  matchesRequiredRoles,
+  isAdminRole,
+  isManagerRole,
+  isTenantRole,
+  normalizeRoleName,
+  resolveSystemRole,
+} from "./permissions-manager";
+
+export type { AccessLevel, AccessProfile } from "./permissions-manager";

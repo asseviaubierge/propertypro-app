@@ -1,0 +1,116 @@
+/**
+ * PropertyPro - PayPal Webhook Handler
+ * Verifies and processes PayPal webhook events (capture completed / denied).
+ * Signature is verified against the configured webhook ID; events are de-duped
+ * so retries are processed at most once.
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import mongoose from "mongoose";
+import connectDB from "@/lib/mongodb";
+import {
+  getPayPalConfig,
+  verifyWebhookSignature,
+  handlePayPalWebhookEvent,
+} from "@/lib/services/paypal.service";
+
+const PROCESSED_EVENTS_COLLECTION = "paypal_webhook_events";
+const PROCESSED_EVENTS_TTL_DAYS = 30;
+
+async function ensureProcessedEventsIndexes(): Promise<void> {
+  const db = mongoose.connection.db;
+  if (!db) return;
+  const collection = db.collection(PROCESSED_EVENTS_COLLECTION);
+  await collection.createIndex({ eventId: 1 }, { unique: true });
+  await collection.createIndex(
+    { processedAt: 1 },
+    { expireAfterSeconds: PROCESSED_EVENTS_TTL_DAYS * 24 * 60 * 60 }
+  );
+}
+
+async function markEventProcessed(
+  eventId: string,
+  eventType: string
+): Promise<boolean> {
+  const db = mongoose.connection.db;
+  if (!db) return true;
+  try {
+    await db.collection(PROCESSED_EVENTS_COLLECTION).insertOne({
+      eventId,
+      eventType,
+      processedAt: new Date(),
+    });
+    return true;
+  } catch (error) {
+    const mongoError = error as { code?: number };
+    if (mongoError?.code === 11000) {
+      return false;
+    }
+    throw error;
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    await connectDB();
+    await ensureProcessedEventsIndexes();
+
+    const rawBody = await request.text();
+    const headersList = await headers();
+
+    const sigHeaders: Record<string, string | null> = {
+      "paypal-auth-algo": headersList.get("paypal-auth-algo"),
+      "paypal-cert-url": headersList.get("paypal-cert-url"),
+      "paypal-transmission-id": headersList.get("paypal-transmission-id"),
+      "paypal-transmission-sig": headersList.get("paypal-transmission-sig"),
+      "paypal-transmission-time": headersList.get("paypal-transmission-time"),
+    };
+
+    const { webhookId } = await getPayPalConfig();
+    if (!webhookId) {
+      console.error("Missing PayPal webhook ID");
+      return NextResponse.json(
+        { error: "Webhook ID not configured" },
+        { status: 500 }
+      );
+    }
+
+    const verified = await verifyWebhookSignature(
+      sigHeaders,
+      rawBody,
+      webhookId
+    );
+    if (!verified) {
+      console.error("Invalid PayPal webhook signature");
+      return NextResponse.json(
+        { error: "Invalid webhook signature" },
+        { status: 400 }
+      );
+    }
+
+    const event = JSON.parse(rawBody) as {
+      id: string;
+      event_type: string;
+      resource: unknown;
+    };
+
+    const isFirstSeen = await markEventProcessed(event.id, event.event_type);
+    if (!isFirstSeen) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
+    await handlePayPalWebhookEvent(event as never);
+
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error("PayPal webhook error:", error);
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    return NextResponse.json(
+      { error: "Webhook handler failed" },
+      { status: 500 }
+    );
+  }
+}

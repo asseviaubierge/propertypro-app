@@ -1,0 +1,57 @@
+{
+  "reports.title": "Finanzberichte",
+  "reports.description": "Erstellen und analysieren Sie Einnahmen-, Ausgaben- und Inkassoberichte",
+  "reports.noData": "Keine Daten für diesen Zeitraum verfügbar",
+
+  "reports.actions.refresh": "Aktualisieren",
+  "reports.actions.export": "Exportieren",
+
+  "reports.dateRange.thisMonth": "Dieser Monat",
+  "reports.dateRange.lastMonth": "Letzter Monat",
+  "reports.dateRange.thisQuarter": "Dieses Quartal",
+  "reports.dateRange.thisYear": "Dieses Jahr",
+  "reports.dateRange.lastYear": "Letztes Jahr",
+
+  "reports.tabs.incomeExpense": "Einnahmen & Ausgaben",
+  "reports.tabs.rentRoll": "Mietübersicht",
+  "reports.tabs.collections": "Inkasso",
+
+  "reports.table.property": "Immobilie",
+  "reports.table.tenant": "Mieter",
+  "reports.table.leasePeriod": "Mietdauer",
+  "reports.table.monthlyRent": "Monatsmiete",
+  "reports.table.deposit": "Kaution",
+  "reports.table.income": "Einnahmen",
+  "reports.table.transactions": "Transaktionen",
+
+  "reports.incomeExpense.totalIncome": "Gesamteinnahmen",
+  "reports.incomeExpense.totalExpenses": "Gesamtausgaben",
+  "reports.incomeExpense.netIncome": "Nettoeinkommen",
+  "reports.incomeExpense.profitMargin": "Gewinnmarge",
+  "reports.incomeExpense.monthlyTrend": "Monatliche Einnahmen vs. Ausgaben",
+  "reports.incomeExpense.monthlyTrendDesc": "Vergleich von Einnahmen und Ausgaben im Zeitverlauf",
+  "reports.incomeExpense.income": "Einnahmen",
+  "reports.incomeExpense.expenses": "Ausgaben",
+  "reports.incomeExpense.incomeByCategory": "Einnahmen nach Kategorie",
+  "reports.incomeExpense.expenseByCategory": "Ausgaben nach Kategorie",
+  "reports.incomeExpense.incomeByProperty": "Einnahmen nach Immobilie",
+
+  "reports.rentRoll.totalUnits": "Aktive Mietverträge",
+  "reports.rentRoll.monthlyRent": "Gesamtmonatsmiete",
+  "reports.rentRoll.annualRent": "Jahresmiete",
+  "reports.rentRoll.totalDeposits": "Kautionen",
+  "reports.rentRoll.activeLeases": "Mietübersicht — Aktive Verträge",
+  "reports.rentRoll.activeLeasesDesc": "Alle aktiven Mietverträge mit Mieter- und Mietdetails",
+
+  "reports.collections.totalDue": "Gesamt fällig",
+  "reports.collections.collected": "Eingezogen",
+  "reports.collections.collectionRate": "Inkassoquote",
+  "reports.collections.overdue": "Überfällig",
+  "reports.collections.payments": "Zahlungen",
+  "reports.collections.overdueAging": "Überfälligkeitsanalyse",
+  "reports.collections.overdueAgingDesc": "Aufschlüsselung überfälliger Beträge nach Alter",
+  "reports.collections.noOverdue": "Keine überfälligen Zahlungen — hervorragend!",
+  "reports.collections.byProperty": "Inkassoquote nach Immobilie",
+  "reports.collections.byPropertyDesc": "Vergleichen Sie die Inkassoleistung zwischen Immobilien",
+  "reports.collections.detailTable": "Inkasso nach Immobilie — Detail"
+}
