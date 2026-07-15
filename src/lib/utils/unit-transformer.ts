@@ -255,12 +255,12 @@ export function validateUnitData(data: UnitFormData): {
     errors.push("Square footage must be between 0 and 50,000");
   }
 
-  if (data.rentAmount < 0 || data.rentAmount > 100000) {
-    errors.push("Rent amount must be between 0 and 100,000");
+  if (data.rentAmount < 0 || data.rentAmount > 100000000) {
+    errors.push("Rent amount must be between 0 and 100,000,000");
   }
 
-  if (data.securityDeposit < 0 || data.securityDeposit > 50000) {
-    errors.push("Security deposit must be between 0 and 50,000");
+  if (data.securityDeposit < 0 || data.securityDeposit > 100000000) {
+    errors.push("Security deposit must be between 0 and 100,000,000");
   }
 
   return {

@@ -49,13 +49,13 @@ const EmbeddedUnitSchema = new Schema(
       type: Number,
       required: [true, "Rent amount is required"],
       min: [0, "Rent amount cannot be negative"],
-      max: [10000000, "Rent amount cannot exceed $10000,000"],
+      max: [100000000, "Rent amount cannot exceed $10000,000"],
     },
     securityDeposit: {
       type: Number,
       required: [true, "Security deposit is required"],
       min: [0, "Security deposit cannot be negative"],
-      max: [5000000, "Security deposit cannot exceed $5000,000"],
+      max: [100000000, "Security deposit cannot exceed $5000,000"],
     },
     status: {
       type: String,

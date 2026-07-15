@@ -200,8 +200,8 @@ export const unitSchema = z.object({
   bedrooms: z.number().min(0).max(20),
   bathrooms: z.number().min(0).max(20),
   squareFootage: z.number().min(0).max(50000),
-  rentAmount: z.number().min(0).max(100000),
-  securityDeposit: z.number().min(0).max(50000),
+  rentAmount: z.number().min(0).max(100000000),
+  securityDeposit: z.number().min(0).max(100000000),
   status: z.nativeEnum(PropertyStatus).default(PropertyStatus.AVAILABLE),
 
   // Outdoor Features
@@ -492,7 +492,7 @@ export const lateFeeConfigSchema = z.object({
   feeAmount: z
     .number()
     .min(0, "Fee amount cannot be negative")
-    .max(1000, "Fee amount too high"),
+    .max(100000000, "Fee amount too high"),
   maxFeeAmount: z
     .number()
     .min(0, "Maximum fee amount cannot be negative")
@@ -527,19 +527,19 @@ export const leaseTermsSchema = z.object({
   rentAmount: z
     .number()
     .min(0, "Rent cannot be negative")
-    .max(100000, "Rent too high"),
+    .max(100000000, "Rent too high"),
   securityDeposit: z
     .number()
     .min(0, "Security deposit cannot be negative")
-    .max(50000, "Security deposit too high"),
+    .max(100000000, "Security deposit too high"),
   lateFee: z
     .number()
     .min(0, "Late fee cannot be negative")
-    .max(1000, "Late fee too high"),
+    .max(100000000, "Late fee too high"),
   petDeposit: z
     .number()
     .min(0, "Pet deposit cannot be negative")
-    .max(5000, "Pet deposit too high")
+    .max(100000000, "Pet deposit too high")
     .optional(),
   utilities: z
     .array(
@@ -658,8 +658,8 @@ export const paymentSchema = z.object({
   leaseId: z.string().optional(),
   amount: z
     .number()
-    .min(0.01, "Amount must be at least $0.01")
-    .max(100000, "Amount too high"),
+    .min(0.01, "Amount must be at least $0.00")
+    .max(100000000, "Amount too high"),
   type: z.nativeEnum(PaymentType),
   paymentMethod: z.nativeEnum(PaymentMethod).optional(),
   dueDate: z.date(),
@@ -673,15 +673,15 @@ export const paymentCreateSchema = z.object({
   leaseId: z.string().optional(),
   amount: z
     .number({ required_error: "Amount is required" })
-    .min(0.01, "Amount must be at least $0.01")
-    .max(100000, "Amount cannot exceed $100,000"),
+    .min(0.01, "Amount must be at least $0.00")
+    .max(100000000, "Amount cannot exceed $100,000,000"),
   type: z.nativeEnum(PaymentType, {
     required_error: "Payment type is required",
   }),
   paymentMethod: z.nativeEnum(PaymentMethod).optional(),
   dueDate: z.date({ required_error: "Due date is required" }),
   description: z.string().max(500, "Description too long").optional(),
-  notes: z.string().max(1000, "Notes too long").optional(),
+  notes: z.string().max(100000000, "Notes too long").optional(),
 });
 
 export const paymentUpdateSchema = paymentCreateSchema.partial().extend({

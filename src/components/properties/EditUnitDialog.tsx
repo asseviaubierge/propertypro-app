@@ -64,8 +64,8 @@ const unitSchema = (t: (key: string, options?: any) => string) =>
     bedrooms: z.number().min(0).max(20),
     bathrooms: z.number().min(0).max(20),
     squareFootage: z.number().min(0).max(50000),
-    rentAmount: z.number().min(0).max(100000),
-    securityDeposit: z.number().min(0).max(50000000),
+    rentAmount: z.number().min(0).max(100000000),
+    securityDeposit: z.number().min(0).max(100000000),
     status: z.enum(["available", "occupied", "maintenance", "unavailable"]),
     balcony: z.boolean().default(false),
     patio: z.boolean().default(false),
@@ -123,8 +123,8 @@ export function EditUnitDialog({
       bedrooms: 1,
       bathrooms: 1,
       squareFootage: 500,
-      rentAmount: 1000,
-      securityDeposit: 1000,
+      rentAmount: 0,
+      securityDeposit: 0,
       status: "available",
       balcony: false,
       patio: false,
@@ -152,8 +152,8 @@ export function EditUnitDialog({
         bedrooms: unit.bedrooms || 1,
         bathrooms: unit.bathrooms || 1,
         squareFootage: unit.squareFootage || 500,
-        rentAmount: unit.rentAmount || 1000,
-        securityDeposit: unit.securityDeposit || 1000,
+        rentAmount: unit.rentAmount || 100000000,
+        securityDeposit: unit.securityDeposit || 100000000,
         status: (unit.status as any) || "available",
         balcony: unit.balcony || false,
         patio: unit.patio || false,
@@ -509,7 +509,7 @@ export function EditUnitDialog({
                             <Input
                               type="number"
                               min="0"
-                              max="100000"
+                              max="100000000"
                               className="pl-10"
                               {...field}
                               onChange={(e) =>
@@ -537,7 +537,7 @@ export function EditUnitDialog({
                             <Input
                               type="number"
                               min="0"
-                              max="50000"
+                              max="100000000"
                               className="pl-10"
                               {...field}
                               onChange={(e) =>

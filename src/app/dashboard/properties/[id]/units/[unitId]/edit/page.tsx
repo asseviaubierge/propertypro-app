@@ -71,8 +71,8 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
       bedrooms: 1,
       bathrooms: 1,
       squareFootage: 500,
-      rentAmount: 1000,
-      securityDeposit: 1000,
+      rentAmount: 100000000,
+      securityDeposit: 100000000,
       status: PropertyStatus.AVAILABLE,
       balcony: false,
       patio: false,
@@ -348,8 +348,8 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                   id="rentAmount"
                   type="number"
                   min="0"
-                  max="100000"
-                  step="0.01"
+                  max="100000000"
+                  step="0.00"
                   {...form.register("rentAmount", { valueAsNumber: true })}
                 />
                 {form.formState.errors.rentAmount && (

@@ -188,12 +188,12 @@ const LeaseTermsSchema = new Schema<ILeaseTerms>(
       type: Number,
       required: [true, "Late fee is required"],
       min: [0, "Late fee cannot be negative"],
-      max: [1000, "Late fee cannot exceed $1,000"],
+      max: [100000000, "Late fee cannot exceed $1,000"],
     },
     petDeposit: {
       type: Number,
       min: [0, "Pet deposit cannot be negative"],
-      max: [5000, "Pet deposit cannot exceed $5,000"],
+      max: [100000, "Pet deposit cannot exceed $5,000"],
     },
     utilities: {
       type: [String],

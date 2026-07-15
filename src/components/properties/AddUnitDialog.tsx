@@ -70,8 +70,8 @@ export function AddUnitDialog({
       bedrooms: 1,
       bathrooms: 1,
       squareFootage: 500,
-      rentAmount: 1000,
-      securityDeposit: 1000,
+      rentAmount: 0,
+      securityDeposit: 0,
       status: "available",
       floor: undefined,
 
@@ -399,7 +399,7 @@ export function AddUnitDialog({
                             type="number"
                             min="0"
                             max="20"
-                            step="0.5"
+                            step="0.0"
                             {...field}
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value) || 0)
@@ -459,7 +459,7 @@ export function AddUnitDialog({
                           <Input
                             type="number"
                             min="0"
-                            max="100000"
+                            max="100000000"
                             placeholder="1000"
                             {...field}
                             onChange={(e) =>
@@ -484,7 +484,7 @@ export function AddUnitDialog({
                           <Input
                             type="number"
                             min="0"
-                            max="50000"
+                            max="100000000"
                             placeholder="1000"
                             {...field}
                             onChange={(e) =>
