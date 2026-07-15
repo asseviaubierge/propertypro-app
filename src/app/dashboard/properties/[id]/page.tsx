@@ -836,7 +836,7 @@ export default function PropertyDetailsPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div>
                       <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
                         <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block uppercase tracking-wide">
                           {t(
@@ -856,47 +856,7 @@ export default function PropertyDetailsPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
-                        <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block uppercase tracking-wide">
-                          {t(
-                            "properties.details.financial.pricePerSquareFoot.label",
-                            {
-                              values: {
-                                unit: t("properties.labels.squareFeetUnit"),
-                              },
-                            }
-                          )}
-                        </label>
-                        <p className="text-xl font-bold text-gray-900 dark:text-white">
-                          {(() => {
-                            if (units.length > 0) {
-                              // Calculate average price per sq ft from units
-                              const totalRent = units.reduce(
-                                (sum, unit) => sum + (unit.rentAmount || 0),
-                                0
-                              );
-                              const totalSqFt = units.reduce(
-                                (sum, unit) => sum + (unit.squareFootage || 0),
-                                0
-                              );
-                              return totalSqFt > 0
-                                ? `${formatCurrency(
-                                    Number((totalRent / totalSqFt).toFixed(2))
-                                  )}`
-                                : t("properties.details.common.notAvailable");
-                            }
-                            return t("properties.details.common.notAvailable");
-                          })()}
-                        </p>
-                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          <Square className="h-3 w-3 mr-1" />
-                          <span>
-                            {t(
-                              "properties.details.financial.pricePerSquareFoot.helper"
-                            )}
-                          </span>
-                        </div>
-                      </div>
+                      {/* Prix par m² supprimé */}
                     </div>
                   </div>
                 </div>

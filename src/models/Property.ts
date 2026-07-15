@@ -42,20 +42,20 @@ const EmbeddedUnitSchema = new Schema(
     squareFootage: {
       type: Number,
       required: [true, "Square footage is required"],
-      min: [50, "Square footage must be at least 50"],
+      min: [0, "Square footage must be at least 0"],
       max: [50000, "Square footage cannot exceed 50,000"],
     },
     rentAmount: {
       type: Number,
       required: [true, "Rent amount is required"],
       min: [0, "Rent amount cannot be negative"],
-      max: [100000, "Rent amount cannot exceed $100,000"],
+      max: [10000000, "Rent amount cannot exceed $10000,000"],
     },
     securityDeposit: {
       type: Number,
       required: [true, "Security deposit is required"],
       min: [0, "Security deposit cannot be negative"],
-      max: [50000, "Security deposit cannot exceed $50,000"],
+      max: [5000000, "Security deposit cannot exceed $5000,000"],
     },
     status: {
       type: String,

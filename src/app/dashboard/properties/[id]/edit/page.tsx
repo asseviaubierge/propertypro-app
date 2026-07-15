@@ -128,10 +128,10 @@ export default function EditPropertyPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
             <Building2 className="h-8 w-8" />
-            Edit Property
+            Modifier la propriété
           </h1>
           <p className="text-muted-foreground">
-            Update property information and integrated unit management
+            Mettre à jour les informations de la propriété
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -141,7 +141,7 @@ export default function EditPropertyPage() {
             onClick={() => router.push(`/dashboard/properties/${propertyId}`)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Property
+            Retour à la propriété
           </Button>
         </div>
       </div>

@@ -251,8 +251,8 @@ export function validateUnitData(data: UnitFormData): {
     errors.push("Bathrooms must be between 0 and 20");
   }
 
-  if (data.squareFootage < 50 || data.squareFootage > 50000) {
-    errors.push("Square footage must be between 50 and 50,000");
+  if (data.squareFootage < 0 || data.squareFootage > 50000) {
+    errors.push("Square footage must be between 0 and 50,000");
   }
 
   if (data.rentAmount < 0 || data.rentAmount > 100000) {

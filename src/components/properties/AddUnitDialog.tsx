@@ -422,7 +422,7 @@ export function AddUnitDialog({
                         <FormControl>
                           <Input
                             type="number"
-                            min="50"
+                            min="0"
                             max="50000"
                             {...field}
                             onChange={(e) =>

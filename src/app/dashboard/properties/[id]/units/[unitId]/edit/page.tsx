@@ -35,9 +35,9 @@ const unitEditSchema = z.object({
   floor: z.number().min(0).max(200).optional(),
   bedrooms: z.number().min(0).max(20),
   bathrooms: z.number().min(0).max(20),
-  squareFootage: z.number().min(50).max(50000),
-  rentAmount: z.number().min(0).max(100000),
-  securityDeposit: z.number().min(0).max(50000),
+  squareFootage: z.number().min(0).max(50000),
+  rentAmount: z.number().min(0).max(100000000),
+  securityDeposit: z.number().min(0).max(50000000),
   status: z.nativeEnum(PropertyStatus),
   balcony: z.boolean().optional(),
   patio: z.boolean().optional(),
@@ -318,7 +318,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                 <Input
                   id="squareFootage"
                   type="number"
-                  min="50"
+                  min="0"
                   max="50000"
                   {...form.register("squareFootage", { valueAsNumber: true })}
                 />

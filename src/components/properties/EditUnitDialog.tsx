@@ -63,9 +63,9 @@ const unitSchema = (t: (key: string, options?: any) => string) =>
     floor: z.number().min(0).max(200).optional(),
     bedrooms: z.number().min(0).max(20),
     bathrooms: z.number().min(0).max(20),
-    squareFootage: z.number().min(50).max(50000),
+    squareFootage: z.number().min(0).max(50000),
     rentAmount: z.number().min(0).max(100000),
-    securityDeposit: z.number().min(0).max(50000),
+    securityDeposit: z.number().min(0).max(50000000),
     status: z.enum(["available", "occupied", "maintenance", "unavailable"]),
     balcony: z.boolean().default(false),
     patio: z.boolean().default(false),
@@ -470,7 +470,7 @@ export function EditUnitDialog({
                         <FormControl>
                           <Input
                             type="number"
-                            min="50"
+                            min="0"
                             max="50000"
                             {...field}
                             onChange={(e) =>
