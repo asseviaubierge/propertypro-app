@@ -176,13 +176,13 @@ const LeaseTermsSchema = new Schema<ILeaseTerms>(
       type: Number,
       required: [true, "Rent amount is required"],
       min: [0, "Rent amount cannot be negative"],
-      max: [100000, "Rent amount cannot exceed $100,000"],
+      max: [100000000, "Rent amount cannot exceed $100,000"],
     },
     securityDeposit: {
       type: Number,
       required: [true, "Security deposit is required"],
       min: [0, "Security deposit cannot be negative"],
-      max: [50000, "Security deposit cannot exceed $50,000"],
+      max: [100000000, "Security deposit cannot exceed $50,000"],
     },
     lateFee: {
       type: Number,
@@ -193,7 +193,7 @@ const LeaseTermsSchema = new Schema<ILeaseTerms>(
     petDeposit: {
       type: Number,
       min: [0, "Pet deposit cannot be negative"],
-      max: [100000, "Pet deposit cannot exceed $5,000"],
+      max: [10000000, "Pet deposit cannot exceed $5,000"],
     },
     utilities: {
       type: [String],
