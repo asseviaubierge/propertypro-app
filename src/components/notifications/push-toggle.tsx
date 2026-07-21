@@ -10,7 +10,7 @@ export function PushToggle() {
   if (status === "unsupported") {
     return (
       <p className="text-xs text-muted-foreground">
-        Push notifications aren&apos;t supported in this browser.
+        Les notifications push ne sont pas prises en charge par ce navigateur.
       </p>
     );
   }
@@ -19,7 +19,7 @@ export function PushToggle() {
     return (
       <Button variant="outline" size="sm" disabled>
         <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-        Checking…
+        Vérification…
       </Button>
     );
   }
@@ -27,7 +27,7 @@ export function PushToggle() {
   if (status === "denied") {
     return (
       <p className="text-xs text-muted-foreground">
-        Notifications are blocked. Enable them in your browser site settings.
+        Les notifications sont bloquées. Veuillez les autoriser dans les paramètres de votre navigateur.
       </p>
     );
   }
@@ -45,7 +45,7 @@ export function PushToggle() {
         ) : (
           <BellOff className="mr-2 h-3.5 w-3.5" />
         )}
-        Disable push
+        Désactiver les notifications
       </Button>
     );
   }
@@ -57,7 +57,7 @@ export function PushToggle() {
       ) : (
         <Bell className="mr-2 h-3.5 w-3.5" />
       )}
-      Enable push notifications
+      Activer les notifications
     </Button>
   );
 }

@@ -89,7 +89,7 @@ export function LeaseDepositCard({
         setDeposit(data.data.deposits?.[0] || null);
       }
     } catch {
-      toast.error("Failed to load deposit");
+      toast.error("Échec du chargement");
     } finally {
       setLoading(false);
     }
@@ -112,14 +112,14 @@ export function LeaseDepositCard({
       });
       const data = await res.json();
       if (data.success) {
-        toast.success("Deposit record created");
+        toast.success("Dépôt créé");
         setShowCreate(false);
         fetchDeposit();
       } else {
-        toast.error(data.error || "Failed to create deposit");
+        toast.error(data.error || "Échec de création");
       }
     } catch {
-      toast.error("An error occurred");
+      toast.error("Une erreur est survenue");
     } finally {
       setActionLoading(false);
     }
@@ -136,16 +136,16 @@ export function LeaseDepositCard({
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || "Action completed");
+        toast.success(data.message || "Action réussie");
         setShowCollect(false);
         setShowDeduction(false);
         setShowRefund(false);
         fetchDeposit();
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || "Échec de l'action");
       }
     } catch {
-      toast.error("An error occurred");
+      toast.error("Une erreur est survenue");
     } finally {
       setActionLoading(false);
     }
@@ -154,23 +154,23 @@ export function LeaseDepositCard({
   const getStatusBadge = (status: SecurityDepositStatus) => {
     const config: Record<SecurityDepositStatus, { label: string; className: string }> = {
       [SecurityDepositStatus.PENDING]: {
-        label: "Pending",
+        label: "En attente",
         className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
       },
       [SecurityDepositStatus.COLLECTED]: {
-        label: "Held",
+        label: "En dépôt",
         className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
       },
       [SecurityDepositStatus.PARTIALLY_REFUNDED]: {
-        label: "Partial Refund",
+        label: "Remb. partiel",
         className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
       },
       [SecurityDepositStatus.FULLY_REFUNDED]: {
-        label: "Refunded",
+        label: "Remboursé",
         className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
       },
       [SecurityDepositStatus.FORFEITED]: {
-        label: "Forfeited",
+        label: "Perdu",
         className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
       },
     };
@@ -190,42 +190,42 @@ export function LeaseDepositCard({
             <div className="p-2 rounded-lg bg-warning/10">
               <ShieldCheck className="h-5 w-5 text-warning" />
             </div>
-            Security Deposit
+            Dépôt de garantie
           </div>
           {deposit && getStatusBadge(deposit.status)}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading deposit…</p>
+          <p className="text-sm text-muted-foreground">Chargement...</p>
         ) : !deposit ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              No deposit record has been created for this lease yet.
+              Aucun dépôt enregistré pour ce bail.
             </p>
             <Button size="sm" onClick={() => setShowCreate(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Create Deposit Record
+              Créer un dépôt
             </Button>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p className="text-muted-foreground">Amount</p>
+                <p className="text-muted-foreground">Montant</p>
                 <p className="font-semibold text-base">
                   {formatCurrency(deposit.amount)}
                 </p>
               </div>
               {deposit.collectedDate && (
                 <div>
-                  <p className="text-muted-foreground">Collected</p>
+                  <p className="text-muted-foreground">Collecté</p>
                   <p>{new Date(deposit.collectedDate).toLocaleDateString()}</p>
                 </div>
               )}
               {totalDeductions > 0 && (
                 <div>
-                  <p className="text-muted-foreground">Total Deductions</p>
+                  <p className="text-muted-foreground">Déductions</p>
                   <p className="font-semibold text-red-600">
                     -{formatCurrency(totalDeductions)}
                   </p>
@@ -233,7 +233,7 @@ export function LeaseDepositCard({
               )}
               {deposit.refundAmount && deposit.refundAmount > 0 && (
                 <div>
-                  <p className="text-muted-foreground">Refunded</p>
+                  <p className="text-muted-foreground">Remboursé</p>
                   <p className="font-semibold text-green-600">
                     {formatCurrency(deposit.refundAmount)}
                   </p>
@@ -244,7 +244,7 @@ export function LeaseDepositCard({
             {deposit.deductions.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  Deductions
+                  Déductions
                 </p>
                 {deposit.deductions.map((d) => (
                   <div
@@ -271,7 +271,7 @@ export function LeaseDepositCard({
               {deposit.status === SecurityDepositStatus.PENDING && (
                 <Button size="sm" onClick={() => setShowCollect(true)}>
                   <DollarSign className="h-4 w-4 mr-2" />
-                  Mark Collected
+                  Marquer collecté
                 </Button>
               )}
               {deposit.status === SecurityDepositStatus.COLLECTED && (
@@ -289,11 +289,11 @@ export function LeaseDepositCard({
                     }}
                   >
                     <AlertTriangle className="h-4 w-4 mr-2" />
-                    Add Deduction
+                    Ajouter déduction
                   </Button>
                   <Button size="sm" onClick={() => setShowRefund(true)}>
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    Process Refund
+                    Rembourser
                   </Button>
                 </>
               )}
@@ -306,13 +306,13 @@ export function LeaseDepositCard({
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Security Deposit Record</DialogTitle>
+            <DialogTitle>Créer un dépôt</DialogTitle>
             <DialogDescription>
-              Enter the deposit amount to start tracking.
+              Entrez le montant du dépôt.
             </DialogDescription>
           </DialogHeader>
           <div>
-            <Label>Amount</Label>
+            <Label>Montant</Label>
             <Input
               type="number"
               min="0"
@@ -323,13 +323,13 @@ export function LeaseDepositCard({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreate(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button
               onClick={handleCreate}
               disabled={actionLoading || !createAmount}
             >
-              {actionLoading ? "Creating…" : "Create"}
+              {actionLoading ? "Création..." : "Créer"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -339,21 +339,21 @@ export function LeaseDepositCard({
       <Dialog open={showCollect} onOpenChange={setShowCollect}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Mark Deposit as Collected</DialogTitle>
+            <DialogTitle>Confirmer collecte</DialogTitle>
             <DialogDescription>
-              Confirm that the deposit of{" "}
-              {deposit && formatCurrency(deposit.amount)} has been received.
+              Confirmer la réception de{" "}
+              {deposit && formatCurrency(deposit.amount)}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCollect(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button
               onClick={() => handleAction("collect", {})}
               disabled={actionLoading}
             >
-              {actionLoading ? "Processing…" : "Confirm Collection"}
+              {actionLoading ? "Traitement..." : "Confirmer"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -363,14 +363,14 @@ export function LeaseDepositCard({
       <Dialog open={showDeduction} onOpenChange={setShowDeduction}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Deduction</DialogTitle>
+            <DialogTitle>Ajouter déduction</DialogTitle>
             <DialogDescription>
-              Record a deduction against the security deposit.
+              Enregistrer une retenue sur le dépôt.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Category</Label>
+              <Label>Catégorie</Label>
               <Select
                 value={deductionForm.category}
                 onValueChange={(v) =>
@@ -381,12 +381,12 @@ export function LeaseDepositCard({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="damage">Property Damage</SelectItem>
-                  <SelectItem value="unpaid_rent">Unpaid Rent</SelectItem>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="key_replacement">Key Replacement</SelectItem>
-                  <SelectItem value="lease_break">Lease Break Fee</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="damage">Dégradations</SelectItem>
+                  <SelectItem value="unpaid_rent">Loyer impayé</SelectItem>
+                  <SelectItem value="cleaning">Ménage</SelectItem>
+                  <SelectItem value="key_replacement">Clés perdues</SelectItem>
+                  <SelectItem value="lease_break">Frais rupture</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -400,11 +400,11 @@ export function LeaseDepositCard({
                     description: e.target.value,
                   })
                 }
-                placeholder="Describe the deduction…"
+                placeholder="Détails de la retenue..."
               />
             </div>
             <div>
-              <Label>Amount</Label>
+              <Label>Montant</Label>
               <Input
                 type="number"
                 min="0"
@@ -422,7 +422,7 @@ export function LeaseDepositCard({
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeduction(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button
               onClick={() =>
@@ -438,7 +438,7 @@ export function LeaseDepositCard({
                 !deductionForm.amount
               }
             >
-              {actionLoading ? "Adding…" : "Add Deduction"}
+              {actionLoading ? "Ajout..." : "Ajouter"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -448,16 +448,16 @@ export function LeaseDepositCard({
       <Dialog open={showRefund} onOpenChange={setShowRefund}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Process Refund</DialogTitle>
+            <DialogTitle>Effectuer remboursement</DialogTitle>
             <DialogDescription>
-              Process the security deposit refund.
+              Rembourser le dépôt restant.
             </DialogDescription>
           </DialogHeader>
           {deposit && (
             <div className="space-y-4">
               <div className="rounded-lg bg-muted p-4 space-y-2">
                 <div className="flex justify-between">
-                  <span>Original Deposit</span>
+                  <span>Dépôt initial</span>
                   <span className="font-medium">
                     {formatCurrency(deposit.amount)}
                   </span>
@@ -474,40 +474,40 @@ export function LeaseDepositCard({
                   </div>
                 ))}
                 <div className="border-t pt-2 flex justify-between font-bold">
-                  <span>Refund Amount</span>
+                  <span>À rembourser</span>
                   <span className="text-green-600">
                     {formatCurrency(refundAvailable)}
                   </span>
                 </div>
               </div>
               <div>
-                <Label>Refund Method</Label>
+                <Label>Méthode</Label>
                 <Select value={refundMethod} onValueChange={setRefundMethod}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                    <SelectItem value="check">Check</SelectItem>
+                    <SelectItem value="bank_transfer">Virement</SelectItem>
+                    <SelectItem value="check">Chèque</SelectItem>
                     <SelectItem value="original_method">
-                      Original Payment Method
+                      Moyen original
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Notes (optional)</Label>
+                <Label>Notes (optionnel)</Label>
                 <Textarea
                   value={refundNotes}
                   onChange={(e) => setRefundNotes(e.target.value)}
-                  placeholder="Any notes about the refund…"
+                  placeholder="Notes sur le remboursement..."
                 />
               </div>
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRefund(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button
               onClick={() =>
@@ -515,7 +515,7 @@ export function LeaseDepositCard({
               }
               disabled={actionLoading}
             >
-              {actionLoading ? "Processing…" : "Process Refund"}
+              {actionLoading ? "Traitement..." : "Rembourser"}
             </Button>
           </DialogFooter>
         </DialogContent>

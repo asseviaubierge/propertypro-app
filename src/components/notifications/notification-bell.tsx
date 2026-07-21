@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale"; // Import de la locale française
 import { Bell, Loader2, Check, AlertTriangle, RotateCcw } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -36,15 +37,15 @@ function getPriorityVariant(priority: NotificationItem["priority"]) {
 function getPriorityLabel(priority: NotificationItem["priority"]) {
   switch (priority) {
     case "critical":
-      return "Critical";
+      return "Critique";
     case "high":
-      return "High";
+      return "Haute";
     case "medium":
-      return "Medium";
+      return "Moyenne";
     case "low":
-      return "Low";
+      return "Basse";
     default:
-      return "Normal";
+      return "Normale";
   }
 }
 
@@ -81,9 +82,7 @@ export function NotificationBell() {
 
   const handleNotificationClick = useCallback(
     (notification: NotificationItem) => {
-      if (!canUseNotifications) {
-        return;
-      }
+      if (!canUseNotifications) return;
 
       if (!notification.read) {
         void markAsRead([notification.id]);
@@ -98,20 +97,17 @@ export function NotificationBell() {
   );
 
   const handleMarkAll = useCallback(() => {
-    if (!canUseNotifications) {
-      return;
-    }
-
-    if (unreadIds.length === 0) {
-      return;
-    }
+    if (!canUseNotifications || unreadIds.length === 0) return;
     void markAllAsRead();
   }, [canUseNotifications, markAllAsRead, unreadIds.length]);
 
-  const isButtonLoading =
-    status === "loading" || (canUseNotifications && isLoading);
+  const isButtonLoading = status === "loading" || (canUseNotifications && isLoading);
   const showRestrictedState = isRoleRestricted || error === "Notifications are unavailable for your role.";
   const notificationsLink = "/dashboard/notifications";
+
+  // Helper pour formater les dates en français
+  const formatRelativeDate = (date: Date) => 
+    formatDistanceToNow(date, { addSuffix: true, locale: fr });
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -122,7 +118,7 @@ export function NotificationBell() {
           className="relative"
           aria-label={
             canUseNotifications && unreadCount > 0
-              ? `${unreadCount} unread notifications`
+              ? `${unreadCount} notification(s) non lue(s)`
               : "Notifications"
           }
         >
@@ -144,10 +140,10 @@ export function NotificationBell() {
             <p className="text-sm font-semibold">Notifications</p>
             <p className="text-xs text-muted-foreground">
               {showRestrictedState
-                ? "Notifications are unavailable for your role."
+                ? "Notifications non disponibles pour votre rôle."
                 : unreadCount > 0
-                  ? `${unreadCount} unread · ${metrics.highPriority} high priority`
-                  : "You're all caught up"}
+                  ? `${unreadCount} non lue(s) · ${metrics.highPriority} prioritaire(s)`
+                  : "Vous êtes à jour"}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -157,7 +153,7 @@ export function NotificationBell() {
               className="h-7 w-7"
               onClick={() => void refresh()}
               disabled={!canUseNotifications}
-              aria-label="Refresh notifications"
+              aria-label="Actualiser les notifications"
             >
               <RotateCcw className="h-3.5 w-3.5" />
             </Button>
@@ -167,7 +163,7 @@ export function NotificationBell() {
               className="h-7 w-7"
               onClick={handleMarkAll}
               disabled={!canUseNotifications || unreadIds.length === 0}
-              aria-label="Mark all notifications as read"
+              aria-label="Tout marquer comme lu"
             >
               <Check className="h-3.5 w-3.5" />
             </Button>
@@ -178,12 +174,8 @@ export function NotificationBell() {
           {showRestrictedState ? (
             <div className="flex flex-col items-center gap-3 px-6 py-10 text-center text-muted-foreground">
               <AlertTriangle className="h-8 w-8 text-warning" />
-              <p className="text-sm font-medium text-foreground">
-                Notifications unavailable
-              </p>
-              <p className="text-xs">
-                You do not have access to notifications in this account.
-              </p>
+              <p className="text-sm font-medium text-foreground">Notifications indisponibles</p>
+              <p className="text-xs">Vous n'avez pas accès aux notifications sur ce compte.</p>
             </div>
           ) : isButtonLoading && !hasNotifications ? (
             <div className="space-y-3 px-4 py-4">
@@ -201,15 +193,12 @@ export function NotificationBell() {
                   key={notification.id}
                   className={cn(
                     "flex w-full items-start gap-3 px-4 py-3 text-left transition",
-                    notification.read
-                      ? "bg-background hover:bg-muted/60"
-                      : "bg-primary/5 hover:bg-primary/10"
+                    notification.read ? "bg-background hover:bg-muted/60" : "bg-primary/5 hover:bg-primary/10"
                   )}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="mt-1">
-                    {notification.priority === "critical" ||
-                    notification.priority === "high" ? (
+                    {["critical", "high"].includes(notification.priority) ? (
                       <AlertTriangle className="h-4 w-4 text-destructive" />
                     ) : (
                       <Bell className="h-4 w-4 text-muted-foreground" />
@@ -217,18 +206,12 @@ export function NotificationBell() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-sm font-semibold text-foreground">
-                        {notification.title}
-                      </h3>
+                      <h3 className="text-sm font-semibold text-foreground">{notification.title}</h3>
                       <span className="text-[11px] font-medium text-muted-foreground">
-                        {formatDistanceToNow(new Date(notification.createdAt), {
-                          addSuffix: true,
-                        })}
+                        {formatRelativeDate(new Date(notification.createdAt))}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                      {notification.message}
-                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{notification.message}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <Badge variant={getPriorityVariant(notification.priority)}>
                         {getPriorityLabel(notification.priority)}
@@ -237,9 +220,7 @@ export function NotificationBell() {
                         {notification.type.replace(/_/g, " ")}
                       </Badge>
                       {!notification.read && (
-                        <span className="text-[11px] font-semibold text-primary">
-                          New
-                        </span>
+                        <span className="text-[11px] font-semibold text-primary">Nouveau</span>
                       )}
                     </div>
                   </div>
@@ -249,12 +230,8 @@ export function NotificationBell() {
           ) : (
             <div className="flex flex-col items-center gap-2 px-6 py-12 text-center text-muted-foreground">
               <Bell className="h-8 w-8" />
-              <p className="text-sm font-medium text-foreground">
-                No notifications yet
-              </p>
-              <p className="text-xs">
-                Notifications you receive will show up here for quick access.
-              </p>
+              <p className="text-sm font-medium text-foreground">Aucune notification</p>
+              <p className="text-xs">Les notifications que vous recevrez s'afficheront ici.</p>
             </div>
           )}
         </ScrollArea>
@@ -262,27 +239,13 @@ export function NotificationBell() {
         <div className="flex items-center justify-between border-t px-4 py-2.5 text-xs">
           <Link
             href={notificationsLink}
-            className={cn(
-              "font-medium text-primary hover:underline",
-              !canUseNotifications && "pointer-events-none opacity-60"
-            )}
-            onClick={() => {
-              if (!canUseNotifications) {
-                return;
-              }
-              setOpen(false);
-            }}
-            aria-disabled={!canUseNotifications}
+            className={cn("font-medium text-primary hover:underline", !canUseNotifications && "pointer-events-none opacity-60")}
+            onClick={() => canUseNotifications && setOpen(false)}
           >
-            View all notifications
+            Voir toutes les notifications
           </Link>
           <span className="text-muted-foreground">
-            Updated
-            {metrics.lastUpdated
-              ? ` ${formatDistanceToNow(new Date(metrics.lastUpdated), {
-                  addSuffix: true,
-                })}`
-              : " just now"}
+            Mis à jour {metrics.lastUpdated ? formatRelativeDate(new Date(metrics.lastUpdated)) : "à l'instant"}
           </span>
         </div>
       </PopoverContent>

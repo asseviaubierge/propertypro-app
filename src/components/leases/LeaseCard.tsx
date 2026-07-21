@@ -103,7 +103,7 @@ export function LeaseCard({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -122,12 +122,12 @@ export function LeaseCard({
     try {
       setIsDeleting(true);
       await leaseService.deleteLease(lease._id);
-      toast.success("Lease deleted successfully");
+      toast.success("Bail supprimé avec succès");
       onDelete?.(lease._id);
     } catch (error) {
-      console.error("Error deleting lease:", error);
+      console.error("Erreur lors de la suppression du bail:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete lease"
+        error instanceof Error ? error.message : "Échec de la suppression du bail"
       );
     } finally {
       setIsDeleting(false);
@@ -138,12 +138,12 @@ export function LeaseCard({
     try {
       await leaseService.archiveLease(lease._id);
       toast.success(
-        "Lease archived. It's hidden from the list but kept for your records."
+        "Bail archivé. Il est masqué de la liste mais conservé pour vos dossiers."
       );
       onUpdate?.();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to archive lease"
+        error instanceof Error ? error.message : "Échec de l'archivage du bail"
       );
     }
   };
@@ -151,11 +151,11 @@ export function LeaseCard({
   const handleUnarchive = async () => {
     try {
       await leaseService.unarchiveLease(lease._id);
-      toast.success("Lease restored to the active list.");
+      toast.success("Bail restauré dans la liste active.");
       onUpdate?.();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to restore lease"
+        error instanceof Error ? error.message : "Échec de la restauration du bail"
       );
     }
   };
@@ -163,18 +163,16 @@ export function LeaseCard({
   const handleTerminate = async () => {
     try {
       setIsTerminating(true);
-      // Terminate frees the unit and stops future charges while keeping all
-      // financial history (invoices, payments) intact.
       await leaseService.changeLeaseStatus(lease._id, LeaseStatus.TERMINATED);
       toast.success(
-        "Lease terminated successfully. Financial records have been preserved."
+        "Bail résilié avec succès. Les documents financiers ont été conservés."
       );
       setShowTerminateDialog(false);
       onUpdate?.();
     } catch (error) {
-      console.error("Error terminating lease:", error);
+      console.error("Erreur lors de la résiliation du bail:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to terminate lease"
+        error instanceof Error ? error.message : "Échec de la résiliation du bail"
       );
     } finally {
       setIsTerminating(false);
@@ -187,7 +185,6 @@ export function LeaseCard({
   return (
     <>
       <Card className="hover:shadow-xl transition-all duration-300 border-border/40 overflow-hidden group p-0 bg-card">
-        {/* Header with gradient background */}
         <div className="relative bg-gradient-to-br from-primary/8 via-primary/4 to-transparent p-4 border-b border-border/50">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -201,7 +198,7 @@ export function LeaseCard({
                   </h3>
                   {lease.unit && (
                     <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 font-medium">
-                      Unit {lease.unit.unitNumber}
+                      Unité {lease.unit.unitNumber}
                     </Badge>
                   )}
                 </div>
@@ -236,14 +233,14 @@ export function LeaseCard({
                     <DropdownMenuItem asChild>
                       <Link href={`/dashboard/leases/${lease._id}`}>
                         <Eye className="mr-2 h-4 w-4" />
-                        View Details
+                        Voir les détails
                       </Link>
                     </DropdownMenuItem>
                     {lease.status === LeaseStatus.DRAFT && (
                       <DropdownMenuItem asChild>
                         <Link href={`/dashboard/leases/${lease._id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Edit Lease
+                          Modifier le bail
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -251,7 +248,7 @@ export function LeaseCard({
                       lease.status === LeaseStatus.DRAFT && (
                         <DropdownMenuItem>
                           <FileSignature className="mr-2 h-4 w-4" />
-                          Send for Signature
+                          Envoyer pour signature
                         </DropdownMenuItem>
                       )}
                     {lease.status === LeaseStatus.ACTIVE && (
@@ -263,14 +260,14 @@ export function LeaseCard({
                         className="text-orange-600 focus:text-orange-600"
                       >
                         <XCircle className="mr-2 h-4 w-4" />
-                        Terminate Lease
+                        Résilier le bail
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href={`/dashboard/leases/${lease._id}/invoice`}>
                         <FileText className="mr-2 h-4 w-4" />
-                        View Invoice
+                        Voir la facture
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -279,13 +276,12 @@ export function LeaseCard({
                         trigger={
                           <div className="flex items-center w-full cursor-pointer">
                             <Download className="mr-2 h-4 w-4" />
-                            Download Invoice
+                            Télécharger facture
                           </div>
                         }
                       />
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {/* Archived leases can be restored */}
                     {lease.archivedAt &&
                       (lease.status === LeaseStatus.TERMINATED ||
                         lease.status === LeaseStatus.EXPIRED) && (
@@ -296,11 +292,9 @@ export function LeaseCard({
                           }}
                         >
                           <ArchiveRestore className="mr-2 h-4 w-4" />
-                          Restore
+                          Restaurer
                         </DropdownMenuItem>
                       )}
-
-                    {/* Ended leases (not archived) can be archived */}
                     {!lease.archivedAt &&
                       (lease.status === LeaseStatus.TERMINATED ||
                         lease.status === LeaseStatus.EXPIRED) && (
@@ -311,21 +305,19 @@ export function LeaseCard({
                           }}
                         >
                           <Archive className="mr-2 h-4 w-4" />
-                          Archive
+                          Archiver
                         </DropdownMenuItem>
                       )}
-
-                    {/* Only draft leases can be deleted */}
                     {lease.status === LeaseStatus.DRAFT && (
                       <DeleteConfirmationDialog
                         itemName={`${
-                          lease.propertyId?.name || "Unknown Property"
+                          lease.propertyId?.name || "Propriété inconnue"
                         } - ${
                           lease.tenantId?.firstName && lease.tenantId?.lastName
                             ? `${lease.tenantId.firstName} ${lease.tenantId.lastName}`
-                            : "Unknown Tenant"
+                            : "Locataire inconnu"
                         }`}
-                        itemType="lease"
+                        itemType="bail"
                         onConfirm={handleDelete}
                         loading={isDeleting}
                       >
@@ -334,7 +326,7 @@ export function LeaseCard({
                           className="text-destructive focus:text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete Lease
+                          Supprimer le bail
                         </DropdownMenuItem>
                       </DeleteConfirmationDialog>
                     )}
@@ -344,7 +336,6 @@ export function LeaseCard({
             </div>
           </div>
 
-          {/* Tenant Info Badge */}
           <div className="flex items-center gap-3 px-3 py-2.5 bg-background/80 backdrop-blur-sm rounded-xl border shadow-sm w-fit">
             <Avatar className="h-9 w-9 border-2 border-primary/20">
               <AvatarImage
@@ -360,21 +351,20 @@ export function LeaseCard({
               <span className="text-sm font-semibold text-foreground">
                 {lease.tenantId?.firstName && lease.tenantId?.lastName
                   ? `${lease.tenantId.firstName} ${lease.tenantId.lastName}`
-                  : "Unknown Tenant"}
+                  : "Locataire inconnu"}
               </span>
               <span className="text-xs text-muted-foreground">
-                {lease.tenantId?.email || "No email"}
+                {lease.tenantId?.email || "Pas d'email"}
               </span>
             </div>
           </div>
         </div>
 
         <CardContent className="p-4 space-y-3">
-          {/* Lease Period with visual timeline */}
           <div className="flex items-center justify-between p-2.5 bg-muted/40 rounded-lg">
             <div className="flex items-center gap-2">
               <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Lease Period</span>
+              <span className="text-xs font-medium text-muted-foreground">Période du bail</span>
             </div>
             <span
               className={`text-xs font-bold px-2 py-0.5 rounded-full ${
@@ -386,22 +376,21 @@ export function LeaseCard({
               }`}
             >
               {daysRemaining > 0
-                ? `${daysRemaining} days remaining`
+                ? `${daysRemaining} jours restants`
                 : daysRemaining === 0
-                ? "Expires today"
-                : "Expired"}
+                ? "Expire aujourd'hui"
+                : "Expiré"}
             </span>
           </div>
           <div className="text-[11px] text-muted-foreground px-1">
             {formatDate(lease.startDate)} - {formatDate(lease.endDate)}
           </div>
 
-          {/* Financial Summary */}
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/40">
               <div className="flex items-center gap-1 text-muted-foreground mb-1">
                 <DollarSign className="h-3 w-3" />
-                <span className="text-[10px] font-medium uppercase tracking-wide">Monthly Rent</span>
+                <span className="text-[10px] font-medium uppercase tracking-wide">Loyer mensuel</span>
               </div>
               <p className="text-sm font-bold text-foreground">
                 {formatCurrency(
@@ -412,7 +401,7 @@ export function LeaseCard({
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/40">
               <div className="flex items-center gap-1 text-muted-foreground mb-1">
                 <DollarSign className="h-3 w-3" />
-                <span className="text-[10px] font-medium uppercase tracking-wide">Security</span>
+                <span className="text-[10px] font-medium uppercase tracking-wide">Dépôt de garantie</span>
               </div>
               <p className="text-sm font-bold text-foreground">
                 {formatCurrency(lease.terms.securityDeposit)}
@@ -420,52 +409,50 @@ export function LeaseCard({
             </div>
           </div>
 
-          {/* Property Details */}
           <div className="flex flex-wrap gap-1.5">
             {lease.unit ? (
               <>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease.unit.bedrooms} bed
+                  {lease.unit.bedrooms} ch
                 </Badge>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease.unit.bathrooms} bath
+                  {lease.unit.bathrooms} sdb
                 </Badge>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease.unit.squareFootage.toLocaleString()} sq ft
+                  {lease.unit.squareFootage.toLocaleString()} m²
                 </Badge>
                 {lease.unit.floor && (
                   <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                    Floor {lease.unit.floor}
+                    Étage {lease.unit.floor}
                   </Badge>
                 )}
               </>
             ) : (
               <>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease?.propertyId?.bedrooms} bed
+                  {lease?.propertyId?.bedrooms} ch
                 </Badge>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease?.propertyId?.bathrooms} bath
+                  {lease?.propertyId?.bathrooms} sdb
                 </Badge>
                 <Badge variant="outline" className="text-[10px] px-2 py-0.5 font-medium">
-                  {lease?.propertyId?.squareFootage?.toLocaleString()} sq ft
+                  {lease?.propertyId?.squareFootage?.toLocaleString()} m²
                 </Badge>
               </>
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-1.5 pt-1">
             <Button variant="outline" size="sm" className="w-full h-8 text-xs" asChild>
               <Link href={`/dashboard/leases/${lease._id}`}>
                 <Eye className="mr-1.5 h-3.5 w-3.5" />
-                View Details
+                Voir détails
               </Link>
             </Button>
             <Button variant="outline" size="sm" className="w-full h-8 text-xs" asChild>
               <Link href={`/dashboard/leases/${lease._id}/invoice`}>
                 <FileText className="mr-1.5 h-3.5 w-3.5" />
-                Invoice
+                Facture
               </Link>
             </Button>
           </div>
@@ -480,6 +467,7 @@ export function LeaseCard({
           />
         </CardContent>
       </Card>
+
       <AlertDialog
         open={showTerminateDialog}
         onOpenChange={setShowTerminateDialog}
@@ -488,28 +476,26 @@ export function LeaseCard({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-600" />
-              Terminate Lease
+              Résilier le bail
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will terminate the lease for{" "}
+              Ceci va résilier le bail pour{" "}
               <span className="font-medium">
-                {lease.propertyId?.name || "this property"}
+                {lease.propertyId?.name || "cette propriété"}
               </span>
-              . The unit will be freed and future charges stop. All invoices and
-              payment history are kept for your records. This action cannot be
-              undone.
+              . L'unité sera libérée et les futurs loyers arrêtés. Toutes les factures et l'historique des paiements sont conservés pour vos dossiers. Cette action est irréversible.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:gap-0">
             <AlertDialogCancel disabled={isTerminating}>
-              Cancel
+              Annuler
             </AlertDialogCancel>
             <Button
               className="bg-orange-600 hover:bg-orange-700 text-white"
               disabled={isTerminating}
               onClick={handleTerminate}
             >
-              {isTerminating ? "Terminating..." : "Terminate Lease"}
+              {isTerminating ? "Résiliation..." : "Résilier le bail"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,6 +1,6 @@
 /**
- * PropertyPro - Email Service
- * Comprehensive email service for tenant invitations, notifications, and password resets
+ * GESTION E-IMMO - Service d'e-mail
+ * Service d'e-mail complet pour les invitations de locataires, les notifications et la réinitialisation de mot de passe
  */
 
 import nodemailer from "nodemailer";
@@ -8,25 +8,25 @@ import { IUser } from "@/types";
 import { formatCurrency } from "@/lib/utils/formatting";
 import { getEmailConfig } from "@/lib/services/email-config.service";
 
-// Email template interface
+// Interface du modèle d'e-mail
 interface EmailTemplate {
   subject: string;
   html: string;
   text: string;
 }
 
-// Email service class
+// Classe de service d'e-mail
 export class EmailService {
   private appName: string;
   private appUrl: string;
 
   constructor() {
-    // App-level branding used inside email templates.
-    this.appName = process.env.APP_NAME || "PropertyPro";
+    // Image de marque au niveau de l'application utilisée dans les modèles d'e-mail.
+    this.appName = process.env.APP_NAME || "GESTION E-IMMO";
     this.appUrl = process.env.APP_URL || "http://localhost:3000";
   }
 
-  // Build a transporter from the active (DB-first, env-fallback) config.
+  // Construire un transporteur à partir de la configuration active (priorité à la base de données, repli sur l'environnement).
   private async getTransport() {
     const config = await getEmailConfig();
     const transporter = nodemailer.createTransport({
@@ -38,19 +38,19 @@ export class EmailService {
     return { transporter, config };
   }
 
-  // Verify email service connection
+  // Vérifier la connexion au service d'e-mail
   async verifyConnection(): Promise<boolean> {
     try {
       const { transporter } = await this.getTransport();
       await transporter.verify();
       return true;
     } catch (error) {
-      console.error("Email service connection failed:", error);
+      console.error("Échec de la connexion au service d'e-mail :", error);
       return false;
     }
   }
 
-  // Send email with template
+  // Envoyer un e-mail avec un modèle
   private async sendEmail(
     to: string,
     template: EmailTemplate,
@@ -77,31 +77,31 @@ export class EmailService {
 
       return true;
     } catch (error: any) {
-      console.error("Failed to send email:", error);
+      console.error("Échec de l'envoi de l'e-mail :", error);
 
-      // Provide specific guidance for Gmail authentication errors
+      // Fournir des conseils spécifiques pour les erreurs d'authentification Gmail
       if (error.code === "EAUTH" && error.responseCode === 535) {
         console.error(`
-🚨 Gmail Authentication Error - Please check:
-1. Enable 2-Factor Authentication on your Gmail account
-2. Generate an App Password (not your regular Gmail password)
-3. Use the App Password in EMAIL_SERVER_PASSWORD
-4. Ensure EMAIL_SERVER_USER is your full Gmail address
+🚨 Erreur d'authentification Gmail - Veuillez vérifier :
+1. Activez l'authentification à deux facteurs sur votre compte Gmail
+2. Générez un mot de passe d'application (pas votre mot de passe Gmail habituel)
+3. Utilisez le mot de passe d'application dans EMAIL_SERVER_PASSWORD
+4. Assurez-vous que EMAIL_SERVER_USER est votre adresse Gmail complète
 
-Current config:
-- User: ${process.env.EMAIL_SERVER_USER}
-- Host: ${process.env.EMAIL_SERVER_HOST}
-- Port: ${process.env.EMAIL_SERVER_PORT}
+Configuration actuelle :
+- Utilisateur : ${process.env.EMAIL_SERVER_USER}
+- Hôte : ${process.env.EMAIL_SERVER_HOST}
+- Port : ${process.env.EMAIL_SERVER_PORT}
 
-📖 Guide: https://support.google.com/accounts/answer/185833
+📖 Guide : https://support.google.com/accounts/answer/185833
         `);
       }
 
-      throw error; // Re-throw to let the API handle the error response
+      throw error; // Relancer pour permettre à l'API de gérer la réponse d'erreur
     }
   }
 
-  // Generate base email template
+  // Générer le modèle d'e-mail de base
   private generateBaseTemplate(
     title: string,
     content: string,
@@ -112,7 +112,7 @@ Current config:
   ): EmailTemplate {
     const html = `
       <!DOCTYPE html>
-      <html lang="en">
+      <html lang="fr">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -206,20 +206,20 @@ Current config:
           }
           
           <div class="footer">
-            <p>This email was sent from ${
+            <p>Cet e-mail a été envoyé depuis le système de gestion immobilière ${
               this.appName
-            } Property Management System.</p>
-            <p>If you have any questions, please contact our support team.</p>
+            }.</p>
+            <p>Si vous avez des questions, veuillez contacter notre équipe de support.</p>
             <p>&copy; ${new Date().getFullYear()} ${
       this.appName
-    }. All rights reserved.</p>
+    }. Tous droits réservés.</p>
           </div>
         </div>
       </body>
       </html>
     `;
 
-    // Generate plain text version
+    // Générer la version en texte brut
     const text = `
 ${this.appName}
 
@@ -230,12 +230,12 @@ ${content
   .replace(/\s+/g, " ")
   .trim()}
 
-${actionButton ? `${actionButton.text}: ${actionButton.url}` : ""}
+${actionButton ? `${actionButton.text} : ${actionButton.url}` : ""}
 
 ---
-This email was sent from ${this.appName} Property Management System.
-If you have any questions, please contact our support team.
-© ${new Date().getFullYear()} ${this.appName}. All rights reserved.
+Cet e-mail a été envoyé depuis le système de gestion immobilière ${this.appName}.
+Si vous avez des questions, veuillez contacter notre équipe de support.
+© ${new Date().getFullYear()} ${this.appName}. Tous droits réservés.
     `.trim();
 
     return {
@@ -245,7 +245,7 @@ If you have any questions, please contact our support team.
     };
   }
 
-  // Send tenant invitation email
+  // Envoyer un e-mail d'invitation de locataire
   async sendTenantInvitation(
     tenantEmail: string,
     tenantName: string,
@@ -255,36 +255,36 @@ If you have any questions, please contact our support team.
     const invitationUrl = `${this.appUrl}/auth/setup-password?token=${invitationToken}`;
 
     const content = `
-      <p>Hello <strong>${tenantName}</strong>,</p>
+      <p>Bonjour <strong>${tenantName}</strong>,</p>
 
-      <p>You have been invited to join ${this.appName} as a tenant by <strong>${invitedBy}</strong>.</p>
+      <p>Vous avez été invité(e) à rejoindre ${this.appName} en tant que locataire par <strong>${invitedBy}</strong>.</p>
 
-      <p>To complete your account setup and access your tenant portal, please click the button below to set up your password:</p>
+      <p>Pour finaliser la configuration de votre compte et accéder à votre portail locataire, veuillez cliquer sur le bouton ci-dessous pour configurer votre mot de passe :</p>
 
       <div class="security-notice">
-        <strong>Security Notice:</strong> This invitation link will expire in 24 hours for your security.
-        If you don't complete the setup within this time, please contact your property manager for a new invitation.
+        <strong>Avis de sécurité :</strong> Ce lien d'invitation expirera dans 24 heures pour votre sécurité.
+        Si vous ne terminez pas la configuration dans ce délai, veuillez contacter votre gestionnaire immobilier pour obtenir une nouvelle invitation.
       </div>
 
-      <p>Once you've set up your password, you'll be able to:</p>
+      <p>Une fois votre mot de passe configuré, vous pourrez :</p>
       <ul>
-        <li>Access your tenant dashboard</li>
-        <li>View lease information and documents</li>
-        <li>Submit maintenance requests</li>
-        <li>Make rent payments online</li>
-        <li>Communicate with your property manager</li>
+        <li>Accéder à votre tableau de bord locataire</li>
+        <li>Consulter les informations et documents de votre bail</li>
+        <li>Soumettre des demandes de maintenance</li>
+        <li>Effectuer des paiements de loyer en ligne</li>
+        <li>Communiquer avec votre gestionnaire immobilier</li>
       </ul>
 
-      <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+      <p>Si vous avez des questions ou besoin d'assistance, n'hésitez pas à contacter notre équipe de support.</p>
 
-      <p>Welcome to ${this.appName}!</p>
+      <p>Bienvenue sur ${this.appName} !</p>
     `;
 
     const template = this.generateBaseTemplate(
-      "Welcome to PropertyPro - Complete Your Account Setup",
+      "Bienvenue sur GESTION E-IMMO - Finalisez la configuration de votre compte",
       content,
       {
-        text: "Set Up My Password",
+        text: "Configurer mon mot de passe",
         url: invitationUrl,
       }
     );
@@ -292,7 +292,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(tenantEmail, template);
   }
 
-  // Send password reset email
+  // Envoyer un e-mail de réinitialisation de mot de passe
   async sendPasswordReset(
     userEmail: string,
     userName: string,
@@ -301,37 +301,37 @@ If you have any questions, please contact our support team.
     const resetUrl = `${this.appUrl}/auth/reset-password?token=${resetToken}`;
 
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>We received a request to reset your password for your ${this.appName} account.</p>
+      <p>Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte ${this.appName}.</p>
 
-      <p>If you requested this password reset, please click the button below to create a new password:</p>
+      <p>Si vous avez initié cette réinitialisation de mot de passe, veuillez cliquer sur le bouton ci-dessous pour créer un nouveau mot de passe :</p>
 
       <div class="security-notice">
-        <strong>Security Notice:</strong> This password reset link will expire in 1 hour for your security.
-        If you don't reset your password within this time, you'll need to request a new reset link.
+        <strong>Avis de sécurité :</strong> Ce lien de réinitialisation de mot de passe expirera dans 1 heure pour votre sécurité.
+        Si vous ne réinitialisez pas votre mot de passe dans ce délai, vous devrez demander un nouveau lien.
       </div>
 
-      <p><strong>If you didn't request this password reset:</strong></p>
+      <p><strong>Si vous n'avez pas demandé cette réinitialisation de mot de passe :</strong></p>
       <ul>
-        <li>You can safely ignore this email</li>
-        <li>Your password will remain unchanged</li>
-        <li>Consider changing your password if you suspect unauthorized access</li>
+        <li>Vous pouvez ignorer cet e-mail en toute sécurité</li>
+        <li>Votre mot de passe restera inchangé</li>
+        <li>Envisagez de modifier votre mot de passe si vous suspectez un accès non autorisé</li>
       </ul>
 
-      <p>For security reasons, we recommend using a strong password that includes:</p>
+      <p>Pour des raisons de sécurité, nous vous recommandons d'utiliser un mot de passe fort comprenant :</p>
       <ul>
-        <li>At least 8 characters</li>
-        <li>A mix of uppercase and lowercase letters</li>
-        <li>Numbers and special characters</li>
+        <li>Au moins 8 caractères</li>
+        <li>Un mélange de lettres majuscules et minuscules</li>
+        <li>Des chiffres et des caractères spéciaux</li>
       </ul>
     `;
 
     const template = this.generateBaseTemplate(
-      "Reset Your PropertyPro Password",
+      "Réinitialisez votre mot de passe GESTION E-IMMO",
       content,
       {
-        text: "Reset My Password",
+        text: "Réinitialiser mon mot de passe",
         url: resetUrl,
       }
     );
@@ -339,7 +339,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(userEmail, template);
   }
 
-  // Send email change verification to the new address
+  // Envoyer la vérification de changement d'e-mail à la nouvelle adresse
   async sendEmailChangeVerification(
     newEmail: string,
     userName: string,
@@ -348,30 +348,30 @@ If you have any questions, please contact our support team.
     const confirmUrl = `${this.appUrl}/auth/confirm-email-change?token=${token}`;
 
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>We received a request to change the email address on your ${this.appName} account to <strong>${newEmail}</strong>.</p>
+      <p>Nous avons reçu une demande de modification de l'adresse e-mail de votre compte ${this.appName} vers <strong>${newEmail}</strong>.</p>
 
-      <p>To confirm this change, please click the button below:</p>
+      <p>Pour confirmer ce changement, veuillez cliquer sur le bouton ci-dessous :</p>
 
       <div class="security-notice">
-        <strong>Security Notice:</strong> This confirmation link will expire in 1 hour.
-        Your account email will not change until you confirm it here.
+        <strong>Avis de sécurité :</strong> Ce lien de confirmation expirera dans 1 heure.
+        L'e-mail de votre compte ne sera pas modifié tant que vous ne l'aurez pas confirmé ici.
       </div>
 
-      <p><strong>If you didn't request this change:</strong></p>
+      <p><strong>Si vous n'avez pas demandé ce changement :</strong></p>
       <ul>
-        <li>You can safely ignore this email</li>
-        <li>Your account email will remain unchanged</li>
-        <li>Consider changing your password if you suspect unauthorized access</li>
+        <li>Vous pouvez ignorer cet e-mail en toute sécurité</li>
+        <li>L'e-mail de votre compte restera inchangé</li>
+        <li>Envisagez de modifier votre mot de passe si vous suspectez un accès non autorisé</li>
       </ul>
     `;
 
     const template = this.generateBaseTemplate(
-      "Confirm Your New Email Address",
+      "Confirmez votre nouvelle adresse e-mail",
       content,
       {
-        text: "Confirm Email Change",
+        text: "Confirmer le changement d'e-mail",
         url: confirmUrl,
       }
     );
@@ -379,7 +379,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(newEmail, template);
   }
 
-  // Send an email-verification link to the user's current address
+  // Envoyer un lien de vérification d'e-mail à l'adresse actuelle de l'utilisateur
   async sendEmailVerification(
     userEmail: string,
     userName: string,
@@ -388,29 +388,29 @@ If you have any questions, please contact our support team.
     const verifyUrl = `${this.appUrl}/auth/verify-email?token=${token}`;
 
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>Please confirm that <strong>${userEmail}</strong> is your email address for your ${this.appName} account.</p>
+      <p>Veuillez confirmer que <strong>${userEmail}</strong> est bien votre adresse e-mail pour votre compte ${this.appName}.</p>
 
-      <p>To verify your email, please click the button below:</p>
+      <p>Pour vérifier votre e-mail, veuillez cliquer sur le bouton ci-dessous :</p>
 
       <div class="security-notice">
-        <strong>Security Notice:</strong> This verification link will expire in 24 hours.
-        Verifying your email helps keep your account secure and ensures you receive important notifications.
+        <strong>Avis de sécurité :</strong> Ce lien de vérification expirera dans 24 heures.
+        La vérification de votre e-mail contribue à la sécurité de votre compte et garantit que vous recevez les notifications importantes.
       </div>
 
-      <p><strong>If you didn't request this:</strong></p>
+      <p><strong>Si vous n'avez pas demandé cela :</strong></p>
       <ul>
-        <li>You can safely ignore this email</li>
-        <li>Your account will remain unchanged</li>
+        <li>Vous pouvez ignorer cet e-mail en toute sécurité</li>
+        <li>Votre compte restera inchangé</li>
       </ul>
     `;
 
     const template = this.generateBaseTemplate(
-      "Verify Your Email Address",
+      "Vérifiez votre adresse e-mail",
       content,
       {
-        text: "Verify My Email",
+        text: "Vérifier mon e-mail",
         url: verifyUrl,
       }
     );
@@ -418,7 +418,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(userEmail, template);
   }
 
-  // Send account activation confirmation
+  // Envoyer la confirmation d'activation du compte
   async sendAccountActivated(
     userEmail: string,
     userName: string
@@ -426,31 +426,31 @@ If you have any questions, please contact our support team.
     const loginUrl = `${this.appUrl}/auth/signin`;
 
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>Great news! Your ${this.appName} account has been successfully activated.</p>
+      <p>Excellente nouvelle ! Votre compte ${this.appName} a été activé avec succès.</p>
 
-      <p>You can now log in to your tenant portal and access all available features:</p>
+      <p>Vous pouvez dès à présent vous connecter à votre portail locataire et accéder à toutes les fonctionnalités disponibles :</p>
 
       <ul>
-        <li><strong>Dashboard:</strong> View your account overview and important notifications</li>
-        <li><strong>Lease Management:</strong> Access your lease documents and information</li>
-        <li><strong>Maintenance Requests:</strong> Submit and track maintenance requests</li>
-        <li><strong>Payment Portal:</strong> Make rent payments and view payment history</li>
-        <li><strong>Communication:</strong> Message your property manager directly</li>
-        <li><strong>Profile Settings:</strong> Update your contact information and preferences</li>
+        <li><strong>Tableau de bord :</strong> Consultez la vue d'ensemble de votre compte et les notifications importantes</li>
+        <li><strong>Gestion des baux :</strong> Accédez aux documents et informations de votre bail</li>
+        <li><strong>Demandes de maintenance :</strong> Soumettez et suivez vos demandes de maintenance</li>
+        <li><strong>Portail de paiement :</strong> Effectuez des paiements de loyer et consultez l'historique des paiements</li>
+        <li><strong>Communication :</strong> Envoyez un message direct à votre gestionnaire immobilier</li>
+        <li><strong>Paramètres du profil :</strong> Mettez à jour vos coordonnées et préférences</li>
       </ul>
 
-      <p>If you have any questions about using the platform or need assistance, our support team is here to help.</p>
+      <p>Si vous avez des questions sur l'utilisation de la plateforme ou si vous avez besoin d'aide, notre équipe de support est là pour vous aider.</p>
 
-      <p>Welcome to ${this.appName}!</p>
+      <p>Bienvenue sur ${this.appName} !</p>
     `;
 
     const template = this.generateBaseTemplate(
-      "Your PropertyPro Account is Ready!",
+      "Votre compte GESTION E-IMMO est prêt !",
       content,
       {
-        text: "Access My Portal",
+        text: "Accéder à mon portail",
         url: loginUrl,
       }
     );
@@ -458,7 +458,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(userEmail, template);
   }
 
-  // Send general notification email
+  // Envoyer un e-mail de notification générale
   async sendNotification(
     userEmail: string,
     userName: string,
@@ -470,7 +470,7 @@ If you have any questions, please contact our support team.
     }
   ): Promise<boolean> {
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
       <div style="margin: 20px 0;">
         ${message.replace(/\n/g, "<br>")}
@@ -481,7 +481,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(userEmail, template);
   }
 
-  // Send email with custom template and attachments (public method)
+  // Envoyer un e-mail avec un modèle personnalisé et des pièces jointes (méthode publique)
   async sendEmailWithAttachments(
     to: string,
     template: EmailTemplate,
@@ -495,10 +495,10 @@ If you have any questions, please contact our support team.
   }
 
   // ============================================================================
-  // CALENDAR EVENT EMAIL METHODS
+  // MÉTHODES D'E-MAIL POUR LES ÉVÉNEMENTS DU CALENDRIER
   // ============================================================================
 
-  // Send event invitation email
+  // Envoyer un e-mail d'invitation à un événement
   async sendEventInvitation(
     attendeeEmail: string,
     attendeeName: string,
@@ -514,7 +514,7 @@ If you have any questions, please contact our support team.
     },
     invitationToken?: string
   ): Promise<boolean> {
-    const eventDate = event.startDate.toLocaleDateString("en-US", {
+    const eventDate = event.startDate.toLocaleDateString("fr-FR", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -522,17 +522,17 @@ If you have any questions, please contact our support team.
     });
 
     const eventTime = event.allDay
-      ? "All day"
-      : `${event.startDate.toLocaleTimeString("en-US", {
+      ? "Toute la journée"
+      : `${event.startDate.toLocaleTimeString("fr-FR", {
           hour: "numeric",
           minute: "2-digit",
-          hour12: true,
+          hour12: false,
         })}${
           event.endDate
-            ? ` - ${event.endDate.toLocaleTimeString("en-US", {
+            ? ` - ${event.endDate.toLocaleTimeString("fr-FR", {
                 hour: "numeric",
                 minute: "2-digit",
-                hour12: true,
+                hour12: false,
               })}`
             : ""
         }`;
@@ -542,9 +542,9 @@ If you have any questions, please contact our support team.
       : null;
 
     const content = `
-      <p>Hello <strong>${attendeeName}</strong>,</p>
+      <p>Bonjour <strong>${attendeeName}</strong>,</p>
 
-      <p>You have been invited to the following event:</p>
+      <p>Vous avez été invité(e) à l'événement suivant :</p>
 
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px;">${
@@ -552,36 +552,36 @@ If you have any questions, please contact our support team.
         }</h3>
 
         <div style="margin-bottom: 10px;">
-          <strong>📅 Date:</strong> ${eventDate}
+          <strong>📅 Date :</strong> ${eventDate}
         </div>
 
         <div style="margin-bottom: 10px;">
-          <strong>🕐 Time:</strong> ${eventTime}
+          <strong>🕐 Heure :</strong> ${eventTime}
         </div>
 
         ${
           event.location
             ? `
         <div style="margin-bottom: 10px;">
-          <strong>📍 Location:</strong> ${event.location}
+          <strong>📍 Lieu :</strong> ${event.location}
         </div>
         `
             : ""
         }
 
         <div style="margin-bottom: 10px;">
-          <strong>👤 Organizer:</strong> ${event.organizer}
+          <strong>👤 Organisateur :</strong> ${event.organizer}
         </div>
 
         <div style="margin-bottom: 10px;">
-          <strong>📋 Type:</strong> ${event.type.replace(/_/g, " ")}
+          <strong>📋 Type :</strong> ${event.type.replace(/_/g, " ")}
         </div>
 
         ${
           event.description
             ? `
         <div style="margin-top: 15px;">
-          <strong>Description:</strong>
+          <strong>Description :</strong>
           <p style="margin: 5px 0 0 0; color: #64748b;">${event.description}</p>
         </div>
         `
@@ -592,25 +592,25 @@ If you have any questions, please contact our support team.
       ${
         rsvpUrl
           ? `
-      <p>Please respond to this invitation:</p>
+      <p>Veuillez répondre à cette invitation :</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${rsvpUrl}&response=accepted" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Accept</a>
-        <a href="${rsvpUrl}&response=declined" style="display: inline-block; background: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Decline</a>
-        <a href="${rsvpUrl}&response=tentative" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Maybe</a>
+        <a href="${rsvpUrl}&response=accepted" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Accepter</a>
+        <a href="${rsvpUrl}&response=declined" style="display: inline-block; background: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Refuser</a>
+        <a href="${rsvpUrl}&response=tentative" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 0 5px;">Peut-être</a>
       </div>
       `
           : ""
       }
 
-      <p>If you have any questions about this event, please contact the organizer.</p>
+      <p>Si vous avez des questions concernant cet événement, veuillez contacter l'organisateur.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Event Invitation: ${event.title}`,
+      `Invitation à un événement : ${event.title}`,
       content,
       rsvpUrl
         ? {
-            text: "View Event Details",
+            text: "Afficher les détails de l'événement",
             url: rsvpUrl,
           }
         : undefined
@@ -619,7 +619,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(attendeeEmail, template);
   }
 
-  // Send event reminder email
+  // Envoyer un e-mail de rappel d'événement
   async sendEventReminder(
     attendeeEmail: string,
     attendeeName: string,
@@ -634,7 +634,7 @@ If you have any questions, please contact our support team.
     },
     reminderType: "1_hour" | "1_day" | "1_week" = "1_hour"
   ): Promise<boolean> {
-    const eventDate = event.startDate.toLocaleDateString("en-US", {
+    const eventDate = event.startDate.toLocaleDateString("fr-FR", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -642,23 +642,23 @@ If you have any questions, please contact our support team.
     });
 
     const eventTime = event.allDay
-      ? "All day"
-      : event.startDate.toLocaleTimeString("en-US", {
+      ? "Toute la journée"
+      : event.startDate.toLocaleTimeString("fr-FR", {
           hour: "numeric",
           minute: "2-digit",
-          hour12: true,
+          hour12: false,
         });
 
     const reminderText = {
-      "1_hour": "in 1 hour",
-      "1_day": "tomorrow",
-      "1_week": "in 1 week",
+      "1_hour": "dans 1 heure",
+      "1_day": "demain",
+      "1_week": "dans 1 semaine",
     }[reminderType];
 
     const content = `
-      <p>Hello <strong>${attendeeName}</strong>,</p>
+      <p>Bonjour <strong>${attendeeName}</strong>,</p>
 
-      <p>This is a reminder that you have an upcoming event <strong>${reminderText}</strong>:</p>
+      <p>Ceci est un rappel que vous avez un événement à venir <strong>${reminderText}</strong> :</p>
 
       <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 18px;">⏰ ${
@@ -666,18 +666,18 @@ If you have any questions, please contact our support team.
         }</h3>
 
         <div style="margin-bottom: 10px;">
-          <strong>📅 Date:</strong> ${eventDate}
+          <strong>📅 Date :</strong> ${eventDate}
         </div>
 
         <div style="margin-bottom: 10px;">
-          <strong>🕐 Time:</strong> ${eventTime}
+          <strong>🕐 Heure :</strong> ${eventTime}
         </div>
 
         ${
           event.location
             ? `
         <div style="margin-bottom: 10px;">
-          <strong>📍 Location:</strong> ${event.location}
+          <strong>📍 Lieu :</strong> ${event.location}
         </div>
         `
             : ""
@@ -687,7 +687,7 @@ If you have any questions, please contact our support team.
           event.description
             ? `
         <div style="margin-top: 15px;">
-          <strong>Description:</strong>
+          <strong>Description :</strong>
           <p style="margin: 5px 0 0 0; color: #92400e;">${event.description}</p>
         </div>
         `
@@ -695,18 +695,18 @@ If you have any questions, please contact our support team.
         }
       </div>
 
-      <p>Please make sure you're prepared for this event. If you need to make any changes, please contact the organizer as soon as possible.</p>
+      <p>Veuillez vous assurer d'être préparé(e) pour cet événement. Si vous devez apporter des modifications, veuillez contacter l'organisateur dès que possible.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Reminder: ${event.title} ${reminderText}`,
+      `Rappel : ${event.title} (${reminderText})`,
       content
     );
 
     return this.sendEmail(attendeeEmail, template);
   }
 
-  // Send event cancellation email
+  // Envoyer un e-mail d'annulation d'événement
   async sendEventCancellation(
     attendeeEmail: string,
     attendeeName: string,
@@ -718,7 +718,7 @@ If you have any questions, please contact our support team.
       reason?: string;
     }
   ): Promise<boolean> {
-    const eventDate = event.startDate.toLocaleDateString("en-US", {
+    const eventDate = event.startDate.toLocaleDateString("fr-FR", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -726,9 +726,9 @@ If you have any questions, please contact our support team.
     });
 
     const content = `
-      <p>Hello <strong>${attendeeName}</strong>,</p>
+      <p>Bonjour <strong>${attendeeName}</strong>,</p>
 
-      <p>We regret to inform you that the following event has been <strong>cancelled</strong>:</p>
+      <p>Nous avons le regret de vous informer que l'événement suivant a été <strong>annulé</strong> :</p>
 
       <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0; color: #dc2626; font-size: 18px;">❌ ${
@@ -736,28 +736,28 @@ If you have any questions, please contact our support team.
         }</h3>
 
         <div style="margin-bottom: 10px;">
-          <strong>📅 Original Date:</strong> ${eventDate}
+          <strong>📅 Date initiale :</strong> ${eventDate}
         </div>
 
         ${
           event.location
             ? `
         <div style="margin-bottom: 10px;">
-          <strong>📍 Location:</strong> ${event.location}
+          <strong>📍 Lieu :</strong> ${event.location}
         </div>
         `
             : ""
         }
 
         <div style="margin-bottom: 10px;">
-          <strong>👤 Organizer:</strong> ${event.organizer}
+          <strong>👤 Organisateur :</strong> ${event.organizer}
         </div>
 
         ${
           event.reason
             ? `
         <div style="margin-top: 15px;">
-          <strong>Reason for cancellation:</strong>
+          <strong>Motif de l'annulation :</strong>
           <p style="margin: 5px 0 0 0; color: #dc2626;">${event.reason}</p>
         </div>
         `
@@ -765,18 +765,18 @@ If you have any questions, please contact our support team.
         }
       </div>
 
-      <p>We apologize for any inconvenience this may cause. If you have any questions, please contact the organizer.</p>
+      <p>Nous vous prions de nous excuser pour tout désagrément que cela pourrait causer. Si vous avez des questions, veuillez contacter l'organisateur.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Event Cancelled: ${event.title}`,
+      `Événement annulé : ${event.title}`,
       content
     );
 
     return this.sendEmail(attendeeEmail, template);
   }
 
-  // Send event update email
+  // Envoyer un e-mail de mise à jour d'événement
   async sendEventUpdate(
     attendeeEmail: string,
     attendeeName: string,
@@ -790,7 +790,7 @@ If you have any questions, please contact our support team.
     },
     changes: string[]
   ): Promise<boolean> {
-    const eventDate = event.startDate.toLocaleDateString("en-US", {
+    const eventDate = event.startDate.toLocaleDateString("fr-FR", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -798,17 +798,17 @@ If you have any questions, please contact our support team.
     });
 
     const eventTime = event.allDay
-      ? "All day"
-      : event.startDate.toLocaleTimeString("en-US", {
+      ? "Toute la journée"
+      : event.startDate.toLocaleTimeString("fr-FR", {
           hour: "numeric",
           minute: "2-digit",
-          hour12: true,
+          hour12: false,
         });
 
     const content = `
-      <p>Hello <strong>${attendeeName}</strong>,</p>
+      <p>Bonjour <strong>${attendeeName}</strong>,</p>
 
-      <p>The following event has been <strong>updated</strong>:</p>
+      <p>L'événement suivant a été <strong>mis à jour</strong> :</p>
 
       <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0; color: #0369a1; font-size: 18px;">📝 ${
@@ -816,43 +816,43 @@ If you have any questions, please contact our support team.
         }</h3>
 
         <div style="margin-bottom: 10px;">
-          <strong>📅 Date:</strong> ${eventDate}
+          <strong>📅 Date :</strong> ${eventDate}
         </div>
 
         <div style="margin-bottom: 10px;">
-          <strong>🕐 Time:</strong> ${eventTime}
+          <strong>🕐 Heure :</strong> ${eventTime}
         </div>
 
         ${
           event.location
             ? `
         <div style="margin-bottom: 10px;">
-          <strong>📍 Location:</strong> ${event.location}
+          <strong>📍 Lieu :</strong> ${event.location}
         </div>
         `
             : ""
         }
 
         <div style="margin-top: 15px;">
-          <strong>Changes made:</strong>
+          <strong>Modifications apportées :</strong>
           <ul style="margin: 5px 0 0 20px; color: #0369a1;">
             ${changes.map((change) => `<li>${change}</li>`).join("")}
           </ul>
         </div>
       </div>
 
-      <p>Please update your calendar accordingly. If you have any questions about these changes, please contact the organizer.</p>
+      <p>Veuillez mettre à jour votre calendrier en conséquence. Si vous avez des questions concernant ces modifications, veuillez contacter l'organisateur.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Event Updated: ${event.title}`,
+      `Événement mis à jour : ${event.title}`,
       content
     );
 
     return this.sendEmail(attendeeEmail, template);
   }
 
-  // Send RSVP confirmation email
+  // Envoyer un e-mail de confirmation de RSVP
   async sendRSVPConfirmation(
     attendeeEmail: string,
     attendeeName: string,
@@ -864,9 +864,9 @@ If you have any questions, please contact our support team.
     response: "accepted" | "declined" | "tentative"
   ): Promise<boolean> {
     const responseText = {
-      accepted: "accepted",
-      declined: "declined",
-      tentative: "tentatively accepted",
+      accepted: "accepté",
+      declined: "refusé",
+      tentative: "accepté provisoirement",
     }[response];
 
     const responseColor = {
@@ -876,9 +876,9 @@ If you have any questions, please contact our support team.
     }[response];
 
     const content = `
-      <p>Hello <strong>${attendeeName}</strong>,</p>
+      <p>Bonjour <strong>${attendeeName}</strong>,</p>
 
-      <p>Thank you for your response. You have <strong style="color: ${responseColor};">${responseText}</strong> the invitation to:</p>
+      <p>Merci pour votre réponse. Vous avez <strong style="color: ${responseColor};">${responseText}</strong> l'invitation à :</p>
 
       <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h3 style="margin: 0 0 15px 0; color: #1e293b; font-size: 18px;">${
@@ -886,8 +886,8 @@ If you have any questions, please contact our support team.
         }</h3>
 
         <div style="margin-bottom: 10px;">
-          <strong>📅 Date:</strong> ${event.startDate.toLocaleDateString(
-            "en-US",
+          <strong>📅 Date :</strong> ${event.startDate.toLocaleDateString(
+            "fr-FR",
             {
               weekday: "long",
               year: "numeric",
@@ -901,7 +901,7 @@ If you have any questions, please contact our support team.
           event.location
             ? `
         <div style="margin-bottom: 10px;">
-          <strong>📍 Location:</strong> ${event.location}
+          <strong>📍 Lieu :</strong> ${event.location}
         </div>
         `
             : ""
@@ -911,27 +911,27 @@ If you have any questions, please contact our support team.
       ${
         response === "accepted"
           ? `
-      <p>We look forward to seeing you at the event!</p>
+      <p>Nous avons hâte de vous voir à l'événement !</p>
       `
           : response === "declined"
           ? `
-      <p>We're sorry you won't be able to attend. If your plans change, please let the organizer know.</p>
+      <p>Nous sommes désolés que vous ne puissiez pas y assister. Si vos plans changent, veuillez en informer l'organisateur.</p>
       `
           : `
-      <p>Please confirm your attendance as soon as possible.</p>
+      <p>Veuillez confirmer votre présence dès que possible.</p>
       `
       }
     `;
 
     const template = this.generateBaseTemplate(
-      `RSVP Confirmation: ${event.title}`,
+      `Confirmation de RSVP : ${event.title}`,
       content
     );
 
     return this.sendEmail(attendeeEmail, template);
   }
 
-  // Send payment reminder email
+  // Envoyer un e-mail de rappel de paiement
   async sendPaymentReminder(
     tenantEmail: string,
     tenantName: string,
@@ -944,49 +944,49 @@ If you have any questions, please contact our support team.
     const isOverdue = daysOverdue > 0;
 
     const content = `
-      <p>Hello <strong>${tenantName}</strong>,</p>
+      <p>Bonjour <strong>${tenantName}</strong>,</p>
 
       ${
         isOverdue
           ? `<div style="background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px; margin: 20px 0; color: #dc2626;">
-             <strong>⚠️ Overdue Payment Notice</strong><br>
-             Your rent payment is ${daysOverdue} day${
+             <strong>⚠️ Avis de paiement en retard</strong><br>
+             Votre paiement de loyer est en retard de ${daysOverdue} jour${
               daysOverdue > 1 ? "s" : ""
-            } overdue.
+            }.
            </div>`
-          : `<p>This is a friendly reminder that your rent payment is due soon.</p>`
+          : `<p>Ceci est un rappel amical indiquant que votre paiement de loyer arrive bientôt à échéance.</p>`
       }
 
       <div style="background-color: #f3f4f6; border-radius: 6px; padding: 20px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Payment Details</h3>
-        <p style="margin: 5px 0;"><strong>Property:</strong> ${propertyName}</p>
-        <p style="margin: 5px 0;"><strong>Amount Due:</strong> ${formatCurrency(
+        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Détails du paiement</h3>
+        <p style="margin: 5px 0;"><strong>Propriété :</strong> ${propertyName}</p>
+        <p style="margin: 5px 0;"><strong>Montant dû :</strong> ${formatCurrency(
           rentAmount
         )}</p>
-        <p style="margin: 5px 0;"><strong>Due Date:</strong> ${dueDate.toLocaleDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Date d'échéance :</strong> ${dueDate.toLocaleDateString()}</p>
         ${
           isOverdue
-            ? `<p style="margin: 5px 0; color: #dc2626;"><strong>Days Overdue:</strong> ${daysOverdue}</p>`
+            ? `<p style="margin: 5px 0; color: #dc2626;"><strong>Jours de retard :</strong> ${daysOverdue}</p>`
             : ""
         }
       </div>
 
-      <p>You can make your payment securely through your tenant portal using the button below.</p>
+      <p>Vous pouvez effectuer votre paiement en toute sécurité via votre portail locataire en utilisant le bouton ci-dessous.</p>
 
       ${
         isOverdue
-          ? `<p style="color: #dc2626;"><strong>Important:</strong> Please make your payment as soon as possible to avoid any late fees or further action.</p>`
-          : `<p>Thank you for being a valued tenant!</p>`
+          ? `<p style="color: #dc2626;"><strong>Important :</strong> Veuillez effectuer votre paiement dès que possible pour éviter des frais de retard ou toute autre action.</p>`
+          : `<p>Merci d'être un locataire précieux !</p>`
       }
     `;
 
     const template = this.generateBaseTemplate(
       isOverdue
-        ? "Overdue Rent Payment - Action Required"
-        : "Rent Payment Reminder",
+        ? "Paiement de loyer en retard - Action requise"
+        : "Rappel de paiement de loyer",
       content,
       {
-        text: "Pay Rent Now",
+        text: "Payer le loyer maintenant",
         url: paymentUrl,
       }
     );
@@ -994,7 +994,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(tenantEmail, template);
   }
 
-  // Send lease expiry reminder
+  // Envoyer un rappel d'expiration de bail
   async sendLeaseExpiryReminder(
     tenantEmail: string,
     tenantName: string,
@@ -1005,35 +1005,35 @@ If you have any questions, please contact our support team.
     const renewalUrl = `${this.appUrl}/dashboard/leases/my-lease`;
 
     const content = `
-      <p>Hello <strong>${tenantName}</strong>,</p>
+      <p>Bonjour <strong>${tenantName}</strong>,</p>
 
-      <p>We wanted to remind you that your lease for <strong>${propertyName}</strong> is approaching its expiration date.</p>
+      <p>Nous souhaitions vous rappeler que votre bail pour <strong>${propertyName}</strong> approche de sa date d'expiration.</p>
 
       <div style="background-color: ${
         daysUntilExpiry <= 30 ? "#fef3c7" : "#f0f9ff"
       }; border: 1px solid ${
       daysUntilExpiry <= 30 ? "#f59e0b" : "#0ea5e9"
     }; border-radius: 6px; padding: 20px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Lease Information</h3>
-        <p style="margin: 5px 0;"><strong>Property:</strong> ${propertyName}</p>
-        <p style="margin: 5px 0;"><strong>Lease Expires:</strong> ${expiryDate.toLocaleDateString()}</p>
-        <p style="margin: 5px 0;"><strong>Days Remaining:</strong> ${daysUntilExpiry}</p>
+        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Informations sur le bail</h3>
+        <p style="margin: 5px 0;"><strong>Propriété :</strong> ${propertyName}</p>
+        <p style="margin: 5px 0;"><strong>Expiration du bail :</strong> ${expiryDate.toLocaleDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Jours restants :</strong> ${daysUntilExpiry}</p>
       </div>
 
       ${
         daysUntilExpiry <= 30
-          ? `<p style="color: #92400e;"><strong>Action Required:</strong> Your lease expires in ${daysUntilExpiry} days. Please contact your property manager to discuss renewal options.</p>`
-          : `<p>Please start considering your renewal options and contact your property manager if you have any questions.</p>`
+          ? `<p style="color: #92400e;"><strong>Action requise :</strong> Votre bail expire dans ${daysUntilExpiry} jours. Veuillez contacter votre gestionnaire immobilier pour discuter des options de renouvellement.</p>`
+          : `<p>Veuillez commencer à réfléchir à vos options de renouvellement et contacter votre gestionnaire immobilier si vous avez des questions.</p>`
       }
 
-      <p>To review your current lease details or contact your property manager, please visit your tenant portal.</p>
+      <p>Pour consulter les détails de votre bail actuel ou contacter votre gestionnaire immobilier, veuillez visiter votre portail locataire.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Lease Expiry Reminder - ${daysUntilExpiry} Days Remaining`,
+      `Rappel d'expiration de bail - ${daysUntilExpiry} jours restants`,
       content,
       {
-        text: "View Lease Details",
+        text: "Afficher les détails du bail",
         url: renewalUrl,
       }
     );
@@ -1041,7 +1041,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(tenantEmail, template);
   }
 
-  // Send lease expiry reminder to landlord (property owner/manager)
+  // Envoyer un rappel d'expiration de bail au propriétaire/gestionnaire
   async sendLeaseExpiryReminderToLandlord(
     landlordEmail: string,
     landlordName: string,
@@ -1056,58 +1056,58 @@ If you have any questions, please contact our support team.
       : `${this.appUrl}/dashboard/leases`;
 
     const content = `
-      <p>Hello <strong>${landlordName}</strong>,</p>
+      <p>Bonjour <strong>${landlordName}</strong>,</p>
 
-      <p>This is an automated reminder that a lease agreement for one of your properties is approaching its expiration date.</p>
+      <p>Ceci est un rappel automatisé indiquant qu'un contrat de bail pour l'une de vos propriétés approche de sa date d'expiration.</p>
 
       <div style="background-color: ${
         daysUntilExpiry <= 30 ? "#fef3c7" : "#f0f9ff"
       }; border: 1px solid ${
       daysUntilExpiry <= 30 ? "#f59e0b" : "#0ea5e9"
     }; border-radius: 6px; padding: 20px; margin: 20px 0;">
-        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Lease Expiry Details</h3>
-        <p style="margin: 5px 0;"><strong>Property:</strong> ${propertyName}</p>
-        <p style="margin: 5px 0;"><strong>Tenant:</strong> ${tenantName}</p>
-        <p style="margin: 5px 0;"><strong>Lease Expires:</strong> ${expiryDate.toLocaleDateString()}</p>
-        <p style="margin: 5px 0;"><strong>Days Remaining:</strong> ${daysUntilExpiry}</p>
+        <h3 style="margin: 0 0 10px 0; color: #1f2937;">Détails de l'expiration du bail</h3>
+        <p style="margin: 5px 0;"><strong>Propriété :</strong> ${propertyName}</p>
+        <p style="margin: 5px 0;"><strong>Locataire :</strong> ${tenantName}</p>
+        <p style="margin: 5px 0;"><strong>Expiration du bail :</strong> ${expiryDate.toLocaleDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Jours restants :</strong> ${daysUntilExpiry}</p>
       </div>
 
       ${
         daysUntilExpiry <= 30
           ? `<div style="background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px; margin: 20px 0; color: #dc2626;">
-               <strong>⚠️ Action Required</strong><br>
-               This lease expires in ${daysUntilExpiry} days. Please take the following actions:
+               <strong>⚠️ Action requise</strong><br>
+               Ce bail expire dans ${daysUntilExpiry} jours. Veuillez prendre les mesures suivantes :
                <ul style="margin: 10px 0; padding-left: 20px;">
-                 <li>Contact the tenant to discuss renewal options</li>
-                 <li>Prepare a new lease agreement if renewal is desired</li>
-                 <li>Plan for property turnover if tenant is moving out</li>
-                 <li>Schedule property inspection if needed</li>
+                 <li>Contacter le locataire pour discuter des options de renouvellement</li>
+                 <li>Préparer un nouveau contrat de bail si un renouvellement est souhaité</li>
+                 <li>Prévoir la rotation de la propriété si le locataire déménage</li>
+                 <li>Planifier une inspection de la propriété si nécessaire</li>
                </ul>
              </div>`
-          : `<p>You have sufficient time to plan ahead. Consider reaching out to the tenant to discuss their renewal intentions.</p>`
+          : `<p>Vous disposez de suffisamment de temps pour planifier à l'avance. Pensez à contacter le locataire pour discuter de ses intentions de renouvellement.</p>`
       }
 
-      <p><strong>Recommended Actions:</strong></p>
+      <p><strong>Actions recommandées :</strong></p>
       <ul style="line-height: 1.8;">
-        <li>Review the current lease terms and tenant payment history</li>
-        <li>Determine if you want to offer a lease renewal</li>
-        <li>Consider any rent adjustments for the new term</li>
-        <li>Communicate with the tenant about their plans</li>
+        <li>Examiner les conditions actuelles du bail et l'historique des paiements du locataire</li>
+        <li>Déterminer si vous souhaitez proposer un renouvellement de bail</li>
+        <li>Envisager d'éventuels ajustements de loyer pour la nouvelle période</li>
+        <li>Communiquer avec le locataire concernant ses projets</li>
         ${
           daysUntilExpiry <= 30
-            ? "<li><strong>Act promptly to avoid vacancy periods</strong></li>"
+            ? "<li><strong>Agir rapidement pour éviter les périodes de vacance</strong></li>"
             : ""
         }
       </ul>
 
-      <p>Click the button below to view the full lease details and take action.</p>
+      <p>Cliquez sur le bouton ci-dessous pour afficher l'ensemble des détails du bail et agir.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Lease Expiring Soon - ${propertyName} (${daysUntilExpiry} Days)`,
+      `Bail expirant bientôt - ${propertyName} (${daysUntilExpiry} jours)`,
       content,
       {
-        text: "View Lease Details",
+        text: "Afficher les détails du bail",
         url: leaseUrl,
       }
     );
@@ -1115,7 +1115,7 @@ If you have any questions, please contact our support team.
     return this.sendEmail(landlordEmail, template);
   }
 
-  // Send maintenance update notification
+  // Envoyer une notification de mise à jour de maintenance
   async sendMaintenanceUpdate(
     userEmail: string,
     userName: string,
@@ -1138,36 +1138,36 @@ If you have any questions, please contact our support team.
       statusColors[status as keyof typeof statusColors] || "#6b7280";
 
     const content = `
-      <p>Hello <strong>${userName}</strong>,</p>
+      <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>Your maintenance request has been updated.</p>
+      <p>Votre demande de maintenance a été mise à jour.</p>
 
       <div style="background-color: #f9fafb; border-radius: 6px; padding: 20px; margin: 20px 0;">
-        <h3 style="margin: 0 0 15px 0; color: #1f2937;">Request Details</h3>
-        <p style="margin: 5px 0;"><strong>Request ID:</strong> #${requestId}</p>
-        <p style="margin: 5px 0;"><strong>Property:</strong> ${propertyName}</p>
-        <p style="margin: 5px 0;"><strong>Description:</strong> ${description}</p>
+        <h3 style="margin: 0 0 15px 0; color: #1f2937;">Détails de la demande</h3>
+        <p style="margin: 5px 0;"><strong>ID de la demande :</strong> #${requestId}</p>
+        <p style="margin: 5px 0;"><strong>Propriété :</strong> ${propertyName}</p>
+        <p style="margin: 5px 0;"><strong>Description :</strong> ${description}</p>
         <p style="margin: 5px 0;">
-          <strong>Status:</strong>
+          <strong>Statut :</strong>
           <span style="background-color: ${statusColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase;">
             ${status.replace("_", " ")}
           </span>
         </p>
         ${
           notes
-            ? `<p style="margin: 15px 0 5px 0;"><strong>Notes:</strong> ${notes}</p>`
+            ? `<p style="margin: 15px 0 5px 0;"><strong>Remarques :</strong> ${notes}</p>`
             : ""
         }
       </div>
 
-      <p>You can view the full details and track the progress of your request using the button below.</p>
+      <p>Vous pouvez consulter l'ensemble des détails et suivre la progression de votre demande en utilisant le bouton ci-dessous.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      `Maintenance Request Update - #${requestId}`,
+      `Mise à jour de la demande de maintenance - #${requestId}`,
       content,
       {
-        text: "View Request Details",
+        text: "Afficher les détails de la demande",
         url: maintenanceUrl,
       }
     );
@@ -1175,43 +1175,43 @@ If you have any questions, please contact our support team.
     return this.sendEmail(userEmail, template);
   }
 
-  // Send test email to verify configuration
+  // Envoyer un e-mail de test pour vérifier la configuration
   async sendTestEmail(recipientEmail: string): Promise<boolean> {
     const template: EmailTemplate = {
-      subject: `${this.appName} - Email Service Test`,
+      subject: `${this.appName} - Test du service d'e-mail`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333; text-align: center;">Email Service Test</h2>
+          <h2 style="color: #333; text-align: center;">Test du service d'e-mail</h2>
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <p style="margin: 0; color: #666;">
-              This is a test email to verify that your ${
+              Ceci est un e-mail de test pour vérifier que votre service d'e-mail ${
                 this.appName
-              } email service is working correctly.
+              } fonctionne correctement.
             </p>
           </div>
           <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #28a745; font-weight: bold;">✅ Email service is working!</p>
+            <p style="color: #28a745; font-weight: bold;">✅ Le service d'e-mail fonctionne !</p>
           </div>
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
           <p style="color: #999; font-size: 12px; text-align: center;">
-            This email was sent from ${
+            Cet e-mail a été envoyé depuis ${
               this.appName
-            } at ${new Date().toLocaleString()}
+            } le ${new Date().toLocaleString()}
           </p>
         </div>
       `,
       text: `
-        ${this.appName} - Email Service Test
+        ${this.appName} - Test du service d'e-mail
 
-        This is a test email to verify that your ${
+        Ceci est un e-mail de test pour vérifier que votre service d'e-mail ${
           this.appName
-        } email service is working correctly.
+        } fonctionne correctement.
 
-        ✅ Email service is working!
+        ✅ Le service d'e-mail fonctionne !
 
-        This email was sent from ${
+        Cet e-mail a été envoyé depuis ${
           this.appName
-        } at ${new Date().toLocaleString()}
+        } le ${new Date().toLocaleString()}
       `,
     };
 
@@ -1219,5 +1219,5 @@ If you have any questions, please contact our support team.
   }
 }
 
-// Create singleton instance
+// Créer une instance singleton
 export const emailService = new EmailService();

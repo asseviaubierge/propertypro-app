@@ -46,23 +46,23 @@ import {
 import { LeaseStatus } from "@/types";
 import { FormDatePicker } from "@/components/ui/date-picker";
 
-// Validation schemas
+// Schémas de validation
 const signatureSchema = z.object({
-  signatureData: z.string().min(1, "Signature is required"),
+  signatureData: z.string().min(1, "La signature est requise"),
   ipAddress: z.string().optional(),
 });
 
 const terminationSchema = z.object({
-  terminationDate: z.string().min(1, "Termination date is required"),
-  reason: z.string().min(1, "Reason is required"),
+  terminationDate: z.string().min(1, "La date de résiliation est requise"),
+  reason: z.string().min(1, "Le motif est requis"),
   notice: z.string().optional(),
   moveOutInspection: z.boolean(),
 });
 
 const renewalSchema = z.object({
-  newStartDate: z.string().min(1, "New start date is required"),
-  newEndDate: z.string().min(1, "New end date is required"),
-  newRentAmount: z.number().min(0, "Rent amount must be positive").optional(),
+  newStartDate: z.string().min(1, "La nouvelle date de début est requise"),
+  newEndDate: z.string().min(1, "La nouvelle date de fin est requise"),
+  newRentAmount: z.number().min(0, "Le montant du loyer doit être positif").optional(),
   renewalType: z.enum(["automatic", "manual"]),
   notes: z.string().optional(),
 });
@@ -115,14 +115,14 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
     try {
       setIsLoading(true);
       await leaseService.signLease(lease._id, data);
-      toast.success("Lease signed successfully!");
+      toast.success("Bail signé avec succès !");
       setIsSigningOpen(false);
       signatureForm.reset();
       onUpdate();
     } catch (error) {
-      console.error("Error signing lease:", error);
+      console.error("Erreur lors de la signature:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to sign lease"
+        error instanceof Error ? error.message : "Échec de la signature du bail"
       );
     } finally {
       setIsLoading(false);
@@ -133,14 +133,14 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
     try {
       setIsLoading(true);
       await leaseService.terminateLease(lease._id, data);
-      toast.success("Lease terminated successfully!");
+      toast.success("Bail résilié avec succès !");
       setIsTerminationOpen(false);
       terminationForm.reset();
       onUpdate();
     } catch (error) {
-      console.error("Error terminating lease:", error);
+      console.error("Erreur lors de la résiliation:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to terminate lease"
+        error instanceof Error ? error.message : "Échec de la résiliation du bail"
       );
     } finally {
       setIsLoading(false);
@@ -164,14 +164,14 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
       }
 
       await leaseService.renewLease(lease._id, renewalData);
-      toast.success("Lease renewed successfully!");
+      toast.success("Bail renouvelé avec succès !");
       setIsRenewalOpen(false);
       renewalForm.reset();
       onUpdate();
     } catch (error) {
-      console.error("Error renewing lease:", error);
+      console.error("Erreur lors du renouvellement:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to renew lease"
+        error instanceof Error ? error.message : "Échec du renouvellement du bail"
       );
     } finally {
       setIsLoading(false);
@@ -179,28 +179,27 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
   };
 
   const canSign = lease.status === LeaseStatus.DRAFT && !lease.signedDate;
-  const canTerminate = lease.status === LeaseStatus.ACTIVE;
   const canRenew =
     lease.status === LeaseStatus.ACTIVE || lease.status === LeaseStatus.EXPIRED;
 
-  const propertyName = lease.propertyId?.name ?? "this property";
+  const propertyName = lease.propertyId?.name ?? "cette propriété";
 
   return (
     <div className="flex items-center gap-2">
-      {/* Sign Lease */}
+      {/* Signer le bail */}
       {canSign && (
         <Dialog open={isSigningOpen} onOpenChange={setIsSigningOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="cursor-pointer">
               <FileSignature className="mr-2 h-4 w-4" />
-              Sign Lease
+              Signer le bail
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Sign Lease Agreement</DialogTitle>
+              <DialogTitle>Signer le contrat de bail</DialogTitle>
               <DialogDescription>
-                Complete the lease signing process for {propertyName}.
+                Complétez le processus de signature pour {propertyName}.
               </DialogDescription>
             </DialogHeader>
             <Form {...signatureForm}>
@@ -213,15 +212,15 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                   name="signatureData"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Digital Signature</FormLabel>
+                      <FormLabel>Signature numérique</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter your full name as digital signature"
+                          placeholder="Entrez votre nom complet en guise de signature"
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        Type your full name to serve as your digital signature
+                        Tapez votre nom complet pour valider votre signature numérique.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -233,10 +232,10 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                     variant="outline"
                     onClick={() => setIsSigningOpen(false)}
                   >
-                    Cancel
+                    Annuler
                   </Button>
                   <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Signing..." : "Sign Lease"}
+                    {isLoading ? "Signature..." : "Signer le bail"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -245,20 +244,20 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
         </Dialog>
       )}
 
-      {/* Renew Lease */}
+      {/* Renouveler le bail */}
       {canRenew && (
         <Dialog open={isRenewalOpen} onOpenChange={setIsRenewalOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="cursor-pointer">
               <RotateCcw className="mr-2 h-4 w-4" />
-              Renew Lease
+              Renouveler le bail
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Renew Lease Agreement</DialogTitle>
+              <DialogTitle>Renouveler le contrat de bail</DialogTitle>
               <DialogDescription>
-                Create a renewal for the lease at {propertyName}.
+                Créez un renouvellement pour le bail de {propertyName}.
               </DialogDescription>
             </DialogHeader>
             <Form {...renewalForm}>
@@ -276,7 +275,7 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                     name="newStartDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>New Start Date</FormLabel>
+                        <FormLabel>Nouvelle date de début</FormLabel>
                         <FormControl>
                           <FormDatePicker
                             value={
@@ -284,26 +283,17 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                             }
                             onChange={(date) => {
                               if (date) {
-                                // Format date as YYYY-MM-DD without timezone conversion
                                 const year = date.getFullYear();
-                                const month = String(
-                                  date.getMonth() + 1
-                                ).padStart(2, "0");
-                                const day = String(date.getDate()).padStart(
-                                  2,
-                                  "0"
-                                );
+                                const month = String(date.getMonth() + 1).padStart(2, "0");
+                                const day = String(date.getDate()).padStart(2, "0");
                                 field.onChange(`${year}-${month}-${day}`);
                               } else {
                                 field.onChange("");
                               }
                             }}
-                            placeholder="Select new start date"
+                            placeholder="Choisir date début"
                             disabled={(date) =>
-                              date <
-                              new Date(
-                                new Date().setDate(new Date().getDate() - 1)
-                              )
+                              date < new Date(new Date().setDate(new Date().getDate() - 1))
                             }
                           />
                         </FormControl>
@@ -316,7 +306,7 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                     name="newEndDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>New End Date</FormLabel>
+                        <FormLabel>Nouvelle date de fin</FormLabel>
                         <FormControl>
                           <FormDatePicker
                             value={
@@ -324,27 +314,18 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                             }
                             onChange={(date) => {
                               if (date) {
-                                // Format date as YYYY-MM-DD without timezone conversion
                                 const year = date.getFullYear();
-                                const month = String(
-                                  date.getMonth() + 1
-                                ).padStart(2, "0");
-                                const day = String(date.getDate()).padStart(
-                                  2,
-                                  "0"
-                                );
+                                const month = String(date.getMonth() + 1).padStart(2, "0");
+                                const day = String(date.getDate()).padStart(2, "0");
                                 field.onChange(`${year}-${month}-${day}`);
                               } else {
                                 field.onChange("");
                               }
                             }}
-                            placeholder="Select new end date"
+                            placeholder="Choisir date fin"
                             disabled={(date) => {
-                              const startDate =
-                                renewalForm.watch("newStartDate");
-                              return startDate
-                                ? date <= new Date(startDate)
-                                : date < new Date();
+                              const startDate = renewalForm.watch("newStartDate");
+                              return startDate ? date <= new Date(startDate) : date < new Date();
                             }}
                           />
                         </FormControl>
@@ -359,7 +340,7 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                   name="newRentAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Monthly Rent (Optional)</FormLabel>
+                      <FormLabel>Nouveau loyer mensuel (Optionnel)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -374,8 +355,7 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                         />
                       </FormControl>
                       <FormDescription>
-                        Leave empty to keep current rent of $
-                        {lease.terms.rentAmount}
+                        Laissez vide pour conserver le loyer actuel de {lease.terms.rentAmount} €
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -387,10 +367,10 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Renewal Notes</FormLabel>
+                      <FormLabel>Notes de renouvellement</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Add any notes about the renewal..."
+                          placeholder="Ajoutez des notes concernant le renouvellement..."
                           {...field}
                         />
                       </FormControl>
@@ -405,10 +385,10 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
                     variant="outline"
                     onClick={() => setIsRenewalOpen(false)}
                   >
-                    Cancel
+                    Annuler
                   </Button>
                   <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Renewing..." : "Renew Lease"}
+                    {isLoading ? "Renouvellement..." : "Renouveler le bail"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -416,124 +396,6 @@ export function LeaseActions({ lease, onUpdate }: LeaseActionsProps) {
           </DialogContent>
         </Dialog>
       )}
-
-      {/* Terminate Lease */}
-      {/* DISABLED: Delete functionality temporarily disabled */}
-      {/* {canTerminate && (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-orange-600 hover:text-orange-700 cursor-pointer"
-            >
-              <XCircle className="mr-2 h-4 w-4" />
-              Terminate Lease
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="sm:max-w-lg">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                Terminate Lease Agreement
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This will terminate the lease for {propertyName}. This action
-                cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <Form {...terminationForm}>
-              <form
-                onSubmit={terminationForm.handleSubmit(handleTerminateLease) as React.FormEventHandler<HTMLFormElement>}
-                className="space-y-4"
-              >
-                <FormField<TerminationFormData>
-                  control={terminationForm.control}
-                  name="terminationDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Termination Date</FormLabel>
-                      <FormControl>
-                        <FormDatePicker
-                          value={
-                            field.value && typeof field.value === 'string' ? new Date(field.value) : undefined
-                          }
-                          onChange={(date) => {
-                            if (date) {
-                              // Format date as YYYY-MM-DD without timezone conversion
-                              const year = date.getFullYear();
-                              const month = String(date.getMonth() + 1).padStart(2, '0');
-                              const day = String(date.getDate()).padStart(2, '0');
-                              field.onChange(`${year}-${month}-${day}`);
-                            } else {
-                              field.onChange("");
-                            }
-                          }}
-                          placeholder="Select termination date"
-                          disabled={(date) =>
-                            date <
-                            new Date(
-                              new Date().setDate(new Date().getDate() - 1)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField<TerminationFormData>
-                  control={terminationForm.control}
-                  name="reason"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Reason for Termination</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Explain the reason for lease termination..."
-                          {...field}
-                          value={typeof field.value === 'string' ? field.value : ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField<TerminationFormData>
-                  control={terminationForm.control}
-                  name="notice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Additional Notice</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Any additional notices or instructions..."
-                          {...field}
-                          value={typeof field.value === 'string' ? field.value : ''}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    type="submit"
-                    disabled={isLoading}
-                    className="bg-orange-600 hover:bg-orange-700"
-                  >
-                    {isLoading ? "Terminating..." : "Terminate Lease"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </form>
-            </Form>
-          </AlertDialogContent>
-        </AlertDialog>
-      )} */}
     </div>
   );
 }
