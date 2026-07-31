@@ -46,7 +46,7 @@ interface MaintenanceAnalyticsData {
   trends: {
     monthly: Array<{
       month: string;
-      requests: number;
+      demandes: number;
       cost: number;
       avgTime: number;
     }>;
@@ -66,28 +66,28 @@ interface MaintenanceCostAnalysisProps {
 // Mock data for comprehensive cost analysis
 const mockCostBreakdown = [
   {
-    category: "Labor",
+    category: "Main-d'œuvre",
     amount: 45600,
     percentage: 52.3,
     budget: 50000,
     variance: -8.8,
   },
   {
-    category: "Materials",
+    category: "Matériaux",
     amount: 28900,
     percentage: 33.1,
     budget: 30000,
     variance: -3.7,
   },
   {
-    category: "Equipment",
+    category: "Équipement",
     amount: 8200,
     percentage: 9.4,
     budget: 8000,
     variance: 2.5,
   },
   {
-    category: "Subcontractors",
+    category: "Sous-traitants",
     amount: 4500,
     percentage: 5.2,
     budget: 5000,
@@ -158,35 +158,35 @@ const mockPropertyCosts = [
     cost: 15600,
     budget: 16000,
     variance: -2.5,
-    requests: 45,
+    demandes: 45,
   },
   {
     property: "Downtown Lofts",
     cost: 12800,
     budget: 13500,
     variance: -5.2,
-    requests: 38,
+    demandes: 38,
   },
   {
     property: "Garden View Complex",
     cost: 18900,
     budget: 18000,
     variance: 5.0,
-    requests: 52,
+    demandes: 52,
   },
   {
     property: "Riverside Towers",
     cost: 9400,
     budget: 10000,
     variance: -6.0,
-    requests: 29,
+    demandes: 29,
   },
   {
     property: "Metro Heights",
     cost: 14200,
     budget: 14500,
     variance: -2.1,
-    requests: 41,
+    demandes: 41,
   },
 ];
 
@@ -216,25 +216,25 @@ export function MaintenanceCostAnalysis({
     return `${value.toFixed(1)}%`;
   };
 
-  const getVarianceColor = (variance: number) => {
-    if (variance <= -5) return "text-green-600"; // Under budget is good
+  const getÉcartColor = (variance: number) => {
+    if (variance <= -5) return "text-green-600"; // Sous le budget is good
     if (variance <= 5) return "text-blue-600"; // Within tolerance
-    return "text-red-600"; // Over budget
+    return "text-red-600"; // Au-dessus du budget
   };
 
-  const getVarianceBadge = (variance: number) => {
+  const getÉcartBadge = (variance: number) => {
     if (variance <= -5)
       return {
-        label: "Under Budget",
+        label: "Sous le budget",
         variant: "bg-green-100 text-green-800 border-green-200",
       };
     if (variance <= 5)
       return {
-        label: "On Track",
+        label: "Conforme",
         variant: "bg-blue-100 text-blue-800 border-blue-200",
       };
     return {
-      label: "Over Budget",
+      label: "Dépassement",
       variant: "bg-red-100 text-red-800 border-red-200",
     };
   };
@@ -247,7 +247,7 @@ export function MaintenanceCostAnalysis({
     (sum, item) => sum + item.amount,
     0,
   );
-  const totalVariance = ((totalActual - totalBudget) / totalBudget) * 100;
+  const totalÉcart = ((totalActual - totalBudget) / totalBudget) * 100;
 
   return (
     <div className="space-y-6">
@@ -255,7 +255,7 @@ export function MaintenanceCostAnalysis({
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="border-blue-200 bg-blue-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Budget</CardTitle>
+            <CardTitle className="text-sm font-medium">Budget total</CardTitle>
             <Target className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -263,14 +263,14 @@ export function MaintenanceCostAnalysis({
               {formatCurrency(totalBudget)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Annual maintenance budget
+              Budget annuel de maintenance
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-green-200 bg-green-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Actual Spend</CardTitle>
+            <CardTitle className="text-sm font-medium">Dépenses réelles</CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -278,21 +278,21 @@ export function MaintenanceCostAnalysis({
               {formatCurrency(totalActual)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Year-to-date spending
+              Dépenses depuis le début de l'année
             </p>
           </CardContent>
         </Card>
 
         <Card
-          className={`border-${totalVariance <= 0 ? "green" : "red"}-200 bg-${
-            totalVariance <= 0 ? "green" : "red"
+          className={`border-${totalÉcart <= 0 ? "green" : "red"}-200 bg-${
+            totalÉcart <= 0 ? "green" : "red"
           }-50`}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Budget Variance
+              Écart budgétaire
             </CardTitle>
-            {totalVariance <= 0 ? (
+            {totalÉcart <= 0 ? (
               <TrendingDown className="h-4 w-4 text-green-600" />
             ) : (
               <TrendingUp className="h-4 w-4 text-red-600" />
@@ -300,14 +300,14 @@ export function MaintenanceCostAnalysis({
           </CardHeader>
           <CardContent>
             <div
-              className={`text-2xl font-bold ${getVarianceColor(
-                totalVariance,
+              className={`text-2xl font-bold ${getÉcartColor(
+                totalÉcart,
               )}`}
             >
-              {formatPercentage(Math.abs(totalVariance))}
+              {formatPercentage(Math.abs(totalÉcart))}
             </div>
             <p className="text-xs text-muted-foreground">
-              {totalVariance <= 0 ? "Under budget" : "Over budget"}
+              {totalÉcart <= 0 ? "Sous le budget" : "Au-dessus du budget"}
             </p>
           </CardContent>
         </Card>
@@ -315,7 +315,7 @@ export function MaintenanceCostAnalysis({
         <Card className="border-purple-200 bg-purple-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Cost per Request
+              Coût par demande
             </CardTitle>
             <Calculator className="h-4 w-4 text-purple-600" />
           </CardHeader>
@@ -324,7 +324,7 @@ export function MaintenanceCostAnalysis({
               {formatCurrency(data?.overview?.avgCost ?? 425)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Average cost per request
+              Coût moyen par demande
             </p>
           </CardContent>
         </Card>
@@ -336,7 +336,7 @@ export function MaintenanceCostAnalysis({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChartIcon className="h-5 w-5" />
-              Cost Breakdown by Category
+              Répartition des coûts par catégorie
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -372,7 +372,7 @@ export function MaintenanceCostAnalysis({
 
         <Card>
           <CardHeader>
-            <CardTitle>Budget vs Actual by Category</CardTitle>
+            <CardTitle>Budget vs Réel par catégorie</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -387,7 +387,7 @@ export function MaintenanceCostAnalysis({
                       </span>
                       <Badge
                         variant="outline"
-                        className={getVarianceBadge(item.variance).variant}
+                        className={getÉcartBadge(item.variance).variant}
                       >
                         {formatPercentage(Math.abs(item.variance))}
                       </Badge>
@@ -404,12 +404,12 @@ export function MaintenanceCostAnalysis({
         </Card>
       </div>
 
-      {/* Monthly Cost Trends */}
+      {/* Évolution mensuelle des coûts */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Monthly Cost Trends
+            Évolution mensuelle des coûts
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -420,14 +420,14 @@ export function MaintenanceCostAnalysis({
               <YAxis />
               <Tooltip formatter={(value) => formatCurrency(value as number)} />
               <Legend />
-              <Bar dataKey="planned" fill="#8884d8" name="Planned Budget" />
-              <Bar dataKey="actual" fill="#82ca9d" name="Actual Spend" />
+              <Bar dataKey="planned" fill="#8884d8" name="Budget prévu" />
+              <Bar dataKey="actual" fill="#82ca9d" name="Dépenses réelles" />
               <Line
                 type="monotone"
                 dataKey="labor"
                 stroke="#ff7300"
                 strokeWidth={2}
-                name="Labor Costs"
+                name="Coûts de main-d'œuvre"
               />
             </ComposedChart>
           </ResponsiveContainer>
@@ -437,7 +437,7 @@ export function MaintenanceCostAnalysis({
       {/* Property Cost Analysis */}
       <Card>
         <CardHeader>
-          <CardTitle>Cost Analysis by Property</CardTitle>
+          <CardTitle>Analyse des coûts par propriété</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -449,7 +449,7 @@ export function MaintenanceCostAnalysis({
                 <div className="flex-1">
                   <h4 className="font-semibold">{property.property}</h4>
                   <p className="text-sm text-muted-foreground">
-                    {property.requests} requests
+                    {property.demandes} demandes
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -458,26 +458,26 @@ export function MaintenanceCostAnalysis({
                       {formatCurrency(property.cost)}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Budget: {formatCurrency(property.budget)}
+                      Budget : {formatCurrency(property.budget)}
                     </div>
                   </div>
                   <div className="text-right">
                     <div
-                      className={`font-semibold ${getVarianceColor(
+                      className={`font-semibold ${getÉcartColor(
                         property.variance,
                       )}`}
                     >
                       {formatPercentage(Math.abs(property.variance))}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Variance
+                      Écart
                     </div>
                   </div>
                   <Badge
                     variant="outline"
-                    className={getVarianceBadge(property.variance).variant}
+                    className={getÉcartBadge(property.variance).variant}
                   >
-                    {getVarianceBadge(property.variance).label}
+                    {getÉcartBadge(property.variance).label}
                   </Badge>
                 </div>
               </div>
@@ -489,7 +489,7 @@ export function MaintenanceCostAnalysis({
       {/* Cost Type Trends */}
       <Card>
         <CardHeader>
-          <CardTitle>Maintenance Cost Types Over Time</CardTitle>
+          <CardTitle>Évolution des types de coûts de maintenance</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -506,7 +506,7 @@ export function MaintenanceCostAnalysis({
                 stroke="#00C49F"
                 fill="#00C49F"
                 fillOpacity={0.6}
-                name="Preventive"
+                name="Préventive"
               />
               <Area
                 type="monotone"
@@ -515,7 +515,7 @@ export function MaintenanceCostAnalysis({
                 stroke="#0088FE"
                 fill="#0088FE"
                 fillOpacity={0.6}
-                name="Reactive"
+                name="Corrective"
               />
               <Area
                 type="monotone"
@@ -524,7 +524,7 @@ export function MaintenanceCostAnalysis({
                 stroke="#FF8042"
                 fill="#FF8042"
                 fillOpacity={0.6}
-                name="Emergency"
+                name="Urgence"
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -535,13 +535,13 @@ export function MaintenanceCostAnalysis({
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-green-200 bg-green-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cost Savings</CardTitle>
+            <CardTitle className="text-sm font-medium">Économies réalisées</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">$4,200</div>
             <p className="text-xs text-muted-foreground">
-              Saved through preventive maintenance
+              Économies grâce à la maintenance préventive
             </p>
           </CardContent>
         </Card>
@@ -549,14 +549,14 @@ export function MaintenanceCostAnalysis({
         <Card className="border-yellow-200 bg-yellow-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Optimization Potential
+              Potentiel d'optimisation
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">15%</div>
             <p className="text-xs text-muted-foreground">
-              Potential cost reduction
+              Réduction potentielle des coûts
             </p>
           </CardContent>
         </Card>
@@ -564,14 +564,14 @@ export function MaintenanceCostAnalysis({
         <Card className="border-blue-200 bg-blue-50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              ROI on Preventive
+              ROI on Préventive
             </CardTitle>
             <Target className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">3.2x</div>
             <p className="text-xs text-muted-foreground">
-              Return on preventive investment
+              Retour sur investissement de la maintenance préventive
             </p>
           </CardContent>
         </Card>

@@ -43,7 +43,7 @@ import {
   Clock,
   DollarSign,
 } from "lucide-react";
-import { UserRole, IUser } from "@/types";
+import { UserRole, AccountType, IUser } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { UserActivityLog } from "@/components/users/user-activity-log";
 import { UserSessionManagement } from "@/components/users/user-session-management";
@@ -579,6 +579,67 @@ export default function UserDetailPage({ params }: UserDetailPageProps) {
                           t("admin.userDetail.accountInfo.phoneNotProvided")}
                       </p>
                     </div>
+                    {user?.role !== UserRole.TENANT && user?.accountType && (
+  <>
+    <div>
+      <label className="text-sm font-medium text-muted-foreground">
+        Type de compte
+      </label>
+      <p className="text-sm font-medium">
+        {user.accountType === AccountType.DIRECT_OWNER
+          ? "Propriétaire direct"
+          : user.accountType === AccountType.AGENCY
+            ? "Agence immobilière"
+            : user.accountType === AccountType.E_IMMO
+              ? "E-IMMO"
+              : user.accountType}
+      </p>
+    </div>
+
+    {user.cip && (
+      <div>
+        <label className="text-sm font-medium text-muted-foreground">
+          Numéro CIP
+        </label>
+        <p className="text-sm">{user.cip}</p>
+      </div>
+    )}
+
+    {(user.accountType === AccountType.AGENCY ||
+      user.accountType === AccountType.E_IMMO) && (
+      <>
+        {user.businessName && (
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Nom commercial
+            </label>
+            <p className="text-sm font-medium">
+              {user.businessName}
+            </p>
+          </div>
+        )}
+
+        {user.ifu && (
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Numéro IFU
+            </label>
+            <p className="text-sm">{user.ifu}</p>
+          </div>
+        )}
+
+        {user.rccm && (
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Numéro RCCM
+            </label>
+            <p className="text-sm">{user.rccm}</p>
+          </div>
+        )}
+      </>
+    )}
+  </>
+)}
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
                         {t("admin.userDetail.accountInfo.accountCreated")}

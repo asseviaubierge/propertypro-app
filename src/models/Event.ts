@@ -128,7 +128,7 @@ const EventRecurrenceSchema = new Schema<IEventRecurrence>({
       validator: function (days: number[]) {
         return days.every((day) => day >= 0 && day <= 6);
       },
-      message: "Days of week must be between 0 (Sunday) and 6 (Saturday)",
+      message: "Les jours de la semaine doivent être compris entre 0 (dimanche) et 6 (samedi)",
     },
   },
   dayOfMonth: {
@@ -147,19 +147,19 @@ const EventSchema = new Schema<IEvent>(
   {
     title: {
       type: String,
-      required: [true, "Event title is required"],
+      required: [true, "Le titre de l'événement est requis"],
       trim: true,
-      maxlength: [200, "Title cannot exceed 200 characters"],
+      maxlength: [200, "Le titre ne peut pas dépasser 200 caractères"],
     },
     description: {
       type: String,
       trim: true,
-      maxlength: [2000, "Description cannot exceed 2000 characters"],
+      maxlength: [2000, "La description ne peut pas dépasser 2000 caractères"],
     },
     type: {
       type: String,
       enum: Object.values(EventType),
-      required: [true, "Event type is required"],
+      required: [true, "Le type d'événement est requis"],
     },
     status: {
       type: String,
@@ -175,16 +175,16 @@ const EventSchema = new Schema<IEvent>(
     // Date and time
     startDate: {
       type: Date,
-      required: [true, "Start date is required"],
+      required: [true, "La date de début est requise"],
     },
     endDate: {
       type: Date,
-      required: [true, "End date is required"],
+      required: [true, "La date de fin est requise"],
       validate: {
         validator: function (this: IEvent, endDate: Date) {
           return endDate >= this.startDate;
         },
-        message: "End date must be after start date",
+        message: "La date de fin doit être postérieure à la date de début",
       },
     },
     allDay: {
@@ -215,7 +215,7 @@ const EventSchema = new Schema<IEvent>(
     organizer: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Event organizer is required"],
+      required: [true, "L'organisateur de l'événement est requis"],
     },
     attendees: {
       type: [EventAttendeeSchema],
@@ -307,7 +307,7 @@ try {
 } catch (error) {
   // Silently handle index creation errors in development
   if (process.env.NODE_ENV !== "production") {
-    console.warn("Event index creation warning:", error);
+    console.warn("Avertissement de création des index Event :", error);
   }
 }
 

@@ -1,5 +1,5 @@
 /**
- * PropertyPro - Lease Management Module
+ * PropriétéPro - Gestion des baux Module
  * Comprehensive lease management interface for tenants with multiple leases
  */
 
@@ -35,7 +35,7 @@ import {
   DollarSign,
   FileText,
   Search,
-  RefreshCw,
+  ActualiserCw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/formatting";
 
@@ -64,9 +64,9 @@ interface Lease {
   };
   daysUntilExpiration: number;
   daysUntilStart: number;
-  isActive: boolean;
-  isUpcoming: boolean;
-  isExpired: boolean;
+  isActif: boolean;
+  isÀ venir: boolean;
+  isExpiré: boolean;
   documents?: string[];
   signedDate?: string;
   renewalOptions?: {
@@ -102,9 +102,9 @@ interface LeaseManagementProps {
 export default function LeaseManagement({ className }: LeaseManagementProps) {
   const { data: session } = useSession();
   const [leases, setLeases] = useState<Lease[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoices, setFactures] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("leases");
+  const [activeTab, setActifTab] = useState("leases");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("endDate");
@@ -119,20 +119,20 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
   const handleLeaseAction = (action: string, lease: Lease) => {
     switch (action) {
       case "download-agreement":
-        toast.info("Downloading lease agreement...");
+        toast.info("Téléchargement du contrat de bail...");
         // Implement download functionality
         break;
       case "view-invoices":
-        setActiveTab("invoices");
+        setActifTab("invoices");
         // Filter invoices by lease
         break;
       case "contact-manager":
-        toast.info("Redirecting to Messages...");
+        toast.info("Redirection vers les messages...");
         // Redirect to the main Messages module
         window.location.href = "/dashboard/messages";
         break;
       case "request-renewal":
-        toast.info("Renewal request functionality coming soon...");
+        toast.info("La demande de renouvellement sera bientôt disponible...");
         // Implement renewal request
         break;
       default:
@@ -142,11 +142,11 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
   const handleInvoiceAction = (action: string, invoice: Invoice) => {
     switch (action) {
       case "download-pdf":
-        toast.info("Downloading invoice PDF...");
+        toast.info("Téléchargement de la facture PDF...");
         // Implement PDF download functionality
         break;
       case "make-payment":
-        toast.info("Redirecting to payment portal...");
+        toast.info("Redirection vers le portail de paiement...");
         // Integrate with existing payment system
         break;
       default:
@@ -169,11 +169,11 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
       }
 
       if (invoicesData.success) {
-        setInvoices(invoicesData.data.invoices || []);
+        setFactures(invoicesData.data.invoices || []);
       }
     } catch (error) {
       console.error("Error fetching lease data:", error);
-      toast.error("Failed to load lease data");
+      toast.error("Impossible de charger les données des baux");
     } finally {
       setLoading(false);
     }
@@ -187,7 +187,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
   // };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -197,25 +197,25 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
   const getStatusBadge = (status: string, isLease: boolean = true) => {
     if (isLease) {
       const statusConfig = {
-        active: {
+        actifs: {
           variant: "default" as const,
           color: "bg-green-500",
-          label: "Active",
+          label: "Actif",
         },
         expired: {
           variant: "secondary" as const,
           color: "bg-gray-500",
-          label: "Expired",
+          label: "Expiré",
         },
         upcoming: {
           variant: "outline" as const,
           color: "bg-blue-500",
-          label: "Upcoming",
+          label: "À venir",
         },
         terminated: {
           variant: "destructive" as const,
           color: "bg-red-500",
-          label: "Terminated",
+          label: "Résilié",
         },
       };
       const config =
@@ -293,7 +293,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
     }
   });
 
-  const filteredInvoices = invoices.filter((invoice) => {
+  const filteredFactures = invoices.filter((invoice) => {
     const matchesSearch =
       invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.propertyId.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -314,10 +314,10 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Lease Management
+            Gestion des baux
           </h1>
           <p className="text-muted-foreground">
-            Manage your leases, invoices, and property documents
+            Gérez vos baux, factures et documents
           </p>
         </div>
 
@@ -328,8 +328,8 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
             onClick={fetchLeaseData}
             className="gap-2"
           >
-            <RefreshCw className="h-4 w-4" />
-            Refresh
+            <ActualiserCw className="h-4 w-4" />
+            Actualiser
           </Button>
         </div>
       </div>
@@ -338,38 +338,38 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Leases</CardTitle>
+            <CardTitle className="text-sm font-medium">Total des baux</CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{leases.length}</div>
             <p className="text-xs text-muted-foreground">
-              {leases.filter((l) => l.isActive).length} active
+              {leases.filter((l) => l.isActif).length} actifs
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Rent</CardTitle>
+            <CardTitle className="text-sm font-medium">Loyer mensuel</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(
                 leases
-                  .filter((l) => l.isActive)
+                  .filter((l) => l.isActif)
                   .reduce((sum, l) => sum + l.terms.rentAmount, 0)
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Active leases total</p>
+            <p className="text-xs text-muted-foreground">Total des baux actifs</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Outstanding Invoices
+              Factures impayées
             </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -389,7 +389,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+            <CardTitle className="text-sm font-medium">Expiration prochaine</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -401,7 +401,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
                 ).length
               }
             </div>
-            <p className="text-xs text-muted-foreground">Next 90 days</p>
+            <p className="text-xs text-muted-foreground">90 prochains jours</p>
           </CardContent>
         </Card>
       </div>
@@ -409,12 +409,12 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
       {/* Main Content Tabs */}
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={setActifTab}
         className="space-y-4"
       >
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="leases">My Leases</TabsTrigger>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+          <TabsTrigger value="leases">Mes baux</TabsTrigger>
+          <TabsTrigger value="invoices">Factures</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
         </TabsList>
 
@@ -424,7 +424,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search properties..."
+                placeholder="Rechercher une propriété..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8"
@@ -435,11 +435,11 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="terminated">Terminated</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="active">Actif</SelectItem>
+                <SelectItem value="upcoming">À venir</SelectItem>
+                <SelectItem value="expired">Expiré</SelectItem>
+                <SelectItem value="terminated">Résilié</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -447,13 +447,13 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
           <div className="flex items-center space-x-2">
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder="Trier par" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="property">Property</SelectItem>
-                <SelectItem value="startDate">Start Date</SelectItem>
-                <SelectItem value="endDate">End Date</SelectItem>
-                <SelectItem value="rent">Rent Amount</SelectItem>
+                <SelectItem value="property">Propriété</SelectItem>
+                <SelectItem value="startDate">Date de début</SelectItem>
+                <SelectItem value="endDate">Date de fin</SelectItem>
+                <SelectItem value="rent">Montant du loyer</SelectItem>
                 <SelectItem value="status">Status</SelectItem>
               </SelectContent>
             </Select>
@@ -473,7 +473,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
 
         <TabsContent value="invoices" className="space-y-4">
           <InvoiceTable
-            invoices={filteredInvoices}
+            invoices={filteredFactures}
             onInvoiceAction={handleInvoiceAction}
           />
         </TabsContent>

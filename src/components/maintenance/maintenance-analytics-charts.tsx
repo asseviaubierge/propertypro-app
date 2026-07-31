@@ -76,25 +76,25 @@ const mockMonthlyData = [
 ];
 
 const mockCategoryData = [
-  { category: "Plumbing", count: 85, cost: 25600, avgTime: 4.2 },
+  { category: "Plomberie", count: 85, cost: 25600, avgTime: 4.2 },
   { category: "HVAC", count: 62, cost: 31200, avgTime: 5.8 },
-  { category: "Electrical", count: 48, cost: 18900, avgTime: 3.1 },
-  { category: "General", count: 73, cost: 12400, avgTime: 2.3 },
-  { category: "Appliances", count: 34, cost: 15800, avgTime: 3.7 },
-  { category: "Flooring", count: 29, cost: 22100, avgTime: 6.2 },
+  { category: "Électricité", count: 48, cost: 18900, avgTime: 3.1 },
+  { category: "Général", count: 73, cost: 12400, avgTime: 2.3 },
+  { category: "Appareils", count: 34, cost: 15800, avgTime: 3.7 },
+  { category: "Revêtement de sol", count: 29, cost: 22100, avgTime: 6.2 },
 ];
 
 const mockStatusData = [
-  { name: "Completed", value: 78, color: "#00C49F" },
-  { name: "In Progress", value: 15, color: "#0088FE" },
-  { name: "Pending", value: 7, color: "#FFBB28" },
+  { name: "Terminée", value: 78, color: "#00C49F" },
+  { name: "En cours", value: 15, color: "#0088FE" },
+  { name: "En attente", value: 7, color: "#FFBB28" },
 ];
 
 const mockPriorityData = [
-  { name: "Low", value: 45, color: "#00C49F" },
-  { name: "Medium", value: 35, color: "#FFBB28" },
-  { name: "High", value: 15, color: "#FF8042" },
-  { name: "Emergency", value: 5, color: "#FF0000" },
+  { name: "Faible", value: 45, color: "#00C49F" },
+  { name: "Moyenne", value: 35, color: "#FFBB28" },
+  { name: "Élevée", value: 15, color: "#FF8042" },
+  { name: "Urgence", value: 5, color: "#FF0000" },
 ];
 
 import { formatCurrency } from "@/lib/utils/formatting";
@@ -127,7 +127,7 @@ export function MaintenanceAnalyticsCharts({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Monthly Request Trends
+              Évolution mensuelle des demandes
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -145,7 +145,7 @@ export function MaintenanceAnalyticsCharts({
                   stroke="#8884d8"
                   fill="#8884d8"
                   fillOpacity={0.6}
-                  name="Total Requests"
+                  name="Total des demandes"
                 />
                 <Area
                   type="monotone"
@@ -154,7 +154,7 @@ export function MaintenanceAnalyticsCharts({
                   stroke="#82ca9d"
                   fill="#82ca9d"
                   fillOpacity={0.6}
-                  name="Completed"
+                  name="Terminée"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -165,7 +165,7 @@ export function MaintenanceAnalyticsCharts({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Monthly Cost Analysis
+              Analyse mensuelle des coûts
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -178,7 +178,7 @@ export function MaintenanceAnalyticsCharts({
                   formatter={(value) => formatCurrency(value as number)}
                 />
                 <Legend />
-                <Bar dataKey="cost" fill="#8884d8" name="Total Cost" />
+                <Bar dataKey="cost" fill="#8884d8" name="Coût total" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -190,7 +190,7 @@ export function MaintenanceAnalyticsCharts({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            Maintenance by Category
+            Maintenance par catégorie
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -212,26 +212,26 @@ export function MaintenanceAnalyticsCharts({
                 yAxisId="left"
                 dataKey="count"
                 fill="#8884d8"
-                name="Request Count"
+                name="Nombre de demandes"
               />
               <Bar
                 yAxisId="right"
                 dataKey="cost"
                 fill="#82ca9d"
-                name="Total Cost"
+                name="Coût total"
               />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      {/* Status and Priority Distribution */}
+      {/* Status and Répartition des priorités */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChartIcon className="h-5 w-5" />
-              Request Status Distribution
+              Répartition des statuts des demandes
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -263,7 +263,7 @@ export function MaintenanceAnalyticsCharts({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChartIcon className="h-5 w-5" />
-              Priority Distribution
+              Répartition des priorités
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -297,7 +297,7 @@ export function MaintenanceAnalyticsCharts({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Average Completion Time Trends
+            Évolution du temps moyen de résolution
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -313,7 +313,7 @@ export function MaintenanceAnalyticsCharts({
                 dataKey="avgTime"
                 stroke="#8884d8"
                 strokeWidth={2}
-                name="Avg Completion Time"
+                name="Temps moyen de résolution"
               />
             </LineChart>
           </ResponsiveContainer>

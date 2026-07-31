@@ -65,12 +65,12 @@ import { useLocalizationContext } from "@/components/providers/LocalizationProvi
 const lineItemSchema = z.object({
   description: z
     .string()
-    .min(1, "Description is required")
-    .max(200, "Description too long"),
+    .min(1, "La description est obligatoire")
+    .max(200, "Description trop longue"),
   amount: z
     .number()
-    .min(0.01, "Amount must be at least $0.01")
-    .max(100000, "Amount too high"),
+    .min(0.01, "Le montant doit être d'au moins 0,01")
+    .max(100000, "Montant trop élevé"),
   type: z.enum([
     "rent",
     "security_deposit",
@@ -81,22 +81,22 @@ const lineItemSchema = z.object({
   ]),
   quantity: z
     .number()
-    .min(1, "Quantity must be at least 1")
-    .max(1000, "Quantity too high"),
+    .min(1, "La quantité doit être d'au moins 1")
+    .max(1000, "Quantité trop élevée"),
   unitPrice: z
     .number()
-    .min(0.01, "Unit price must be at least $0.01")
-    .max(100000, "Unit price too high"),
+    .min(0.01, "Le prix unitaire doit être d'au moins 0,01")
+    .max(100000, "Prix unitaire trop élevé"),
 });
 
 const invoiceEditSchema = z
   .object({
     invoiceNumber: z
       .string()
-      .min(1, "Invoice number is required")
-      .max(50, "Invoice number too long"),
-    dueDate: z.string().min(1, "Due date is required"),
-    issueDate: z.string().min(1, "Issue date is required"),
+      .min(1, "Le numéro de facture est obligatoire")
+      .max(50, "Numéro de facture trop long"),
+    dueDate: z.string().min(1, "La date d'échéance est obligatoire"),
+    issueDate: z.string().min(1, "La date d'émission est obligatoire"),
     status: z.enum([
       "scheduled",
       "issued",
@@ -107,13 +107,13 @@ const invoiceEditSchema = z
     ]),
     lineItems: z
       .array(lineItemSchema)
-      .min(1, "At least one line item is required")
-      .max(50, "Too many line items"),
-    notes: z.string().max(1000, "Notes too long").optional(),
+      .min(1, "Au moins une ligne est requise")
+      .max(50, "Trop de lignes de facture"),
+    notes: z.string().max(1000, "Notes trop longues").optional(),
     taxAmount: z
       .number()
-      .min(0, "Tax amount cannot be negative")
-      .max(10000, "Tax amount too high"),
+      .min(0, "Le montant de la taxe ne peut pas être négatif")
+      .max(10000, "Montant de la taxe trop élevé"),
   })
   .refine(
     (data) => {
@@ -122,7 +122,7 @@ const invoiceEditSchema = z
       return dueDate >= issueDate;
     },
     {
-      message: "Due date must be on or after issue date",
+      message: "La date d'échéance doit être postérieure ou égale à la date d'émission",
       path: ["dueDate"],
     }
   );
@@ -303,11 +303,11 @@ export default function InvoiceEditPage() {
         });
         setHasChanges(false);
       } else {
-        showSimpleError("Load Error", t("leases.invoices.details.toasts.fetchError"));
+        showSimpleError("Erreur de chargement", t("leases.invoices.details.toasts.fetchError"));
         router.push("/dashboard/accounting/invoices");
       }
     } catch (error) {
-      showSimpleError("Load Error", t("leases.invoices.details.toasts.fetchError"));
+      showSimpleError("Erreur de chargement", t("leases.invoices.details.toasts.fetchError"));
       router.push("/dashboard/accounting/invoices");
     } finally {
       setLoading(false);
@@ -338,7 +338,7 @@ export default function InvoiceEditPage() {
 
       if (result?.success) {
         showSimpleSuccess(
-          "Invoice Updated",
+          "Facture mise à jour",
           t("leases.invoices.edit.toasts.updateSuccess", {
             values: { invoiceNumber: result.data?.invoiceNumber ?? "" },
           })
@@ -347,12 +347,12 @@ export default function InvoiceEditPage() {
         router.push(`/dashboard/accounting/invoices/${invoiceId}`);
       } else {
         showSimpleError(
-          "Update Failed",
+          "Échec de la mise à jour",
           result.error || t("leases.invoices.edit.toasts.updateError")
         );
       }
     } catch (error) {
-      showSimpleError("Update Failed", t("leases.invoices.edit.toasts.updateError"));
+      showSimpleError("Échec de la mise à jour", t("leases.invoices.edit.toasts.updateError"));
     } finally {
       setSaving(false);
     }
@@ -402,7 +402,7 @@ export default function InvoiceEditPage() {
     if (fields.length > 1) {
       remove(index);
     } else {
-      showSimpleError("Validation Error", t("leases.invoices.edit.toasts.atLeastOneLineItemRequired"));
+      showSimpleError("Erreur de validation", t("leases.invoices.edit.toasts.atLeastOneLineItemRequired"));
     }
   };
 
@@ -465,13 +465,13 @@ export default function InvoiceEditPage() {
         <div className="flex items-center gap-2">
           {invoice.tenantId && (
             <Badge variant="outline">
-              {invoice.tenantId?.firstName || "Unknown"}{" "}
-              {invoice.tenantId?.lastName || "Tenant"}
+              {invoice.tenantId?.firstName || "Inconnu"}{" "}
+              {invoice.tenantId?.lastName || "Locataire"}
             </Badge>
           )}
           {invoice.propertyId && (
             <Badge variant="outline">
-              {invoice.propertyId?.name || "Unknown Property"}
+              {invoice.propertyId?.name || "Bien inconnu"}
             </Badge>
           )}
           <Button

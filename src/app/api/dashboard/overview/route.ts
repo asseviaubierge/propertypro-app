@@ -1017,12 +1017,23 @@ export const GET = withPermissionAndDB("profile_management")(
 
       const propertyTypes = Object.entries(propertyTypeCounts).map(
         ([type, count], index) => ({
-          name: type
-            .split("_")
-            .map(
-              (segment) => segment.charAt(0).toUpperCase() + segment.slice(1),
-            )
-            .join(" "),
+          name:
+            ({
+              furnished_apartment: "Appartement meublé",
+              multi_family: "Immeuble multifamilial",
+              private_house: "Maison individuelle",
+              residence: "Résidence",
+              single_family: "Maison individuelle",
+              apartment: "Appartement",
+              house: "Maison",
+              condo: "Condominium",
+              townhouse: "Maison en rangée",
+              commercial: "Commercial",
+            } as Record<string,string>)[type] ??
+            type
+              .split("_")
+              .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+              .join(" "),
           value: count,
           color: ALERT_COLOR_MAP[index % ALERT_COLOR_MAP.length],
         }),

@@ -111,13 +111,13 @@ export function LeaseInvoice({
     const end = new Date(lease.endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const months = Math.floor(diffDays / 30);
-    const days = diffDays % 30;
+    const mois = Math.floor(diffDays / 30);
+    const jours = diffDays % 30;
 
-    if (months > 0) {
-      return days > 0 ? `${months} months, ${days} days` : `${months} months`;
+    if (mois > 0) {
+      return jours > 0 ? `${mois} mois, ${jours} jours` : `${mois} mois`;
     }
-    return `${days} days`;
+    return `${jours} jours`;
   };
 
   // Get status color
@@ -143,7 +143,7 @@ export function LeaseInvoice({
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Unable to open print dialog. Please check your popup blocker.";
+          : "Impossible d’ouvrir la boîte de dialogue d’impression. Vérifiez le bloqueur de fenêtres.";
       toast.error(errorMessage);
     }
   };
@@ -158,7 +158,7 @@ export function LeaseInvoice({
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to download invoice PDF. Please try again.";
+          : "Échec du téléchargement du PDF. Veuillez réessayer.";
       toast.error(errorMessage);
     } finally {
       setIsGeneratingPDF(false);
@@ -190,7 +190,7 @@ export function LeaseInvoice({
           ) : (
             <Download className="h-4 w-4" />
           )}
-          {isGeneratingPDF ? "Generating PDF..." : "Download PDF"}
+          {isGeneratingPDF ? "Génération du PDF..." : "Télécharger le PDF"}
         </Button>
       </div> */}
 
@@ -248,19 +248,19 @@ export function LeaseInvoice({
 
               <div className="invoice-info text-right">
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  LEASE INVOICE
+                  FACTURE DE LOCATION
                 </h2>
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>
-                    <span className="font-medium">Invoice #:</span>{" "}
+                    <span className="font-medium">Facture n° :</span>{" "}
                     {generatedInvoiceNumber}
                   </p>
                   <p>
-                    <span className="font-medium">Issue Date:</span>{" "}
+                    <span className="font-medium">Date d’émission :</span>{" "}
                     {formatDate(resolvedIssueDate)}
                   </p>
                   <p>
-                    <span className="font-medium">Due Date:</span>{" "}
+                    <span className="font-medium">Date d’échéance :</span>{" "}
                     {formatDate(resolvedDueDate)}
                   </p>
                   <div className="mt-2">
@@ -281,11 +281,11 @@ export function LeaseInvoice({
 
             {/* Parties Information */}
             <div className="parties grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              {/* Property Information */}
+              {/* Informations sur le bien */}
               <div className="party">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
                   <Home className="h-5 w-5 text-blue-600" />
-                  Property Information
+                  Informations sur le bien
                 </h3>
                 <div className="space-y-2 text-sm">
                   <p className="font-medium text-gray-900">
@@ -301,19 +301,19 @@ export function LeaseInvoice({
                   </p>
                   <div className="mt-3 space-y-1">
                     <p className="text-gray-600">
-                      <span className="font-medium">Type:</span>{" "}
+                      <span className="font-medium">Type :</span>{" "}
                       {lease.propertyId?.type || "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      <span className="font-medium">Bedrooms:</span>{" "}
+                      <span className="font-medium">Chambres :</span>{" "}
                       {lease.propertyId?.bedrooms || "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      <span className="font-medium">Bathrooms:</span>{" "}
+                      <span className="font-medium">Salles de bain :</span>{" "}
                       {lease.propertyId?.bathrooms || "N/A"}
                     </p>
                     <p className="text-gray-600">
-                      <span className="font-medium">Square Feet:</span>{" "}
+                      <span className="font-medium">Superficie :</span>{" "}
                       {lease.propertyId?.squareFootage?.toLocaleString() ||
                         "N/A"}
                     </p>
@@ -321,11 +321,11 @@ export function LeaseInvoice({
                 </div>
               </div>
 
-              {/* Tenant Information */}
+              {/* Informations sur le locataire */}
               <div className="party">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
                   <User className="h-5 w-5 text-blue-600" />
-                  Tenant Information
+                  Informations sur le locataire
                 </h3>
                 <div className="space-y-2 text-sm">
                   <p className="font-medium text-gray-900">
@@ -344,7 +344,7 @@ export function LeaseInvoice({
                   )}
                   <div className="mt-3">
                     <p className="text-gray-600">
-                      <span className="font-medium">Tenant ID:</span>{" "}
+                      <span className="font-medium">ID du locataire :</span>{" "}
                       {lease.tenantId?._id || "N/A"}
                     </p>
                   </div>
@@ -352,16 +352,16 @@ export function LeaseInvoice({
               </div>
             </div>
 
-            {/* Lease Details */}
+            {/* Détails du bail */}
             <div className="lease-details bg-gray-50 p-6 rounded-lg mb-8">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
                 <FileText className="h-5 w-5 text-blue-600" />
-                Lease Details
+                Détails du bail
               </h3>
               <div className="details-grid grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Lease ID:
+                    ID du bail :
                   </span>
                   <span className="detail-value text-gray-600">
                     {lease._id}
@@ -369,7 +369,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Status:
+                    Statut :
                   </span>
                   <Badge
                     className={cn("text-xs", getStatusColor(lease.status))}
@@ -379,7 +379,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Start Date:
+                    Date de début :
                   </span>
                   <span className="detail-value text-gray-600">
                     {formatDate(lease.startDate)}
@@ -387,7 +387,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    End Date:
+                    Date de fin :
                   </span>
                   <span className="detail-value text-gray-600">
                     {formatDate(lease.endDate)}
@@ -395,7 +395,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Duration:
+                    Durée :
                   </span>
                   <span className="detail-value text-gray-600">
                     {calculateDuration()}
@@ -404,7 +404,7 @@ export function LeaseInvoice({
                 {lease.signedDate && (
                   <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                     <span className="detail-label font-medium text-gray-700">
-                      Signed Date:
+                      Date de signature :
                     </span>
                     <span className="detail-value text-gray-600">
                       {formatDate(lease.signedDate)}
@@ -413,7 +413,7 @@ export function LeaseInvoice({
                 )}
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Created:
+                    Créé le :
                   </span>
                   <span className="detail-value text-gray-600">
                     {formatDate(lease.createdAt)}
@@ -421,7 +421,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="detail-item flex justify-between py-2 border-b border-gray-200">
                   <span className="detail-label font-medium text-gray-700">
-                    Last Updated:
+                    Dernière mise à jour :
                   </span>
                   <span className="detail-value text-gray-600">
                     {formatDate(lease.updatedAt)}
@@ -430,16 +430,16 @@ export function LeaseInvoice({
               </div>
             </div>
 
-            {/* Financial Summary */}
+            {/* Résumé financier */}
             <div className="financial-summary bg-blue-50 p-6 rounded-lg mb-8">
               <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
                 <DollarSign className="h-5 w-5 text-blue-600" />
-                Financial Summary
+                Résumé financier
               </h3>
               <div className="summary-grid space-y-3">
                 <div className="summary-item flex justify-between py-3 border-b border-blue-200">
                   <span className="summary-label font-medium text-blue-900">
-                    Monthly Rent:
+                    Loyer mensuel :
                   </span>
                   <span className="summary-value font-semibold text-blue-900">
                     {formatCurrency(lease.terms?.rentAmount || 0)}
@@ -447,7 +447,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="summary-item flex justify-between py-3 border-b border-blue-200">
                   <span className="summary-label font-medium text-blue-900">
-                    Security Deposit:
+                    Dépôt de garantie :
                   </span>
                   <span className="summary-value font-semibold text-blue-900">
                     {formatCurrency(lease.terms?.securityDeposit || 0)}
@@ -455,7 +455,7 @@ export function LeaseInvoice({
                 </div>
                 <div className="summary-item flex justify-between py-3 border-b border-blue-200">
                   <span className="summary-label font-medium text-blue-900">
-                    Late Fee:
+                    Pénalité de retard :
                   </span>
                   <span className="summary-value font-semibold text-blue-900">
                     {formatCurrency(lease.terms?.lateFee || 0)}
@@ -464,7 +464,7 @@ export function LeaseInvoice({
                 {lease.terms?.petDeposit && lease.terms?.petDeposit > 0 && (
                   <div className="summary-item flex justify-between py-3 border-b border-blue-200">
                     <span className="summary-label font-medium text-blue-900">
-                      Pet Deposit:
+                      Dépôt pour animaux :
                     </span>
                     <span className="summary-value font-semibold text-blue-900">
                       {formatCurrency(lease.terms?.petDeposit || 0)}
@@ -475,7 +475,7 @@ export function LeaseInvoice({
                 {/* Total Initial Payment */}
                 <div className="total-row summary-item flex justify-between py-3 border-t-2 border-blue-600 mt-4">
                   <span className="summary-label font-bold text-blue-900 text-lg">
-                    Total Initial Payment:
+                    Paiement initial total :
                   </span>
                   <span className="summary-value font-bold text-blue-900 text-lg">
                     {formatCurrency(
@@ -489,23 +489,23 @@ export function LeaseInvoice({
               </div>
             </div>
 
-            {/* Lease Terms & Conditions */}
+            {/* Lease Conditions générales */}
             {(lease.terms?.utilities?.length > 0 ||
               lease.terms?.restrictions?.length > 0) && (
               <div className="lease-terms bg-gray-50 p-6 rounded-lg mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Terms & Conditions
+                  Conditions générales
                 </h3>
 
                 {lease.terms?.utilities?.length > 0 && (
                   <div className="mb-4">
                     <h4 className="font-medium text-gray-800 mb-2">
-                      Utilities Included:
+                      Services inclus :
                     </h4>
                     <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                       {lease.terms?.utilities?.map((utility, index) => (
                         <li key={index}>{utility}</li>
-                      )) || <li>None specified</li>}
+                      )) || <li>Aucun</li>}
                     </ul>
                   </div>
                 )}
@@ -513,41 +513,41 @@ export function LeaseInvoice({
                 {lease.terms?.restrictions?.length > 0 && (
                   <div>
                     <h4 className="font-medium text-gray-800 mb-2">
-                      Restrictions:
+                      Restrictions :
                     </h4>
                     <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                       {lease.terms?.restrictions?.map((restriction, index) => (
                         <li key={index}>{restriction}</li>
-                      )) || <li>None specified</li>}
+                      )) || <li>Aucun</li>}
                     </ul>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Renewal Options */}
+            {/* Options de renouvellement */}
             {lease.renewalOptions?.available && (
               <div className="renewal-options bg-green-50 p-6 rounded-lg mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Renewal Options
+                  Options de renouvellement
                 </h3>
                 <p className="text-sm text-gray-600">
-                  This lease is eligible for renewal.
+                  Ce bail est éligible au renouvellement.
                 </p>
                 {lease.renewalOptions?.terms && (
                   <p className="text-sm text-gray-600 mt-2">
-                    <span className="font-medium">Terms:</span>{" "}
+                    <span className="font-medium">Conditions :</span>{" "}
                     {lease.renewalOptions?.terms}
                   </p>
                 )}
               </div>
             )}
 
-            {/* Additional Notes */}
+            {/* Notes complémentaires */}
             {lease.notes && (
               <div className="notes bg-yellow-50 p-6 rounded-lg mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Additional Notes
+                  Notes complémentaires
                 </h3>
                 <p className="text-sm text-gray-600 whitespace-pre-wrap">
                   {lease.notes}
@@ -559,7 +559,7 @@ export function LeaseInvoice({
             {lease.documents?.length > 0 && (
               <div className="documents bg-gray-50 p-6 rounded-lg mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Associated Documents
+                  Documents associés
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {lease.documents?.map((_, index) => (
@@ -578,15 +578,15 @@ export function LeaseInvoice({
             {/* Footer */}
             <div className="footer text-center text-gray-500 text-sm mt-12 pt-6 border-t border-gray-200">
               <p className="mb-2">
-                This invoice was generated on {formatDate(new Date())} by
-                PropertyPro Management System
+                Cette facture a été générée le {formatDate(new Date())} par
+                GESTION E-IMMO
               </p>
               <p className="mb-2">
                 For questions regarding this invoice, please contact us at{" "}
                 {companyInfo.email} or {companyInfo.phone}
               </p>
               <p className="text-xs">
-                Invoice #{generatedInvoiceNumber} | Lease ID: {lease._id}
+                Invoice #{generatedInvoiceNumber} | ID du bail : {lease._id}
               </p>
             </div>
           </div>

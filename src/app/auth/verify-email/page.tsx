@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle2, XCircle, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Mail, MessageCircle, } from "lucide-react";
 
 type Status = "validating" | "ready" | "confirming" | "success" | "error";
 
@@ -22,6 +22,41 @@ function VerifyEmailInner() {
   const [status, setStatus] = useState<Status>("validating");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+const [companyName, setCompanyName] = useState("GESTION E-IMMO");
+
+useEffect(() => {
+  (async () => {
+    try {
+      const res = await fetch("/api/branding/public");
+      const data = await res.json();
+
+      if (res.ok && data?.success && data?.data) {
+        setWhatsappNumber(data.data.whatsappNumber || "");
+        setWhatsappEnabled(data.data.whatsappEnabled ?? false);
+        setCompanyName(data.data.companyName || "GESTION E-IMMO");
+      }
+    } catch {
+      // WhatsApp reste simplement indisponible si le branding ne peut pas être chargé.
+    }
+  })();
+}, []);
+
+const openWhatsApp = () => {
+  const cleanNumber = whatsappNumber.replace(/\D/g, "");
+  if (!cleanNumber) return;
+
+  const whatsappMessage = encodeURIComponent(
+    `Bonjour ${companyName}, je viens de confirmer mon adresse e-mail ${email} sur E-IMMO et je souhaite confirmer mon numéro WhatsApp.`
+  );
+
+  window.open(
+    `https://wa.me/${cleanNumber}?text=${whatsappMessage}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+};
 
   // Validate the token on load.
   useEffect(() => {
@@ -45,7 +80,7 @@ function VerifyEmailInner() {
       } catch (err) {
         setStatus("error");
         setMessage(
-          err instanceof Error ? err.message : "This link is invalid or has expired."
+          err instanceof Error ? err.message : "Ce lien est invalide ou a expiré."
         );
       }
     })();
@@ -64,11 +99,11 @@ function VerifyEmailInner() {
         throw new Error(data?.error || "Failed to verify your email.");
       }
       setStatus("success");
-      setMessage("Your email address has been verified. Thank you!");
+      setMessage("Votre adresse e-mail a été confirmée avec succès.");
     } catch (err) {
       setStatus("error");
       setMessage(
-        err instanceof Error ? err.message : "Failed to verify your email."
+        err instanceof Error ? err.message : "Impossible de vérifier votre adresse e-mail."
       );
     }
   };
@@ -86,11 +121,11 @@ function VerifyEmailInner() {
               <Mail className="h-6 w-6 text-primary" />
             )}
           </div>
-          <CardTitle>Verify Your Email</CardTitle>
+          <CardTitle>Vérifiez votre adresse e-mail</CardTitle>
           <CardDescription>
-            {status === "validating" && "Validating your verification link…"}
-            {status === "ready" && `Confirm that ${email} is your email address.`}
-            {status === "confirming" && "Verifying your email…"}
+            {status === "validating" && "Vérification de votre lien en cours…"}
+            {status === "ready" && `Confirmez que ${email} est bien votre adresse e-mail.`}
+            {status === "confirming" && "Confirmation de votre adresse e-mail…"}
             {(status === "success" || status === "error") && message}
           </CardDescription>
         </CardHeader>
@@ -103,7 +138,7 @@ function VerifyEmailInner() {
 
           {status === "ready" && (
             <Button className="w-full" onClick={handleConfirm}>
-              Verify {email}
+              Confirmer mon adresse e-mail
             </Button>
           )}
 
@@ -115,17 +150,38 @@ function VerifyEmailInner() {
           )}
 
           {status === "success" && (
-            <Button className="w-full" asChild>
-              <Link href="/dashboard/settings/security">
-                Back to Security Settings
-              </Link>
-            </Button>
-          )}
+  <div className="space-y-3">
+    {whatsappEnabled && whatsappNumber && (
+      <>
+        <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
+          Votre adresse e-mail est maintenant confirmée.
+          Vous pouvez également confirmer votre numéro WhatsApp auprès de{" "}
+          <strong className="text-foreground">{companyName}</strong>.
+        </div>
+
+        <Button
+          type="button"
+          onClick={openWhatsApp}
+          className="w-full bg-green-600 text-white hover:bg-green-700"
+        >
+          <MessageCircle className="mr-2 h-5 w-5" />
+          Confirmer mon WhatsApp
+        </Button>
+      </>
+    )}
+
+    <Button variant="outline" className="w-full" asChild>
+      <Link href="/auth/signin">
+        Se connecter
+      </Link>
+    </Button>
+  </div>
+)}
 
           {status === "error" && (
             <Button variant="outline" className="w-full" asChild>
               <Link href="/dashboard/settings/security">
-                Back to Security Settings
+                Retour aux paramètres de sécurité
               </Link>
             </Button>
           )}

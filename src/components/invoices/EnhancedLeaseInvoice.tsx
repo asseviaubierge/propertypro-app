@@ -6,9 +6,9 @@ import {
   Building2,
   Download,
   Mail,
-  Printer,
+  Imprimerer,
   Save,
-  Share2,
+  Partager2,
   FileText,
   Loader2,
   Check,
@@ -32,15 +32,15 @@ import { LeaseResponse } from "@/lib/services/lease.service";
 import {
   emailInvoicePDF,
   generateLeaseInvoicePDF,
-  saveInvoiceToDocuments,
+  saveInvoiceÀDocuments,
   InvoiceGenerationOptions,
 } from "@/lib/invoice-pdf-generator";
 import {
   printInvoiceDirect,
   downloadInvoiceAsPDFDirect,
-  type PrintableInvoice,
+  type ImprimerableInvoice,
 } from "@/lib/invoice-print";
-import { buildPrintableInvoiceFromLease } from "@/lib/invoice/invoice-builders";
+import { buildImprimerableInvoiceFromLease } from "@/lib/invoice/invoice-builders";
 
 export interface EnhancedLeaseInvoiceProps {
   lease: LeaseResponse;
@@ -76,41 +76,41 @@ export function EnhancedLeaseInvoice({
   const [isEmailing, setIsEmailing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareDialogOpen, setPartagerDialogOpen] = useState(false);
 
   // Email form state
-  const [emailTo, setEmailTo] = useState(lease.tenantId?.userId?.email || "");
-  const [emailSubject, setEmailSubject] = useState(
-    `Lease Invoice - ${lease.propertyId?.name || "Property"}`
+  const [emailÀ, setEmailÀ] = useState(lease.tenantId?.userId?.email || "");
+  const [emailObjet, setEmailObjet] = useState(
+    `Facture de location - ${lease.propertyId?.name || "Bien"}`
   );
   const [emailMessage, setEmailMessage] = useState(
     `Dear ${
-      lease.tenantId?.userId?.firstName || "Tenant"
-    },\n\nPlease find attached your lease invoice for ${
-      lease.propertyId?.name || "the property"
-    }.\n\nBest regards,\n${companyInfo?.name || "PropertyPro Management"}`
+      lease.tenantId?.userId?.firstName || "Locataire"
+    },\n\nVeuillez trouver ci-joint votre facture de location pour ${
+      lease.propertyId?.name || "le bien"
+    }.\n\nCordialement,\n${companyInfo?.name || "BienPro Management"}`
   );
 
-  // Build a PrintableInvoice from lease data (keeps print and download identical)
-  const buildPrintableFromLease = (): PrintableInvoice =>
-    buildPrintableInvoiceFromLease(lease, {
+  // Build a ImprimerableInvoice from lease data (keeps print and download identical)
+  const buildImprimerableFromLease = (): ImprimerableInvoice =>
+    buildImprimerableInvoiceFromLease(lease, {
       companyInfo,
       invoiceNumber,
       issueDate,
       dueDate,
-    }) as PrintableInvoice;
+    }) as ImprimerableInvoice;
 
   // Generate PDF and download using the same HTML design
   const handleDownloadPDF = async () => {
     try {
       setIsGenerating(true);
-      const printable = buildPrintableFromLease();
+      const printable = buildImprimerableFromLease();
       await downloadInvoiceAsPDFDirect(printable, companyInfo);
-      toast.success("Invoice downloaded");
+      toast.success("Facture téléchargée");
       onInvoiceGenerated?.(String(printable.invoiceNumber));
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to download invoice";
+        error instanceof Error ? error.message : "Échec du téléchargement de la facture";
       toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
@@ -123,23 +123,23 @@ export function EnhancedLeaseInvoice({
       setIsEmailing(true);
 
       const emailResult = await emailInvoicePDF({
-        to: emailTo,
-        subject: emailSubject,
+        to: emailÀ,
+        subject: emailObjet,
         message: emailMessage,
         leaseId: lease._id,
         invoiceNumber: invoiceNumber,
       });
 
       if (emailResult.success) {
-        toast.success(`Invoice emailed to ${emailTo}`);
-        onInvoiceEmailed?.(emailTo);
+        toast.success(`Facture envoyée à ${emailÀ}`);
+        onInvoiceEmailed?.(emailÀ);
         setEmailDialogOpen(false);
       } else {
-        throw new Error(emailResult.error || "Failed to send email");
+        throw new Error(emailResult.error || "Échec de l'envoi de l'e-mail");
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to email invoice";
+        error instanceof Error ? error.message : "Échec de l'envoi de la facture";
       toast.error(errorMessage);
     } finally {
       setIsEmailing(false);
@@ -164,40 +164,40 @@ export function EnhancedLeaseInvoice({
       const result = await generateLeaseInvoicePDF(options);
 
       if (result.success) {
-        const saveResult = await saveInvoiceToDocuments(result, lease._id);
+        const saveResult = await saveInvoiceÀDocuments(result, lease._id);
 
         if (saveResult.success && saveResult.documentId) {
-          toast.success("Invoice saved to documents");
+          toast.success("Facture enregistrée dans les documents");
           onInvoiceSaved?.(saveResult.documentId);
         } else {
-          throw new Error(saveResult.error || "Failed to save document");
+          throw new Error(saveResult.error || "Échec de l'enregistrement du document");
         }
       } else {
-        throw new Error(result.error || "Failed to generate PDF");
+        throw new Error(result.error || "Échec de la génération du PDF");
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to save invoice";
+        error instanceof Error ? error.message : "Échec de l'enregistrement de la facture";
       toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Print invoice using the same HTML design
-  const handlePrint = async () => {
-    const printable = buildPrintableFromLease();
+  // Imprimer invoice using the same HTML design
+  const handleImprimer = async () => {
+    const printable = buildImprimerableFromLease();
     await printInvoiceDirect(printable, companyInfo);
   };
 
   // Copy share link
-  const handleCopyShareLink = () => {
+  const handleCopyPartagerLink = () => {
     const shareUrl = `${window.location.origin}/dashboard/leases/${
       lease._id || "unknown"
     }/invoice`;
     navigator.clipboard.writeText(shareUrl);
-    toast.success("Share link copied to clipboard");
-    setShareDialogOpen(false);
+    toast.success("Lien de partage copié");
+    setPartagerDialogOpen(false);
   };
 
   return (
@@ -207,23 +207,23 @@ export function EnhancedLeaseInvoice({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Invoice Actions
+            Actions sur la facture
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            {/* Print Button */}
+            {/* Imprimer Button */}
             <Button
               variant="outline"
               size="sm"
-              onClick={handlePrint}
+              onClick={handleImprimer}
               className="flex items-center gap-2"
             >
-              <Printer className="h-4 w-4" />
-              Print
+              <Imprimerer className="h-4 w-4" />
+              Imprimer
             </Button>
 
-            {/* Download PDF Button */}
+            {/* Télécharger le PDF Button */}
             <Button
               variant="outline"
               size="sm"
@@ -236,7 +236,7 @@ export function EnhancedLeaseInvoice({
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              {isGenerating ? "Generating..." : "Download PDF"}
+              {isGenerating ? "Génération..." : "Télécharger le PDF"}
             </Button>
 
             {/* Email Button */}
@@ -253,29 +253,29 @@ export function EnhancedLeaseInvoice({
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Email Invoice</DialogTitle>
+                  <DialogTitle>Envoyer la facture</DialogTitle>
                   <DialogDescription>
-                    Send the invoice PDF via email
+                    Envoyer la facture PDF par e-mail
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="email-to">To</Label>
+                    <Label htmlFor="email-to">À</Label>
                     <Input
                       id="email-to"
                       type="email"
-                      value={emailTo}
-                      onChange={(e) => setEmailTo(e.target.value)}
-                      placeholder="recipient@example.com"
+                      value={emailÀ}
+                      onChange={(e) => setEmailÀ(e.target.value)}
+                      placeholder="destinataire@exemple.com"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email-subject">Subject</Label>
+                    <Label htmlFor="email-subject">Objet</Label>
                     <Input
                       id="email-subject"
-                      value={emailSubject}
-                      onChange={(e) => setEmailSubject(e.target.value)}
-                      placeholder="Email subject"
+                      value={emailObjet}
+                      onChange={(e) => setEmailObjet(e.target.value)}
+                      placeholder="Objet de l'e-mail"
                     />
                   </div>
                   <div>
@@ -284,7 +284,7 @@ export function EnhancedLeaseInvoice({
                       id="email-message"
                       value={emailMessage}
                       onChange={(e) => setEmailMessage(e.target.value)}
-                      placeholder="Email message"
+                      placeholder="Message de l'e-mail"
                       rows={4}
                     />
                   </div>
@@ -295,18 +295,18 @@ export function EnhancedLeaseInvoice({
                     onClick={() => setEmailDialogOpen(false)}
                     disabled={isEmailing}
                   >
-                    Cancel
+                    Annuler
                   </Button>
                   <Button
                     onClick={handleEmailPDF}
-                    disabled={isEmailing || !emailTo}
+                    disabled={isEmailing || !emailÀ}
                   >
                     {isEmailing ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : (
                       <Mail className="h-4 w-4 mr-2" />
                     )}
-                    {isEmailing ? "Sending..." : "Send Email"}
+                    {isEmailing ? "Envoi..." : "Envoyer"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -325,31 +325,31 @@ export function EnhancedLeaseInvoice({
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isSaving ? "Saving..." : "Save to Documents"}
+              {isSaving ? "Enregistrement..." : "Enregistrer dans les documents"}
             </Button>
 
-            {/* Share Button */}
-            <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+            {/* Partager Button */}
+            <Dialog open={shareDialogOpen} onOpenChange={setPartagerDialogOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-2"
                 >
-                  <Share2 className="h-4 w-4" />
-                  Share
+                  <Partager2 className="h-4 w-4" />
+                  Partager
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Share Invoice</DialogTitle>
+                  <DialogTitle>Partager la facture</DialogTitle>
                   <DialogDescription>
-                    Share a link to this invoice
+                    Partager un lien vers cette facture
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label>Share Link</Label>
+                    <Label>Lien de partage</Label>
                     <div className="flex gap-2">
                       <Input
                         value={`${window.location.origin}/dashboard/leases/${
@@ -361,7 +361,7 @@ export function EnhancedLeaseInvoice({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={handleCopyShareLink}
+                        onClick={handleCopyPartagerLink}
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -371,9 +371,9 @@ export function EnhancedLeaseInvoice({
                 <DialogFooter>
                   <Button
                     variant="outline"
-                    onClick={() => setShareDialogOpen(false)}
+                    onClick={() => setPartagerDialogOpen(false)}
                   >
-                    Close
+                    Fermer
                   </Button>
                 </DialogFooter>
               </DialogContent>

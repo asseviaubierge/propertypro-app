@@ -61,6 +61,8 @@ const formDisplaySettingsSchema = z.object({
       secondaryColor: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
       companyName: z.string().optional(),
       companyAddress: z.string().optional(),
+      whatsappNumber: z.string().optional(),
+      whatsappEnabled: z.boolean().optional(),
       r2: z
         .object({
           logoLight: z
@@ -268,6 +270,8 @@ export function DisplaySettings({
             secondaryColor: settings.branding.secondaryColor || "#64748B",
             companyName: settings.branding.companyName || "",
             companyAddress: settings.branding.companyAddress || "",
+            whatsappNumber: settings.branding.whatsappNumber || "",
+            whatsappEnabled: settings.branding.whatsappEnabled ?? false,
             r2: settings.branding.r2 || {},
           }
         : {
@@ -278,6 +282,8 @@ export function DisplaySettings({
             secondaryColor: "#64748B",
             companyName: "",
             companyAddress: "",
+            whatsappNumber: "",
+            whatsappEnabled: false,
             r2: {},
           },
     },

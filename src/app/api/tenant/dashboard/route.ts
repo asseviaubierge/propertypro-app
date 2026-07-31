@@ -179,16 +179,16 @@ export const GET = withPermissionAndDB("lease_view", {
     const notifications = [
       {
         _id: "notif1",
-        title: "Rent Reminder",
-        message: "Your rent payment is due in 3 days",
+        title: "Rappel de loyer",
+        message: "Votre paiement de loyer est prévu dans 3 jours.",
         type: "payment",
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         read: false,
       },
       {
         _id: "notif2",
-        title: "Maintenance Update",
-        message: "Your maintenance request has been assigned to a technician",
+        title: "Mise à jour de maintenance",
+        message: "Votre demande de maintenance a été attribuée à un technicien.",
         type: "maintenance",
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
         read: true,
@@ -250,10 +250,10 @@ export const GET = withPermissionAndDB("lease_view", {
 
       return createSuccessResponse(
         dashboardData,
-        "Dashboard data retrieved successfully"
+        "Données du tableau de bord récupérées avec succès"
       );
     } catch (error) {
-      return createErrorResponse("Failed to fetch tenant dashboard data", 500);
+      return createErrorResponse("Impossible de récupérer les données du tableau de bord du locataire", 500);
     }
   }
 );

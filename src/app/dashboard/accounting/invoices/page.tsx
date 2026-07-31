@@ -68,7 +68,7 @@ import BulkOperationsDialog from "@/components/invoice/BulkOperationsDialog";
 import { showSimpleError, showSimpleSuccess } from "@/lib/toast-notifications";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
-interface Invoice {
+interface Facture {
   _id: string;
   invoiceNumber: string;
   tenantId?: {
@@ -166,7 +166,7 @@ const formatDisplayDate = (value?: string | Date) => {
   return Number.isNaN(parsed.getTime()) ? "—" : parsed.toLocaleDateString();
 };
 
-export default function InvoicesPage() {
+export default function FacturesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -175,14 +175,14 @@ export default function InvoicesPage() {
     useLocalizationContext();
   const initialLeaseId = searchParams.get("leaseId") || undefined;
   const initialPropertyId = searchParams.get("propertyId") || undefined;
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoices, setInvoices] = useState<Facture[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] =
-    useState<Invoice | null>(null);
+    useState<Facture | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 12,
@@ -203,7 +203,7 @@ export default function InvoicesPage() {
   });
   const viewMode = useViewPreferencesStore((state) => state.invoicesView);
   const setViewMode = useViewPreferencesStore((state) => state.setInvoicesView);
-  const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
+  const [selectedInvoices, setSelectedFactures] = useState<string[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     scheduled: 0,
@@ -223,7 +223,7 @@ export default function InvoicesPage() {
       return;
     }
 
-    fetchInvoices(filters, true);
+    fetchFactures(filters, true);
     fetchStats();
   }, [status]);
 
@@ -232,7 +232,7 @@ export default function InvoicesPage() {
       return;
     }
 
-    fetchInvoices(filters, false);
+    fetchFactures(filters, false);
   }, [filters, isInitialLoad, status]);
 
   useEffect(() => {
@@ -243,7 +243,7 @@ export default function InvoicesPage() {
     fetchStats();
   }, [filters.propertyId, filters.tenantId, filters.leaseId, status]);
 
-  const fetchInvoices = async (
+  const fetchFactures = async (
     currentFilters?: InvoiceQueryParams,
     showFullLoading: boolean = false,
   ) => {
@@ -265,7 +265,7 @@ export default function InvoicesPage() {
         const data = await response.json();
 
         if (data?.success) {
-          const allInv: Invoice[] = data.data?.invoices || [];
+          const allInv: Facture[] = data.data?.invoices || [];
           const search = (activeFilters.search || "").toLowerCase().trim();
           const filtered = allInv.filter((inv) => {
             const matchesStatus =
@@ -273,7 +273,7 @@ export default function InvoicesPage() {
             if (!search) return matchesStatus;
             const haystack = [
               inv.invoiceNumber,
-              inv.propertyId?.name,
+              fullInvoice.propertyId?.name,
               inv.tenantId?.firstName,
               inv.tenantId?.lastName,
               inv.tenantId?.email,
@@ -289,7 +289,7 @@ export default function InvoicesPage() {
             path
               .split(".")
               .reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
-          const getSortVal = (inv: Invoice) => {
+          const getSortVal = (inv: Facture) => {
             const v = get(inv, sortBy);
             if (!v) return 0;
             const key = sortBy.toLowerCase();
@@ -355,7 +355,7 @@ export default function InvoicesPage() {
           });
         } else {
           showSimpleError(
-            "Load Error",
+            "Erreur de chargement",
             t("leases.invoices.toasts.fetchTenantError"),
           );
         }
@@ -375,7 +375,7 @@ export default function InvoicesPage() {
         const data = await response.json();
 
         if (data?.success) {
-          const allInv: Invoice[] = data.data?.invoices || [];
+          const allInv: Facture[] = data.data?.invoices || [];
           const search = (activeFilters.search || "").toLowerCase().trim();
           const filtered = allInv.filter((inv) => {
             const matchesStatus =
@@ -383,7 +383,7 @@ export default function InvoicesPage() {
             if (!search) return matchesStatus;
             const haystack = [
               inv.invoiceNumber,
-              inv.propertyId?.name,
+              fullInvoice.propertyId?.name,
               inv.tenantId?.firstName,
               inv.tenantId?.lastName,
               inv.tenantId?.email,
@@ -399,7 +399,7 @@ export default function InvoicesPage() {
             path
               .split(".")
               .reduce((acc, key) => (acc == null ? acc : acc[key]), obj);
-          const getSortVal = (inv: Invoice) => {
+          const getSortVal = (inv: Facture) => {
             const v = get(inv, sortBy);
             if (!v) return 0;
             const key = sortBy.toLowerCase();
@@ -439,11 +439,11 @@ export default function InvoicesPage() {
             hasPrev: page > 1,
           });
         } else {
-          showSimpleError("Load Error", t("leases.invoices.toasts.fetchError"));
+          showSimpleError("Erreur de chargement", t("leases.invoices.toasts.fetchError"));
         }
       }
     } catch {
-      showSimpleError("Load Error", t("leases.invoices.toasts.fetchError"));
+      showSimpleError("Erreur de chargement", t("leases.invoices.toasts.fetchError"));
     } finally {
       setLoading(false);
       setIsSearching(false);
@@ -506,46 +506,102 @@ export default function InvoicesPage() {
     setFilters((prev) => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
-  const handleDownloadInvoice = async (inv: Invoice) => {
-    try {
-      // Fetch company info from display settings
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const companyInfo = await getCompanyInfo();
+  const handleDownloadInvoice = async (inv: Facture) => {
+  try {
+  const response = await fetch(`/api/invoices/${inv._id}`);
+  const data = await response.json();
+  const fullInvoice = data.data;
+    const { getCompanyInfo } = await import("@/lib/utils/company-info");
 
-      const printable = normalizeInvoiceForPrint(inv, {
-        companyInfo: companyInfo || undefined,
-      }) as PrintableInvoice;
-      await downloadInvoiceAsPDF(printable);
-      showSimpleSuccess(
-        "Download Complete",
-        t("leases.invoices.toasts.downloadSuccess"),
-      );
-    } catch (error) {
-      showSimpleError(
-        "Download Failed",
-        t("leases.invoices.toasts.downloadError"),
-      );
-    }
-  };
+    const fallback = await getCompanyInfo();
 
-  const handlePrintInvoice = async (inv: Invoice) => {
-    try {
-      // Fetch company info from display settings
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const companyInfo = await getCompanyInfo();
+    const owner = (fullInvoice.propertyId as any)?.ownerId;
 
-      const printable = normalizeInvoiceForPrint(inv, {
-        companyInfo: companyInfo || undefined,
-      }) as PrintableInvoice;
-      printInvoice(printable);
-    } catch (error) {
-      showSimpleError("Print Failed", t("leases.invoices.toasts.printError"));
-    }
-  };
+    const ownerCompany =
+      owner && typeof owner === "object"
+        ? {
+            name:
+              owner.businessName ||
+              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
 
-  const handleSendInvoice = async (inv: Invoice) => {
+            address:
+              typeof fullInvoice.propertyId?.address === "string"
+                ? fullInvoice.propertyId.address
+                : "",
+
+            phone: owner.phone || "",
+            email: owner.email || "",
+            logo: owner.businessLogo || "",
+            cip: owner.cip || "",
+            ifu: owner.ifu || "",
+            rccm: owner.rccm || "",
+          }
+        : undefined;
+
+    const printable = normalizeInvoiceForPrint(fullInvoice, {
+      companyInfo: ownerCompany ?? fallback ?? undefined,
+    }) as PrintableInvoice;
+
+    await downloadInvoiceAsPDF(printable);
+
+    showSimpleSuccess(
+      "Téléchargement terminé",
+      t("leases.invoices.toasts.downloadSuccess"),
+    );
+  } catch {
+    showSimpleError(
+      "Échec du téléchargement",
+      t("leases.invoices.toasts.downloadError"),
+    );
+  }
+};
+
+  const handlePrintInvoice = async (inv: Facture) => {
+  try {
+    const response = await fetch(`/api/invoices/${inv._id}`);
+    const data = await response.json();
+    const fullInvoice = data.data;
+
+    const { getCompanyInfo } = await import("@/lib/utils/company-info");
+    const fallback = await getCompanyInfo();
+
+    const owner = (fullInvoice.propertyId as any)?.ownerId;
+
+    const ownerCompany =
+      owner && typeof owner === "object"
+        ? {
+            name:
+              owner.businessName ||
+              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
+            address:
+              typeof fullInvoice.propertyId?.address === "string"
+                ? fullInvoice.propertyId.address
+                : "",
+            phone: owner.phone || "",
+            email: owner.email || "",
+            logo: owner.businessLogo || "",
+            cip: owner.cip || "",
+            ifu: owner.ifu || "",
+            rccm: owner.rccm || "",
+          }
+        : undefined;
+
+    const printable = normalizeInvoiceForPrint(fullInvoice, {
+      companyInfo: ownerCompany ?? fallback ?? undefined,
+    }) as PrintableInvoice;
+
+    printInvoice(printable);
+  } catch {
+    showSimpleError(
+      "Échec de l'impression",
+      t("leases.invoices.toasts.printError"),
+    );
+  }
+};
+
+  const handleSendInvoice = async (inv: Facture) => {
     if (!inv?.tenantId?.email) {
-      showSimpleError("Email Failed", t("leases.invoices.toasts.emailError"));
+      showSimpleError("Échec de l'envoi de l'e-mail", t("leases.invoices.toasts.emailError"));
       return;
     }
     try {
@@ -554,8 +610,8 @@ export default function InvoicesPage() {
         invoiceId: inv._id,
         to: inv.tenantId?.email,
         invoiceNumber: inv.invoiceNumber || "N/A",
-        subject: `Invoice ${inv.invoiceNumber || "N/A"}`,
-        message: `Please find attached your invoice ${inv.invoiceNumber || "N/A"}.`,
+        subject: `Facture ${inv.invoiceNumber || "N/A"}`,
+        message: `Veuillez trouver ci-joint votre facture ${inv.invoiceNumber || "N/A"}.`,
       };
       const res = await fetch("/api/invoices/email", {
         method: "POST",
@@ -565,14 +621,14 @@ export default function InvoicesPage() {
       const data = await res.json();
       if (res.ok && data?.success) {
         showSimpleSuccess(
-          "Email Sent",
+          "E-mail envoyé",
           t("leases.invoices.toasts.emailSuccess"),
         );
       } else {
         throw new Error(data?.error || t("leases.invoices.toasts.emailError"));
       }
     } catch {
-      showSimpleError("Email Failed", t("leases.invoices.toasts.emailError"));
+      showSimpleError("Échec de l'envoi de l'e-mail", t("leases.invoices.toasts.emailError"));
     }
   };
 
@@ -585,15 +641,15 @@ export default function InvoicesPage() {
       const data = await res.json();
       if (res.ok && data?.success) {
         showSimpleSuccess(
-          "Invoice Deleted",
+          "Facture Deleted",
           t("leases.invoices.toasts.refreshed"),
         );
-        fetchInvoices(filters, false);
+        fetchFactures(filters, false);
       } else {
-        throw new Error(data?.error || "Failed to delete invoice");
+        throw new Error(data?.error || "Échec de la suppression de la facture");
       }
     } catch {
-      showSimpleError("Delete Failed", "Failed to delete invoice");
+      showSimpleError("Delete Failed", "Échec de la suppression de la facture");
     } finally {
       setDeletingId(null);
     }
@@ -667,22 +723,22 @@ export default function InvoicesPage() {
       const data = await response.json();
       if (data?.success) {
         showSimpleSuccess(
-          "Late Fees Applied",
+          "Pénalités de retard appliquées",
           t("leases.invoices.toasts.lateFeesSuccess", {
             values: { count: data?.data?.feesApplied ?? 0 },
           }),
         );
-        fetchInvoices(filters, false);
+        fetchFactures(filters, false);
         fetchStats();
       } else {
         showSimpleError(
-          "Late Fees Failed",
+          "Échec de l'application des pénalités de retard",
           t("leases.invoices.toasts.lateFeesError"),
         );
       }
     } catch {
       showSimpleError(
-        "Late Fees Failed",
+        "Échec de l'application des pénalités de retard",
         t("leases.invoices.toasts.lateFeesError"),
       );
     }
@@ -690,7 +746,7 @@ export default function InvoicesPage() {
 
   const handleBulkAction = async () => {
     if (selectedInvoices.length === 0) {
-      showSimpleError("No Selection", t("leases.invoices.toasts.noSelection"));
+      showSimpleError("Aucune sélection", t("leases.invoices.toasts.noSelection"));
       return;
     }
 
@@ -698,7 +754,7 @@ export default function InvoicesPage() {
     setBulkDialogOpen(true);
   };
 
-  const handleRecordPayment = (invoice: Invoice) => {
+  const handleRecordPayment = (invoice: Facture) => {
     setSelectedInvoiceForPayment(invoice);
     setPaymentDialogOpen(true);
   };
@@ -712,7 +768,7 @@ export default function InvoicesPage() {
   };
 
   // Define columns for DataTable
-  const invoiceColumns: DataTableColumn<Invoice>[] = [
+  const invoiceColumns: DataTableColumn<Facture>[] = [
     {
       id: "invoiceNumber",
       header: t("leases.invoices.table.invoiceNumber"),
@@ -787,7 +843,7 @@ export default function InvoicesPage() {
         const propertyName =
           invoice.propertyId?.name ||
           invoice.leaseId?.propertyId?.name ||
-          "Unknown Property";
+          "Bien inconnu";
         const propertyAddress =
           invoice.propertyId?.address || invoice.leaseId?.propertyId?.address;
         const address = formatAddress(propertyAddress);
@@ -985,20 +1041,20 @@ export default function InvoicesPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             {isTenant
               ? t("invoices.header.myTitle", {
-                  defaultValue: "My Invoices",
+                  defaultValue: "Mes factures",
                 })
               : t("invoices.header.title", {
-                  defaultValue: "Invoices",
+                  defaultValue: "Factures",
                 })}
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">
             {isTenant
               ? t("invoices.header.mySubtitle", {
-                  defaultValue: "View and pay your invoices",
+                  defaultValue: "Consultez et payez vos factures",
                 })
               : t("invoices.header.subtitle", {
                   defaultValue:
-                    "Create and manage invoices for leases, services, and charges",
+                    "Créer et gérer les factures des baux, services et frais",
                 })}
           </p>
         </div>
@@ -1007,10 +1063,10 @@ export default function InvoicesPage() {
             variant="outline"
             size="sm"
             onClick={() => {
-              fetchInvoices(filters, true);
+              fetchFactures(filters, true);
               fetchStats();
               showSimpleSuccess(
-                "Refreshed",
+                "Actualisé",
                 t("leases.invoices.toasts.refreshed"),
               );
             }}
@@ -1036,7 +1092,7 @@ export default function InvoicesPage() {
               >
                 <Plus className="mr-2 h-4 w-4" />
                 {t("invoices.actions.createInvoice", {
-                  defaultValue: "Create Invoice",
+                  defaultValue: "Créer une facture",
                 })}
               </Button>
             </>
@@ -1051,7 +1107,7 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.total")}
             value={stats.total}
             description={t("leases.invoices.stats.totalDescription", {
-              defaultValue: "All invoices",
+              defaultValue: "Toutes les factures",
             })}
             icon={FileText}
             iconColor="primary"
@@ -1060,7 +1116,7 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.paid")}
             value={stats.paid}
             description={t("leases.invoices.stats.paidDescription", {
-              defaultValue: "Successfully paid",
+              defaultValue: "Payées avec succès",
             })}
             icon={CheckCircle}
             iconColor="success"
@@ -1069,18 +1125,18 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.overdue")}
             value={stats.overdue}
             description={t("leases.invoices.stats.overdueDescription", {
-              defaultValue: "Needs attention",
+              defaultValue: "Nécessite une attention",
             })}
             icon={AlertTriangle}
             iconColor="warning"
           />
           <AnalyticsCard
             title={t("leases.invoices.stats.balance", {
-              defaultValue: "Balance",
+              defaultValue: "Solde",
             })}
             value={formatCurrency(stats.overdueAmount)}
             description={t("leases.invoices.stats.balanceDescription", {
-              defaultValue: "Outstanding balance",
+              defaultValue: "Solde impayé",
             })}
             icon={DollarSign}
             iconColor="error"
@@ -1092,7 +1148,7 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.total")}
             value={stats.total}
             description={t("leases.invoices.stats.totalDescription", {
-              defaultValue: "All invoices",
+              defaultValue: "Toutes les factures",
             })}
             icon={FileText}
             iconColor="primary"
@@ -1102,7 +1158,7 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.paid")}
             value={stats.paid}
             description={t("leases.invoices.stats.paidDescription", {
-              defaultValue: "Successfully paid",
+              defaultValue: "Payées avec succès",
             })}
             icon={CheckCircle}
             iconColor="success"
@@ -1122,7 +1178,7 @@ export default function InvoicesPage() {
             title={t("leases.invoices.stats.overdue")}
             value={stats.overdue}
             description={t("leases.invoices.stats.overdueDescription", {
-              defaultValue: "Needs attention",
+              defaultValue: "Nécessite une attention",
             })}
             icon={AlertTriangle}
             iconColor="error"
@@ -1130,7 +1186,7 @@ export default function InvoicesPage() {
         </AnalyticsCardGrid>
       )}
 
-      {/* Invoice List with Integrated Filters */}
+      {/* Facture List with Integrated Filters */}
       <Card className="gap-2">
         <CardHeader>
           {/* Main Header */}
@@ -1185,7 +1241,7 @@ export default function InvoicesPage() {
                 isLoading={isSearching}
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-white dark:bg-gray-800"
-                ariaLabel="Search invoices"
+                ariaLabel="Rechercher des factures"
               />
 
               {/* Filter Controls */}
@@ -1258,7 +1314,7 @@ export default function InvoicesPage() {
                 </SelectContent>
               </Select>
 
-              {/* Clear Filters */}
+              {/* Effacer Filters */}
               {(filters.search || filters.status) && (
                 <Button
                   variant="ghost"
@@ -1274,7 +1330,7 @@ export default function InvoicesPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("leases.filters.clear") || "Clear"}
+                  {t("leases.filters.clear") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -1301,7 +1357,7 @@ export default function InvoicesPage() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleBulkAction}>
                       <Send className="mr-2 h-4 w-4" />
-                      {t("leases.invoices.bulk.sendInvoices")}
+                      {t("leases.invoices.bulk.sendFactures")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleBulkAction}>
                       <Download className="mr-2 h-4 w-4" />
@@ -1317,7 +1373,7 @@ export default function InvoicesPage() {
                       className="text-red-600"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      {t("leases.invoices.bulk.cancelInvoices")}
+                      {t("leases.invoices.bulk.cancelFactures")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -1348,13 +1404,13 @@ export default function InvoicesPage() {
                 <div className="col-span-full flex flex-col items-center gap-2 py-12">
                   <FileText className="h-12 w-12 text-muted-foreground" />
                   <h3 className="text-lg font-semibold">
-                    {t("leases.invoices.empty.noInvoices", {
-                      defaultValue: "No invoices found",
+                    {t("leases.invoices.empty.noFactures", {
+                      defaultValue: "Aucune facture trouvée",
                     })}
                   </h3>
                   <p className="text-muted-foreground mb-2">
                     {t("leases.invoices.empty.description", {
-                      defaultValue: "No invoices match your current filters.",
+                      defaultValue: "Aucune facture ne correspond aux filtres actuels.",
                     })}
                   </p>
                   {!isTenant && !filters.search && !filters.status && (
@@ -1366,7 +1422,7 @@ export default function InvoicesPage() {
                       }
                     >
                       {t("invoices.empty.createFirst", {
-                        defaultValue: "Create Invoice",
+                        defaultValue: "Créer une facture",
                       })}
                     </Button>
                   )}
@@ -1415,12 +1471,12 @@ export default function InvoicesPage() {
                             checked={selectedInvoices.includes(invoice._id)}
                             onChange={(e) => {
                               if (e.target.checked) {
-                                setSelectedInvoices([
+                                setSelectedFactures([
                                   ...selectedInvoices,
                                   invoice._id,
                                 ]);
                               } else {
-                                setSelectedInvoices(
+                                setSelectedFactures(
                                   selectedInvoices.filter(
                                     (id) => id !== invoice._id,
                                   ),
@@ -1612,16 +1668,16 @@ export default function InvoicesPage() {
                       selectedIds: selectedInvoices,
                       onSelectAll: (checked: boolean) => {
                         if (checked) {
-                          setSelectedInvoices(invoices.map((inv) => inv._id));
+                          setSelectedFactures(invoices.map((inv) => inv._id));
                         } else {
-                          setSelectedInvoices([]);
+                          setSelectedFactures([]);
                         }
                       },
                       onSelectRow: (id: string, checked: boolean) => {
                         if (checked) {
-                          setSelectedInvoices((prev) => [...prev, id]);
+                          setSelectedFactures((prev) => [...prev, id]);
                         } else {
-                          setSelectedInvoices((prev) =>
+                          setSelectedFactures((prev) =>
                             prev.filter((i) => i !== id),
                           );
                         }
@@ -1639,11 +1695,11 @@ export default function InvoicesPage() {
               }
               emptyState={{
                 icon: <FileText className="h-12 w-12 text-muted-foreground" />,
-                title: t("leases.invoices.empty.noInvoices", {
-                  defaultValue: "No invoices found",
+                title: t("leases.invoices.empty.noFactures", {
+                  defaultValue: "Aucune facture trouvée",
                 }),
                 description: t("leases.invoices.empty.description", {
-                  defaultValue: "No invoices match your current filters.",
+                  defaultValue: "Aucune facture ne correspond aux filtres actuels.",
                 }),
               }}
               striped
@@ -1677,7 +1733,7 @@ export default function InvoicesPage() {
         onOpenChange={setPaymentDialogOpen}
         invoice={paymentDialogInvoice}
         onPaymentRecorded={() => {
-          fetchInvoices(filters, false);
+          fetchFactures(filters, false);
           setSelectedInvoiceForPayment(null);
         }}
       />
@@ -1688,8 +1744,8 @@ export default function InvoicesPage() {
         onOpenChange={setBulkDialogOpen}
         selectedInvoices={selectedInvoices}
         onOperationComplete={() => {
-          fetchInvoices(filters, false);
-          setSelectedInvoices([]);
+          fetchFactures(filters, false);
+          setSelectedFactures([]);
         }}
       />
     </div>

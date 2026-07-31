@@ -956,6 +956,40 @@ export default function PropertyDetailsPage() {
                   {units.length || 1}
                 </p>
               </div>
+              
+              {/* Property Owner Card */}
+{property?.ownerId && (
+  <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+    <div className="flex items-center gap-3 mb-3">
+      <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900">
+        <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+      </div>
+
+      <label className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+        Propriétaire du bien
+      </label>
+    </div>
+
+    <p className="text-lg font-bold text-gray-900 dark:text-white">
+      {property.ownerId.businessName ||
+        `${property.ownerId.firstName || ""} ${
+          property.ownerId.lastName || ""
+        }`.trim()}
+    </p>
+
+    {property.ownerId.accountType && (
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        {property.ownerId.accountType === "direct_owner"
+          ? "Propriétaire direct"
+          : property.ownerId.accountType === "agency"
+            ? "Agence immobilière"
+            : property.ownerId.accountType === "e_immo"
+              ? "E-IMMO"
+              : property.ownerId.accountType}
+      </p>
+    )}
+  </div>
+)}
 
               {/* Year Built Card */}
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">

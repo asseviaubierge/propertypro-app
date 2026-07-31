@@ -31,13 +31,25 @@ export async function GET(
     }
 
     const invoice = await Invoice.findById(id)
-      .populate("tenantId", "firstName lastName email phone")
-      .populate("propertyId", "name address")
-      .populate("leaseId", "startDate endDate terms");
+  .populate("tenantId", "firstName lastName email phone")
+  .populate({
+    path: "propertyId",
+    select: "name address ownerId",
+    populate: {
+      path: "ownerId",
+      select:
+        "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
+    },
+  })
+  .populate("leaseId", "startDate endDate terms");
 
     if (!invoice) {
       return createErrorResponse("Invoice not found", 404);
     }
+    
+    console.log("========== INVOICE DEBUG ==========");
+    console.dir(invoice?.propertyId, { depth: 5 });
+    console.log("==================================");
 
     // Generate the PDF using the same design used in the lease module
     const pdfData = await generateInvoicePdfBuffer(invoice);
@@ -47,7 +59,7 @@ export async function GET(
     invoice.pdfPath = `/invoices/${invoice._id}.pdf`;
     await invoice.save();
 
-    return new NextResponse(pdfData, {
+    return new NextResponse(new Uint8Array(pdfData), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="invoice-${invoice.invoiceNumber}.pdf"`,
@@ -75,9 +87,17 @@ export async function POST(
     }
 
     const invoice = await Invoice.findById(id)
-      .populate("tenantId", "firstName lastName email phone")
-      .populate("propertyId", "name address")
-      .populate("leaseId", "startDate endDate terms");
+  .populate("tenantId", "firstName lastName email phone")
+  .populate({
+    path: "propertyId",
+    select: "name address ownerId",
+    populate: {
+      path: "ownerId",
+      select:
+        "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
+    },
+  })
+  .populate("leaseId", "startDate endDate terms");
 
     if (!invoice) {
       return createErrorResponse("Invoice not found", 404);

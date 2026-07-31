@@ -27,53 +27,53 @@ import { ArrowLeft, Loader2, Plus, X } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
-// Grouped categories for the dropdown
+// Groupes de catégories pour le menu déroulant
 const INVOICE_CATEGORY_GROUPS: SearchableSelectGroup[] = [
   {
-    label: "Tenant Charges & Fees",
+    label: "Frais et charges locataire",
     options: [
-      { value: InvoiceType.RENT, label: "Rent" },
-      { value: InvoiceType.SECURITY_DEPOSIT, label: "Security Deposit" },
-      { value: InvoiceType.LATE_FEE, label: "Late Fee" },
-      { value: InvoiceType.APPLICATION_FEE, label: "Application Fee" },
-      { value: InvoiceType.MOVE_IN_FEE, label: "Move-in Fee" },
-      { value: InvoiceType.MOVE_OUT_FEE, label: "Move-out Fee" },
-      { value: InvoiceType.PET_DEPOSIT, label: "Pet Deposit" },
-      { value: InvoiceType.PET_RENT, label: "Pet Rent" },
-      { value: InvoiceType.PARKING_FEE, label: "Parking Fee" },
-      { value: InvoiceType.STORAGE_FEE, label: "Storage Fee" },
-      { value: InvoiceType.LEASE_BREAK_FEE, label: "Lease Break Fee" },
-      { value: InvoiceType.NSF_FEE, label: "NSF Fee" },
+      { value: InvoiceType.RENT, label: "Loyer" },
+      { value: InvoiceType.SECURITY_DEPOSIT, label: "Dépôt de garantie" },
+      { value: InvoiceType.LATE_FEE, label: "Frais de retard" },
+      { value: InvoiceType.APPLICATION_FEE, label: "Frais de dossier" },
+      { value: InvoiceType.MOVE_IN_FEE, label: "Frais d'emménagement" },
+      { value: InvoiceType.MOVE_OUT_FEE, label: "Frais de déménagement" },
+      { value: InvoiceType.PET_DEPOSIT, label: "Caution animal de compagnie" },
+      { value: InvoiceType.PET_RENT, label: "Loyer animal de compagnie" },
+      { value: InvoiceType.PARKING_FEE, label: "Frais de parking" },
+      { value: InvoiceType.STORAGE_FEE, label: "Frais de stockage" },
+      { value: InvoiceType.LEASE_BREAK_FEE, label: "Frais de rupture de bail" },
+      { value: InvoiceType.NSF_FEE, label: "Frais de rejet de paiement" },
     ],
   },
   {
-    label: "Utilities",
+    label: "Services publics (Utilitaires)",
     options: [
-      { value: InvoiceType.ELECTRICITY, label: "Electricity" },
-      { value: InvoiceType.WATER_SEWER, label: "Water / Sewer" },
-      { value: InvoiceType.GAS, label: "Gas" },
-      { value: InvoiceType.TRASH, label: "Trash" },
+      { value: InvoiceType.ELECTRICITY, label: "Électricité" },
+      { value: InvoiceType.WATER_SEWER, label: "Eau / Assainissement" },
+      { value: InvoiceType.GAS, label: "Gaz" },
+      { value: InvoiceType.TRASH, label: "Ordures ménagères" },
       { value: InvoiceType.INTERNET, label: "Internet" },
-      { value: InvoiceType.CABLE, label: "Cable" },
-      { value: InvoiceType.UTILITY, label: "Utility (General)" },
+      { value: InvoiceType.CABLE, label: "Câble" },
+      { value: InvoiceType.UTILITY, label: "Services (Général)" },
     ],
   },
   {
-    label: "Maintenance & Repairs",
+    label: "Maintenance et réparations",
     options: [
       { value: InvoiceType.MAINTENANCE, label: "Maintenance" },
-      { value: InvoiceType.REPAIR, label: "Repair" },
-      { value: InvoiceType.CLEANING, label: "Cleaning" },
-      { value: InvoiceType.LANDSCAPING, label: "Landscaping" },
+      { value: InvoiceType.REPAIR, label: "Réparation" },
+      { value: InvoiceType.CLEANING, label: "Nettoyage" },
+      { value: InvoiceType.LANDSCAPING, label: "Aménagement paysager" },
     ],
   },
   {
-    label: "Other",
+    label: "Autre",
     options: [
-      { value: InvoiceType.MANAGEMENT_FEE, label: "Management Fee" },
-      { value: InvoiceType.LEGAL_FEE, label: "Legal Fee" },
-      { value: InvoiceType.INSURANCE, label: "Insurance" },
-      { value: InvoiceType.OTHER, label: "Other" },
+      { value: InvoiceType.MANAGEMENT_FEE, label: "Frais de gestion" },
+      { value: InvoiceType.LEGAL_FEE, label: "Frais juridiques" },
+      { value: InvoiceType.INSURANCE, label: "Assurance" },
+      { value: InvoiceType.OTHER, label: "Autre" },
     ],
   },
 ];
@@ -173,7 +173,7 @@ export default function NewInvoicePage() {
           setProperties(
             (Array.isArray(data?.data) ? data.data : []).map((p: any) => ({
               id: p?._id || "",
-              name: p?.name || "Unknown Property",
+              name: p?.name || "Propriété inconnue",
             })),
           );
         }
@@ -187,12 +187,12 @@ export default function NewInvoicePage() {
               propertyId: l.propertyId?._id || l.propertyId,
               startDate: l.startDate,
               endDate: l.endDate,
-              propertyName: l.propertyId?.name || "Lease",
+              propertyName: l.propertyId?.name || "Bail",
             })),
           );
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        console.error("Échec de la récupération des données :", error);
       } finally {
         setIsLoadingData(false);
       }
@@ -200,7 +200,6 @@ export default function NewInvoicePage() {
     fetchData();
   }, []);
 
-  // Build searchable options with avatars / subtitles
   const tenantOptions: SearchableSelectOption[] = useMemo(
     () =>
       tenants.map((t) => ({
@@ -248,7 +247,7 @@ export default function NewInvoicePage() {
     () =>
       filteredLeases.map((l) => ({
         value: l.id,
-        label: l.propertyName || "Lease",
+        label: l.propertyName || "Bail",
         subtitle: `${formatLeaseDate(l?.startDate)} - ${formatLeaseDate(l?.endDate)}`,
       })),
     [filteredLeases],
@@ -300,7 +299,7 @@ export default function NewInvoicePage() {
     if (!category) {
       toast.error(
         t("invoices.form.selectCategoryError", {
-          defaultValue: "Please select a category",
+          defaultValue: "Veuillez sélectionner une catégorie",
         }),
       );
       return;
@@ -309,7 +308,7 @@ export default function NewInvoicePage() {
     if (!selectedTenantId) {
       toast.error(
         t("invoices.form.selectTenantError", {
-          defaultValue: "Please select a tenant",
+          defaultValue: "Veuillez sélectionner un locataire",
         }),
       );
       return;
@@ -318,7 +317,7 @@ export default function NewInvoicePage() {
     if (!selectedPropertyId) {
       toast.error(
         t("invoices.form.selectPropertyError", {
-          defaultValue: "Please select a property",
+          defaultValue: "Veuillez sélectionner une propriété",
         }),
       );
       return;
@@ -327,7 +326,7 @@ export default function NewInvoicePage() {
     if (!dueDate) {
       toast.error(
         t("invoices.form.dueDateError", {
-          defaultValue: "Please set a due date",
+          defaultValue: "Veuillez définir une date d'échéance",
         }),
       );
       return;
@@ -340,7 +339,7 @@ export default function NewInvoicePage() {
       toast.error(
         t("invoices.form.lineItemsError", {
           defaultValue:
-            "Add at least one line item with a description and amount",
+            "Ajoutez au moins un article avec une description et un montant",
         }),
       );
       return;
@@ -374,16 +373,16 @@ export default function NewInvoicePage() {
       if (res.ok) {
         toast.success(
           t("invoices.toasts.createSuccess", {
-            defaultValue: "Invoice created successfully",
+            defaultValue: "Facture créée avec succès",
           }),
         );
         router.push("/dashboard/accounting/invoices");
       } else {
-        throw new Error(result.error || "Failed to create invoice");
+        throw new Error(result.error || "Échec de la création de la facture");
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create invoice",
+        error instanceof Error ? error.message : "Échec de la création de la facture",
       );
     } finally {
       setIsSubmitting(false);
@@ -414,15 +413,15 @@ export default function NewInvoicePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* En-tête */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            {t("invoices.new.title", { defaultValue: "Create Invoice" })}
+            {t("invoices.new.title", { defaultValue: "Créer une facture" })}
           </h1>
           <p className="text-muted-foreground text-sm">
             {t("invoices.new.subtitle", {
-              defaultValue: "Create a new invoice for a tenant",
+              defaultValue: "Créer une nouvelle facture pour un locataire",
             })}
           </p>
         </div>
@@ -430,7 +429,7 @@ export default function NewInvoicePage() {
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("invoices.new.backToInvoices", {
-              defaultValue: "Back to Invoices",
+              defaultValue: "Retour aux factures",
             })}
           </Button>
         </Link>
@@ -439,11 +438,11 @@ export default function NewInvoicePage() {
       <form onSubmit={handleSubmit}>
         <div className="bg-card border rounded-xl p-6 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Category & Subcategory */}
+            {/* Catégorie */}
             <div className="space-y-2">
               <Label className="font-semibold">
                 {t("invoices.form.category", {
-                  defaultValue: "Category & Subcategory",
+                  defaultValue: "Catégorie et sous-catégorie",
                 })}{" "}
                 *
               </Label>
@@ -452,40 +451,42 @@ export default function NewInvoicePage() {
                 onValueChange={setCategory}
                 groups={INVOICE_CATEGORY_GROUPS}
                 placeholder={t("invoices.form.chooseCategory", {
-                  defaultValue: "Select a category...",
+                  defaultValue: "Sélectionner une catégorie...",
                 })}
                 searchPlaceholder={t("invoices.form.searchCategory", {
-                  defaultValue: "Search categories...",
+                  defaultValue: "Rechercher des catégories...",
                 })}
                 emptyMessage={t("invoices.form.noCategoryFound", {
-                  defaultValue: "No category found.",
+                  defaultValue: "Aucune catégorie trouvée.",
                 })}
               />
             </div>
 
+            {/* Locataire */}
             <div className="space-y-2">
               <Label className="font-semibold">
-                {t("invoices.form.tenant", { defaultValue: "Tenant" })} *
+                {t("invoices.form.tenant", { defaultValue: "Locataire" })} *
               </Label>
               <SearchableSelect
                 value={selectedTenantId}
                 onValueChange={setSelectedTenantId}
                 options={tenantOptions}
                 placeholder={t("invoices.form.chooseTenant", {
-                  defaultValue: "Select a tenant...",
+                  defaultValue: "Sélectionner un locataire...",
                 })}
                 searchPlaceholder={t("invoices.form.searchTenant", {
-                  defaultValue: "Search by name...",
+                  defaultValue: "Rechercher par nom...",
                 })}
                 emptyMessage={t("invoices.form.noTenantFound", {
-                  defaultValue: "No tenant found.",
+                  defaultValue: "Aucun locataire trouvé.",
                 })}
               />
             </div>
 
+            {/* Propriété */}
             <div className="space-y-2">
               <Label className="font-semibold">
-                {t("invoices.form.property", { defaultValue: "Property" })} *
+                {t("invoices.form.property", { defaultValue: "Propriété" })} *
               </Label>
               <SearchableSelect
                 value={selectedPropertyId}
@@ -493,24 +494,24 @@ export default function NewInvoicePage() {
                 options={propertyOptions}
                 placeholder={t("invoices.form.chooseProperty", {
                   defaultValue: selectedTenantId
-                    ? "Select a property..."
-                    : "Select a tenant first...",
+                    ? "Sélectionner une propriété..."
+                    : "Sélectionnez d'abord un locataire...",
                 })}
                 searchPlaceholder={t("invoices.form.searchProperty", {
-                  defaultValue: "Search properties...",
+                  defaultValue: "Rechercher des propriétés...",
                 })}
                 emptyMessage={t("invoices.form.noPropertyFound", {
                   defaultValue: selectedTenantId
-                    ? "No property found for this tenant."
-                    : "Select a tenant to see valid properties.",
+                    ? "Aucune propriété trouvée pour ce locataire."
+                    : "Sélectionnez un locataire pour voir les propriétés valides.",
                 })}
               />
             </div>
 
-            {/* Lease (optional) */}
+            {/* Bail (optionnel) */}
             <div className="space-y-2">
               <Label className="font-semibold">
-                {t("invoices.form.lease", { defaultValue: "Lease (optional)" })}
+                {t("invoices.form.lease", { defaultValue: "Bail (optionnel)" })}
               </Label>
               <SearchableSelect
                 value={selectedLeaseId}
@@ -518,28 +519,28 @@ export default function NewInvoicePage() {
                 options={leaseOptions}
                 placeholder={t("invoices.form.chooseLease", {
                   defaultValue: selectedPropertyId
-                    ? "Select a lease..."
-                    : "Select a property first...",
+                    ? "Sélectionner un bail..."
+                    : "Sélectionnez d'abord une propriété...",
                 })}
                 searchPlaceholder={t("invoices.form.searchLease", {
-                  defaultValue: "Search leases...",
+                  defaultValue: "Rechercher des baux...",
                 })}
                 emptyMessage={t("invoices.form.noLeaseFound", {
                   defaultValue:
                     selectedTenantId || selectedPropertyId
-                      ? "No lease found for the selected tenant/property."
-                      : "Select a tenant and property to see matching leases.",
+                      ? "Aucun bail trouvé pour le locataire/la propriété sélectionnés."
+                      : "Sélectionnez un locataire et une propriété pour voir les baux correspondants.",
                 })}
               />
             </div>
           </div>
 
-          {/* Date Created & Due Date */}
+          {/* Dates de création et d'échéance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="issueDate" className="font-semibold">
                 {t("invoices.form.dateCreated", {
-                  defaultValue: "Date Created",
+                  defaultValue: "Date de création",
                 })}
               </Label>
               <Input
@@ -552,7 +553,7 @@ export default function NewInvoicePage() {
 
             <div className="space-y-2">
               <Label htmlFor="dueDate" className="font-semibold">
-                {t("invoices.form.dueDate", { defaultValue: "Due Date" })}
+                {t("invoices.form.dueDate", { defaultValue: "Date d'échéance" })}
               </Label>
               <Input
                 id="dueDate"
@@ -563,11 +564,11 @@ export default function NewInvoicePage() {
             </div>
           </div>
 
-          {/* Items Details */}
+          {/* Détails des articles */}
           <div className="space-y-3">
             <Label className="text-base font-semibold">
               {t("invoices.form.itemsDetails", {
-                defaultValue: "Items Details",
+                defaultValue: "Détails des articles",
               })}
             </Label>
 
@@ -577,12 +578,12 @@ export default function NewInvoicePage() {
                   <TableRow className="bg-muted/40">
                     <TableHead className="font-semibold text-primary">
                       {t("invoices.form.itemDescription", {
-                        defaultValue: "Item Description",
+                        defaultValue: "Description de l'article",
                       })}
                     </TableHead>
                     <TableHead className="font-semibold text-primary w-40 text-right">
                       {t("invoices.form.amount", {
-                        defaultValue: "Amount",
+                        defaultValue: "Montant",
                       })}
                     </TableHead>
                     <TableHead className="w-10" />
@@ -601,7 +602,7 @@ export default function NewInvoicePage() {
                             "invoices.form.itemDescriptionPlaceholder",
                             {
                               defaultValue:
-                                "e.g., Monthly Rent, Late Fee, Utility",
+                                "ex: Loyer mensuel, Frais de retard, Service public",
                             },
                           )}
                           maxLength={200}
@@ -646,18 +647,18 @@ export default function NewInvoicePage() {
               onClick={addLineItem}
             >
               <Plus className="h-4 w-4 mr-1" />
-              {t("invoices.form.addItem", { defaultValue: "Add Item" })}
+              {t("invoices.form.addItem", { defaultValue: "Ajouter un article" })}
             </Button>
           </div>
 
-          {/* Summary */}
+          {/* Résumé */}
           <div className="bg-muted/30 border rounded-lg p-6">
             <div className="flex justify-end">
               <div className="w-full max-w-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     {t("invoices.summary.subTotal", {
-                      defaultValue: "Sub Total:",
+                      defaultValue: "Sous-total :",
                     })}
                   </span>
                   <span className="text-sm font-medium">
@@ -667,7 +668,7 @@ export default function NewInvoicePage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {t("invoices.summary.tax", { defaultValue: "Tax:" })}
+                    {t("invoices.summary.tax", { defaultValue: "Taxe :" })}
                   </span>
                   <Input
                     type="number"
@@ -683,12 +684,12 @@ export default function NewInvoicePage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     {t("invoices.summary.discount", {
-                      defaultValue: "Discount:",
+                      defaultValue: "Remise :",
                     })}
                   </span>
                   <Input
                     type="number"
-                    step="0.01"
+                    step="0.00"
                     min="0"
                     value={discountAmount}
                     onChange={(e) => setDiscountAmount(e.target.value)}
@@ -700,7 +701,7 @@ export default function NewInvoicePage() {
                 <div className="border-t pt-3 flex items-center justify-between">
                   <span className="font-bold">
                     {t("invoices.summary.grandTotal", {
-                      defaultValue: "Grand Total:",
+                      defaultValue: "Total général :",
                     })}
                   </span>
                   <span className="font-bold text-lg">
@@ -715,7 +716,7 @@ export default function NewInvoicePage() {
           <div className="space-y-2">
             <Label htmlFor="notes" className="font-semibold">
               {t("invoices.form.notesOptional", {
-                defaultValue: "Notes (optional)",
+                defaultValue: "Notes (optionnel)",
               })}
             </Label>
             <Textarea
@@ -723,7 +724,7 @@ export default function NewInvoicePage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder={t("invoices.form.notesPlaceholder", {
-                defaultValue: "Add any notes for this invoice...",
+                defaultValue: "Ajoutez des notes pour cette facture...",
               })}
               rows={4}
               maxLength={1000}
@@ -738,12 +739,12 @@ export default function NewInvoicePage() {
             variant="outline"
             onClick={() => router.push("/dashboard/accounting/invoices")}
           >
-            {t("common.cancel", { defaultValue: "Cancel" })}
+            {t("common.cancel", { defaultValue: "Annuler" })}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             {t("invoices.form.submit", {
-              defaultValue: "Create Invoice",
+              defaultValue: "Créer la facture",
             })}
           </Button>
         </div>

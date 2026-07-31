@@ -47,6 +47,7 @@ import {
   ArrowLeftRight,
   ClipboardCheck,
   Mail,
+  MessageCircle,
 } from "lucide-react";
 import { UserRole } from "@/types";
 import { useTheme } from "next-themes";
@@ -507,6 +508,24 @@ export function Sidebar({ className, isCollapsed = false }: SidebarProps) {
   const { settings } = useSettings();
   const branding = settings.branding;
   const navColor = settings.navColor ?? "integrate";
+  const whatsappEnabled = branding?.whatsappEnabled ?? false;
+  const whatsappNumber = branding?.whatsappNumber ?? "";
+
+  const openWhatsApp = () => {
+  const cleanNumber = whatsappNumber.replace(/\D/g, "");
+
+  if (!cleanNumber) return;
+
+  const message = encodeURIComponent(
+    "Bonjour GESTION E-IMMO, je vous contacte depuis mon espace E-IMMO."
+  );
+
+  window.open(
+    `https://wa.me/${cleanNumber}?text=${message}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+};
 
   // Get dynamic sidebar counts
   const { counts } = useSidebarCounts({
@@ -1013,6 +1032,46 @@ export function Sidebar({ className, isCollapsed = false }: SidebarProps) {
       >
         {filteredSections.map((section) => renderSection(section))}
       </nav>
+      
+            {/* WhatsApp GESTION E-IMMO */}
+      {whatsappEnabled && whatsappNumber && (
+        <div
+          className={cn(
+            "shrink-0 px-3 pb-3",
+            isCollapsed && "px-2"
+          )}
+        >
+          <button
+            type="button"
+            onClick={openWhatsApp}
+            className={cn(
+              "w-full bg-green-600 hover:bg-green-700 text-white",
+              "rounded-xl transition-colors shadow-sm",
+              "flex items-center",
+              isCollapsed
+                ? "justify-center h-11"
+                : "gap-3 px-3 py-3 text-left"
+            )}
+            aria-label="Contacter GESTION E-IMMO sur WhatsApp"
+            title="WhatsApp GESTION E-IMMO"
+          >
+            <MessageCircle className="h-5 w-5 shrink-0" />
+
+            {!isCollapsed && (
+              <div className="min-w-0">
+                <div className="text-sm font-semibold">
+                  WhatsApp
+                </div>
+                <div className="text-xs text-white/80 truncate">
+                  Contacter GESTION E-IMMO
+                </div>
+              </div>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* User Info */}
 
       {/* User Info */}
       {session?.user && (

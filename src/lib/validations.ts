@@ -8,6 +8,7 @@ import {
   PropertyType,
   PropertyStatus,
   UserRole,
+  AccountType,
   PaymentType,
   PaymentMethod,
   MaintenancePriority,
@@ -69,6 +70,38 @@ export const userSchema = z.object({
     .max(50, "Last name too long"),
   phone: z.string().optional(),
   role: z.nativeEnum(UserRole),
+    // Identité professionnelle / gestion immobilière
+  accountType: z.nativeEnum(AccountType).optional(),
+
+  cip: z
+    .string()
+    .trim()
+    .min(5, "Le numéro CIP doit contenir au moins 5 caractères")
+    .max(30, "Le numéro CIP ne peut pas dépasser 30 caractères")
+    .optional(),
+
+  businessName: z
+    .string()
+    .trim()
+    .max(150, "Le nom commercial ne peut pas dépasser 150 caractères")
+    .optional(),
+
+  businessLogo: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+
+  ifu: z
+    .string()
+    .trim()
+    .max(50, "Le numéro IFU ne peut pas dépasser 50 caractères")
+    .optional(),
+
+  rccm: z
+    .string()
+    .trim()
+    .max(100, "Le numéro RCCM ne peut pas dépasser 100 caractères")
+    .optional(),
   avatar: z.string().url("Invalid avatar URL").optional().or(z.literal("")),
   bio: z.string().max(500, "Bio too long").optional(),
   location: z.string().max(100, "Location too long").optional(),
@@ -89,19 +122,13 @@ export const userSchema = z.object({
     .optional(),
   dateOfBirth: z.date().optional(),
   ssn: z
-    .string()
-    .optional()
-    .transform((val) => {
-      if (!val || val.trim() === "") return undefined;
-      return val.trim();
-    })
-    .refine(
-      (val) => {
-        if (!val) return true; // Allow empty/undefined values
-        return /^\d{3}-?\d{2}-?\d{4}$/.test(val);
-      },
-      { message: "Invalid SSN format" }
-    ),
+  .string()
+  .trim()
+  .regex(
+    /^\d{5,15}$/,
+    "Le numéro CIP doit contenir entre 5 et 15 chiffres"
+  )
+  .optional(),
   employmentInfo: employmentInfoSchema.optional(),
   emergencyContacts: z
     .array(emergencyContactSchema)
@@ -395,30 +422,11 @@ export const tenantSchema = z.object({
       return val;
     }),
   ssn: z
-    .string()
-    .optional()
-    .transform((val) => {
-      if (!val || val.trim() === "") return undefined;
-      return val.trim();
-    })
-    .refine(
-      (val) => {
-        if (!val) return true; // Allow empty/undefined values
-        return /^\d{3}-?\d{2}-?\d{4}$/.test(val);
-      },
-      { message: "Invalid SSN format" }
-    )
-    .transform((val) => {
-      if (!val) return val;
-      // Remove any existing dashes and add them in the correct format
-      const cleaned = val.replace(/\D/g, "");
-      if (cleaned.length === 9) {
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 5)}-${cleaned.slice(
-          5
-        )}`;
-      }
-      return val;
-    }),
+  .string()
+  .trim()
+  .min(5, "Le numéro CIP doit contenir au moins 5 chiffres")
+  .max(15, "Le numéro CIP ne peut pas dépasser 15 chiffres")
+  .regex(/^\d+$/, "Le numéro CIP doit contenir uniquement des chiffres"),
   employmentInfo: employmentInfoSchema.optional(),
   emergencyContacts: z
     .array(emergencyContactSchema)
@@ -1014,9 +1022,11 @@ export const applicationSchema = z.object({
     phone: z.string().min(1, "Phone number is required"),
     dateOfBirth: z.date(),
     ssn: z
-      .string()
-      .regex(/^\d{3}-\d{2}-\d{4}$/, "SSN must be in format XXX-XX-XXXX")
-      .optional(),
+  .string()
+  .trim()
+  .min(5, "Le numéro CIP doit contenir au moins 5 chiffres")
+  .max(15, "Le numéro CIP ne peut pas dépasser 15 chiffres")
+  .regex(/^\d+$/, "Le numéro CIP doit contenir uniquement des chiffres"),
   }),
   employmentInfo: z
     .object({
@@ -1331,6 +1341,8 @@ export const displaySettingsSchema = z.object({
         .default("#64748B"),
       companyName: z.string().optional(),
       companyAddress: z.string().optional(),
+      whatsappNumber: z.string().optional(),
+      whatsappEnabled: z.boolean().optional(),
       // Optional R2 metadata saved with branding
       r2: z
         .object({

@@ -154,15 +154,15 @@ const mockYearlyTrends = [
 ];
 
 const mockSeasonalTrends = [
-  { season: "Spring", requests: 140, cost: 39000, avgTime: 3.2, trend: "+12%" },
-  { season: "Summer", requests: 130, cost: 37200, avgTime: 3.0, trend: "-7%" },
-  { season: "Fall", requests: 123, cost: 34000, avgTime: 2.8, trend: "-5%" },
-  { season: "Winter", requests: 118, cost: 32800, avgTime: 2.9, trend: "-4%" },
+  { season: "Printemps", requests: 140, cost: 39000, avgTime: 3.2, trend: "+12%" },
+  { season: "Été", requests: 130, cost: 37200, avgTime: 3.0, trend: "-7%" },
+  { season: "Automne", requests: 123, cost: 34000, avgTime: 2.8, trend: "-5%" },
+  { season: "Hiver", requests: 118, cost: 32800, avgTime: 2.9, trend: "-4%" },
 ];
 
 const mockCategoryTrends = [
   {
-    category: "Plumbing",
+    category: "Plomberie",
     jan: 15,
     feb: 12,
     mar: 18,
@@ -171,12 +171,12 @@ const mockCategoryTrends = [
     jun: 13,
   },
   { category: "HVAC", jan: 8, feb: 6, mar: 10, apr: 7, may: 9, jun: 6 },
-  { category: "Electrical", jan: 6, feb: 5, mar: 8, apr: 6, may: 7, jun: 5 },
-  { category: "General", jan: 12, feb: 10, mar: 14, apr: 11, may: 13, jun: 10 },
-  { category: "Appliances", jan: 4, feb: 5, mar: 2, apr: 3, may: 2, jun: 5 },
+  { category: "Électricité", jan: 6, feb: 5, mar: 8, apr: 6, may: 7, jun: 5 },
+  { category: "Général", jan: 12, feb: 10, mar: 14, apr: 11, may: 13, jun: 10 },
+  { category: "Appareils", jan: 4, feb: 5, mar: 2, apr: 3, may: 2, jun: 5 },
 ];
 
-const mockPredictiveData = [
+const mockPrévisionsData = [
   { month: "Jul", actual: 43, predicted: 45, confidence: 85 },
   { month: "Aug", actual: 48, predicted: 46, confidence: 82 },
   { month: "Sep", actual: 35, predicted: 42, confidence: 78 },
@@ -240,10 +240,10 @@ export function MaintenanceTrendAnalysis({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="yearly">Yearly View</SelectItem>
-              <SelectItem value="seasonal">Seasonal View</SelectItem>
-              <SelectItem value="category">By Category</SelectItem>
-              <SelectItem value="predictive">Predictive</SelectItem>
+              <SelectItem value="yearly">Vue annuelle</SelectItem>
+              <SelectItem value="seasonal">Vue saisonnière</SelectItem>
+              <SelectItem value="category">Par catégorie</SelectItem>
+              <SelectItem value="predictive">Prévisions</SelectItem>
             </SelectContent>
           </Select>
           <Select value={selectedMetric} onValueChange={setSelectedMetric}>
@@ -251,10 +251,10 @@ export function MaintenanceTrendAnalysis({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="requests">Requests</SelectItem>
-              <SelectItem value="cost">Cost</SelectItem>
-              <SelectItem value="avgTime">Avg Time</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="requests">Demandes</SelectItem>
+              <SelectItem value="cost">Coût</SelectItem>
+              <SelectItem value="avgTime">Temps moyen</SelectItem>
+              <SelectItem value="completed">Terminées</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -267,7 +267,7 @@ export function MaintenanceTrendAnalysis({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Annual Maintenance Trends
+                Tendances annuelles de maintenance
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -294,13 +294,13 @@ export function MaintenanceTrendAnalysis({
                     fill="#8884d8"
                     fillOpacity={0.3}
                     stroke="#8884d8"
-                    name="Total Requests"
+                    name="Total Demandes"
                   />
                   <Bar
                     yAxisId="left"
                     dataKey="completed"
                     fill="#00C49F"
-                    name="Completed"
+                    name="Terminées"
                   />
                   <Line
                     yAxisId="right"
@@ -308,7 +308,7 @@ export function MaintenanceTrendAnalysis({
                     dataKey="avgTime"
                     stroke="#ffc658"
                     strokeWidth={2}
-                    name="Avg Time (hours)"
+                    name="Temps moyen (hours)"
                   />
                 </ComposedChart>
               </ResponsiveContainer>
@@ -318,7 +318,7 @@ export function MaintenanceTrendAnalysis({
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Cost Analysis</CardTitle>
+                <CardTitle>Monthly Coût Analysis</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -329,7 +329,7 @@ export function MaintenanceTrendAnalysis({
                     <Tooltip
                       formatter={(value) => formatCurrency(value as number)}
                     />
-                    <Bar dataKey="cost" fill="#82ca9d" name="Monthly Cost" />
+                    <Bar dataKey="cost" fill="#82ca9d" name="Monthly Coût" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -337,7 +337,7 @@ export function MaintenanceTrendAnalysis({
 
             <Card>
               <CardHeader>
-                <CardTitle>Completion Rate Trends</CardTitle>
+                <CardTitle>Tendances du taux de résolution</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -351,14 +351,14 @@ export function MaintenanceTrendAnalysis({
                       dataKey="completed"
                       stroke="#00C49F"
                       strokeWidth={2}
-                      name="Completed Requests"
+                      name="Terminées Demandes"
                     />
                     <Line
                       type="monotone"
                       dataKey="pending"
                       stroke="#FF8042"
                       strokeWidth={2}
-                      name="Pending Requests"
+                      name="Pending Demandes"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -375,7 +375,7 @@ export function MaintenanceTrendAnalysis({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Seasonal Maintenance Patterns
+                Tendances saisonnières de maintenance
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -389,7 +389,7 @@ export function MaintenanceTrendAnalysis({
                       <div className="space-y-2">
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
-                            Requests:
+                            Demandes:
                           </span>
                           <span className="font-semibold">
                             {season.requests}
@@ -397,7 +397,7 @@ export function MaintenanceTrendAnalysis({
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
-                            Cost:
+                            Coût:
                           </span>
                           <span className="font-semibold">
                             {formatCurrency(season.cost)}
@@ -405,7 +405,7 @@ export function MaintenanceTrendAnalysis({
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">
-                            Avg Time:
+                            Temps moyen:
                           </span>
                           <span className="font-semibold">
                             {formatHours(season.avgTime)}
@@ -413,7 +413,7 @@ export function MaintenanceTrendAnalysis({
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-muted-foreground">
-                            Trend:
+                            Tendance :
                           </span>
                           {getTrendIndicator(season.trend)}
                         </div>
@@ -433,7 +433,7 @@ export function MaintenanceTrendAnalysis({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Category Trends Over Time
+              Évolution par catégorie
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -486,32 +486,32 @@ export function MaintenanceTrendAnalysis({
         </Card>
       )}
 
-      {/* Predictive Analysis */}
+      {/* Prévisions Analysis */}
       {selectedView === "predictive" && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5" />
-                Predictive Maintenance Forecast
+                Prévisions Maintenance Forecast
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <ComposedChart data={mockPredictiveData}>
+                <ComposedChart data={mockPrévisionsData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="actual" fill="#8884d8" name="Actual Requests" />
+                  <Bar dataKey="actual" fill="#8884d8" name="Actual Demandes" />
                   <Line
                     type="monotone"
                     dataKey="predicted"
                     stroke="#ff7300"
                     strokeWidth={2}
                     strokeDasharray="5 5"
-                    name="Predicted Requests"
+                    name="Predicted Demandes"
                   />
                   <Area
                     type="monotone"
@@ -519,7 +519,7 @@ export function MaintenanceTrendAnalysis({
                     fill="#82ca9d"
                     fillOpacity={0.2}
                     stroke="none"
-                    name="Confidence %"
+                    name="Confiance %"
                   />
                 </ComposedChart>
               </ResponsiveContainer>
@@ -530,14 +530,14 @@ export function MaintenanceTrendAnalysis({
             <Card className="border-blue-200 bg-blue-50">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Next Month Forecast
+                  Prévision du mois prochain
                 </CardTitle>
                 <TrendingUp className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">44</div>
                 <p className="text-xs text-muted-foreground">
-                  Expected requests (75% confidence)
+                  Demandes prévues (75 % de confiance)
                 </p>
               </CardContent>
             </Card>
@@ -545,14 +545,14 @@ export function MaintenanceTrendAnalysis({
             <Card className="border-green-200 bg-green-50">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Cost Projection
+                  Coût Projection
                 </CardTitle>
                 <TrendingDown className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">$12,800</div>
                 <p className="text-xs text-muted-foreground">
-                  Estimated monthly cost
+                  Coût mensuel estimé
                 </p>
               </CardContent>
             </Card>
@@ -560,14 +560,14 @@ export function MaintenanceTrendAnalysis({
             <Card className="border-yellow-200 bg-yellow-50">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Resource Planning
+                  Planification des ressources
                 </CardTitle>
                 <AlertTriangle className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">3</div>
                 <p className="text-xs text-muted-foreground">
-                  Additional technicians needed
+                  Techniciens supplémentaires nécessaires
                 </p>
               </CardContent>
             </Card>

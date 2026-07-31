@@ -42,7 +42,7 @@ export function MessageInput({
       );
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body?.error || body?.message || "Failed to send message");
+        throw new Error(body?.error || body?.message || "Impossible d'envoyer le message");
       }
       const data = await res.json();
       const normalized = normalizeMessage(data?.message);
@@ -53,7 +53,7 @@ export function MessageInput({
       textareaRef.current?.focus();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to send message"
+        error instanceof Error ? error.message : "Impossible d'envoyer le message"
       );
     } finally {
       setSending(false);
@@ -76,7 +76,7 @@ export function MessageInput({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder="Écrire un message..."
             className="min-h-[44px] max-h-[200px] resize-none pr-12 rounded-xl border-border/50 bg-background text-sm"
             disabled={sending}
           />
@@ -86,7 +86,7 @@ export function MessageInput({
             variant="ghost"
             className="absolute right-2 bottom-2 h-7 w-7 rounded-full hover:bg-accent"
             disabled
-            title="Attachments coming soon"
+            title="Pièces jointes bientôt disponibles"
           >
             <Paperclip className="h-4 w-4 text-muted-foreground" />
           </Button>

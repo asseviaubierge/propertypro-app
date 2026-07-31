@@ -43,7 +43,10 @@ export const GET = withAccessAndDB({
       }
 
       // Find the tenant user
-      const tenantUser = await User.findOne({ _id: id, role: UserRole.TENANT });
+      const tenantUser = await User.findOne({
+  _id: id,
+  role: UserRole.TENANT,
+}).select("+ssn");
 
       if (!tenantUser) {
         return createErrorResponse("Tenant not found", 404);

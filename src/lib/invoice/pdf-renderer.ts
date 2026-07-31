@@ -380,15 +380,15 @@ async function renderHeader(
     day: "numeric",
   };
   const issueDate = normalized.issueDate.toLocaleDateString(
-    "en-US",
+    "fr-FR",
     dateFormat
   );
-  const dueDate = normalized.dueDate.toLocaleDateString("en-US", dateFormat);
+  const dueDate = normalized.dueDate.toLocaleDateString("fr-FR", dateFormat);
 
   let dateY = statusBadgeY + 14;
-  pdf.text(`Issue Date: ${issueDate}`, rightX, dateY, { align: "right" });
+  pdf.text(`Date d'émission: ${issueDate}`, rightX, dateY, { align: "right" });
   dateY += 5;
-  pdf.text(`Due Date: ${dueDate}`, rightX, dateY, { align: "right" });
+  pdf.text(`Date d'échéance: ${dueDate}`, rightX, dateY, { align: "right" });
 
   // Update context y position
   ctx.y = Math.max(logoY + logoSize + 15, dateY + 10);
@@ -410,13 +410,26 @@ function renderPartySections(
   const leftX = PAGE.MARGIN_LEFT;
   const rightX = PAGE.WIDTH / 2 + 10;
 
-  // Build "Invoice From" lines
-  const fromLines = [
-    company.name,
-    company.address,
-    company.phone,
-    company.email,
-  ].filter(Boolean);
+  // Informations professionnelles de l'émetteur
+const accountTypeLabel =
+  company.accountType === "direct_owner"
+    ? "Propriétaire direct"
+    : company.accountType === "agency"
+      ? "Agence immobilière"
+      : company.accountType === "e_immo"
+        ? "E-IMMO"
+        : "";
+
+const fromLines = [
+  company.name,
+  accountTypeLabel,
+  company.cip ? `CIP : ${company.cip}` : "",
+  company.ifu ? `IFU : ${company.ifu}` : "",
+  company.rccm ? `RCCM : ${company.rccm}` : "",
+  company.address,
+  company.phone,
+  company.email,
+].filter(Boolean) as string[];
 
   // Build "Invoice To" lines
   const toLines: string[] = [];
@@ -425,7 +438,7 @@ function renderPartySections(
   const tenantName =
     [tenant.firstName, tenant.lastName].filter(Boolean).join(" ") ||
     tenant.name ||
-    "Tenant";
+    "Locataire";
   toLines.push(tenantName);
 
   // Tenant contact
@@ -457,7 +470,7 @@ function renderPartySections(
     pdf,
     leftX,
     sectionY,
-    "Bill From",
+    "Émetteur",
     fromLines,
     75
   );
@@ -465,7 +478,7 @@ function renderPartySections(
     pdf,
     rightX,
     sectionY,
-    "Bill To",
+    "Facturé à",
     toLines,
     75
   );
@@ -519,10 +532,10 @@ function renderLineItemsTable(
   const headerY = ctx.y + 7;
   pdf.text("#", tableX + cols.num.x + 4, headerY);
   pdf.text("Description", tableX + cols.desc.x + 4, headerY);
-  pdf.text("Qty", tableX + cols.qty.x + cols.qty.width / 2, headerY, {
+  pdf.text("Qté", tableX + cols.qty.x + cols.qty.width / 2, headerY, {
     align: "center",
   });
-  pdf.text("Unit Price", tableX + cols.unit.x + cols.unit.width - 2, headerY, {
+  pdf.text("Prix unitaire", tableX + cols.unit.x + cols.unit.width - 2, headerY, {
     align: "right",
   });
   pdf.text("Total", tableX + cols.total.x + cols.total.width - 2, headerY, {
@@ -540,7 +553,7 @@ function renderLineItemsTable(
   if (items.length === 0) {
     // Empty state
     setTextColor(pdf, COLORS.MUTED);
-    pdf.text("No line items", tableX + tableWidth / 2, ctx.y + 6, {
+    pdf.text("Aucun élément", tableX + tableWidth / 2, ctx.y + 6, {
       align: "center",
     });
     ctx.y += rowHeight + 4;
@@ -633,13 +646,13 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   setTextColor(pdf, COLORS.SECONDARY);
 
   // Subtotal
-  pdf.text("Subtotal", labelX, y);
+  pdf.text("Sous-total", labelX, y);
   pdf.text(formatDisplayCurrency(subtotal, normalized.currencyCode), valueX, y, { align: "right" });
   y += lineHeight;
 
   // Only show non-zero additional charges
   if (!isApproximatelyZero(shippingAmount)) {
-    pdf.text("Shipping", labelX, y);
+    pdf.text("Frais", labelX, y);
     pdf.text(formatDisplayCurrency(shippingAmount, normalized.currencyCode), valueX, y, {
       align: "right",
     });
@@ -647,7 +660,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   }
 
   if (!isApproximatelyZero(discountAmount)) {
-    pdf.text("Discount", labelX, y);
+    pdf.text("Remise", labelX, y);
     const discountDisplay = -Math.abs(discountAmount);
     pdf.text(formatDisplayCurrency(discountDisplay, normalized.currencyCode), valueX, y, {
       align: "right",
@@ -656,7 +669,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   }
 
   if (!isApproximatelyZero(adjustmentsAmount)) {
-    pdf.text("Adjustments", labelX, y);
+    pdf.text("Ajustements", labelX, y);
     pdf.text(formatDisplayCurrency(adjustmentsAmount, normalized.currencyCode), valueX, y, {
       align: "right",
     });
@@ -664,7 +677,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   }
 
   if (!isApproximatelyZero(taxAmount)) {
-    pdf.text("Tax", labelX, y);
+    pdf.text("Taxes", labelX, y);
     pdf.text(formatDisplayCurrency(taxAmount, normalized.currencyCode), valueX, y, { align: "right" });
     y += lineHeight;
   }
@@ -688,7 +701,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   pdf.setFont(FONTS.FAMILY, "normal");
   pdf.setFontSize(FONTS.SIZES.SMALL);
   setTextColor(pdf, COLORS.SECONDARY);
-  pdf.text("Amount Paid", labelX, y);
+  pdf.text("Montant payé", labelX, y);
   pdf.text(formatDisplayCurrency(amountPaid, normalized.currencyCode), valueX, y, { align: "right" });
   y += lineHeight + 2;
 
@@ -700,7 +713,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
 
     setTextColor(pdf, COLORS.WHITE);
     pdf.setFont(FONTS.FAMILY, "bold");
-    pdf.text("Balance Due", labelX, y + 2);
+    pdf.text("Solde dû", labelX, y + 2);
     pdf.text(formatDisplayCurrency(balanceDue, normalized.currencyCode), valueX, y + 2, {
       align: "right",
     });
@@ -708,7 +721,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
   } else {
     setTextColor(pdf, COLORS.ACCENT);
     pdf.setFont(FONTS.FAMILY, "bold");
-    pdf.text("Balance Due", labelX, y);
+    pdf.text("Solde dû", labelX, y);
     pdf.text(formatDisplayCurrency(0, normalized.currencyCode), valueX, y, { align: "right" });
     y += lineHeight;
   }
@@ -745,7 +758,7 @@ function renderNotes(ctx: RenderContext, normalized: NormalizedInvoice): void {
   setTextColor(pdf, COLORS.MUTED);
 
   // Wrap notes text
-  const notesText = normalized.notes || "Thank you for your business!";
+  const notesText = normalized.notes || "Merci pour votre confiance!";
   const wrappedNotes = pdf.splitTextToSize(notesText, 100);
   wrappedNotes.forEach((line: string) => {
     pdf.text(line, PAGE.MARGIN_LEFT, ctx.y);
@@ -759,7 +772,7 @@ function renderNotes(ctx: RenderContext, normalized: NormalizedInvoice): void {
   pdf.setFont(FONTS.FAMILY, "bold");
   pdf.setFontSize(FONTS.SIZES.BODY);
   setTextColor(pdf, COLORS.PRIMARY);
-  pdf.text("Questions?", contactX, contactY);
+  pdf.text("Une question ?", contactX, contactY);
 
   pdf.setFont(FONTS.FAMILY, "normal");
   pdf.setFontSize(FONTS.SIZES.SMALL);
@@ -783,7 +796,7 @@ function renderFooter(ctx: RenderContext): void {
 
   // Left side - generated message
   pdf.text(
-    "Generated by PropertyPro Property Management",
+    "Généré par GESTION E-IMMO",
     PAGE.MARGIN_LEFT,
     footerY
   );

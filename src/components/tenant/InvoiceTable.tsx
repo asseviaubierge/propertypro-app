@@ -1,5 +1,5 @@
 /**
- * PropertyPro - Invoice Table Component
+ * PropriétéPro - Invoice Table Component
  * Comprehensive table for displaying and managing tenant invoices across all leases
  */
 
@@ -65,9 +65,9 @@ interface Invoice {
   issueDate: string;
   dueDate: string;
   status: string;
-  totalAmount: number;
+  totalMontant: number;
   balanceRemaining: number;
-  daysOverdue: number;
+  joursEn retard: number;
   lineItems: Array<{
     description: string;
     amount: number;
@@ -106,34 +106,34 @@ export default function InvoiceTable({
   // };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
   };
 
-  const getStatusBadge = (invoice: Invoice) => {
+  const getStatutBadge = (invoice: Invoice) => {
     switch (invoice.status.toLowerCase()) {
       case "paid":
         return (
           <Badge variant="default" className="bg-green-500">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Paid
+            Payée
           </Badge>
         );
       case "overdue":
         return (
           <Badge variant="destructive">
             <AlertTriangle className="w-3 h-3 mr-1" />
-            Overdue
+            En retard
           </Badge>
         );
       case "partial":
         return (
           <Badge variant="secondary" className="bg-yellow-500">
             <Clock className="w-3 h-3 mr-1" />
-            Partial
+            Partielle
           </Badge>
         );
       case "issued":
@@ -141,38 +141,38 @@ export default function InvoiceTable({
         return (
           <Badge variant="outline">
             <FileText className="w-3 h-3 mr-1" />
-            Issued
+            Émise
           </Badge>
         );
     }
   };
 
-  const getOverdueDisplay = (invoice: Invoice) => {
+  const getEn retardDisplay = (invoice: Invoice) => {
     if (invoice.status === "paid") {
-      return <span className="text-sm text-green-600">Paid</span>;
+      return <span className="text-sm text-green-600">Payée</span>;
     }
 
-    if (invoice.daysOverdue > 0) {
+    if (invoice.daysEn retard > 0) {
       return (
         <span className="text-sm text-red-600 font-medium">
-          {invoice.daysOverdue} days overdue
+          {invoice.daysEn retard} jours de retard
         </span>
       );
     }
 
-    const daysUntilDue = Math.ceil(
+    const joursUntilDue = Math.ceil(
       (new Date(invoice.dueDate).getTime() - new Date().getTime()) /
         (1000 * 60 * 60 * 24)
     );
 
     if (daysUntilDue === 0) {
       return (
-        <span className="text-sm text-orange-600 font-medium">Due today</span>
+        <span className="text-sm text-orange-600 font-medium">Échéance aujourd'hui</span>
       );
     } else if (daysUntilDue > 0) {
       return (
         <span className="text-sm text-muted-foreground">
-          Due in {daysUntilDue} days
+          Échéance dans {daysUntilDue} jours
         </span>
       );
     }
@@ -203,19 +203,19 @@ export default function InvoiceTable({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            All Invoices ({invoices.length})
+            Toutes les factures ({invoices.length})
           </CardTitle>
           <CardDescription>
-            View and manage invoices across all your leases
+            Consultez et gérez les factures de tous vos baux
           </CardDescription>
         </CardHeader>
         <CardContent>
           {invoices.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Invoices Found</h3>
+              <h3 className="text-lg font-semibold mb-2">Aucune facture trouvée</h3>
               <p className="text-muted-foreground">
-                You don't have any invoices at this time.
+                Vous n'avez aucune facture pour le moment.
               </p>
             </div>
           ) : (
@@ -224,12 +224,12 @@ export default function InvoiceTable({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Property</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Days Overdue</TableHead>
+                      <TableHead>N° Facture</TableHead>
+                      <TableHead>Propriété</TableHead>
+                      <TableHead>Montant</TableHead>
+                      <TableHead>Date d'échéance</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Days En retard</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -242,7 +242,7 @@ export default function InvoiceTable({
                               {invoice.invoiceNumber}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Issued: {formatDate(invoice.issueDate)}
+                              Émise: {formatDate(invoice.issueDate)}
                             </div>
                           </div>
                         </TableCell>
@@ -257,13 +257,13 @@ export default function InvoiceTable({
                         <TableCell>
                           <div className="flex flex-col">
                             <div className="font-medium">
-                              {formatCurrency(invoice.totalAmount)}
+                              {formatCurrency(invoice.totalMontant)}
                             </div>
                             {invoice.balanceRemaining > 0 &&
                               invoice.balanceRemaining <
-                                invoice.totalAmount && (
+                                invoice.totalMontant && (
                                 <div className="text-xs text-muted-foreground">
-                                  Balance:{" "}
+                                  Reste :{" "}
                                   {formatCurrency(invoice.balanceRemaining)}
                                 </div>
                               )}
@@ -275,13 +275,13 @@ export default function InvoiceTable({
                             {formatDate(invoice.dueDate)}
                           </div>
                         </TableCell>
-                        <TableCell>{getStatusBadge(invoice)}</TableCell>
-                        <TableCell>{getOverdueDisplay(invoice)}</TableCell>
+                        <TableCell>{getStatutBadge(invoice)}</TableCell>
+                        <TableCell>{getEn retardDisplay(invoice)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">Ouvrir le menu</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -292,7 +292,7 @@ export default function InvoiceTable({
                                 }
                               >
                                 <Eye className="mr-2 h-4 w-4" />
-                                View Details
+                                Voir les détails
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() =>
@@ -300,7 +300,7 @@ export default function InvoiceTable({
                                 }
                               >
                                 <Download className="mr-2 h-4 w-4" />
-                                Download PDF
+                                Télécharger le PDF
                               </DropdownMenuItem>
                               {invoice.status !== "paid" && (
                                 <DropdownMenuItem
@@ -309,7 +309,7 @@ export default function InvoiceTable({
                                   }
                                 >
                                   <CreditCard className="mr-2 h-4 w-4" />
-                                  Make Payment
+                                  Payer
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
@@ -346,10 +346,10 @@ export default function InvoiceTable({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Invoice Details - {selectedInvoice?.invoiceNumber}
+              Détails de la facture - {selectedInvoice?.invoiceNumber}
             </DialogTitle>
             <DialogDescription>
-              Complete invoice information and line items
+              Informations complètes de la facture et lignes
             </DialogDescription>
           </DialogHeader>
 
@@ -358,12 +358,12 @@ export default function InvoiceTable({
               {/* Invoice Header */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Invoice Information</CardTitle>
+                  <CardTitle className="text-lg">Informations sur la facture</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Invoice Number
+                      Numéro de facture
                     </label>
                     <p className="text-lg font-semibold">
                       {selectedInvoice.invoiceNumber}
@@ -371,7 +371,7 @@ export default function InvoiceTable({
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Property
+                      Propriété
                     </label>
                     <p className="font-semibold">
                       {selectedInvoice.propertyId?.name || "N/A"}
@@ -379,39 +379,39 @@ export default function InvoiceTable({
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Issue Date
+                      Date d'émission
                     </label>
                     <p>{formatDate(selectedInvoice.issueDate)}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Due Date
+                      Date d'échéance
                     </label>
                     <p>{formatDate(selectedInvoice.dueDate)}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Status
+                      Statut
                     </label>
                     <div className="mt-1">
-                      {getStatusBadge(selectedInvoice)}
+                      {getStatutBadge(selectedInvoice)}
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
-                      Total Amount
+                      Total Montant
                     </label>
                     <p className="text-lg font-semibold">
-                      {formatCurrency(selectedInvoice.totalAmount)}
+                      {formatCurrency(selectedInvoice.totalMontant)}
                     </p>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Line Items */}
+              {/* Éléments de la facture */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Line Items</CardTitle>
+                  <CardTitle className="text-lg">Éléments de la facture</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -429,13 +429,13 @@ export default function InvoiceTable({
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t font-semibold text-lg">
                     <span>Total</span>
-                    <span>{formatCurrency(selectedInvoice.totalAmount)}</span>
+                    <span>{formatCurrency(selectedInvoice.totalMontant)}</span>
                   </div>
                   {selectedInvoice.balanceRemaining > 0 &&
                     selectedInvoice.balanceRemaining <
-                      selectedInvoice.totalAmount && (
+                      selectedInvoice.totalMontant && (
                       <div className="flex justify-between items-center pt-2 text-orange-600">
-                        <span>Balance Remaining</span>
+                        <span>Solde restant</span>
                         <span className="font-semibold">
                           {formatCurrency(selectedInvoice.balanceRemaining)}
                         </span>
@@ -450,7 +450,7 @@ export default function InvoiceTable({
                   onClick={() => handleAction("download-pdf", selectedInvoice)}
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download PDF
+                  Télécharger le PDF
                 </Button>
                 {selectedInvoice.status !== "paid" && (
                   <Button
@@ -459,7 +459,7 @@ export default function InvoiceTable({
                     }
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Make Payment
+                    Payer
                   </Button>
                 )}
               </div>

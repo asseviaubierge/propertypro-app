@@ -1,6 +1,12 @@
 import mongoose, { Schema, Model, HydratedDocument } from "mongoose";
 import bcrypt from "bcryptjs";
-import { IUser, IUserMethods, UserRole, IEmergencyContact } from "@/types";
+import {
+  IUser,
+  IUserMethods,
+  UserRole,
+  AccountType,
+  IEmergencyContact,
+} from "@/types";
 
 // Type for User document with methods
 export type UserDocument = HydratedDocument<IUser, IUserMethods>;
@@ -116,6 +122,40 @@ const UserSchema = new Schema<
       trim: true,
       lowercase: true,
     },
+    
+        // Professional / property management identity
+    accountType: {
+      type: String,
+      enum: Object.values(AccountType),
+      default: undefined,
+    },
+    cip: {
+      type: String,
+      trim: true,
+      minlength: [5, "Le numéro CIP doit contenir au moins 5 caractères"],
+      maxlength: [30, "Le numéro CIP ne peut pas dépasser 30 caractères"],
+    },
+    businessName: {
+      type: String,
+      trim: true,
+      maxlength: [150, "Le nom commercial ne peut pas dépasser 150 caractères"],
+    },
+    businessLogo: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    ifu: {
+      type: String,
+      trim: true,
+      maxlength: [50, "Le numéro IFU ne peut pas dépasser 50 caractères"],
+    },
+    rccm: {
+      type: String,
+      trim: true,
+      maxlength: [100, "Le numéro RCCM ne peut pas dépasser 100 caractères"],
+    },
+    
     avatar: {
       type: String,
       default: null,
@@ -206,18 +246,23 @@ const UserSchema = new Schema<
       },
     },
     ssn: {
-      type: String,
-      trim: true,
-      select: false, // Don't include in queries by default for security
-      validate: {
-        validator: function (ssn: string) {
-          if (!ssn) return true; // Optional field
-          // Basic SSN format validation (XXX-XX-XXXX)
-          return /^\d{3}-\d{2}-\d{4}$/.test(ssn);
-        },
-        message: "Please enter a valid SSN format (XXX-XX-XXXX)",
-      },
+  type: String,
+  trim: true,
+  select: false,
+  required: [
+    function (this: IUser) {
+      return this.role === UserRole.TENANT;
     },
+    "Le numéro CIP est obligatoire pour un locataire",
+  ],
+  validate: {
+    validator: function (cip: string) {
+      if (!cip) return this.role !== UserRole.TENANT;
+      return /^\d{5,15}$/.test(cip);
+    },
+    message: "Le numéro CIP doit contenir entre 5 et 15 chiffres",
+  },
+},
     employmentInfo: {
       type: EmploymentInfoSchema,
       default: null,

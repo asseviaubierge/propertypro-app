@@ -8,11 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/layout/sidebar";
 import { UserMenu } from "@/components/layout/user-menu";
 import { GlobalSearch } from "@/components/layout/global-search";
-import { Menu, X, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import {
+  Menu,
+  X,
+  PanelLeftClose,
+  PanelLeftOpen,
+  MessageCircle,
+} from "lucide-react";
 import { useUserAvatar } from "@/components/providers/UserAvatarProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PreferencesDrawer } from "@/components/layout/preferences/preferences-drawer";
+import { useSettings } from "@/components/providers/SettingsProvider";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,6 +28,26 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session, status } = useSession();
   const { avatarUrl } = useUserAvatar();
+  const { settings } = useSettings();
+
+  const whatsappEnabled = settings.branding?.whatsappEnabled ?? false;
+  const whatsappNumber = settings.branding?.whatsappNumber ?? "";
+
+  const openWhatsApp = () => {
+  const cleanNumber = whatsappNumber.replace(/\D/g, "");
+
+    if (!cleanNumber) return;
+
+  const message = encodeURIComponent(
+      "Bonjour GESTION E-IMMO, je vous contacte depuis mon espace E-IMMO."
+    );
+
+    window.open(
+      `https://wa.me/${cleanNumber}?text=${message}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -117,6 +144,31 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Right Side */}
           <div className="flex items-center gap-2 lg:gap-4">
+          {/* WhatsApp E-IMMO */}
+{whatsappEnabled && whatsappNumber && (
+  <>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={openWhatsApp}
+      className="hidden sm:inline-flex items-center gap-2"
+      aria-label="Contacter GESTION E-IMMO sur WhatsApp"
+    >
+      <MessageCircle className="h-4 w-4" />
+      <span>WhatsApp</span>
+    </Button>
+
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={openWhatsApp}
+      className="sm:hidden"
+      aria-label="Contacter GESTION E-IMMO sur WhatsApp"
+    >
+      <MessageCircle className="h-5 w-5" />
+    </Button>
+  </>
+)}
             {/* Notifications */}
             <div className="hidden sm:flex">
               <NotificationBell />

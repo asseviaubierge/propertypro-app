@@ -26,6 +26,10 @@ import {
   validateSchema,
 } from "@/lib/validations";
 import { z } from "zod";
+import {
+  createEmailVerificationToken,
+  sendEmailVerificationLink,
+} from "@/lib/invitation-utils";
 
 // Schema for tenants listing filters (extends pagination with status)
 const tenantFilterSchema = paginationSchema.extend({
@@ -337,7 +341,42 @@ export const POST = withPermissionAndDB("tenant_create")(
       // Create the tenant user
       const tenant = new User(userData);
       await tenant.save();
+      
+            // Send the email verification link automatically after tenant creation.
+      // Tenant creation remains successful even if sending the email fails.
+      try {
+        const tokenResult = await createEmailVerificationToken(
+          tenant._id.toString(),
+          tenant.email
+        );
 
+        if (tokenResult.success && tokenResult.token) {
+          const userName =
+            `${tenant.firstName} ${tenant.lastName}`.trim();
+
+          const sendResult = await sendEmailVerificationLink(
+            tokenResult.token,
+            userName
+          );
+
+          if (!sendResult.success) {
+            console.error(
+              "Tenant created, but verification email could not be sent:",
+              sendResult.error
+            );
+          }
+        } else {
+          console.error(
+            "Tenant created, but verification token could not be created:",
+            tokenResult.error
+          );
+        }
+      } catch (emailError) {
+        console.error(
+          "Tenant created, but automatic email verification failed:",
+          emailError
+        );
+      }
       return createSuccessResponse(
         tenant,
         "Tenant created successfully",

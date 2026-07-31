@@ -2,82 +2,60 @@
   "dashboard.greeting.morning": "Bonjour",
   "dashboard.greeting.afternoon": "Bon après-midi",
   "dashboard.greeting.evening": "Bonsoir",
-
   "dashboard.header.title": "Tableau de bord",
   "dashboard.header.subtitle": "Voici ce qui se passe dans votre portefeuille immobilier",
-
   "dashboard.actions.refresh": "Actualiser",
   "dashboard.actions.retry": "Réessayer",
   "dashboard.actions.addProperty": "Ajouter un bien",
   "dashboard.actions.createLease": "Créer un bail",
-
   "dashboard.error.unavailable.title": "Tableau de bord indisponible",
   "dashboard.error.unavailable.description": "{error} — veuillez actualiser la page.",
-
   "dashboard.error.staleData.title": "Certaines données peuvent ne pas être à jour",
   "dashboard.error.staleData.description": "{error} — essayez d’actualiser pour obtenir les dernières mesures.",
-
   "dashboard.alerts.overduePayments.title": "Paiements en retard",
   "dashboard.alerts.overduePayments.message.withCount": "{count} paiements sont en retard",
   "dashboard.alerts.overduePayments.message.zero": "Aucun paiement en retard pour le moment",
-
   "dashboard.alerts.urgentMaintenance.title": "Maintenance urgente",
   "dashboard.alerts.urgentMaintenance.message.withCount": "{count} demandes de maintenance urgentes nécessitent une attention immédiate",
   "dashboard.alerts.urgentMaintenance.message.zero": "Aucune demande de maintenance urgente",
-
   "dashboard.alerts.expiringLeases.title": "Baux arrivant à échéance",
   "dashboard.alerts.expiringLeases.message.withCount": "{count} baux arrivent à échéance dans les 30 prochains jours",
   "dashboard.alerts.expiringLeases.message.zero": "Aucun bail n’arrive bientôt à échéance",
-
   "dashboard.alerts.pendingApplications.title": "Demandes en attente",
   "dashboard.alerts.pendingApplications.message.withCount": "{count} demandes de locataire en attente d’examen",
-
   "dashboard.cards.totalProperties.title": "Propriétés totales",
   "dashboard.cards.totalProperties.description": "Propriétés actives dans le portefeuille",
-
   "dashboard.cards.occupancyRate.title": "Taux d’occupation",
   "dashboard.cards.occupancyRate.description": "{occupied} sur {total} unités occupées",
-
   "dashboard.cards.monthlyRevenue.title": "Revenu mensuel",
   "dashboard.cards.monthlyRevenue.description": "Montant encaissé ce mois-ci",
-
   "dashboard.cards.collectionRate.title": "Taux de recouvrement",
   "dashboard.cards.collectionRate.description": "Efficacité du recouvrement des paiements",
-
   "dashboard.cards.activeTenants.title": "Locataires actifs",
   "dashboard.cards.activeTenants.description": "{count} demandes en attente",
-
   "dashboard.cards.maintenanceRequests.title": "Demandes de maintenance",
   "dashboard.cards.maintenanceRequests.description": "{count} urgentes",
-
   "dashboard.cards.vacantUnits.title": "Unités vacantes",
   "dashboard.cards.vacantUnits.description": "{rate} taux de vacance",
-
   "dashboard.cards.averageRent.title": "Loyer moyen",
   "dashboard.cards.averageRent.description": "Moyenne mensuelle par unité",
-
   "dashboard.cards.leaseRenewals.title": "Renouvellements de bail",
   "dashboard.cards.leaseRenewals.description": "Échéance dans les 30 prochains jours",
-
   "dashboard.cards.recentEvents.title": "Événements récents",
   "dashboard.cards.recentEvents.description": "{count} activités urgentes",
-
   "dashboard.charts.revenueExpenses.title": "Revenus et dépenses",
   "dashboard.charts.revenueExpenses.description": "Performance financière mensuelle",
   "dashboard.charts.revenueExpenses.legend.revenue": "Revenus totaux",
   "dashboard.charts.revenueExpenses.legend.expenses": "Dépenses totales",
   "dashboard.charts.revenueExpenses.empty": "Aucune donnée disponible pour cette période",
-
   "dashboard.charts.propertyDistribution.title": "Répartition des propriétés",
   "dashboard.charts.propertyDistribution.description": "Répartition par type de propriété",
   "dashboard.charts.propertyDistribution.total": "Total",
-
   "dashboard.paymentStatus.title": "Statut des paiements",
   "dashboard.paymentStatus.description": "Recouvrements du mois en cours",
   "dashboard.paymentStatus.collected": "Encaisé",
   "dashboard.paymentStatus.pending": "En attente",
   "dashboard.paymentStatus.overdue": "En retard",
-
   "dashboard.financialSummary.title": "Résumé financier",
   "dashboard.financialSummary.description": "Aperçu financier du mois en cours",
   "dashboard.financialSummary.netIncome": "Revenu net",
@@ -86,58 +64,43 @@
   "dashboard.financialSummary.thisMonth": "Ce mois-ci",
   "dashboard.financialSummary.pendingAndOverdue": "{pending} en attente, {overdue} en retard",
   "dashboard.financialSummary.vsLastMonth": "par rapport au mois dernier",
-
   "dashboard.recentActivity.title": "Activité récente",
   "dashboard.recentActivity.description": "Dernières mises à jour de votre portefeuille",
   "dashboard.recentActivity.empty": "Aucune activité récente pour le moment.",
-
   "dashboard.tasks.title": "Tâches à venir",
   "dashboard.tasks.description": "Tâches importantes nécessitant votre attention",
   "dashboard.tasks.empty": "Aucune tâche planifiée pour le moment.",
   "dashboard.tasks.datePending": "Date à définir",
-
   "dashboard.priority.high": "Élevée",
   "dashboard.priority.urgent": "Urgente",
   "dashboard.priority.medium": "Moyenne",
   "dashboard.priority.low": "Faible",
-
   "dashboard.time.justNow": "À l’instant",
   "dashboard.time.minutesAgo": "Il y a {count} min",
   "dashboard.time.hoursAgo": "Il y a {count} h",
   "dashboard.time.daysAgo": "Il y a {count} j",
-
   "dashboard.mobile.header.subtitle": "Voici ce qui se passe avec vos propriétés",
-
   "dashboard.mobile.stats.properties": "Propriétés",
   "dashboard.mobile.stats.tenants": "Locataires",
   "dashboard.mobile.stats.monthlyRevenue": "Revenu mensuel",
   "dashboard.mobile.stats.pendingIssues": "Problèmes en attente",
-
   "dashboard.mobile.quickActions.title": "Actions rapides",
   "dashboard.mobile.quickActions.description": "Tâches et raccourcis courants",
-
   "dashboard.mobile.quickActions.addProperty.title": "Ajouter une propriété",
   "dashboard.mobile.quickActions.addProperty.description": "Enregistrer une nouvelle propriété",
-
   "dashboard.mobile.quickActions.addTenant.title": "Ajouter un locataire",
   "dashboard.mobile.quickActions.addTenant.description": "Intégrer un nouveau locataire",
-
   "dashboard.mobile.quickActions.collectPayment.title": "Encaisser un paiement",
   "dashboard.mobile.quickActions.collectPayment.description": "Enregistrer un paiement",
-
   "dashboard.mobile.quickActions.maintenance.title": "Maintenance",
   "dashboard.mobile.quickActions.maintenance.description": "Créer un ordre de travail",
-
   "dashboard.mobile.metrics.occupancyRate.title": "Taux d’occupation",
   "dashboard.mobile.metrics.occupancyRate.change": "+2,1 % par rapport au mois dernier",
-
   "dashboard.mobile.metrics.overduePayments.title": "Paiements en retard",
   "dashboard.mobile.metrics.overduePayments.description": "Nécessite une attention",
-
   "dashboard.mobile.recentActivity.title": "Activité récente",
   "dashboard.mobile.recentActivity.description": "Dernières mises à jour et notifications",
   "dashboard.mobile.recentActivity.viewAll": "Tout afficher",
-
   "dashboard.tenant.welcome": "Bienvenue sur votre espace locataire",
   "dashboard.tenant.activeLeases": "Baux actifs",
   "dashboard.tenant.totalLeases": "{count} baux au total",
@@ -169,14 +132,12 @@
   "dashboard.tenant.tryAgain": "Réessayer",
   "dashboard.tenant.dashboardRefreshed": "Tableau de bord actualisé",
   "dashboard.tenant.failedToLoad": "Échec du chargement des données du tableau de bord",
-
   "dashboard.tenant.status.active": "Actif",
   "dashboard.tenant.status.expired": "Expiré",
   "dashboard.tenant.status.upcoming": "À venir",
   "dashboard.tenant.status.terminated": "Résilié",
   "dashboard.tenant.activityType.notification": "Notification",
   "dashboard.tenant.activityType.maintenance": "Maintenance",
-
   "dashboard.notifications.header.title": "Notifications",
   "dashboard.notifications.header.subtitle": "Consultez les alertes, rappels et activités système depuis un seul flux dédié.",
   "dashboard.notifications.panel.subtitle": "Gérez les alertes, rappels et activités système associées",

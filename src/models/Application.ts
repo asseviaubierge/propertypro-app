@@ -195,11 +195,15 @@ const ApplicationSchema = new Schema<IApplication>(
         },
       },
       ssn: {
-        type: String,
-        trim: true,
-        match: [/^\d{3}-\d{2}-\d{4}$/, "SSN must be in format XXX-XX-XXXX"],
-        select: false, // Never include in queries by default
-      },
+  type: String,
+  trim: true,
+  required: [true, "Le numéro CIP est obligatoire"],
+  match: [
+    /^\d{5,15}$/,
+    "Le numéro CIP doit contenir entre 5 et 15 chiffres",
+  ],
+  select: false,
+},
     },
     employmentInfo: {
       employer: {

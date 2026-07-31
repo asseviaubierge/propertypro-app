@@ -35,37 +35,37 @@ export function StatusBadge({
         return {
           variant: "default" as const,
           icon: Clock,
-          label: "Submitted",
+          label: "Soumise",
         };
       case MaintenanceStatus.ASSIGNED:
         return {
           variant: "secondary" as const,
           icon: User,
-          label: "Assigned",
+          label: "Assignée",
         };
       case MaintenanceStatus.IN_PROGRESS:
         return {
           variant: "default" as const,
           icon: Play,
-          label: "In Progress",
+          label: "En cours",
         };
       case MaintenanceStatus.COMPLETED:
         return {
           variant: "secondary" as const,
           icon: CheckCircle,
-          label: "Completed",
+          label: "Terminée",
         };
       case MaintenanceStatus.CANCELLED:
         return {
           variant: "outline" as const,
           icon: X,
-          label: "Cancelled",
+          label: "Annulée",
         };
       default:
         return {
           variant: "outline" as const,
           icon: Clock,
-          label: "Unknown",
+          label: "Inconnu",
         };
     }
   };
@@ -102,31 +102,31 @@ export function PriorityBadge({
         return {
           variant: "destructive" as const,
           icon: AlertTriangle,
-          label: "Emergency",
+          label: "Urgence",
         };
       case MaintenancePriority.HIGH:
         return {
           variant: "destructive" as const,
           icon: AlertTriangle,
-          label: "High",
+          label: "Élevée",
         };
       case MaintenancePriority.MEDIUM:
         return {
           variant: "default" as const,
           icon: null,
-          label: "Medium",
+          label: "Moyenne",
         };
       case MaintenancePriority.LOW:
         return {
           variant: "secondary" as const,
           icon: null,
-          label: "Low",
+          label: "Faible",
         };
       default:
         return {
           variant: "outline" as const,
           icon: null,
-          label: "Unknown",
+          label: "Inconnu",
         };
     }
   };
@@ -181,7 +181,7 @@ export function StatusProgress({
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex justify-between text-sm">
-        <span className="font-medium">Progress</span>
+        <span className="font-medium">Progression</span>
         <span className="text-muted-foreground">{progressValue}%</span>
       </div>
       <Progress
@@ -195,9 +195,9 @@ export function StatusProgress({
         }`}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>Created: {createdAt.toLocaleDateString()}</span>
+        <span>Créée : {createdAt.toLocaleDateString()}</span>
         {completedDate && (
-          <span>Completed: {completedDate.toLocaleDateString()}</span>
+          <span>Terminée : {completedDate.toLocaleDateString()}</span>
         )}
       </div>
     </div>
@@ -226,28 +226,28 @@ export function StatusTimeline({
   const timelineSteps = [
     {
       status: MaintenanceStatus.SUBMITTED,
-      label: "Submitted",
+      label: "Soumise",
       icon: Clock,
       date: createdAt,
       completed: true,
     },
     {
       status: MaintenanceStatus.ASSIGNED,
-      label: "Assigned",
+      label: "Assignée",
       icon: User,
       date: assignedAt,
       completed: assignedAt !== undefined,
     },
     {
       status: MaintenanceStatus.IN_PROGRESS,
-      label: "In Progress",
+      label: "En cours",
       icon: Play,
       date: startedAt,
       completed: startedAt !== undefined,
     },
     {
       status: MaintenanceStatus.COMPLETED,
-      label: "Completed",
+      label: "Terminée",
       icon: CheckCircle,
       date: completedAt,
       completed: completedAt !== undefined,
@@ -258,7 +258,7 @@ export function StatusTimeline({
   if (status === MaintenanceStatus.CANCELLED) {
     timelineSteps.push({
       status: MaintenanceStatus.CANCELLED,
-      label: "Cancelled",
+      label: "Annulée",
       icon: X,
       date: cancelledAt,
       completed: cancelledAt !== undefined,
@@ -310,7 +310,7 @@ export function StatusTimeline({
                     </span>
                     {step.date && (
                       <span className="text-sm text-muted-foreground">
-                        {step.date.toLocaleDateString("en-US", {
+                        {step.date.toLocaleDateString("fr-FR", {
                           month: "short",
                           day: "numeric",
                           hour: "2-digit",
@@ -359,7 +359,7 @@ export function NextAction({
         if (canManage) {
           return {
             action: "assign",
-            label: "Assign Technician",
+            label: "Assigner un technicien",
             icon: User,
             variant: "default" as const,
           };
@@ -370,7 +370,7 @@ export function NextAction({
         if (canWork && (isAssignedToUser || canManage)) {
           return {
             action: "start",
-            label: "Start Work",
+            label: "Commencer les travaux",
             icon: Play,
             variant: "default" as const,
           };
@@ -381,7 +381,7 @@ export function NextAction({
         if (canWork && (isAssignedToUser || canManage)) {
           return {
             action: "complete",
-            label: "Mark Complete",
+            label: "Marquer comme terminée",
             icon: CheckCircle,
             variant: "default" as const,
           };

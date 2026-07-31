@@ -33,7 +33,7 @@ import { useAuthorization } from "@/hooks/useAuthorization";
 interface UserStats {
   total: number;
   active: number;
-  inactive: number;
+  inactifs: number;
   newThisMonth: number;
   newThisWeek: number;
   byRole: Record<UserRole, number>;
@@ -79,7 +79,7 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
       const mockStats: UserStats = {
         total: 156,
         active: 142,
-        inactive: 14,
+        inactifs: 14,
         newThisMonth: 23,
         newThisWeek: 7,
         byRole: {
@@ -139,45 +139,45 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
       {/* Main Stats Cards */}
       <AnalyticsCardGrid>
         <AnalyticsCard
-          title="Total Users"
+          title="Utilisateurs au total"
           value={stats.total}
           icon={Users}
           iconColor="primary"
           trend={{
-            value: `${Math.abs(stats.trends.totalChange)}% from last month`,
+            value: `${Math.abs(stats.trends.totalChange)}% par rapport au mois dernier`,
             isPositive: stats.trends.totalChange > 0,
             icon: stats.trends.totalChange > 0 ? TrendingUp : TrendingDown,
           }}
         />
 
         <AnalyticsCard
-          title="Active Users"
+          title="Utilisateurs actifs"
           value={stats.active}
-          description={`${activePercentage.toFixed(1)}% of total`}
+          description={`${activePercentage.toFixed(1)}% du total`}
           icon={UserCheck}
           iconColor="success"
         >
           <Badge variant="outline" className="text-xs mt-2">
-            {stats.inactive} inactive
+            {stats.inactifs} inactifs
           </Badge>
         </AnalyticsCard>
 
         <AnalyticsCard
-          title="New This Month"
+          title="Nouveaux ce mois-ci"
           value={stats.newThisMonth}
           icon={UserPlus}
           iconColor="info"
           trend={{
-            value: `${Math.abs(stats.trends.newUsersChange)}% vs last month`,
+            value: `${Math.abs(stats.trends.newUsersChange)}% par rapport au mois dernier`,
             isPositive: stats.trends.newUsersChange > 0,
             icon: stats.trends.newUsersChange > 0 ? TrendingUp : TrendingDown,
           }}
         />
 
         <AnalyticsCard
-          title="Recent Activity"
+          title="Activité récente"
           value={stats.recentActivity.logins}
-          description="Logins in last 24h"
+          description="Connexions des dernières 24 h"
           icon={Activity}
           iconColor="warning"
         />
@@ -191,10 +191,10 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
               <div className="p-2 rounded-lg bg-primary/10">
                 <Shield className="h-5 w-5 text-primary" />
               </div>
-              Users by Role
+              Utilisateurs par rôle
             </CardTitle>
             <CardDescription>
-              Distribution of users across different roles
+              Répartition des utilisateurs par rôle
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -208,7 +208,7 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
                       <div className="flex items-center gap-2">
                         <RoleBadge role={role as UserRole} size="sm" />
                         <span className="text-sm font-medium">
-                          {count} users
+                          {count} utilisateurs
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground">
@@ -226,15 +226,15 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Recent Activity Summary
+              Résumé de l’activité récente
             </CardTitle>
-            <CardDescription>User activity in the last 7 days</CardDescription>
+            <CardDescription>Activité des utilisateurs au cours des 7 derniers jours</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <UserCheck className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium">User Logins</span>
+                <span className="text-sm font-medium">Connexions utilisateurs</span>
               </div>
               <span className="text-lg font-bold">
                 {stats.recentActivity.logins}
@@ -244,7 +244,7 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <UserPlus className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium">New Registrations</span>
+                <span className="text-sm font-medium">Nouvelles inscriptions</span>
               </div>
               <span className="text-lg font-bold">
                 {stats.recentActivity.registrations}
@@ -254,7 +254,7 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <UserX className="h-4 w-4 text-red-600" />
-                <span className="text-sm font-medium">Deactivations</span>
+                <span className="text-sm font-medium">Désactivations</span>
               </div>
               <span className="text-lg font-bold">
                 {stats.recentActivity.deactivations}
@@ -264,7 +264,7 @@ export function UserManagementStats({ className }: UserManagementStatsProps) {
             <div className="pt-2 border-t">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  New users this week
+                  New utilisateurs this week
                 </span>
                 <Badge variant="outline">{stats.newThisWeek}</Badge>
               </div>

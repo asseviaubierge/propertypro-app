@@ -5,7 +5,7 @@
 
 import { NextRequest } from "next/server";
 import { Lease, User, Role } from "@/models";
-import { LeaseStatus, UserRole } from "@/types";
+import { AccountType, LeaseStatus, UserRole } from "@/types";
 import {
   AuthenticatedAccessUser,
   createSuccessResponse,
@@ -24,6 +24,10 @@ import {
   createAccessProfile,
 } from "@/lib/permissions-manager";
 import { resolveAccessProfile } from "@/lib/server-permissions";
+import {
+  createEmailVerificationToken,
+  sendEmailVerificationLink,
+} from "@/lib/invitation-utils";
 
 async function getRoleAccessMap(users: Array<{ role?: string | null }>) {
   const uniqueRoles = [...new Set(users.map((user) => user.role || UserRole.TENANT))];
@@ -212,6 +216,50 @@ export const POST = withPermissionAndDB("user_management")(
         }
       }
     }
+    
+    // Validation de l'identité professionnelle
+if (body.role !== UserRole.TENANT) {
+  if (!body.accountType) {
+    return createErrorResponse(
+      "Le type de compte est obligatoire",
+      400
+    );
+  }
+
+  if (!Object.values(AccountType).includes(body.accountType)) {
+    return createErrorResponse(
+      "Le type de compte est invalide",
+      400
+    );
+  }
+
+  const cip = String(body.cip || "").trim();
+
+  if (!cip) {
+    return createErrorResponse(
+      "Le numéro CIP est obligatoire",
+      400
+    );
+  }
+
+  if (cip.length < 5 || cip.length > 30) {
+    return createErrorResponse(
+      "Le numéro CIP doit contenir entre 5 et 30 caractères",
+      400
+    );
+  }
+
+  if (
+    (body.accountType === AccountType.AGENCY ||
+      body.accountType === AccountType.E_IMMO) &&
+    !String(body.businessName || "").trim()
+  ) {
+    return createErrorResponse(
+      "Le nom commercial est obligatoire pour une agence ou E-IMMO",
+      400
+    );
+  }
+}
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: body.email });
@@ -221,17 +269,61 @@ export const POST = withPermissionAndDB("user_management")(
 
     // Create new user
     const newUser = new User({
-      firstName: body.firstName,
-      lastName: body.lastName,
-      email: body.email,
-      password: body.password, // Will be hashed by the model
-      role: body.role || UserRole.TENANT,
-      phone: body.phone || undefined,
-      avatar: body.avatar || undefined,
-      isActive: body.isActive !== undefined ? body.isActive : true,
-    });
+  firstName: body.firstName,
+  lastName: body.lastName,
+  email: body.email,
+  password: body.password, // Will be hashed by the model
+  role: body.role || UserRole.TENANT,
+  phone: body.phone || undefined,
+
+  // Identité professionnelle / gestion immobilière
+  accountType: body.accountType || undefined,
+  cip: body.cip?.trim() || undefined,
+  businessName: body.businessName?.trim() || undefined,
+  ifu: body.ifu?.trim() || undefined,
+  rccm: body.rccm?.trim() || undefined,
+
+  avatar: body.avatar || undefined,
+  isActive: body.isActive !== undefined ? body.isActive : true,
+});
 
     const savedUser = await newUser.save();
+    
+    // Send the email verification link automatically after account creation.
+// User creation must remain successful even if the email cannot be sent.
+try {
+  const tokenResult = await createEmailVerificationToken(
+    savedUser._id.toString(),
+    savedUser.email
+  );
+
+  if (tokenResult.success && tokenResult.token) {
+    const userName =
+      `${savedUser.firstName} ${savedUser.lastName}`.trim();
+
+    const sendResult = await sendEmailVerificationLink(
+      tokenResult.token,
+      userName
+    );
+
+    if (!sendResult.success) {
+      console.error(
+        "User created, but verification email could not be sent:",
+        sendResult.error
+      );
+    }
+  } else {
+    console.error(
+      "User created, but verification token could not be created:",
+      tokenResult.error
+    );
+  }
+} catch (emailError) {
+  console.error(
+    "User created, but automatic email verification failed:",
+    emailError
+  );
+}
 
     // Remove password from response
     const userResponse = savedUser.toObject();

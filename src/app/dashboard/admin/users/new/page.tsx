@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UserRole } from "@/types";
+import { UserRole, AccountType } from "@/types";
 import { isValidPhoneNumber } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,13 +73,91 @@ const createUserSchemaFactory = (t: (key: string) => string) =>
           message: t("admin.createUser.validation.invalidPhone"),
         }),
       role: z.string().min(1, t("admin.createUser.validation.selectValidRole")),
-      isActive: z.boolean(),
-      sendWelcomeEmail: z.boolean(),
-      avatar: z.string().optional(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t("admin.createUser.validation.passwordsDontMatch"),
-      path: ["confirmPassword"],
+
+accountType: z.nativeEnum(AccountType).optional(),
+
+cip: z
+  .string()
+  .trim()
+  .max(30, "Le numéro CIP ne peut pas dépasser 30 caractères")
+  .optional(),
+
+businessName: z
+  .string()
+  .trim()
+  .max(150, "Le nom commercial ne peut pas dépasser 150 caractères")
+  .optional(),
+
+ifu: z
+  .string()
+  .trim()
+  .max(50, "Le numéro IFU ne peut pas dépasser 50 caractères")
+  .optional(),
+
+rccm: z
+  .string()
+  .trim()
+  .max(100, "Le numéro RCCM ne peut pas dépasser 100 caractères")
+  .optional(),
+
+isActive: z.boolean(),
+sendWelcomeEmail: z.boolean(),
+avatar: z.string().optional(),
+        })
+    .superRefine((data, ctx) => {
+      // Vérification des mots de passe
+      if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("admin.createUser.validation.passwordsDontMatch"),
+          path: ["confirmPassword"],
+        });
+      }
+
+      // Les locataires n'ont pas de type de compte professionnel
+      if (data.role === UserRole.TENANT) {
+        return;
+      }
+
+      // Type de compte obligatoire pour les comptes de gestion
+      if (!data.accountType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Le type de compte est obligatoire",
+          path: ["accountType"],
+        });
+      }
+
+      // CIP obligatoire
+      const cip = data.cip?.trim() || "";
+
+      if (!cip) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Le numéro CIP est obligatoire",
+          path: ["cip"],
+        });
+      } else if (cip.length < 5) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Le numéro CIP doit contenir au moins 5 caractères",
+          path: ["cip"],
+        });
+      }
+
+      // Nom commercial obligatoire pour Agence et E-IMMO
+      if (
+        data.accountType === AccountType.AGENCY ||
+        data.accountType === AccountType.E_IMMO
+      ) {
+        if (!data.businessName?.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Le nom commercial est obligatoire",
+            path: ["businessName"],
+          });
+        }
+      }
     });
 
 type CreateUserFormData = z.infer<ReturnType<typeof createUserSchemaFactory>>;
@@ -113,11 +191,19 @@ export default function CreateUserPage() {
       confirmPassword: "",
       phone: "",
       role: UserRole.MANAGER,
+      accountType: undefined,
+      cip: "",
+      businessName: "",
+      ifu: "",
+      rccm: "",
       isActive: true,
       sendWelcomeEmail: true,
       avatar: "",
     },
   });
+  
+  const selectedRole = form.watch("role");
+  const selectedAccountType = form.watch("accountType");
 
   const getDefaultRoleOptions = () => [
     {
@@ -206,15 +292,23 @@ export default function CreateUserPage() {
     try {
       // Create user data with avatar
       const userData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-        phone: data.phone,
-        role: data.role,
-        avatar: avatarUrl || undefined,
-        isActive: data.isActive,
-      };
+  firstName: data.firstName,
+  lastName: data.lastName,
+  email: data.email,
+  password: data.password,
+  phone: data.phone,
+  role: data.role,
+
+  // Identité professionnelle / gestion immobilière
+  accountType: data.accountType,
+  cip: data.cip?.trim() || undefined,
+  businessName: data.businessName?.trim() || undefined,
+  ifu: data.ifu?.trim() || undefined,
+  rccm: data.rccm?.trim() || undefined,
+
+  avatar: avatarUrl || undefined,
+  isActive: data.isActive,
+};
 
       const response = await fetch("/api/users", {
         method: "POST",
@@ -585,6 +679,157 @@ export default function CreateUserPage() {
                           </FormItem>
                         )}
                       />
+                      {selectedRole !== UserRole.TENANT && (
+                        <FormField
+                          control={form.control}
+                          name="accountType"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel className="text-sm font-semibold text-foreground">
+                                Type de compte
+                              </FormLabel>
+
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200">
+                                    <SelectValue placeholder="Sélectionner le type de compte" />
+                                  </SelectTrigger>
+                                </FormControl>
+
+                                <SelectContent>
+                                  <SelectItem value={AccountType.DIRECT_OWNER}>
+                                    Propriétaire direct
+                                  </SelectItem>
+
+                                  <SelectItem value={AccountType.AGENCY}>
+                                    Agence immobilière
+                                  </SelectItem>
+
+                                  <SelectItem value={AccountType.E_IMMO}>
+                                    E-IMMO
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      
+                        {selectedRole !== UserRole.TENANT &&
+                        selectedAccountType && (
+                          <FormField
+                            control={form.control}
+                            name="cip"
+                            render={({ field }) => (
+                              <FormItem className="space-y-3">
+                                <FormLabel className="text-sm font-semibold text-foreground">
+                                  Numéro CIP *
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Input
+                                    placeholder="Ex. : 021254585844"
+                                    className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
+                                    {...field}
+                                  />
+                                </FormControl>
+
+                                <p className="text-xs text-muted-foreground">
+                                  Numéro d'identification du responsable du compte
+                                </p>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+                        
+                        {(selectedAccountType === AccountType.AGENCY ||
+                        selectedAccountType === AccountType.E_IMMO) && (
+                        <FormField
+                          control={form.control}
+                          name="businessName"
+                          render={({ field }) => (
+                            <FormItem className="space-y-3">
+                              <FormLabel className="text-sm font-semibold text-foreground">
+                                Nom commercial *
+                              </FormLabel>
+
+                              <FormControl>
+                                <Input
+                                  placeholder={
+                                    selectedAccountType === AccountType.AGENCY
+                                      ? "Ex. : Agence Immobilière Akatola"
+                                      : "Ex. : E-IMMO"
+                                  }
+                                  className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
+                                  {...field}
+                                />
+                              </FormControl>
+
+                              <p className="text-xs text-muted-foreground">
+                                Ce nom apparaîtra sur les reçus, factures et documents des biens gérés par ce compte.
+                              </p>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                      
+                        {(selectedAccountType === AccountType.AGENCY ||
+                        selectedAccountType === AccountType.E_IMMO) && (
+                        <>
+                          <FormField
+                            control={form.control}
+                            name="ifu"
+                            render={({ field }) => (
+                              <FormItem className="space-y-3">
+                                <FormLabel className="text-sm font-semibold text-foreground">
+                                  Numéro IFU
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Input
+                                    placeholder="Numéro IFU (facultatif)"
+                                    className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
+                                    {...field}
+                                  />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="rccm"
+                            render={({ field }) => (
+                              <FormItem className="space-y-3">
+                                <FormLabel className="text-sm font-semibold text-foreground">
+                                  Numéro RCCM
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Input
+                                    placeholder="Numéro RCCM (facultatif)"
+                                    className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
+                                    {...field}
+                                  />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

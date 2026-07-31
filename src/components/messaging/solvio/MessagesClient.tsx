@@ -233,7 +233,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                 variant="ghost"
                 className="h-8 w-8 rounded-full hover:bg-accent"
                 onClick={() => setShowNewDialog(true)}
-                title="New conversation"
+                title="Nouvelle conversation"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -293,11 +293,11 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                             ? selectedConversation.participants
                                 .filter((p) => p.id !== userId)
                                 .map((p) => p.name)
-                                .join(", ") || "Group"
-                            : otherParticipant?.name || "User"}
+                                .join(", ") || "Groupe"
+                            : otherParticipant?.name || "Utilisateur"}
                         </h2>
                         <p className="text-[11px] text-green-600 dark:text-green-400 font-medium">
-                          Active now
+                          En ligne
                         </p>
                       </div>
                     </div>
@@ -307,7 +307,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
-                      title="Audio call"
+                      title="Appel audio"
                     >
                       <Phone className="h-4 w-4" />
                     </Button>
@@ -315,7 +315,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
-                      title="Video call"
+                      title="Appel vidéo"
                     >
                       <Video className="h-4 w-4" />
                     </Button>
@@ -350,17 +350,17 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                 <MessageSquare className="h-9 w-9 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                No conversation selected
+                Aucune conversation sélectionnée
               </h3>
               <p className="text-sm text-muted-foreground mb-5 max-w-xs">
-                Choose a conversation from the sidebar or start a new one to begin messaging
+                Choisissez une conversation dans la barre latérale ou démarrez-en une nouvelle pour commencer à discuter
               </p>
               <Button
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
                 onClick={() => setShowNewDialog(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Start New Conversation
+                Nouvelle conversation
               </Button>
             </div>
           )}
@@ -400,12 +400,12 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                 </Avatar>
                 <h3 className="text-base font-semibold text-center">
                   {isGroupChat
-                    ? "Group Conversation"
-                    : otherParticipant?.name || "User"}
+                    ? "Conversation de groupe"
+                    : otherParticipant?.name || "Utilisateur"}
                 </h3>
                 {!isGroupChat && (
                   <p className="text-xs text-green-600 dark:text-green-400 font-medium mt-0.5">
-                    Active now
+                    En ligne
                   </p>
                 )}
               </div>
@@ -413,31 +413,31 @@ export function MessagesClient({ userId }: MessagesClientProps) {
               <div className="flex items-center justify-center gap-1.5 px-4 pb-4 shrink-0">
                 <Lock className="h-3 w-3 text-muted-foreground" />
                 <span className="text-[11px] text-muted-foreground">
-                  End-to-end encrypted
+                  Chiffrement de bout en bout
                 </span>
               </div>
 
               <div className="flex items-center justify-center gap-6 px-4 pb-5 shrink-0">
-                <ActionButton icon={User} label="Profile" />
-                <ActionButton icon={BellOff} label="Mute" />
-                <ActionButton icon={Search} label="Search" />
+                <ActionButton icon={User} label="Profil" />
+                <ActionButton icon={BellOff} label="Muet" />
+                <ActionButton icon={Search} label="Rechercher" />
               </div>
 
               <div className="flex-1 overflow-y-auto px-2">
-                <MenuLink icon={Info} label="Chat info" />
-                <MenuLink icon={Settings} label="Customize chat" />
+                <MenuLink icon={Info} label="Informations" />
+                <MenuLink icon={Settings} label="Personnaliser la discussion" />
                 <MenuLink
                   icon={ImageIcon}
-                  label="Media & files"
+                  label="Médias et fichiers"
                   onClick={() => setRightPanelView("media")}
                 />
-                <MenuLink icon={Shield} label="Privacy & support" />
+                <MenuLink icon={Shield} label="Confidentialité et assistance" />
               </div>
 
               {isGroupChat && (
                 <div className="px-4 py-3 border-t border-border/50 shrink-0">
                   <p className="text-xs text-muted-foreground">
-                    {selectedConversation.participants.length} participants in this group
+                    {selectedConversation.participants.length} participants dans ce groupe
                   </p>
                   <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
                     {selectedConversation.participants.map((p) => (
@@ -451,7 +451,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                           </AvatarFallback>
                         </Avatar>
                         <span className="text-xs">
-                          {p.id === userId ? "You" : p.name}
+                          {p.id === userId ? "Vous" : p.name}
                         </span>
                       </div>
                     ))}
@@ -472,7 +472,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="text-sm font-semibold">Media, files and links</h3>
+                <h3 className="text-sm font-semibold">Médias, fichiers et liens</h3>
               </div>
 
               <div className="flex border-b border-border/50 shrink-0">
@@ -501,7 +501,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                   mediaItems.length === 0 ? (
                     <EmptyMediaState
                       icon={ImageIcon}
-                      text="No media shared yet"
+                      text="Aucun média partagé"
                     />
                   ) : (
                     <div className="p-2">
@@ -542,7 +542,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                   )
                 ) : mediaTab === "files" ? (
                   fileItems.length === 0 ? (
-                    <EmptyMediaState icon={FileIcon} text="No files shared yet" />
+                    <EmptyMediaState icon={FileIcon} text="Aucun fichier partagé" />
                   ) : (
                     <div className="p-2">
                       {Object.entries(groupByMonth(fileItems)).map(
@@ -585,7 +585,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                     </div>
                   )
                 ) : linkItems.length === 0 ? (
-                  <EmptyMediaState icon={LinkIcon} text="No links shared yet" />
+                  <EmptyMediaState icon={LinkIcon} text="Aucun lien partagé" />
                 ) : (
                   <div className="p-2">
                     {linkItems.map(({ url, message }, idx) => (

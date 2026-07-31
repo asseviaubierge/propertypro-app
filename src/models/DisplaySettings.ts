@@ -61,6 +61,8 @@ export interface IDisplaySettings extends Document {
     secondaryColor: string;
     companyName?: string;
     companyAddress?: string;
+    whatsappNumber?: string;
+    whatsappEnabled?: boolean;
     r2?: {
       logoLight?: {
         objectKey?: string;
@@ -305,6 +307,8 @@ const displaySettingsSchema = new Schema<IDisplaySettings>(
       },
       companyName: { type: String },
       companyAddress: { type: String },
+      whatsappNumber: { type: String, default: "" },
+      whatsappEnabled: { type: Boolean, default: false },
       r2: {
         logoLight: {
           objectKey: { type: String },

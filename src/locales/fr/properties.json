@@ -1,22 +1,17 @@
 {
   "properties.header.title": "Biens",
   "properties.header.subtitle": "Gérez votre portefeuille",
-
   "properties.accessDenied.title": "Accès refusé",
   "properties.accessDenied.description": "Connectez-vous pour voir vos biens.",
-
   "properties.actions.refresh": "Actualiser",
   "properties.actions.addProperty.full": "Ajouter un bien",
   "properties.actions.addProperty.short": "Ajouter",
   "properties.actions.addFirstProperty": "Ajouter un premier bien",
   "properties.actions.retry": "Réessayer",
-
   "properties.bulk.selected": "{count} sélectionné(s)",
-
   "properties.view.grid": "Grille",
   "properties.view.rows": "Lignes",
   "properties.view.list": "Liste",
-
   "properties.filters.search.placeholder": "Rechercher...",
   "properties.filters.type.all": "Tous types",
   "properties.filters.status.all": "Tous statuts",
@@ -30,7 +25,6 @@
   "properties.filters.unitType.placeholder": "Type",
   "properties.filters.unitType.all": "Tous types",
   "properties.filters.clear": "Réinitialiser",
-
   "properties.type.furnished_apartment": "Appartement Meublé",
   "properties.type.multi_family": "Multi-logements",
   "properties.type.private_house": "Maison",
@@ -45,21 +39,18 @@
   "properties.type.event_hall": "Salle de fête",
   "properties.type.public_space": "Espace Public",
   "properties.type.personal_property": "Bien Personnel",
-
   "properties.unitType.apartment": "Appartement",
   "properties.unitType.house": "Maison",
   "properties.unitType.studio": "Studio",
   "properties.unitType.penthouse": "Appartement de Luxe",
   "properties.unitType.loft": "Grand Espace",
   "properties.unitType.room": "Chambre",
-
   "properties.units.types.apartment": "Appartement",
   "properties.units.types.house": "Maison",
   "properties.units.types.studio": "Studio",
   "properties.units.types.penthouse": "Appartement de Luxe",
   "properties.units.types.loft": "Grand Espace",
   "properties.units.types.room": "Chambre",
-
   "properties.table.property": "Bien",
   "properties.table.status": "Statut",
   "properties.table.contact": "Contact",
@@ -71,7 +62,6 @@
   "properties.table.selectAll": "Tout sélectionner",
   "properties.table.selectProperty": "Sélectionner {name}",
   "properties.table.propertyOwner": "Propriétaire",
-
   "properties.labels.unknown": "Inconnu",
   "properties.labels.locationUnavailable": "Localisation indisponible",
   "properties.labels.unit": "Logement",
@@ -82,13 +72,11 @@
   "properties.labels.squareFeetUnit": "m2",
   "properties.labels.deleted": "Supprimé",
   "properties.labels.deletedWithDate": "Supprimé : {date}",
-
   "properties.status.available": "Disponible",
   "properties.status.occupied": "Occupé",
   "properties.status.maintenance": "Maintenance",
   "properties.status.unavailable": "Indisponible",
   "properties.status.unknown": "Inconnu",
-
   "properties.units.available": "disponibles",
   "properties.units.occupied": "occupés",
   "properties.units.maintenance": "maintenance",
@@ -160,19 +148,15 @@
   "properties.units.toasts.add.error": "Erreur d'ajout",
   "properties.units.toasts.update.success": "Logement mis à jour",
   "properties.units.toasts.update.error": "Erreur de mise à jour",
-
   "properties.empty.title": "Aucun bien",
   "properties.empty.addFirst": "Ajouter un premier bien",
-
   "properties.error.fetchFailed": "Erreur de chargement",
   "properties.toasts.statusUpdate.success": "Statut mis à jour",
   "properties.toasts.statusUpdate.error": "Erreur de mise à jour",
-
   "properties.pagination.summary": "{from}-{to} sur {total} biens",
   "properties.pagination.previous": "Précédent",
   "properties.pagination.prevShort": "Préc.",
   "properties.pagination.next": "Suivant",
-
   "properties.stats.totalProperties.title": "Total biens",
   "properties.stats.totalProperties.description": "Tous les biens",
   "properties.stats.availableProperties.title": "Biens dispo",
@@ -195,7 +179,6 @@
   "properties.stats.occupiedUnits.description": "Loués",
   "properties.stats.unitsInMaintenance.title": "Maintenance",
   "properties.stats.unitsInMaintenance.description": "En réparation",
-
   "properties.menu.actions": "Actions",
   "properties.menu.viewDetails": "Détails",
   "properties.menu.editProperty": "Modifier",
@@ -205,21 +188,16 @@
   "properties.menu.markOccupied": "Occupé",
   "properties.menu.markMaintenance": "Maintenance",
   "properties.menu.markUnavailable": "Indisponible",
-
   "properties.deleteDialog.title": "Supprimer le bien",
   "properties.deleteDialog.description": "Confirmer la suppression de \"{name}\" ? Irréversible.",
   "properties.deleteDialog.cancel": "Annuler",
   "properties.deleteDialog.confirm": "Supprimer",
   "properties.deleteDialog.deleting": "Suppression...",
-
   "properties.row.unknownProperty": "Bien inconnu",
   "properties.row.addressUnavailable": "Adresse indisponible",
-
   "properties.form.general.title": "Infos générales",
   "properties.form.general.description": "Informations clés du bien.",
-
   "properties.form.address.title": "Adresse",
-
   "properties.form.fields.name.label": "Nom du bien",
   "properties.form.fields.name.placeholder": "Ex. : Résidence Vlavonou",
   "properties.form.fields.type.label": "Type de bien",
@@ -239,7 +217,6 @@
   "properties.form.fields.zipCode.label": "Code postal",
   "properties.form.fields.zipCode.placeholder": "Ex. : 01 BP 1234",
   "properties.form.fields.country.label": "Pays",
-
   "properties.form.units.intro": "Configurez les logements.",
   "properties.form.units.title": "Logements",
   "properties.form.units.description": "Gérez surface, loyer et statut.",
@@ -256,14 +233,12 @@
   "properties.form.units.fields.images": "Images",
   "properties.form.units.uploadImages": "Télécharger images",
   "properties.form.units.placeholders.floor": "Ex. : 3",
-
   "properties.form.amenities.title": "Équipements",
   "properties.form.amenities.description": "Atouts du bien.",
   "properties.form.amenities.custom.label": "Ajouter équipement perso",
   "properties.form.amenities.custom.placeholder": "Ex. : Toit-terrasse...",
   "properties.form.amenities.selected.label": "Sélectionnés ({count})",
   "properties.form.amenities.selected.remove": "Retirer {name}",
-
   "properties.amenities.items.parking": "Parking",
   "properties.amenities.items.evCharging": "Borne VE",
   "properties.amenities.items.pool": "Piscine",
@@ -282,20 +257,16 @@
   "properties.amenities.items.elevator": "Ascenseur",
   "properties.amenities.items.storage": "Rangement",
   "properties.amenities.items.fireplace": "Cheminée",
-
   "properties.form.images.title": "Images",
   "properties.form.images.description": "Photos du bien.",
   "properties.form.images.count": "{count} image(s)",
-
   "properties.form.actions.create": "Créer",
   "properties.form.actions.update": "Enregistrer",
-
   "properties.form.alert.unitRequired.title": "Logement requis",
   "properties.form.alert.unitRequired.summary": "Configurez au moins un logement.",
   "properties.form.alert.unitRequired.callout": "Action :",
   "properties.form.alert.unitRequired.instructions": "Allez dans 'Logements' et cliquez sur 'Ajouter'.",
   "properties.form.alert.unitRequired.cta": "Compris",
-
   "properties.form.validation.nameRequired": "Nom requis.",
   "properties.form.validation.streetRequired": "Adresse requise.",
   "properties.form.validation.cityRequired": "Ville requise.",
@@ -304,7 +275,6 @@
   "properties.form.validation.zipTooLong": "Max 20 caractères.",
   "properties.form.validation.yearBuiltMin": "Min 1800.",
   "properties.form.validation.yearBuiltMax": "Pas dans le futur.",
-
   "properties.newProperty.title": "Nouveau bien",
   "properties.newProperty.subtitle": "Ajoutez un bien à votre portefeuille.",
   "properties.newProperty.backToList": "Retour",
@@ -413,48 +383,39 @@
   "properties.unitDetails.utilities.status.tenant": "locataire",
   "properties.unitDetails.utilities.status.shared": "partagé",
   "properties.unitDetails.fields.yearBuilt": "Année construction",
-
   "properties.labels.yes": "Oui",
   "properties.labels.no": "Non",
-
   "properties.details.common.notAvailable": "N/A",
-
   "properties.details.unknownProperty": "Bien inconnu",
   "properties.details.notFound.title": "Bien introuvable",
   "properties.details.notFound.description": "Introuvable.",
   "properties.details.error.title": "Erreur",
   "properties.details.error.fetchFailed": "Erreur chargement.",
-
   "properties.details.actions.backToList": "Retour",
   "properties.details.actions.retry": "Réessayer",
   "properties.details.actions.editProperty": "Modifier",
   "properties.details.actions.deleteProperty": "Supprimer",
-
   "properties.details.tabs.overview": "Aperçu",
   "properties.details.tabs.details": "Détails",
   "properties.details.tabs.units": "Logements",
   "properties.details.tabs.images": "Images",
   "properties.details.tabs.amenities": "Équipements",
-
   "properties.details.overview.propertyType": "Type",
   "properties.details.overview.totalUnits": "Total logements",
   "properties.details.overview.bedrooms": "Chambres",
   "properties.details.overview.availableUnits": "Logements dispo",
   "properties.details.overview.bathrooms": "Salles de bain",
   "properties.details.overview.totalSquareFootage": "Surface totale",
-
   "properties.details.overview.occupancy.title": "Occupation",
   "properties.details.overview.occupancy.subtitle": "Temps réel",
   "properties.details.overview.occupancy.rateLabel": "Taux",
   "properties.details.overview.occupancy.summary": "{occupied} sur {total} occupés",
-
   "properties.details.location.title": "Localisation",
   "properties.details.location.subtitle": "Adresse",
   "properties.details.location.street": "Adresse",
   "properties.details.location.city": "Ville",
   "properties.details.location.state": "Département",
   "properties.details.location.postalCode": "Code postal",
-
   "properties.details.financial.title": "Finances",
   "properties.details.financial.subtitle": "Revenus",
   "properties.details.financial.monthlyRent.label": "Loyer mensuel",
@@ -463,7 +424,6 @@
   "properties.details.financial.securityDeposit.helper": "Coût initial",
   "properties.details.financial.pricePerSquareFoot.label": "Prix/{unit}",
   "properties.details.financial.pricePerSquareFoot.helper": "Prix marché",
-
   "properties.details.specs.title": "Spécifications",
   "properties.details.specs.subtitle": "Détails",
   "properties.details.specs.fields.type": "Type",
@@ -481,38 +441,30 @@
   "properties.details.specs.fields.rentRange": "Plage loyers",
   "properties.details.specs.fields.yearBuilt": "Année construction",
   "properties.details.specs.fields.description": "Description",
-
   "properties.details.features.title": "Caractéristiques",
   "properties.details.features.subtitle": "Points forts",
   "properties.details.amenities.title": "Équipements",
   "properties.details.amenities.subtitle": "Disponibles",
-
   "properties.amenities.validation.requiredFields": "Champs obligatoires.",
   "properties.amenities.toasts.addSuccess": "Équipement ajouté.",
   "properties.amenities.toasts.addError": "Erreur ajout.",
   "properties.amenities.toasts.removeSuccess": "Équipement supprimé.",
   "properties.amenities.toasts.removeError": "Erreur suppression.",
-
   "properties.amenities.empty.title": "Aucun équipement",
   "properties.amenities.empty.description": "Aucun ajouté.",
   "properties.amenities.empty.addFirst": "Ajouter",
-
   "properties.amenities.header.title": "Équipements",
   "properties.amenities.header.summary": "Total : {count}",
-
   "properties.amenities.actions.add": "Ajouter",
   "properties.amenities.actions.adding": "Ajout...",
-
   "properties.amenities.dialog.addTitle": "Ajouter équipement",
   "properties.amenities.dialog.addDescription": "Mettez en valeur le bien.",
-
   "properties.amenities.form.name.label": "Nom",
   "properties.amenities.form.name.placeholder": "Ex. : Piscine...",
   "properties.amenities.form.category.label": "Catégorie",
   "properties.amenities.form.category.placeholder": "Sélectionnez",
   "properties.amenities.form.description.label": "Description",
   "properties.amenities.form.description.placeholder": "Facultatif...",
-
   "properties.amenities.categories.kitchen": "Cuisine",
   "properties.amenities.categories.bathroom": "Salle de bain",
   "properties.amenities.categories.living": "Séjour",
@@ -525,38 +477,29 @@
   "properties.amenities.categories.laundry": "Buanderie",
   "properties.amenities.categories.climate": "Clim",
   "properties.amenities.categories.other": "Autre",
-
   "properties.images.header.title": "Images",
   "properties.images.header.summary": "Total : {count}",
-
   "properties.images.toasts.addSuccess": "{count} image(s) ajoutée(s).",
   "properties.images.toasts.addError": "Erreur ajout.",
-
   "properties.images.empty.title": "Aucune image",
   "properties.images.empty.description": "Aucune ajoutée.",
   "properties.images.empty.addFirst": "Ajouter",
-
   "properties.images.actions.add": "Ajouter",
   "properties.images.actions.view": "Voir",
-
   "properties.images.dialog.addTitle": "Ajouter images",
   "properties.images.dialog.addDescription": "Photos haute qualité.",
   "properties.images.dialog.helper": "Optimisées automatiquement.",
   "properties.images.dialog.processing": "Traitement...",
   "properties.images.dialog.done": "Terminé",
-
   "properties.images.viewer.title": "Image",
   "properties.images.viewer.close": "Fermer",
   "properties.images.viewer.openInNewTab": "Ouvrir",
-
   "properties.images.alt.thumbnail": "{name} - {index}",
   "properties.images.alt.main": "{name} - Principale",
-
   "properties.status.description.available": "Disponible à la location.",
   "properties.status.description.occupied": "Occupé.",
   "properties.status.description.maintenance": "En maintenance.",
   "properties.status.description.unavailable": "Non disponible.",
-
   "properties.statusManager.button.changeStatus": "Changer statut",
   "properties.statusManager.menu.label": "Mettre à jour statut",
   "properties.statusManager.badge.current": "Actuel",
@@ -564,23 +507,19 @@
   "properties.statusManager.confirm.description": "Passer en {status} ?",
   "properties.statusManager.confirm.updating": "Mise à jour...",
   "properties.statusManager.confirm.update": "Mettre à jour",
-
   "properties.details.overview.actions.viewAllUnits": "Voir tout",
   "properties.details.overview.actions.addUnit": "Ajouter",
   "properties.details.units.refreshError": "Erreur actualisation",
-
   "properties.available.header.title": "Logements dispo",
   "properties.available.header.subtitle": "Disponibles à la location",
   "properties.available.actions.refresh": "Actualiser",
   "properties.available.actions.addProperty": "Ajouter",
-
   "properties.available.card.title": "Logements dispo",
   "properties.available.card.subtitle": "Disponibles",
   "properties.available.card.available": "Dispo",
   "properties.available.card.unit": "Logement",
   "properties.available.card.floor": "Étage {floor}",
   "properties.available.card.perMonth": "/mois",
-
   "properties.available.filters.search.placeholder": "Rechercher...",
   "properties.available.filters.type.all": "Tous types",
   "properties.available.filters.bedrooms.any": "Toutes",
@@ -605,10 +544,8 @@
   "properties.available.filters.sort.asc": "Croissant",
   "properties.available.filters.sort.desc": "Décroissant",
   "properties.available.filters.clear": "Effacer",
-
   "properties.available.menu.viewUnitDetails": "Détails",
   "properties.available.menu.viewProperty": "Voir le bien",
-
   "properties.available.table.unit": "Logement",
   "properties.available.table.property": "Bien",
   "properties.available.table.location": "Emplacement",
@@ -617,15 +554,12 @@
   "properties.available.table.actions": "Actions",
   "properties.available.table.squareFeet": "m2",
   "properties.available.table.perMonth": "/mois",
-
   "properties.available.empty.title": "Rien trouvé",
   "properties.available.empty.addProperty": "Ajouter",
   "properties.available.error.tryAgain": "Réessayer",
-
   "properties.available.pagination.previous": "Précédent",
   "properties.available.pagination.next": "Suivant",
   "properties.available.pagination.page": "Page {page} sur {pages}",
-
   "properties.available.stats.availableUnits.title": "Dispo",
   "properties.available.stats.totalUnits.title": "Total",
   "properties.available.stats.totalUnits.description": "Dans {count} {plural}",

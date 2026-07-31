@@ -151,7 +151,7 @@ export default function TenantDocumentUploadDialog({
           .min(
             1,
             t("leases.documents.upload.validation.selectDocumentType", {
-              defaultValue: "Select a document type",
+              defaultValue: "Sélectionnez un type de document",
             })
           ),
         category: z
@@ -159,7 +159,7 @@ export default function TenantDocumentUploadDialog({
           .min(
             1,
             t("leases.documents.upload.validation.selectCategory", {
-              defaultValue: "Select a document category",
+              defaultValue: "Sélectionnez une catégorie de document",
             })
           ),
         description: z
@@ -369,7 +369,7 @@ export default function TenantDocumentUploadDialog({
         toast.success(
           payload?.message ??
             t("leases.documents.upload.toasts.uploadSuccess", {
-              defaultValue: "Documents uploaded successfully",
+              defaultValue: "Documents téléversés avec succès",
             })
         );
       }
@@ -381,7 +381,7 @@ export default function TenantDocumentUploadDialog({
         error instanceof Error
           ? error.message
           : t("leases.documents.upload.toasts.uploadError", {
-              defaultValue: "Failed to upload documents",
+              defaultValue: "Échec du téléversement des documents",
             })
       );
     } finally {
@@ -395,7 +395,7 @@ export default function TenantDocumentUploadDialog({
         <DialogHeader>
           <DialogTitle>
             {t("leases.documents.upload.dialog.title", {
-              defaultValue: "Upload Documents",
+              defaultValue: "Téléverser des documents",
             })}
           </DialogTitle>
           <DialogDescription>
@@ -417,7 +417,7 @@ export default function TenantDocumentUploadDialog({
                   <FormItem>
                     <FormLabel>
                       {t("leases.documents.upload.form.type.label", {
-                        defaultValue: "Document Type",
+                        defaultValue: "Type de document",
                       })}
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
@@ -426,7 +426,7 @@ export default function TenantDocumentUploadDialog({
                           <SelectValue
                             placeholder={t(
                               "leases.documents.upload.form.type.placeholder",
-                              { defaultValue: "Select type" }
+                              { defaultValue: "Sélectionnez un type" }
                             )}
                           />
                         </SelectTrigger>
@@ -453,7 +453,7 @@ export default function TenantDocumentUploadDialog({
                   <FormItem>
                     <FormLabel>
                       {t("leases.documents.upload.form.category.label", {
-                        defaultValue: "Category",
+                        defaultValue: "Catégorie",
                       })}
                     </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
@@ -462,7 +462,7 @@ export default function TenantDocumentUploadDialog({
                           <SelectValue
                             placeholder={t(
                               "leases.documents.upload.form.category.placeholder",
-                              { defaultValue: "Select category" }
+                              { defaultValue: "Sélectionnez une catégorie" }
                             )}
                           />
                         </SelectTrigger>
@@ -490,7 +490,7 @@ export default function TenantDocumentUploadDialog({
                   <FormItem>
                     <FormLabel>
                       {t("leases.documents.upload.form.description.label", {
-                        defaultValue: "Description (optional)",
+                        defaultValue: "Description (facultative)",
                       })}
                     </FormLabel>
                     <FormControl>
@@ -517,7 +517,7 @@ export default function TenantDocumentUploadDialog({
                   <FormItem>
                     <FormLabel>
                       {t("leases.documents.upload.form.tags.label", {
-                        defaultValue: "Tags (optional)",
+                        defaultValue: "Étiquettes (facultatif)",
                       })}
                     </FormLabel>
                     <FormControl>
@@ -541,7 +541,7 @@ export default function TenantDocumentUploadDialog({
             <div className="space-y-3">
               <Label htmlFor="tenant-document-upload">
                 {t("leases.documents.upload.form.files.label", {
-                  defaultValue: "Files",
+                  defaultValue: "Fichiers",
                 })}
               </Label>
               <div
@@ -568,7 +568,7 @@ export default function TenantDocumentUploadDialog({
                       className="cursor-pointer"
                     >
                       {t("leases.documents.upload.form.dropzone.browse", {
-                        defaultValue: "Browse files",
+                        defaultValue: "Parcourir les fichiers",
                       })}
                     </label>
                   </Button>
@@ -626,7 +626,7 @@ export default function TenantDocumentUploadDialog({
                           <Trash2 className="h-4 w-4" />
                           <span className="sr-only">
                             {t("leases.documents.upload.form.removeFile", {
-                              defaultValue: "Remove file",
+                              defaultValue: "Supprimer le fichier",
                             })}
                           </span>
                         </Button>
@@ -654,15 +654,15 @@ export default function TenantDocumentUploadDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={uploading}
               >
-                {t("common.cancel", { defaultValue: "Cancel" })}
+                {t("common.cancel", { defaultValue: "Annuler" })}
               </Button>
               <Button type="submit" disabled={uploading}>
                 {uploading
                   ? t("leases.documents.upload.buttons.uploading", {
-                      defaultValue: "Uploading...",
+                      defaultValue: "Téléversement...",
                     })
                   : t("leases.documents.upload.buttons.upload", {
-                      defaultValue: "Upload",
+                      defaultValue: "Téléverser",
                     })}
               </Button>
             </DialogFooter>

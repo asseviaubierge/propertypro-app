@@ -23,7 +23,7 @@ import { formatCurrency } from "@/lib/utils/formatting";
 export function CleanLeaseInvoice({
   lease,
   companyInfo = {
-    name: "PropertyPro Management",
+    name: "GESTION E-IMMO",
     address: "123 Business Ave, Suite 100, City, State 12345",
     phone: "+1 (555) 123-4567",
     email: "info@PropertyPro.com",
@@ -155,7 +155,7 @@ export function CleanLeaseInvoice({
             )}
           </div>
           <div>
-            <span style={{ color: "#6b7280", fontSize: "13px" }}>Paid</span>
+            <span style={{ color: "#6b7280", fontSize: "13px" }}>Payée</span>
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -171,7 +171,7 @@ export function CleanLeaseInvoice({
               marginBottom: "8px",
             }}
           >
-            Paid
+            Payée
           </div>
           <p
             style={{
@@ -187,10 +187,10 @@ export function CleanLeaseInvoice({
             style={{ fontSize: "13px", color: "#6b7280", textAlign: "right" }}
           >
             <p style={{ margin: "2px 0", fontWeight: "500" }}>
-              Issue Date: {formatDate(issueDate)}
+              Date d’émission : {formatDate(issueDate)}
             </p>
             <p style={{ margin: "2px 0", fontWeight: "500" }}>
-              Due Date: {formatDate(calculatedDueDate)}
+              Date d’échéance : {formatDate(calculatedDueDate)}
             </p>
           </div>
         </div>
@@ -215,7 +215,7 @@ export function CleanLeaseInvoice({
               margin: "0 0 8px 0",
             }}
           >
-            Invoice from
+            Facture émise par
           </h3>
           <div
             style={{ color: "#374151", fontSize: "13px", lineHeight: "1.4" }}
@@ -237,7 +237,7 @@ export function CleanLeaseInvoice({
               margin: "0 0 8px 0",
             }}
           >
-            Invoice to
+            Facture adressée à
           </h3>
           <div
             style={{ color: "#374151", fontSize: "13px", lineHeight: "1.4" }}
@@ -268,7 +268,7 @@ export function CleanLeaseInvoice({
             margin: "0 0 12px 0",
           }}
         >
-          Invoice details
+          Détails de la facture
         </h3>
         <table
           style={{
@@ -319,7 +319,7 @@ export function CleanLeaseInvoice({
                   width: "12%",
                 }}
               >
-                Qty
+                Qté
               </th>
               <th
                 style={{
@@ -333,7 +333,7 @@ export function CleanLeaseInvoice({
                   width: "15%",
                 }}
               >
-                Unit price
+                Prix unitaire
               </th>
               <th
                 style={{
@@ -378,10 +378,10 @@ export function CleanLeaseInvoice({
                     marginBottom: "2px",
                   }}
                 >
-                  Monthly Rent - {lease.propertyId.name}
+                  Loyer mensuel - {lease.propertyId.name}
                 </div>
                 <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                  Lease period: {formatDate(lease.startDate)} -{" "}
+                  Période de location : {formatDate(lease.startDate)} -{" "}
                   {formatDate(lease.endDate)}
                 </div>
               </td>
@@ -448,10 +448,10 @@ export function CleanLeaseInvoice({
                     marginBottom: "2px",
                   }}
                 >
-                  Security Deposit
+                  Dépôt de garantie
                 </div>
                 <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                  Refundable security deposit for property protection
+                  Dépôt de garantie remboursable pour la protection du bien
                 </div>
               </td>
               <td
@@ -518,10 +518,10 @@ export function CleanLeaseInvoice({
                       marginBottom: "2px",
                     }}
                   >
-                    Pet Deposit
+                    Dépôt pour animaux
                   </div>
                   <div style={{ fontSize: "12px", color: "#6b7280" }}>
-                    Additional deposit for pet accommodation
+                    Dépôt supplémentaire pour l’hébergement d’animaux
                   </div>
                 </td>
                 <td
@@ -583,7 +583,7 @@ export function CleanLeaseInvoice({
                 paddingBottom: "4px",
               }}
             >
-              <span style={{ color: "#6b7280" }}>Subtotal</span>
+              <span style={{ color: "#6b7280" }}>Sous-total</span>
               <span style={{ color: "#111827" }}>
                 {formatCurrency(subtotal)}
               </span>
@@ -596,7 +596,7 @@ export function CleanLeaseInvoice({
                 paddingBottom: "4px",
               }}
             >
-              <span style={{ color: "#6b7280" }}>Shipping</span>
+              <span style={{ color: "#6b7280" }}>Frais de livraison</span>
               <span style={{ color: "#111827" }}>
                 {formatCurrency(shipping)}
               </span>
@@ -609,7 +609,7 @@ export function CleanLeaseInvoice({
                 paddingBottom: "4px",
               }}
             >
-              <span style={{ color: "#6b7280" }}>Discount</span>
+              <span style={{ color: "#6b7280" }}>Remise</span>
               <span style={{ color: "#111827" }}>
                 {formatCurrency(discount)}
               </span>
@@ -687,8 +687,8 @@ export function CleanLeaseInvoice({
                 margin: "0",
               }}
             >
-              We appreciate your business. Should you need us to add VAT or
-              extra notes let us know!
+              Merci de votre confiance. Si vous souhaitez ajouter la TVA ou
+              des remarques supplémentaires, faites-le-nous savoir !
             </p>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -701,7 +701,7 @@ export function CleanLeaseInvoice({
                 margin: "0 0 6px 0",
               }}
             >
-              Have a question?
+              Une question ?
             </h3>
             <p style={{ fontSize: "13px", color: "#6b7280", margin: "0" }}>
               {companyInfo.email}

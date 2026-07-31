@@ -14,6 +14,10 @@ import {
   withDatabase,
 } from "@/lib/api-utils";
 import { isValidPhoneNumber, normalizePhoneNumber } from "@/lib/utils";
+import {
+  createEmailVerificationToken,
+  sendEmailVerificationLink,
+} from "@/lib/invitation-utils";
 
 // ============================================================================
 // POST /api/auth/register - Register a new user
@@ -125,7 +129,41 @@ export const POST = withDatabase(async (request: NextRequest) => {
 
       // Save user (password will be hashed by pre-save middleware)
       const savedUser = await newUser.save();
+      // Start email verification automatically after registration.
+// Registration remains successful even if sending the email fails.
+try {
+  const tokenResult = await createEmailVerificationToken(
+    savedUser._id.toString(),
+    savedUser.email
+  );
 
+  if (tokenResult.success && tokenResult.token) {
+    const userName =
+      `${savedUser.firstName} ${savedUser.lastName}`.trim();
+
+    const sendResult = await sendEmailVerificationLink(
+      tokenResult.token,
+      userName
+    );
+
+    if (!sendResult.success) {
+      console.error(
+        "Registration succeeded, but verification email could not be sent:",
+        sendResult.error
+      );
+    }
+  } else {
+    console.error(
+      "Registration succeeded, but verification token could not be created:",
+      tokenResult.error
+    );
+  }
+} catch (emailError) {
+  console.error(
+    "Registration succeeded, but automatic email verification failed:",
+    emailError
+  );
+}
       // Remove password from response
       const userResponse = savedUser.toJSON();
       delete userResponse.password;

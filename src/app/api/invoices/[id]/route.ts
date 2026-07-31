@@ -38,7 +38,15 @@ export async function GET(
 
     const invoice = await Invoice.findById(id)
       .populate("tenantId", "firstName lastName email phone")
-      .populate("propertyId", "name address")
+      .populate({
+  path: "propertyId",
+  select: "name address ownerId",
+  populate: {
+    path: "ownerId",
+    select:
+      "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
+  },
+})
       .populate("leaseId", "startDate endDate terms")
       .populate({
         path: "paymentIds",

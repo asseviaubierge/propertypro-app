@@ -147,7 +147,7 @@ export const normalizeTenantDocument = (
 
   return {
     _id: doc._id ?? String(doc.id ?? ""),
-    name: doc.name ?? doc.originalName ?? "Untitled Document",
+    name: doc.name ?? doc.originalName ?? "Document sans titre",
     description: doc.description ?? doc.metadata?.description ?? "",
     type: doc.type ?? doc.metadata?.type ?? "other",
     category: doc.category ?? doc.metadata?.category ?? "general",
@@ -188,25 +188,25 @@ type EnrichedDocument = TenantDocument & {
 };
 
 const typeLabelMap: Record<string, string> = {
-  lease: "Lease",
-  receipt: "Receipt",
-  notice: "Notice",
-  insurance: "Insurance",
-  identification: "Identification",
-  income: "Income",
+  lease: "Bail",
+  receipt: "Reçu",
+  notice: "Avis",
+  insurance: "Assurance",
+  identification: "Pièce d'identité",
+  income: "Revenus",
   maintenance: "Maintenance",
   inspection: "Inspection",
-  other: "Other",
+  other: "Autre",
 };
 
 const categoryLabelMap: Record<string, string> = {
-  lease: "Lease",
-  payments: "Payments",
+  lease: "Bail",
+  payments: "Paiements",
   maintenance: "Maintenance",
-  insurance: "Insurance",
-  identification: "Identification",
-  notices: "Notices",
-  general: "General",
+  insurance: "Assurance",
+  identification: "Pièce d'identité",
+  notices: "Avis",
+  general: "Général",
 };
 
 const toTitleCase = (value: string) =>
@@ -333,7 +333,7 @@ export default function DocumentManagement({
       console.error("Error fetching tenant documents:", error);
       toast.error(
         t("leases.documents.toasts.fetchDocumentsError", {
-          defaultValue: "Failed to load documents",
+          defaultValue: "Impossible de charger les documents",
         })
       );
     } finally {
@@ -577,7 +577,7 @@ export default function DocumentManagement({
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                 {t("leases.documents.summary.totalDocuments", {
-                  defaultValue: "Total Documents",
+                  defaultValue: "Total des documents",
                 })}
               </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
@@ -634,7 +634,7 @@ export default function DocumentManagement({
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 {t("leases.documents.summary.recentUploads", {
-                  defaultValue: "Recent Uploads",
+                  defaultValue: "Téléversements récents",
                 })}
               </CardTitle>
               <Upload className="h-4 w-4 text-muted-foreground" />
@@ -647,7 +647,7 @@ export default function DocumentManagement({
               )}
               <p className="text-xs text-muted-foreground">
                 {t("leases.documents.summary.last30Days", {
-                  defaultValue: "Last 30 days",
+                  defaultValue: "30 derniers jours",
                 })}
               </p>
             </CardContent>
@@ -663,7 +663,7 @@ export default function DocumentManagement({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t("leases.documents.filters.searchPlaceholder", {
-                  defaultValue: "Search documents...",
+                  defaultValue: "Rechercher des documents...",
                 })}
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -675,14 +675,14 @@ export default function DocumentManagement({
               <SelectTrigger className="w-full sm:w-40">
                 <SelectValue
                   placeholder={t("leases.documents.filters.categoryPlaceholder", {
-                    defaultValue: "Category",
+                    defaultValue: "Catégorie",
                   })}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
                   {t("leases.documents.filters.allCategories", {
-                    defaultValue: "All Categories",
+                    defaultValue: "Toutes les catégories",
                   })}
                 </SelectItem>
                 {categoryOptions.map((option) => (
@@ -706,7 +706,7 @@ export default function DocumentManagement({
               <SelectContent>
                 <SelectItem value="all">
                   {t("leases.documents.filters.allTypes", {
-                    defaultValue: "All Types",
+                    defaultValue: "Tous les types",
                   })}
                 </SelectItem>
                 {typeOptions.map((option) => (
@@ -723,14 +723,14 @@ export default function DocumentManagement({
               <SelectTrigger className="w-full sm:w-40">
                 <SelectValue
                   placeholder={t("leases.documents.filters.propertyPlaceholder", {
-                    defaultValue: "Property",
+                    defaultValue: "Propriété",
                   })}
                 />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">
                   {t("leases.documents.filters.allProperties", {
-                    defaultValue: "All Properties",
+                    defaultValue: "Toutes les propriétés",
                   })}
                 </SelectItem>
                 {propertyOptions.map((option) => (
@@ -753,7 +753,7 @@ export default function DocumentManagement({
               <RefreshCw
                 className={`h-4 w-4 ${internalLoading ? "animate-spin" : ""}`}
               />
-              {t("leases.actions.refresh", { defaultValue: "Refresh" })}
+              {t("leases.actions.refresh", { defaultValue: "Actualiser" })}
             </Button>
           )}
         </div>
@@ -787,12 +787,12 @@ export default function DocumentManagement({
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
                 {t("leases.documents.empty.title", {
-                  defaultValue: "No Documents Found",
+                  defaultValue: "Aucun document trouvé",
                 })}
               </h3>
               <p className="text-muted-foreground">
                 {t("leases.documents.empty.description", {
-                  defaultValue: "No documents match your current filters.",
+                  defaultValue: "Aucun document ne correspond aux filtres actuels.",
                 })}
               </p>
             </div>
@@ -814,17 +814,17 @@ export default function DocumentManagement({
                       </TableHead>
                       <TableHead>
                         {t("leases.documents.table.columns.property", {
-                          defaultValue: "Property",
+                          defaultValue: "Propriété",
                         })}
                       </TableHead>
                       <TableHead>
                         {t("leases.documents.table.columns.uploadDate", {
-                          defaultValue: "Upload Date",
+                          defaultValue: "Date de téléversement",
                         })}
                       </TableHead>
                       <TableHead>
                         {t("leases.documents.table.columns.size", {
-                          defaultValue: "Size",
+                          defaultValue: "Taille",
                         })}
                       </TableHead>
                       <TableHead className="text-right">
@@ -873,7 +873,7 @@ export default function DocumentManagement({
                               <Button variant="ghost" className="h-8 w-8 p-0">
                                 <span className="sr-only">
                                   {t("leases.documents.actions.openMenu", {
-                                    defaultValue: "Open menu",
+                                    defaultValue: "Ouvrir le menu",
                                   })}
                                 </span>
                                 <MoreHorizontal className="h-4 w-4" />
@@ -887,7 +887,7 @@ export default function DocumentManagement({
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 {t("leases.documents.actions.preview", {
-                                  defaultValue: "Preview",
+                                  defaultValue: "Aperçu",
                                 })}
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -897,7 +897,7 @@ export default function DocumentManagement({
                               >
                                 <Download className="mr-2 h-4 w-4" />
                                 {t("leases.documents.actions.download", {
-                                  defaultValue: "Download",
+                                  defaultValue: "Télécharger",
                                 })}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -945,13 +945,13 @@ export default function DocumentManagement({
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
               {t("leases.documents.preview.title", {
-                defaultValue: "Document Preview",
+                defaultValue: "Aperçu du document",
               })}
             </DialogTitle>
             <DialogDescription className="break-all">
               {selectedDocument?.description ??
                 t("leases.documents.preview.description", {
-                  defaultValue: "Review document details",
+                  defaultValue: "Consultez les détails du document",
                 })}
             </DialogDescription>
           </DialogHeader>
@@ -1040,7 +1040,7 @@ export default function DocumentManagement({
                 >
                   <Eye className="mr-2 h-4 w-4" />
                   {t("leases.documents.actions.openDocument", {
-                    defaultValue: "Open Document",
+                    defaultValue: "Ouvrir le document",
                   })}
                 </Button>
                 <Button
@@ -1050,14 +1050,14 @@ export default function DocumentManagement({
                 >
                   <Download className="mr-2 h-4 w-4" />
                   {t("leases.documents.actions.download", {
-                    defaultValue: "Download",
+                    defaultValue: "Télécharger",
                   })}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setShowPreviewDialog(false)}
                 >
-                  {t("leases.documents.actions.close", { defaultValue: "Close" })}
+                  {t("leases.documents.actions.close", { defaultValue: "Fermer" })}
                 </Button>
               </div>
             </div>

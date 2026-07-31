@@ -12,11 +12,11 @@ import { ReceiptCompanyInfo } from "@/lib/invoice/receipt-renderer";
  * This ensures PDFs always have valid company info even if settings haven't been configured
  */
 export const DEFAULT_COMPANY_INFO: InvoiceCompanyInfo = {
-  name: "PropertyPro Management",
-  address: "123 Business Avenue, Suite 100, City, State 12345",
-  phone: "+1 (555) 123-4567",
-  email: "info@propertypro.com",
-  website: "www.propertypro.com",
+  name: "GESTION E-IMMO",
+  address: "Carré 58, Rue 9232, Ménotin, Cotonou, Bénin",
+  phone: "+2290191868686",
+  email: "contact@e-immo.bj",
+  website: "gestion.e-immo.bj",
 };
 
 /**

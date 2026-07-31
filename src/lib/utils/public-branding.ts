@@ -18,6 +18,8 @@ export interface PublicBranding {
   primaryColor: string;
   secondaryColor: string;
   companyName: string;
+  whatsappNumber: string;
+  whatsappEnabled: boolean;
 }
 
 export const DEFAULT_PUBLIC_BRANDING: PublicBranding = {
@@ -27,6 +29,8 @@ export const DEFAULT_PUBLIC_BRANDING: PublicBranding = {
   primaryColor: "#3B82F6",
   secondaryColor: "#64748B",
   companyName: "PropertyPro",
+  whatsappNumber: "",
+  whatsappEnabled: false,
 };
 
 /**
@@ -70,6 +74,10 @@ export const getPublicBranding = cache(async (): Promise<PublicBranding> => {
       secondaryColor:
         branding.secondaryColor || DEFAULT_PUBLIC_BRANDING.secondaryColor,
       companyName: branding.companyName || DEFAULT_PUBLIC_BRANDING.companyName,
+      whatsappNumber:
+        branding.whatsappNumber || DEFAULT_PUBLIC_BRANDING.whatsappNumber,
+      whatsappEnabled:
+        branding.whatsappEnabled ?? DEFAULT_PUBLIC_BRANDING.whatsappEnabled,
     };
   } catch (error) {
     console.error("getPublicBranding error:", error);

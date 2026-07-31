@@ -1,6 +1,6 @@
 /**
- * PropertyPro - Communication Center Component
- * Lease-specific messaging and communication with property managers
+ * PropriétéPro - Communication Center Component
+ * Bail-specific messaging and communication with property managers
  */
 
 "use client";
@@ -103,9 +103,9 @@ export default function CommunicationCenter({
   const [conversations] = useState<Conversation[]>([
     {
       _id: "conv1",
-      subject: "Maintenance Request - Kitchen Faucet",
+      subject: "Demande de maintenance - Robinet de cuisine",
       leaseId: "lease1",
-      propertyName: "Sunset Apartments",
+      propertyName: "Résidence Sunset",
       participants: [
         {
           id: "tenant1",
@@ -127,7 +127,7 @@ export default function CommunicationCenter({
         senderName: "Sarah Wilson",
         senderRole: "manager",
         content:
-          "I'll schedule a technician to look at the faucet tomorrow morning.",
+          "Je vais programmer l'intervention d'un technicien demain matin pour le robinet.",
         timestamp: "2024-01-20T10:30:00Z",
         read: false,
       },
@@ -140,9 +140,9 @@ export default function CommunicationCenter({
     },
     {
       _id: "conv2",
-      subject: "Lease Renewal Discussion",
+      subject: "Discussion sur le renouvellement du bail",
       leaseId: "lease1",
-      propertyName: "Sunset Apartments",
+      propertyName: "Résidence Sunset",
       participants: [
         {
           id: "tenant1",
@@ -164,7 +164,7 @@ export default function CommunicationCenter({
         senderName: "John Doe",
         senderRole: "tenant",
         content:
-          "I'm interested in renewing my lease for another year. What are the terms?",
+          "Je souhaite renouveler mon bail pour une année supplémentaire. Quelles sont les conditions ?",
         timestamp: "2024-01-18T16:45:00Z",
         read: true,
       },
@@ -180,13 +180,13 @@ export default function CommunicationCenter({
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNouveauMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [showNewConversationDialog, setShowNewConversationDialog] =
+  const [statusFilter, setStatutFilter] = useState("all");
+  const [categoryFilter, setCatégorieFilter] = useState("all");
+  const [showNouveauConversationDialog, setShowNouveauConversationDialog] =
     useState(false);
-  const [newConversationData, setNewConversationData] = useState({
+  const [newConversationData, setNouveauConversationData] = useState({
     subject: "",
     leaseId: "",
     category: "general",
@@ -195,7 +195,7 @@ export default function CommunicationCenter({
   });
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString("fr-FR", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -204,7 +204,7 @@ export default function CommunicationCenter({
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatutBadge = (status: string) => {
     const statusConfig = {
       open: { variant: "default" as const, color: "text-green-600" },
       closed: { variant: "secondary" as const, color: "text-gray-600" },
@@ -215,7 +215,7 @@ export default function CommunicationCenter({
     return <Badge variant={config.variant}>{status.toUpperCase()}</Badge>;
   };
 
-  const getPriorityBadge = (priority: string) => {
+  const getPrioritéBadge = (priority: string) => {
     const priorityConfig = {
       high: { variant: "destructive" as const, icon: AlertCircle },
       medium: { variant: "outline" as const, icon: Clock },
@@ -233,7 +233,7 @@ export default function CommunicationCenter({
     );
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getCatégorieIcon = (category: string) => {
     switch (category) {
       case "maintenance":
         return <Settings className="h-4 w-4" />;
@@ -248,15 +248,15 @@ export default function CommunicationCenter({
 
   const filteredConversations = conversations.filter((conv) => {
     const matchesSearch =
-      conv.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      conv.propertyName.toLowerCase().includes(searchTerm.toLowerCase());
+      conv.subject.toFaibleerCase().includes(searchTerm.toFaibleerCase()) ||
+      conv.propertyName.toFaibleerCase().includes(searchTerm.toFaibleerCase());
 
-    const matchesStatus =
+    const matchesStatut =
       statusFilter === "all" || conv.status === statusFilter;
-    const matchesCategory =
+    const matchesCatégorie =
       categoryFilter === "all" || conv.category === categoryFilter;
 
-    return matchesSearch && matchesStatus && matchesCategory;
+    return matchesSearch && matchesStatut && matchesCatégorie;
   });
 
   const handleConversationSelect = (conversation: Conversation) => {
@@ -273,7 +273,7 @@ export default function CommunicationCenter({
         content:
           conversation.category === "maintenance"
             ? "Hi, I have an issue with the kitchen faucet. It's been dripping constantly for the past few days."
-            : "I'm interested in renewing my lease for another year. What are the terms?",
+            : "Je souhaite renouveler mon bail pour une année supplémentaire. Quelles sont les conditions ?",
         timestamp: conversation.createdAt,
         read: true,
       },
@@ -296,7 +296,7 @@ export default function CommunicationCenter({
     };
 
     setMessages([...messages, message]);
-    setNewMessage("");
+    setNouveauMessage("");
   };
 
   const handleCreateConversation = () => {
@@ -304,8 +304,8 @@ export default function CommunicationCenter({
 
     // Create new conversation logic would go here
 
-    setShowNewConversationDialog(false);
-    setNewConversationData({
+    setShowNouveauConversationDialog(false);
+    setNouveauConversationData({
       subject: "",
       leaseId: "",
       category: "general",
@@ -326,14 +326,14 @@ export default function CommunicationCenter({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Conversations
+              Conversations totales
             </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{conversations.length}</div>
             <p className="text-xs text-muted-foreground">
-              {conversations.filter((c) => c.status === "open").length} active
+              {conversations.filter((c) => c.status === "open").length} actives
             </p>
           </CardContent>
         </Card>
@@ -341,37 +341,37 @@ export default function CommunicationCenter({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Unread Messages
+              Messages non lus
             </CardTitle>
             <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalUnread}</div>
-            <p className="text-xs text-muted-foreground">Require attention</p>
+            <p className="text-xs text-muted-foreground">Nécessitent votre attention</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Issues</CardTitle>
+            <CardTitle className="text-sm font-medium">Demandes ouvertes</CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {conversations.filter((c) => c.status === "open").length}
             </div>
-            <p className="text-xs text-muted-foreground">Need resolution</p>
+            <p className="text-xs text-muted-foreground">À résoudre</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium">Temps de réponse</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">2.5h</div>
-            <p className="text-xs text-muted-foreground">Average response</p>
+            <p className="text-xs text-muted-foreground">Réponse moyenne</p>
           </CardContent>
         </Card>
       </div>
@@ -387,49 +387,49 @@ export default function CommunicationCenter({
                   Conversations
                 </CardTitle>
                 <Dialog
-                  open={showNewConversationDialog}
-                  onOpenChange={setShowNewConversationDialog}
+                  open={showNouveauConversationDialog}
+                  onOuvertChange={setShowNouveauConversationDialog}
                 >
                   <DialogTrigger asChild>
                     <Button size="sm">
                       <Plus className="h-4 w-4 mr-2" />
-                      New
+                      Nouveau
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Start New Conversation</DialogTitle>
+                      <DialogTitle>Start Nouveau Conversation</DialogTitle>
                       <DialogDescription>
-                        Create a new conversation with your property manager
+                        Créez une nouvelle conversation avec votre gestionnaire.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium">Subject</label>
+                        <label className="text-sm font-medium">Sujet</label>
                         <Input
                           value={newConversationData.subject}
                           onChange={(e) =>
-                            setNewConversationData({
+                            setNouveauConversationData({
                               ...newConversationData,
                               subject: e.target.value,
                             })
                           }
-                          placeholder="Enter conversation subject"
+                          placeholder="Saisissez le sujet"
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Property</label>
+                        <label className="text-sm font-medium">Propriété</label>
                         <Select
                           value={newConversationData.leaseId}
                           onValueChange={(value) =>
-                            setNewConversationData({
+                            setNouveauConversationData({
                               ...newConversationData,
                               leaseId: value,
                             })
                           }
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select property" />
+                            <SelectValue placeholder="Sélectionnez une propriété" />
                           </SelectTrigger>
                           <SelectContent>
                             {leases.map((lease) => (
@@ -443,12 +443,12 @@ export default function CommunicationCenter({
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium">
-                            Category
+                            Catégorie
                           </label>
                           <Select
                             value={newConversationData.category}
                             onValueChange={(value) =>
-                              setNewConversationData({
+                              setNouveauConversationData({
                                 ...newConversationData,
                                 category: value,
                               })
@@ -458,26 +458,26 @@ export default function CommunicationCenter({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="general">General</SelectItem>
+                              <SelectItem value="general">Général</SelectItem>
                               <SelectItem value="maintenance">
                                 Maintenance
                               </SelectItem>
-                              <SelectItem value="payment">Payment</SelectItem>
-                              <SelectItem value="lease">Lease</SelectItem>
+                              <SelectItem value="payment">Paiement</SelectItem>
+                              <SelectItem value="lease">Bail</SelectItem>
                               <SelectItem value="complaint">
-                                Complaint
+                                Réclamation
                               </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
                           <label className="text-sm font-medium">
-                            Priority
+                            Priorité
                           </label>
                           <Select
                             value={newConversationData.priority}
                             onValueChange={(value) =>
-                              setNewConversationData({
+                              setNouveauConversationData({
                                 ...newConversationData,
                                 priority: value,
                               })
@@ -487,9 +487,9 @@ export default function CommunicationCenter({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="low">Low</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="high">High</SelectItem>
+                              <SelectItem value="low">Faible</SelectItem>
+                              <SelectItem value="medium">Moyenne</SelectItem>
+                              <SelectItem value="high">Élevée</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -499,24 +499,24 @@ export default function CommunicationCenter({
                         <Textarea
                           value={newConversationData.content}
                           onChange={(e) =>
-                            setNewConversationData({
+                            setNouveauConversationData({
                               ...newConversationData,
                               content: e.target.value,
                             })
                           }
-                          placeholder="Enter your message"
+                          placeholder="Saisissez votre message"
                           rows={4}
                         />
                       </div>
                       <div className="flex gap-2">
                         <Button onClick={handleCreateConversation}>
-                          Create Conversation
+                          Créer la conversation
                         </Button>
                         <Button
                           variant="outline"
-                          onClick={() => setShowNewConversationDialog(false)}
+                          onClick={() => setShowNouveauConversationDialog(false)}
                         >
-                          Cancel
+                          Annuler
                         </Button>
                       </div>
                     </div>
@@ -524,7 +524,7 @@ export default function CommunicationCenter({
                 </Dialog>
               </div>
               <CardDescription>
-                Your conversations with property managers
+                Vos conversations avec les gestionnaires
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -533,38 +533,38 @@ export default function CommunicationCenter({
                 <div className="relative">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search conversations..."
+                    placeholder="Rechercher des conversations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-8"
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <Select value={statusFilter} onValueChange={setStatutFilter}>
                     <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Status" />
+                      <SelectValue placeholder="Statut" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="open">Open</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="all">All Statut</SelectItem>
+                      <SelectItem value="open">Ouvert</SelectItem>
+                      <SelectItem value="pending">En attente</SelectItem>
+                      <SelectItem value="closed">Fermé</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select
                     value={categoryFilter}
-                    onValueChange={setCategoryFilter}
+                    onValueChange={setCatégorieFilter}
                   >
                     <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="Category" />
+                      <SelectValue placeholder="Catégorie" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="all">Toutes les catégories</SelectItem>
+                      <SelectItem value="general">Général</SelectItem>
                       <SelectItem value="maintenance">Maintenance</SelectItem>
-                      <SelectItem value="payment">Payment</SelectItem>
-                      <SelectItem value="lease">Lease</SelectItem>
-                      <SelectItem value="complaint">Complaint</SelectItem>
+                      <SelectItem value="payment">Paiement</SelectItem>
+                      <SelectItem value="lease">Bail</SelectItem>
+                      <SelectItem value="complaint">Réclamation</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -585,7 +585,7 @@ export default function CommunicationCenter({
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          {getCategoryIcon(conversation.category)}
+                          {getCatégorieIcon(conversation.category)}
                           <span className="font-medium text-sm truncate">
                             {conversation.subject}
                           </span>
@@ -605,8 +605,8 @@ export default function CommunicationCenter({
                       </div>
 
                       <div className="flex items-center gap-2 mb-2">
-                        {getStatusBadge(conversation.status)}
-                        {getPriorityBadge(conversation.priority)}
+                        {getStatutBadge(conversation.status)}
+                        {getPrioritéBadge(conversation.priority)}
                       </div>
 
                       <p className="text-xs text-muted-foreground truncate">
@@ -637,7 +637,7 @@ export default function CommunicationCenter({
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      {getCategoryIcon(selectedConversation.category)}
+                      {getCatégorieIcon(selectedConversation.category)}
                       {selectedConversation.subject}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4 mt-1">
@@ -645,8 +645,8 @@ export default function CommunicationCenter({
                         <Building2 className="h-3 w-3" />
                         {selectedConversation.propertyName}
                       </span>
-                      {getStatusBadge(selectedConversation.status)}
-                      {getPriorityBadge(selectedConversation.priority)}
+                      {getStatutBadge(selectedConversation.status)}
+                      {getPrioritéBadge(selectedConversation.priority)}
                     </CardDescription>
                   </div>
                 </div>
@@ -698,8 +698,8 @@ export default function CommunicationCenter({
                 <div className="flex gap-2">
                   <Textarea
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Type your message..."
+                    onChange={(e) => setNouveauMessage(e.target.value)}
+                    placeholder="Saisissez votre message..."
                     className="flex-1"
                     rows={2}
                     onKeyDown={(e) => {
@@ -724,10 +724,10 @@ export default function CommunicationCenter({
                 <div className="text-center">
                   <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
-                    Select a Conversation
+                    Sélectionnez une conversation
                   </h3>
                   <p className="text-muted-foreground">
-                    Choose a conversation from the list to view messages
+                    Choisissez une conversation pour afficher les messages
                   </p>
                 </div>
               </CardContent>

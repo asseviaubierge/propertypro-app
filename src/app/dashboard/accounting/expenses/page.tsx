@@ -114,7 +114,7 @@ export default function ExpensesPage() {
         setTotalItems(data.pagination?.total || 0);
       }
     } catch (error) {
-      console.error("Failed to fetch expenses:", error);
+      console.error("Échec du chargement des dépenses :", error);
     } finally {
       setLoading(false);
     }
@@ -127,8 +127,8 @@ export default function ExpensesPage() {
   const handleDelete = async (id: string) => {
     if (
       !confirm(
-        t("expenses.actions.confirmDelete", {
-          defaultValue: "Are you sure you want to delete this expense?",
+        t("expenses.actions.confirmSupprimer", {
+          defaultValue: "Êtes-vous sûr de vouloir supprimer cette dépense ?",
         }),
       )
     )
@@ -162,7 +162,7 @@ export default function ExpensesPage() {
     });
   };
 
-  const getStatusLabel = (status?: string | null) => {
+  const getStatutLabel = (status?: string | null) => {
     const normalizedStatus = (status ?? "unknown").toLowerCase();
     return t(`expenses.status.${normalizedStatus}`, {
       defaultValue: normalizedStatus.replace(/_/g, " "),
@@ -189,7 +189,7 @@ export default function ExpensesPage() {
     },
     {
       id: "expenseNumber",
-      header: t("expenses.table.reference", { defaultValue: "Reference" }),
+      header: t("expenses.table.reference", { defaultValue: "Référence" }),
       cell: (row) => (
         <Link
           href={`/dashboard/accounting/expenses/${row._id}`}
@@ -203,7 +203,7 @@ export default function ExpensesPage() {
     },
     {
       id: "category",
-      header: t("expenses.table.category", { defaultValue: "Category" }),
+      header: t("expenses.table.category", { defaultValue: "Catégorie" }),
       cell: (row) => (
         <Badge variant="outline" className="capitalize text-xs font-normal">
           {getCategoryLabel(row.category)}
@@ -225,7 +225,7 @@ export default function ExpensesPage() {
     },
     {
       id: "property",
-      header: t("expenses.table.property", { defaultValue: "Property" }),
+      header: t("expenses.table.property", { defaultValue: "Bien" }),
       cell: (row) =>
         row.propertyId ? (
           <Link
@@ -249,7 +249,7 @@ export default function ExpensesPage() {
     },
     {
       id: "amount",
-      header: t("expenses.table.amount", { defaultValue: "Amount" }),
+      header: t("expenses.table.amount", { defaultValue: "Montant" }),
       cell: (row) => (
         <span className="font-semibold text-sm text-error">
           -{formatCurrency(row.amount)}
@@ -260,13 +260,13 @@ export default function ExpensesPage() {
     },
     {
       id: "status",
-      header: t("expenses.table.status", { defaultValue: "Status" }),
+      header: t("expenses.table.status", { defaultValue: "Statut" }),
       cell: (row) => (
         <Badge
           variant="outline"
           className={`capitalize text-xs ${getStatusColor(row.status)}`}
         >
-          {getStatusLabel(row.status)}
+          {getStatutLabel(row.status)}
         </Badge>
       ),
       width: "min-w-[100px]",
@@ -288,7 +288,7 @@ export default function ExpensesPage() {
               }
             >
               <Eye className="h-4 w-4 mr-2" />
-              {t("expenses.actions.view", { defaultValue: "View" })}
+              {t("expenses.actions.view", { defaultValue: "Voir" })}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
@@ -303,7 +303,7 @@ export default function ExpensesPage() {
               className="text-destructive"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              {t("expenses.actions.delete", { defaultValue: "Delete" })}
+              {t("expenses.actions.delete", { defaultValue: "Supprimer" })}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -322,11 +322,11 @@ export default function ExpensesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            {t("nav.accounting.expenses", { defaultValue: "Expenses" })}
+            {t("nav.accounting.expenses", { defaultValue: "Dépenses" })}
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">
             {t("expenses.header.subtitle", {
-              defaultValue: "Track and manage property expenses",
+              defaultValue: "Suivre et gérer les dépenses des biens",
             })}
           </p>
         </div>
@@ -335,7 +335,7 @@ export default function ExpensesPage() {
           onClick={() => router.push("/dashboard/accounting/expenses/new")}
         >
           <Plus className="h-4 w-4" />
-          {t("expenses.actions.addExpense", { defaultValue: "Add Expense" })}
+          {t("expenses.actions.addExpense", { defaultValue: "Ajouter une dépense" })}
         </Button>
       </div>
 
@@ -343,7 +343,7 @@ export default function ExpensesPage() {
       <AnalyticsCardGrid className="lg:grid-cols-4">
         <AnalyticsCard
           title={t("expenses.stats.monthToDate", {
-            defaultValue: "Month to Date",
+            defaultValue: "Mois en cours",
           })}
           value={formatCurrency(summary?.monthToDate || 0)}
           icon={TrendingDown}
@@ -351,27 +351,27 @@ export default function ExpensesPage() {
         />
         <AnalyticsCard
           title={t("expenses.stats.yearToDate", {
-            defaultValue: "Year to Date",
+            defaultValue: "Année en cours",
           })}
           value={formatCurrency(summary?.yearToDate || 0)}
           icon={DollarSign}
           iconColor="warning"
         />
         <AnalyticsCard
-          title={t("expenses.stats.pending", { defaultValue: "Pending" })}
+          title={t("expenses.stats.pending", { defaultValue: "En attente" })}
           value={formatCurrency(summary?.totalPending || 0)}
           icon={Wallet}
           iconColor="info"
         />
         <AnalyticsCard
           title={t("expenses.stats.topCategory", {
-            defaultValue: "Top Category",
+            defaultValue: "Top Catégorie",
           })}
           value={getCategoryLabel(summary?.topCategory || "none")}
           icon={Receipt}
           iconColor="primary"
           description={t("expenses.stats.totalExpensesCount", {
-            defaultValue: "{count} total expenses",
+            defaultValue: "{count} dépenses au total",
             values: { count: summary?.count || 0 },
           })}
         />
@@ -387,11 +387,11 @@ export default function ExpensesPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {t("nav.accounting.expenses", { defaultValue: "Expenses" })}
+                  {t("nav.accounting.expenses", { defaultValue: "Dépenses" })}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("expenses.header.subtitle", {
-                    defaultValue: "Track and manage property expenses",
+                    defaultValue: "Suivre et gérer les dépenses des biens",
                   })}
                 </p>
               </div>
@@ -402,7 +402,7 @@ export default function ExpensesPage() {
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
               <GlobalSearch
                 placeholder={t("expenses.filters.searchPlaceholder", {
-                  defaultValue: "Search expenses...",
+                  defaultValue: "Rechercher des dépenses...",
                 })}
                 initialValue={search}
                 debounceDelay={300}
@@ -414,7 +414,7 @@ export default function ExpensesPage() {
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-white dark:bg-gray-800"
                 ariaLabel={t("expenses.filters.searchAriaLabel", {
-                  defaultValue: "Search expenses",
+                  defaultValue: "Rechercher des dépenses",
                 })}
               />
 
@@ -428,14 +428,14 @@ export default function ExpensesPage() {
                 <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("expenses.filters.allCategories", {
-                      defaultValue: "All Categories",
+                      defaultValue: "Toutes les catégories",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("expenses.filters.allCategories", {
-                      defaultValue: "All Categories",
+                      defaultValue: "Toutes les catégories",
                     })}
                   </SelectItem>
                   {Object.values(ExpenseCategory).map((cat) => (
@@ -457,20 +457,20 @@ export default function ExpensesPage() {
               >
                 <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
-                    placeholder={t("expenses.filters.allStatus", {
-                      defaultValue: "All Status",
+                    placeholder={t("expenses.filters.allStatut", {
+                      defaultValue: "All Statut",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    {t("expenses.filters.allStatus", {
-                      defaultValue: "All Status",
+                    {t("expenses.filters.allStatut", {
+                      defaultValue: "All Statut",
                     })}
                   </SelectItem>
                   {Object.values(ExpenseStatus).map((s) => (
                     <SelectItem key={s} value={s}>
-                      <span className="capitalize">{getStatusLabel(s)}</span>
+                      <span className="capitalize">{getStatutLabel(s)}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -489,7 +489,7 @@ export default function ExpensesPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("expenses.filters.clear", { defaultValue: "Clear" })}
+                  {t("expenses.filters.clear", { defaultValue: "Effacer" })}
                 </Button>
               )}
             </div>
@@ -505,14 +505,14 @@ export default function ExpensesPage() {
             emptyState={{
               icon: <Wallet className="h-12 w-12 text-muted-foreground" />,
               title: t("expenses.empty.title", {
-                defaultValue: "No expenses found",
+                defaultValue: "Aucune dépense trouvée",
               }),
               description: hasActiveFilters
                 ? t("expenses.empty.filtered", {
-                    defaultValue: "Try adjusting your filters",
+                    defaultValue: "Essayez de modifier vos filtres",
                   })
                 : t("expenses.empty.default", {
-                    defaultValue: "Add your first expense to start tracking",
+                    defaultValue: "Ajoutez votre première dépense pour commencer le suivi",
                   }),
               action: (
                 <Button
@@ -523,7 +523,7 @@ export default function ExpensesPage() {
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   {t("expenses.actions.addExpense", {
-                    defaultValue: "Add Expense",
+                    defaultValue: "Ajouter une dépense",
                   })}
                 </Button>
               ),
@@ -540,13 +540,13 @@ export default function ExpensesPage() {
                 setLimit(newLimit);
                 setPage(1);
               }}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              surLabel={t("common.sur", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading}
             />

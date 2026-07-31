@@ -25,10 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Wallet, Loader2 } from "lucide-react";
-import { ExpenseCategory, ExpenseStatus, PaymentMethod } from "@/types";
+import { ExpenseCatégorie, ExpenseStatut, PaymentMethod } from "@/types";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
-interface Property {
+interface Bien {
   id: string;
   name: string;
 }
@@ -41,16 +41,16 @@ export default function EditExpensePage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<Bien[]>([]);
 
   // Form state
-  const [category, setCategory] = useState("");
+  const [category, setCatégorie] = useState("");
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setMontant] = useState("");
   const [date, setDate] = useState("");
-  const [propertyId, setPropertyId] = useState("");
+  const [propertyId, setBienId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [status, setStatus] = useState<ExpenseStatus>(ExpenseStatus.PAID);
+  const [status, setStatut] = useState<ExpenseStatut>(ExpenseStatut.PAID);
   const [referenceNumber, setReferenceNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [taxDeductible, setTaxDeductible] = useState(false);
@@ -70,7 +70,7 @@ export default function EditExpensePage() {
             (Array.isArray(propData?.data) ? propData.data : []).map(
               (p: any) => ({
                 id: p?._id || "",
-                name: p?.name || "Unknown Property",
+                name: p?.name || "Bien inconnu",
               }),
             ),
           );
@@ -81,32 +81,32 @@ export default function EditExpensePage() {
           const exp = data?.data;
           if (exp) {
             setExpenseNumber(exp.expenseNumber || "");
-            setCategory(exp.category || "");
+            setCatégorie(exp.category || "");
             setDescription(exp.description || "");
-            setAmount(String(exp.amount || ""));
+            setMontant(String(exp.amount || ""));
             const parsedDate = exp?.date ? new Date(exp.date) : null;
             setDate(
               parsedDate && !Number.isNaN(parsedDate.getTime())
                 ? parsedDate.toISOString().split("T")[0]
                 : "",
             );
-            setPropertyId(exp.propertyId?._id || "none");
+            setBienId(exp.propertyId?._id || "none");
             setPaymentMethod(exp.paymentMethod || "");
-            setStatus(exp.status || ExpenseStatus.PAID);
+            setStatut(exp.status || ExpenseStatut.PAID);
             setReferenceNumber(exp.referenceNumber || "");
             setNotes(exp.notes || "");
             setTaxDeductible(exp.taxDeductible || false);
           } else {
-            toast.error("Expense not found");
+            toast.error("Dépense introuvable");
             router.push("/dashboard/accounting/expenses");
           }
         } else {
-          toast.error("Failed to load expense");
+          toast.error("Échec du chargement de la dépense");
           router.push("/dashboard/accounting/expenses");
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
-        toast.error("Failed to load expense data");
+        console.error("Échec du chargement des données :", error);
+        toast.error("Échec du chargement de la dépense data");
         router.push("/dashboard/accounting/expenses");
       } finally {
         setIsLoading(false);
@@ -122,12 +122,12 @@ export default function EditExpensePage() {
     e.preventDefault();
 
     if (!category || !description || !amount || !date) {
-      toast.error("Please fill in all required fields");
+      toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
 
     if (parseFloat(amount) <= 0) {
-      toast.error("Amount must be greater than 0");
+      toast.error("Le montant doit être supérieur à 0");
       return;
     }
 
@@ -155,26 +155,26 @@ export default function EditExpensePage() {
       if (res.ok) {
         toast.success(
           t("expenses.toasts.updateSuccess", {
-            defaultValue: "Expense updated successfully",
+            defaultValue: "Dépense mise à jour avec succès",
           })
         );
         router.push(`/dashboard/accounting/expenses/${expenseId}`);
       } else {
-        throw new Error(result.error || "Failed to update expense");
+        throw new Error(result.error || "Échec de la mise à jour de la dépense");
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update expense"
+        error instanceof Error ? error.message : "Échec de la mise à jour de la dépense"
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getCategoryLabel = (cat?: string | null) => {
-    const normalizedCategory = (cat ?? "unknown").toLowerCase();
-    return t(`expenses.categories.${normalizedCategory}`, {
-      defaultValue: normalizedCategory.replace(/_/g, " "),
+  const getCatégorieLabel = (cat?: string | null) => {
+    const normalizedCatégorie = (cat ?? "unknown").toLowerCase();
+    return t(`expenses.categories.${normalizedCatégorie}`, {
+      defaultValue: normalizedCatégorie.replace(/_/g, " "),
     });
   };
 
@@ -213,21 +213,21 @@ export default function EditExpensePage() {
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
             <Wallet className="h-7 w-7" />
-            {t("expenses.edit.title", { defaultValue: "Edit Expense" })}
+            {t("expenses.edit.title", { defaultValue: "Modifier la dépense" })}
           </h1>
           <p className="text-muted-foreground text-sm">
             {expenseNumber && (
               <span className="font-mono">{expenseNumber} — </span>
             )}
             {t("expenses.edit.subtitle", {
-              defaultValue: "Update expense details",
+              defaultValue: "Mettre à jour les détails de la dépense",
             })}
           </p>
         </div>
         <Link href={`/dashboard/accounting/expenses/${expenseId}`}>
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("common.back", { defaultValue: "Back" })}
+            {t("common.back", { defaultValue: "Retour" })}
           </Button>
         </Link>
       </div>
@@ -237,35 +237,35 @@ export default function EditExpensePage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {t("expenses.edit.details", { defaultValue: "Expense Details" })}
+              {t("expenses.edit.details", { defaultValue: "Détails de la dépense" })}
             </CardTitle>
             <CardDescription>
               {t("expenses.edit.detailsDescription", {
                 defaultValue:
-                  "Update the expense information. Fields marked with * are required.",
+                  "Mettez à jour les informations de la dépense. Les champs marqués d'un * sont obligatoires.",
               })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Row 1: Category + Status */}
+            {/* Row 1: Catégorie + Statut */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">
-                  {t("expenses.form.category", { defaultValue: "Category" })} *
+                  {t("expenses.form.category", { defaultValue: "Catégorie" })} *
                 </Label>
-                <Select value={category} onValueChange={setCategory}>
+                <Select value={category} onValueChange={setCatégorie}>
                   <SelectTrigger id="category">
                     <SelectValue
-                      placeholder={t("expenses.form.selectCategory", {
-                        defaultValue: "Select category",
+                      placeholder={t("expenses.form.selectCatégorie", {
+                        defaultValue: "Sélectionner une catégorie",
                       })}
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(ExpenseCategory).map((cat) => (
+                    {Object.values(ExpenseCatégorie).map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         <span className="capitalize">
-                          {getCategoryLabel(cat)}
+                          {getCatégorieLabel(cat)}
                         </span>
                       </SelectItem>
                     ))}
@@ -275,17 +275,17 @@ export default function EditExpensePage() {
 
               <div className="space-y-2">
                 <Label htmlFor="status">
-                  {t("expenses.form.status", { defaultValue: "Status" })}
+                  {t("expenses.form.status", { defaultValue: "Statut" })}
                 </Label>
                 <Select
                   value={status}
-                  onValueChange={(val) => setStatus(val as ExpenseStatus)}
+                  onValueChange={(val) => setStatut(val as ExpenseStatut)}
                 >
                   <SelectTrigger id="status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(ExpenseStatus).map((s) => (
+                    {Object.values(ExpenseStatut).map((s) => (
                       <SelectItem key={s} value={s}>
                         <span className="capitalize">
                           {s.replace(/_/g, " ")}
@@ -310,17 +310,17 @@ export default function EditExpensePage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t("expenses.form.descriptionPlaceholder", {
-                  defaultValue: "e.g., Plumbing repair for Unit 3B",
+                  defaultValue: "Ex. : Réparation de plomberie pour l'unité 3B",
                 })}
                 maxLength={500}
               />
             </div>
 
-            {/* Row 3: Amount + Date */}
+            {/* Row 3: Montant + Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="amount">
-                  {t("expenses.form.amount", { defaultValue: "Amount" })} *
+                  {t("expenses.form.amount", { defaultValue: "Montant" })} *
                 </Label>
                 <Input
                   id="amount"
@@ -328,7 +328,7 @@ export default function EditExpensePage() {
                   step="0.01"
                   min="0.01"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) => setMontant(e.target.value)}
                   placeholder="0.00"
                 />
               </div>
@@ -346,24 +346,24 @@ export default function EditExpensePage() {
               </div>
             </div>
 
-            {/* Row 4: Property + Payment Method */}
+            {/* Row 4: Bien + Mode de paiement */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="property">
-                  {t("expenses.form.property", { defaultValue: "Property" })}
+                  {t("expenses.form.property", { defaultValue: "Bien" })}
                 </Label>
-                <Select value={propertyId} onValueChange={setPropertyId}>
+                <Select value={propertyId} onValueChange={setBienId}>
                   <SelectTrigger id="property">
                     <SelectValue
-                      placeholder={t("expenses.form.selectProperty", {
-                        defaultValue: "Select property (optional)",
+                      placeholder={t("expenses.form.selectBien", {
+                        defaultValue: "Sélectionner un bien (facultatif)",
                       })}
                     />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
-                      {t("expenses.form.noProperty", {
-                        defaultValue: "No specific property",
+                      {t("expenses.form.noBien", {
+                        defaultValue: "Aucun bien spécifique",
                       })}
                     </SelectItem>
                     {properties.map((prop) => (
@@ -378,14 +378,14 @@ export default function EditExpensePage() {
               <div className="space-y-2">
                 <Label htmlFor="paymentMethod">
                   {t("expenses.form.paymentMethod", {
-                    defaultValue: "Payment Method",
+                    defaultValue: "Mode de paiement",
                   })}
                 </Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                   <SelectTrigger id="paymentMethod">
                     <SelectValue
                       placeholder={t("expenses.form.selectPaymentMethod", {
-                        defaultValue: "Select method (optional)",
+                        defaultValue: "Sélectionner un mode (facultatif)",
                       })}
                     />
                   </SelectTrigger>
@@ -402,11 +402,11 @@ export default function EditExpensePage() {
               </div>
             </div>
 
-            {/* Row 5: Reference Number */}
+            {/* Row 5: Numéro de référence */}
             <div className="space-y-2">
               <Label htmlFor="referenceNumber">
                 {t("expenses.form.referenceNumber", {
-                  defaultValue: "Reference Number",
+                  defaultValue: "Numéro de référence",
                 })}
               </Label>
               <Input
@@ -414,7 +414,7 @@ export default function EditExpensePage() {
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
                 placeholder={t("expenses.form.referenceNumberPlaceholder", {
-                  defaultValue: "e.g., Check #1234, Invoice #5678",
+                  defaultValue: "Ex. : Chèque n°1234, Facture n°5678",
                 })}
               />
             </div>
@@ -429,25 +429,25 @@ export default function EditExpensePage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={t("expenses.form.notesPlaceholder", {
-                  defaultValue: "Additional notes about this expense...",
+                  defaultValue: "Notes supplémentaires concernant cette dépense...",
                 })}
                 rows={3}
                 maxLength={2000}
               />
             </div>
 
-            {/* Row 7: Tax Deductible */}
+            {/* Row 7: Déductible des impôts */}
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <Label htmlFor="taxDeductible" className="text-base">
                   {t("expenses.form.taxDeductible", {
-                    defaultValue: "Tax Deductible",
+                    defaultValue: "Déductible des impôts",
                   })}
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   {t("expenses.form.taxDeductibleDescription", {
                     defaultValue:
-                      "Mark this expense as tax deductible for reporting",
+                      "Marquer cette dépense comme déductible des impôts pour les rapports",
                   })}
                 </p>
               </div>
@@ -464,7 +464,7 @@ export default function EditExpensePage() {
                 {isSubmitting && (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
-                {t("expenses.form.update", { defaultValue: "Update Expense" })}
+                {t("expenses.form.update", { defaultValue: "Mettre à jour la dépense" })}
               </Button>
               <Button
                 type="button"
@@ -473,7 +473,7 @@ export default function EditExpensePage() {
                   router.push(`/dashboard/accounting/expenses/${expenseId}`)
                 }
               >
-                {t("common.cancel", { defaultValue: "Cancel" })}
+                {t("common.cancel", { defaultValue: "Annuler" })}
               </Button>
             </div>
           </CardContent>

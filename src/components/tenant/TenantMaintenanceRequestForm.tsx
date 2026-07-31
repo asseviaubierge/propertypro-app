@@ -151,7 +151,7 @@ export default function TenantMaintenanceRequestForm({
         .replace(/,\s*,/g, ",")
         .replace(/^\s*,\s*|\s*,\s*$/g, "");
     }
-    return "Address not available";
+    return t("maintenance.tenant.form.lease.addressNotAvailable");
   };
 
   // Fetch tenant's leases
@@ -403,7 +403,7 @@ export default function TenantMaintenanceRequestForm({
                         <SelectContent>
                           {selectedLease.propertyId?.units?.map((unit) => (
                             <SelectItem key={unit._id} value={unit._id}>
-                              Unit {unit.unitNumber} ({unit.unitType})
+                              Logement {unit.unitNumber} ({unit.unitType})
                             </SelectItem>
                           ))}
                         </SelectContent>

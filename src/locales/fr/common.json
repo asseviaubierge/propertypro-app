@@ -1,11 +1,10 @@
 {
-  "app.name": "PropertyPro",
+  "app.name": "GESTION E-IMMO",
   "app.tagline": "Plateforme moderne de gestion immobilière multi-tenant",
   "common.save": "Enregistrer",
   "common.saving": "Enregistrement...",
   "common.cancel": "Annuler",
   "common.dismiss": "Fermer",
-
   "common.upload.title": "Télécharger des images de propriété",
   "common.upload.titleDisabled": "Téléchargement désactivé",
   "common.upload.titleDragActive": "Déposez vos images ici !",
@@ -23,7 +22,6 @@
   "common.upload.imageNumber": "Image {number}",
   "common.upload.readyToUpload": "{count} image{plural} prête{plural} à télécharger",
   "common.upload.reviewDescription": "Examinez vos images ci-dessus. Vous pouvez supprimer des images individuelles ou tout effacer pour recommencer.",
-
   "nav.dashboard": "Tableau de bord",
   "nav.section.management": "Gestion",
   "nav.section.operations": "Opérations",
@@ -33,18 +31,15 @@
   "nav.section.events": "Événements",
   "nav.section.settings": "Paramètres",
   "nav.section.administration": "Administration",
-
   "nav.properties": "Propriétés",
   "nav.properties.all": "Toutes les propriétés",
   "nav.properties.new": "Ajouter une propriété",
   "nav.properties.available": "Unités disponibles",
   "nav.properties.allUnits": "Toutes les unités",
-
   "nav.tenants": "Locataires",
   "nav.tenants.all": "Tous les locataires",
   "nav.tenants.new": "Ajouter un locataire",
   "nav.tenants.applications": "Demandes",
-
   "nav.leases": "Baux",
   "nav.leases.all": "Tous les baux",
   "nav.leases.new": "Créer un bail",
@@ -53,7 +48,6 @@
   "nav.leases.invoices": "Factures",
   "nav.leases.my": "Mes baux",
   "nav.leases.documents": "Documents",
-
   "nav.maintenance": "Maintenance",
   "nav.maintenance.all": "Toutes les demandes",
   "nav.maintenance.emergency": "Urgences",
@@ -62,13 +56,11 @@
   "nav.inspections": "Inspections",
   "nav.inspections.all": "Toutes les inspections",
   "nav.inspections.schedule": "Planifier une inspection",
-
   "nav.payments": "Paiements",
   "nav.payments.all": "Tous les paiements",
   "nav.payments.overdue": "En retard",
   "nav.payments.payRent": "Payer le loyer",
   "nav.payments.history": "Historique des paiements",
-
   "nav.accounting.transactions": "Transactions",
   "nav.accounting.invoices": "Factures",
   "nav.accounting.bills": "Factures fournisseurs",
@@ -78,7 +70,6 @@
   "nav.accounting.financialSummary": "Résumé financier",
   "nav.accounting.reports": "Rapports",
   "nav.accounting.payRent": "Payer le loyer",
-
   "nav.inbox": "Boîte de réception",
   "nav.messages": "Messages",
   "nav.notifications": "Notifications",
@@ -88,31 +79,25 @@
   "nav.tickets.mine": "Mes tickets",
   "nav.announcements": "Annonces",
   "nav.calendar": "Calendrier",
-
   "nav.settings": "Paramètres",
   "nav.settings.display": "Affichage et apparence",
   "nav.settings.profile": "Profil",
   "nav.settings.notifications": "Notifications",
   "nav.settings.billing": "Facturation et abonnements",
-
   "nav.admin": "Administration",
   "nav.admin.overview": "Vue d'ensemble",
   "nav.admin.users": "Tous les utilisateurs",
   "nav.admin.users.new": "Ajouter un utilisateur",
   "nav.admin.users.roles": "Rôles des utilisateurs",
-
   "units.status.available": "Disponible",
   "units.status.occupied": "Occupé",
   "units.status.maintenance": "Maintenance",
   "units.status.unavailable": "Indisponible",
-
   "properties.allUnits.header.title": "Toutes les unités",
   "properties.allUnits.header.subtitle": "Parcourez toutes les unités de toutes les propriétés",
-
   "header.menu.profile": "Profil",
   "header.menu.settings": "Paramètres",
   "header.menu.logout": "Se déconnecter",
-
   "common.showing": "Affichage",
   "common.previous": "Précédent",
   "common.next": "Suivant",
@@ -221,7 +206,6 @@
   "expenses.status.approved": "Approuvee",
   "expenses.status.pending": "En attente",
   "expenses.status.cancelled": "Annulee",
-
   "tickets.header.title": "Tickets de Support",
   "tickets.header.subtitle": "Gérer et répondre aux demandes de support des locataires",
   "tickets.newTicket": "Nouveau Ticket",
@@ -282,7 +266,6 @@
   "tickets.pagination.previous": "Précédent",
   "tickets.pagination.next": "Suivant",
   "tickets.pagination.perPage": "par page",
-
   "tickets.new.title": "Soumettre un Ticket",
   "tickets.new.subtitle": "Créez un ticket de support et notre équipe vous répondra",
   "tickets.new.back": "Retour",
@@ -316,7 +299,6 @@
   "tickets.detail.toasts.commentRequired": "Veuillez saisir un commentaire",
   "tickets.detail.toasts.commentAdded": "Commentaire ajouté",
   "tickets.detail.toasts.commentAddError": "Échec de l'ajout du commentaire",
-
   "tickets.form.createdBy": "Créé par",
   "tickets.form.createdByDesc": "Ce ticket est créé par l'utilisateur suivant",
   "tickets.form.details": "Détails du Ticket",

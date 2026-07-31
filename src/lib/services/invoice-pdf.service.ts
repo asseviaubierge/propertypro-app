@@ -33,8 +33,41 @@ export async function generateInvoicePdfBuffer(
 ): Promise<Buffer> {
   const invoice = ensureInvoiceObject(invoiceInput);
 
-  // Fetch company info from display settings
-  const companyInfo = await getCompanyInfoServer();
+// Informations générales de la plateforme (fallback)
+const defaultCompanyInfo = await getCompanyInfoServer();
+
+// Propriétaire réel du bien
+const owner = invoice.propertyId?.ownerId;
+console.log("========== PDF OWNER DEBUG ==========");
+console.log("propertyId =", invoice.propertyId);
+console.log("ownerId =", invoice.propertyId?.ownerId);
+console.log("businessName =", invoice.propertyId?.ownerId?.businessName);
+console.log("accountType =", invoice.propertyId?.ownerId?.accountType);
+console.log("=====================================");
+const ownerFullName = owner
+  ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
+  : "";
+
+// Si le bien possède un propriétaire, son identité devient
+// l'identité professionnelle utilisée sur la facture.
+const companyInfo = owner
+  ? {
+      ...(defaultCompanyInfo ?? {}),
+      name:
+        owner.businessName?.trim() ||
+        ownerFullName ||
+        defaultCompanyInfo?.name ||
+        "GESTION E-IMMO",
+      phone: owner.phone || defaultCompanyInfo?.phone || "",
+      email: owner.email || defaultCompanyInfo?.email || "",
+      logo: owner.businessLogo || defaultCompanyInfo?.logo,
+      accountType: owner.accountType,
+      cip: owner.cip,
+      ifu: owner.ifu,
+      rccm: owner.rccm,
+    }
+  : defaultCompanyInfo;
+
   let currencyCode: string | undefined = currencyCodeOverride;
   try {
     if (!currencyCode) {

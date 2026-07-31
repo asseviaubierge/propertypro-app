@@ -29,43 +29,43 @@ const RecurringPaymentSchema = new Schema<IRecurringPayment>(
     tenantId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Tenant ID is required"],
+      required: [true, "L'identifiant du locataire est requis"],
     },
     propertyId: {
       type: Schema.Types.ObjectId,
       ref: "Property",
-      required: [true, "Property ID is required"],
+      required: [true, "L'identifiant de la propriété est requis"],
     },
     leaseId: {
       type: Schema.Types.ObjectId,
       ref: "Lease",
-      required: [true, "Lease ID is required"],
+      required: [true, "L'identifiant du bail est requis"],
     },
     amount: {
       type: Number,
-      required: [true, "Amount is required"],
-      min: [0.01, "Amount must be at least $0.01"],
+      required: [true, "Le montant est requis"],
+      min: [0.01, "Le montant doit être supérieur à 0,01"],
     },
     type: {
       type: String,
       enum: Object.values(PaymentType),
-      required: [true, "Payment type is required"],
+      required: [true, "Le type de paiement est requis"],
     },
     frequency: {
       type: String,
       enum: Object.values(PaymentFrequency),
-      required: [true, "Payment frequency is required"],
+      required: [true, "La fréquence de paiement est requise"],
     },
     startDate: {
       type: Date,
-      required: [true, "Start date is required"],
+      required: [true, "La date de début est requise"],
     },
     endDate: {
       type: Date,
     },
     nextPaymentDate: {
       type: Date,
-      required: [true, "Next payment date is required"],
+      required: [true, "La prochaine date de paiement est requise"],
     },
     isActive: {
       type: Boolean,
@@ -74,7 +74,7 @@ const RecurringPaymentSchema = new Schema<IRecurringPayment>(
     description: {
       type: String,
       trim: true,
-      maxlength: [500, "Description cannot exceed 500 characters"],
+      maxlength: [500, "La description ne peut pas dépasser 500 caractères"],
     },
     stripeSubscriptionId: {
       type: String,
@@ -94,12 +94,12 @@ const RecurringPaymentSchema = new Schema<IRecurringPayment>(
     totalPaymentsMade: {
       type: Number,
       default: 0,
-      min: [0, "Total payments made cannot be negative"],
+      min: [0, "Le nombre total de paiements ne peut pas être négatif"],
     },
     failedPaymentCount: {
       type: Number,
       default: 0,
-      min: [0, "Failed payment count cannot be negative"],
+      min: [0, "Le nombre d'échecs de paiement ne peut pas être négatif"],
     },
     metadata: {
       type: Schema.Types.Mixed,
@@ -122,7 +122,7 @@ try {
 } catch (error) {
   // Silently handle index creation errors in development
   if (process.env.NODE_ENV !== "production") {
-    console.warn("RecurringPayment index creation warning:", error);
+    console.warn("Avertissement de création des index RecurringPayment :", error);
   }
 }
 

@@ -198,9 +198,14 @@ Configuration actuelle :
           ${
             actionButton
               ? `
-            <div style="text-align: center;">
-              <a href="${actionButton.url}" class="button">${actionButton.text}</a>
-            </div>
+            <div style="text-align: center; margin: 20px 0;">
+  <a
+    href="${actionButton.url}"
+    style="display:inline-block;background-color:#e00000;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:600;"
+  >
+    ${actionButton.text}
+  </a>
+</div>
           `
               : ""
           }
@@ -379,7 +384,7 @@ Si vous avez des questions, veuillez contacter notre équipe de support.
     return this.sendEmail(newEmail, template);
   }
 
-  // Envoyer un lien de vérification d'e-mail à l'adresse actuelle de l'utilisateur
+    // Envoyer un lien de confirmation du compte à l'adresse e-mail de l'utilisateur
   async sendEmailVerification(
     userEmail: string,
     userName: string,
@@ -390,27 +395,22 @@ Si vous avez des questions, veuillez contacter notre équipe de support.
     const content = `
       <p>Bonjour <strong>${userName}</strong>,</p>
 
-      <p>Veuillez confirmer que <strong>${userEmail}</strong> est bien votre adresse e-mail pour votre compte ${this.appName}.</p>
+      <p>Confirmez votre compte ${this.appName} et votre adresse <strong>${userEmail}</strong>.</p>
 
-      <p>Pour vérifier votre e-mail, veuillez cliquer sur le bouton ci-dessous :</p>
+      <p>Cliquez sur le bouton ci-dessous pour continuer :</p>
 
       <div class="security-notice">
-        <strong>Avis de sécurité :</strong> Ce lien de vérification expirera dans 24 heures.
-        La vérification de votre e-mail contribue à la sécurité de votre compte et garantit que vous recevez les notifications importantes.
+        <strong>Sécurité :</strong> Ce lien expire dans 24 heures.
       </div>
 
-      <p><strong>Si vous n'avez pas demandé cela :</strong></p>
-      <ul>
-        <li>Vous pouvez ignorer cet e-mail en toute sécurité</li>
-        <li>Votre compte restera inchangé</li>
-      </ul>
+      <p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.</p>
     `;
 
     const template = this.generateBaseTemplate(
-      "Vérifiez votre adresse e-mail",
+      "Confirmez votre compte",
       content,
       {
-        text: "Vérifier mon e-mail",
+        text: "Confirmer mon compte",
         url: verifyUrl,
       }
     );

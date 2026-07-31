@@ -1,6 +1,6 @@
 /**
- * PropertyPro - New Conversation Dialog
- * Component for creating new conversations with participant selection
+ * PropertyPro - Boîte de dialogue Nouvelle conversation
+ * Composant de création de nouvelles conversations avec sélection des participants
  */
 
 "use client";
@@ -124,7 +124,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       if (!response.ok) {
         const message = await response.text();
         throw new Error(
-          message || `Failed to load participants (${response.status})`
+          message || `Impossible de charger les participants (${response.status})`
         );
       }
 
@@ -171,7 +171,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       if (!response.ok) {
         const message = await response.text();
         throw new Error(
-          message || `Failed to load properties (${response.status})`
+          message || `Impossible de charger les propriétés (${response.status})`
         );
       }
 

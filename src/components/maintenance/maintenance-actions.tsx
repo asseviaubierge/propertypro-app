@@ -128,14 +128,14 @@ export function MaintenanceActions({
 
       if (!response.ok) {
         throw new Error(
-          result.error || `Failed to ${action} maintenance request`,
+          result.error || `Échec de ${action} maintenance request`,
         );
       }
 
-      toast.success(`Maintenance request ${action} successfully!`);
+      toast.success(`Demande de maintenance ${action} effectuée avec succès !`);
       onUpdate();
     } catch (error: any) {
-      toast.error(error?.message || `Failed to ${action} maintenance request`);
+      toast.error(error?.message || `Échec de ${action} maintenance request`);
     } finally {
       setActionLoading(null);
     }
@@ -143,7 +143,7 @@ export function MaintenanceActions({
 
   const handleAssign = async () => {
     if (!selectedTechnician) {
-      toast.error("Please select a technician");
+      toast.error("Veuillez sélectionner un technicien");
       return;
     }
 
@@ -182,13 +182,13 @@ export function MaintenanceActions({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to delete maintenance request");
+        throw new Error(result.error || "Échec de delete maintenance request");
       }
 
-      toast.success("Maintenance request deleted successfully!");
+      toast.success("Demande de maintenance deleted effectuée avec succès !");
       onDelete();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to delete maintenance request");
+      toast.error(error?.message || "Échec de delete maintenance request");
     } finally {
       setActionLoading(null);
     }
@@ -206,12 +206,12 @@ export function MaintenanceActions({
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={onView}>
             <Eye className="mr-2 h-4 w-4" />
-            View Details
+            Voir les détails
           </DropdownMenuItem>
           {canEdit && (
             <DropdownMenuItem onClick={onEdit}>
               <Edit className="mr-2 h-4 w-4" />
-              Edit Request
+              Modifier la demande
             </DropdownMenuItem>
           )}
 
@@ -221,7 +221,7 @@ export function MaintenanceActions({
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setAssignDialogOpen(true)}>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Assign Technician
+                Assigner un technicien
               </DropdownMenuItem>
             </>
           )}
@@ -233,7 +233,7 @@ export function MaintenanceActions({
               className="text-blue-600"
             >
               <Play className="mr-2 h-4 w-4" />
-              Start Work
+              Commencer les travaux
             </DropdownMenuItem>
           )}
 
@@ -243,7 +243,7 @@ export function MaintenanceActions({
               className="text-green-600"
             >
               <CheckCircle className="mr-2 h-4 w-4" />
-              Mark Complete
+              Marquer comme terminée
             </DropdownMenuItem>
           )}
 
@@ -255,7 +255,7 @@ export function MaintenanceActions({
                 <DropdownMenuSeparator />
                 <CancelConfirmationDialog
                   itemName={request.title}
-                  itemType="maintenance request"
+                  itemType="demande de maintenance"
                   onConfirm={handleCancel}
                   loading={actionLoading === "cancel"}
                 >
@@ -264,7 +264,7 @@ export function MaintenanceActions({
                     className="text-orange-600"
                   >
                     <X className="mr-2 h-4 w-4" />
-                    Cancel Request
+                    Annuler la demande
                   </DropdownMenuItem>
                 </CancelConfirmationDialog>
               </>
@@ -275,7 +275,7 @@ export function MaintenanceActions({
               <DropdownMenuSeparator />
               <DeleteConfirmationDialog
                 itemName={request.title}
-                itemType="maintenance request"
+                itemType="demande de maintenance"
                 onConfirm={handleDelete}
                 loading={actionLoading === "delete"}
               >
@@ -284,7 +284,7 @@ export function MaintenanceActions({
                   className="text-red-600"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Request
+                  Supprimer la demande
                 </DropdownMenuItem>
               </DeleteConfirmationDialog>
             </>
@@ -292,24 +292,24 @@ export function MaintenanceActions({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Assign Technician Dialog */}
+      {/* Assigner un technicien Dialog */}
       <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Assign Technician</DialogTitle>
+            <DialogTitle>Assigner un technicien</DialogTitle>
             <DialogDescription>
-              Select a technician to assign to "{request.title}"
+              Sélectionnez un technicien à affecter à "{request.title}"
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="technician">Technician</Label>
+              <Label htmlFor="technician">Technicien</Label>
               <Select
                 value={selectedTechnician}
                 onValueChange={setSelectedTechnician}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a technician" />
+                  <SelectValue placeholder="Sélectionnez un technicien" />
                 </SelectTrigger>
                 <SelectContent>
                   {technicians.map((tech) => (
@@ -339,14 +339,14 @@ export function MaintenanceActions({
       <Dialog open={completeDialogOpen} onOpenChange={setCompleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Complete Maintenance Request</DialogTitle>
+            <DialogTitle>Clôturer la demande de maintenance</DialogTitle>
             <DialogDescription>
-              Mark "{request.title}" as completed and provide final details
+              Marquer « {request.title} » comme terminée et fournir les détails finaux
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="actualCost">Actual Cost (Optional)</Label>
+              <Label htmlFor="actualCost">Coût réel (facultatif)</Label>
               <Input
                 id="actualCost"
                 type="number"
@@ -358,11 +358,11 @@ export function MaintenanceActions({
             </div>
             <div>
               <Label htmlFor="completionNotes">
-                Completion Notes (Optional)
+                Notes de clôture (facultatif)
               </Label>
               <Textarea
                 id="completionNotes"
-                placeholder="Add any notes about the completed work..."
+                placeholder="Ajoutez des notes concernant les travaux effectués..."
                 value={completionNotes}
                 onChange={(e) => setCompletionNotes(e.target.value)}
               />
@@ -375,7 +375,7 @@ export function MaintenanceActions({
             >
               Cancel
             </Button>
-            <Button onClick={handleComplete}>Mark Complete</Button>
+            <Button onClick={handleComplete}>Marquer comme terminée</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

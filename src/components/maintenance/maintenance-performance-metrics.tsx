@@ -28,15 +28,15 @@ interface PerformanceData {
   byProperty: Array<{
     propertyName: string;
     totalRequests: number;
-    completedRequests: number;
+    terminéesRequests: number;
     totalCost: number;
     avgResponseTime: number;
   }>;
   byTechnician: Array<{
     technicianName: string;
-    assignedRequests: number;
-    completedRequests: number;
-    avgCompletionTime: number;
+    assignéesRequests: number;
+    terminéesRequests: number;
+    avgRésolutionTime: number;
     rating: number;
   }>;
 }
@@ -50,7 +50,7 @@ const mockPropertyData = [
   {
     propertyName: "Sunset Apartments",
     totalRequests: 45,
-    completedRequests: 42,
+    terminéesRequests: 42,
     totalCost: 15600,
     avgResponseTime: 2.3,
     completionRate: 93.3,
@@ -58,7 +58,7 @@ const mockPropertyData = [
   {
     propertyName: "Downtown Lofts",
     totalRequests: 38,
-    completedRequests: 35,
+    terminéesRequests: 35,
     totalCost: 12800,
     avgResponseTime: 3.1,
     completionRate: 92.1,
@@ -66,7 +66,7 @@ const mockPropertyData = [
   {
     propertyName: "Garden View Complex",
     totalRequests: 52,
-    completedRequests: 48,
+    terminéesRequests: 48,
     totalCost: 18900,
     avgResponseTime: 2.8,
     completionRate: 92.3,
@@ -74,7 +74,7 @@ const mockPropertyData = [
   {
     propertyName: "Riverside Towers",
     totalRequests: 29,
-    completedRequests: 27,
+    terminéesRequests: 27,
     totalCost: 9400,
     avgResponseTime: 2.1,
     completionRate: 93.1,
@@ -82,7 +82,7 @@ const mockPropertyData = [
   {
     propertyName: "Metro Heights",
     totalRequests: 41,
-    completedRequests: 38,
+    terminéesRequests: 38,
     totalCost: 14200,
     avgResponseTime: 2.6,
     completionRate: 92.7,
@@ -92,45 +92,45 @@ const mockPropertyData = [
 const mockTechnicianData = [
   {
     technicianName: "John Smith",
-    assignedRequests: 28,
-    completedRequests: 26,
-    avgCompletionTime: 2.1,
+    assignéesRequests: 28,
+    terminéesRequests: 26,
+    avgRésolutionTime: 2.1,
     rating: 4.8,
     completionRate: 92.9,
     efficiency: 95,
   },
   {
     technicianName: "Sarah Johnson",
-    assignedRequests: 32,
-    completedRequests: 30,
-    avgCompletionTime: 2.3,
+    assignéesRequests: 32,
+    terminéesRequests: 30,
+    avgRésolutionTime: 2.3,
     rating: 4.6,
     completionRate: 93.8,
     efficiency: 92,
   },
   {
     technicianName: "Mike Davis",
-    assignedRequests: 25,
-    completedRequests: 23,
-    avgCompletionTime: 2.8,
+    assignéesRequests: 25,
+    terminéesRequests: 23,
+    avgRésolutionTime: 2.8,
     rating: 4.4,
     completionRate: 92.0,
     efficiency: 88,
   },
   {
     technicianName: "Lisa Wilson",
-    assignedRequests: 35,
-    completedRequests: 33,
-    avgCompletionTime: 2.0,
+    assignéesRequests: 35,
+    terminéesRequests: 33,
+    avgRésolutionTime: 2.0,
     rating: 4.9,
     completionRate: 94.3,
     efficiency: 97,
   },
   {
     technicianName: "David Brown",
-    assignedRequests: 22,
-    completedRequests: 20,
-    avgCompletionTime: 2.5,
+    assignéesRequests: 22,
+    terminéesRequests: 20,
+    avgRésolutionTime: 2.5,
     rating: 4.5,
     completionRate: 90.9,
     efficiency: 89,
@@ -170,16 +170,16 @@ export function MaintenancePerformanceMetrics({
       };
     if (rate >= 90)
       return {
-        label: "Good",
+        label: "Bon",
         variant: "bg-blue-100 text-blue-800 border-blue-200",
       };
     if (rate >= 85)
       return {
-        label: "Average",
+        label: "Moyen",
         variant: "bg-yellow-100 text-yellow-800 border-yellow-200",
       };
     return {
-      label: "Needs Improvement",
+      label: "À améliorer",
       variant: "bg-red-100 text-red-800 border-red-200",
     };
   };
@@ -204,7 +204,7 @@ export function MaintenancePerformanceMetrics({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Home className="h-5 w-5" />
-            Property Performance Analysis
+            Analyse des performances des propriétés
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -217,10 +217,10 @@ export function MaintenancePerformanceMetrics({
                 <div className="flex-1">
                   <h4 className="font-semibold">{property.propertyName}</h4>
                   <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                    <span>{property.totalRequests} total requests</span>
-                    <span>{property.completedRequests} completed</span>
+                    <span>{property.totalRequests} demandes au total</span>
+                    <span>{property.terminéesRequests} terminées</span>
                     <span>
-                      Avg response: {formatHours(property.avgResponseTime)}
+                      Réponse moyenne : {formatHours(property.avgResponseTime)}
                     </span>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ export function MaintenancePerformanceMetrics({
                       {formatCurrency(property.totalCost)}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Total cost
+                      Coût total
                     </div>
                   </div>
                   <div className="text-right">
@@ -242,7 +242,7 @@ export function MaintenancePerformanceMetrics({
                       {property.completionRate.toFixed(1)}%
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Completion rate
+                      Taux de résolution
                     </div>
                   </div>
                   <Badge
@@ -263,7 +263,7 @@ export function MaintenancePerformanceMetrics({
       {/* Property Performance Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Property Completion Rates</CardTitle>
+          <CardTitle>Taux de résolution par propriété</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
@@ -275,7 +275,7 @@ export function MaintenancePerformanceMetrics({
               <Bar
                 dataKey="completionRate"
                 fill="#8884d8"
-                name="Completion Rate %"
+                name="Taux de résolution %"
               />
             </BarChart>
           </ResponsiveContainer>
@@ -287,7 +287,7 @@ export function MaintenancePerformanceMetrics({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Technician Performance Analysis
+            Analyse des performances des techniciens
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -300,10 +300,10 @@ export function MaintenancePerformanceMetrics({
                 <div className="flex-1">
                   <h4 className="font-semibold">{technician.technicianName}</h4>
                   <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                    <span>{technician.assignedRequests} assigned</span>
-                    <span>{technician.completedRequests} completed</span>
+                    <span>{technician.assignéesRequests} assignées</span>
+                    <span>{technician.terminéesRequests} terminées</span>
                     <span>
-                      Avg time: {formatHours(technician.avgCompletionTime)}
+                      Temps moyen : {formatHours(technician.avgRésolutionTime)}
                     </span>
                   </div>
                 </div>
@@ -325,7 +325,7 @@ export function MaintenancePerformanceMetrics({
                       {technician.completionRate.toFixed(1)}%
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Completion
+                      Résolution
                     </div>
                   </div>
                   <div className="text-center">
@@ -337,7 +337,7 @@ export function MaintenancePerformanceMetrics({
                       {technician.efficiency}%
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Efficiency
+                      Efficacité
                     </div>
                   </div>
                   <Badge
@@ -359,7 +359,7 @@ export function MaintenancePerformanceMetrics({
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Top Performer</CardTitle>
+            <CardTitle className="text-sm font-medium">Meilleur technicien</CardTitle>
             <Award className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
@@ -367,14 +367,14 @@ export function MaintenancePerformanceMetrics({
               Lisa Wilson
             </div>
             <p className="text-xs text-muted-foreground">
-              97% efficiency rating
+              97% taux d'efficacité
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Best Property</CardTitle>
+            <CardTitle className="text-sm font-medium">Meilleure propriété</CardTitle>
             <Target className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -390,14 +390,14 @@ export function MaintenancePerformanceMetrics({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Fastest Response
+              Réponse la plus rapide
             </CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">2.0h</div>
             <p className="text-xs text-muted-foreground">
-              Average response time
+              Moyen response time
             </p>
           </CardContent>
         </Card>

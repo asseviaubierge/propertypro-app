@@ -60,13 +60,13 @@ interface TransactionResponse {
 const EMPTY_TRANSACTION_SUMMARY: ITransactionSummary = {
   totalIncome: 0,
   totalExpenses: 0,
-  netAmount: 0,
+  netMontant: 0,
   outstanding: 0,
   transactionCount: 0,
 };
 
 export default function TransactionsPage() {
-  const { isTenant } = useAuthorization();
+  const { isLocataire } = useAuthorization();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, formatCurrency, formatDate } = useLocalizationContext();
@@ -87,7 +87,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState(
     searchParams.get("type") || "all",
   );
-  const [categoryFilter, setCategoryFilter] = useState(
+  const [categoryFilter, setCatégorieFilter] = useState(
     searchParams.get("category") || "all",
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -123,7 +123,7 @@ export default function TransactionsPage() {
         setTotalItems(data?.pagination?.total ?? 0);
       }
     } catch (error) {
-      console.error("Failed to fetch transactions:", error);
+      console.error("Échec du chargement des transactions :", error);
     } finally {
       setLoading(false);
     }
@@ -146,9 +146,9 @@ export default function TransactionsPage() {
     }
   };
 
-  // Status badge color mapping
-  const getStatusColor = (status?: string | null) => {
-    const normalizedStatus = (status ?? "").toLowerCase();
+  // Statut badge color mapping
+  const getStatutColor = (status?: string | null) => {
+    const normalizedStatut = (status ?? "").toLowerCase();
     const colors: Record<string, string> = {
       completed: "bg-success/10 text-success border-success/20",
       paid: "bg-success/10 text-success border-success/20",
@@ -167,7 +167,7 @@ export default function TransactionsPage() {
       approved: "bg-success/10 text-success border-success/20",
     };
     return (
-      colors[normalizedStatus] || "bg-muted text-muted-foreground border-muted"
+      colors[normalizedStatut] || "bg-muted text-muted-foreground border-muted"
     );
   };
 
@@ -179,17 +179,17 @@ export default function TransactionsPage() {
     });
   };
 
-  const getCategoryLabel = (category?: string | null) => {
-    const normalizedCategory = (category ?? "unknown").toLowerCase();
-    return t(`transactions.categories.${normalizedCategory}`, {
-      defaultValue: normalizedCategory.replace(/_/g, " "),
+  const getCatégorieLabel = (category?: string | null) => {
+    const normalizedCatégorie = (category ?? "unknown").toLowerCase();
+    return t(`transactions.categories.${normalizedCatégorie}`, {
+      defaultValue: normalizedCatégorie.replace(/_/g, " "),
     });
   };
 
-  const getStatusLabel = (status?: string | null) => {
-    const normalizedStatus = (status ?? "unknown").toLowerCase();
-    return t(`transactions.status.${normalizedStatus}`, {
-      defaultValue: normalizedStatus.replace(/_/g, " "),
+  const getStatutLabel = (status?: string | null) => {
+    const normalizedStatut = (status ?? "unknown").toLowerCase();
+    return t(`transactions.status.${normalizedStatut}`, {
+      defaultValue: normalizedStatut.replace(/_/g, " "),
     });
   };
 
@@ -211,26 +211,26 @@ export default function TransactionsPage() {
     return normalized;
   };
 
-  const getSignedAmount = (transaction: IUnifiedTransaction) => {
+  const getSignedMontant = (transaction: IUnifiedTransaction) => {
     const isOutflow =
       transaction.type === TransactionType.EXPENSE ||
       transaction.type === TransactionType.CREDIT;
-    const baseAmount = Number(transaction.amount ?? 0);
-    return isOutflow ? -Math.abs(baseAmount) : Math.abs(baseAmount);
+    const baseMontant = Number(transaction.amount ?? 0);
+    return isOutflow ? -Math.abs(baseMontant) : Math.abs(baseMontant);
   };
 
   const buildStatementCsv = (statementTransactions: IUnifiedTransaction[]) => {
     const header = [
       "Date",
-      "Transaction Type",
+      "Type de transaction",
       "Source",
-      "Category",
+      "Catégorie",
       "Description",
-      "Reference",
-      "Tenant",
-      "Property",
-      "Amount",
-      "Status",
+      "Référence",
+      "Locataire",
+      "Bien",
+      "Montant",
+      "Statut",
     ];
 
     const rows = statementTransactions.map((transaction) => {
@@ -239,19 +239,19 @@ export default function TransactionsPage() {
             transaction.tenantId.lastName || ""
           }`.trim()
         : "";
-      const signedAmount = getSignedAmount(transaction);
+      const signedMontant = getSignedMontant(transaction);
 
       return [
         transaction.date ? formatDate(transaction.date) : "",
         getTransactionTypeLabel(transaction.type),
         getSourceTypeLabel(transaction.sourceType),
-        getCategoryLabel(transaction.category),
+        getCatégorieLabel(transaction.category),
         transaction.description || "",
         transaction.reference || "",
         tenantName,
         transaction.propertyId?.name || "",
-        signedAmount.toFixed(2),
-        getStatusLabel(transaction.status),
+        signedMontant.toFixed(2),
+        getStatutLabel(transaction.status),
       ];
     });
 
@@ -272,12 +272,12 @@ export default function TransactionsPage() {
         const params = buildQueryParams(currentPage, exportLimit);
         const response = await fetch(`/api/accounting/transactions?${params}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch transactions for export");
+          throw new Error("Échec du chargement des transactions pour l'export");
         }
 
         const data: TransactionResponse = await response.json();
         if (!data?.success) {
-          throw new Error("Invalid export payload");
+          throw new Error("Données d'export invalides");
         }
 
         const pageTransactions = data?.data?.transactions ?? [];
@@ -289,7 +289,7 @@ export default function TransactionsPage() {
       if (allTransactions.length === 0) {
         toast.info(
           t("transactions.export.noData", {
-            defaultValue: "No transactions available to export",
+            defaultValue: "Aucune transaction à exporter",
           }),
         );
         return;
@@ -310,14 +310,14 @@ export default function TransactionsPage() {
 
       toast.success(
         t("transactions.export.success", {
-          defaultValue: "Statement exported successfully",
+          defaultValue: "Relevé exporté avec succès",
         }),
       );
     } catch (error) {
       console.error("Failed to export transaction statement:", error);
       toast.error(
         t("transactions.export.error", {
-          defaultValue: "Failed to export statement",
+          defaultValue: "Échec de l'export du relevé",
         }),
       );
     } finally {
@@ -371,10 +371,10 @@ export default function TransactionsPage() {
     },
     {
       id: "category",
-      header: t("transactions.table.category", { defaultValue: "Category" }),
+      header: t("transactions.table.category", { defaultValue: "Catégorie" }),
       cell: (row) => (
         <Badge variant="outline" className="capitalize text-xs font-normal">
-          {getCategoryLabel(row?.category)}
+          {getCatégorieLabel(row?.category)}
         </Badge>
       ),
       visibility: "md",
@@ -397,7 +397,7 @@ export default function TransactionsPage() {
     },
     {
       id: "reference",
-      header: t("transactions.table.reference", { defaultValue: "Reference" }),
+      header: t("transactions.table.reference", { defaultValue: "Référence" }),
       cell: (row) => (
         <span className="font-mono text-xs text-muted-foreground">
           {row?.reference || "—"}
@@ -408,7 +408,7 @@ export default function TransactionsPage() {
     },
     {
       id: "tenant",
-      header: t("transactions.table.tenant", { defaultValue: "Tenant" }),
+      header: t("transactions.table.tenant", { defaultValue: "Locataire" }),
       cell: (row) =>
         row.tenantId ? (
           <Link
@@ -427,7 +427,7 @@ export default function TransactionsPage() {
     },
     {
       id: "property",
-      header: t("transactions.table.property", { defaultValue: "Property" }),
+      header: t("transactions.table.property", { defaultValue: "Bien" }),
       cell: (row) =>
         row.propertyId ? (
           <Link
@@ -446,7 +446,7 @@ export default function TransactionsPage() {
     },
     {
       id: "amount",
-      header: t("transactions.table.amount", { defaultValue: "Amount" }),
+      header: t("transactions.table.amount", { defaultValue: "Montant" }),
       cell: (row) => (
         <span
           className={`font-semibold text-sm ${
@@ -468,13 +468,13 @@ export default function TransactionsPage() {
     },
     {
       id: "status",
-      header: t("transactions.table.status", { defaultValue: "Status" }),
+      header: t("transactions.table.status", { defaultValue: "Statut" }),
       cell: (row) => (
         <Badge
           variant="outline"
-          className={`capitalize text-xs ${getStatusColor(row?.status)}`}
+          className={`capitalize text-xs ${getStatutColor(row?.status)}`}
         >
-          {getStatusLabel(row?.status)}
+          {getStatutLabel(row?.status)}
         </Badge>
       ),
       width: "min-w-[110px]",
@@ -501,7 +501,7 @@ export default function TransactionsPage() {
   ];
 
   // Filter out tenant-only hidden columns
-  const visibleColumns = isTenant
+  const visibleColumns = isLocataire
     ? columns.filter((c) => c.id !== "tenant")
     : columns;
 
@@ -518,7 +518,7 @@ export default function TransactionsPage() {
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">
             {t("transactions.header.bankSubtitle", {
-              defaultValue: "Confirmed bank-level money movement only",
+              defaultValue: "Uniquement les mouvements bancaires confirmés",
             })}
           </p>
         </div>
@@ -530,10 +530,10 @@ export default function TransactionsPage() {
           <ArrowUpDown className="h-4 w-4 mr-2" />
           {sortOrder === "desc"
             ? t("transactions.sort.newestFirst", {
-                defaultValue: "Newest First",
+                defaultValue: "Plus récentes d'abord",
               })
             : t("transactions.sort.oldestFirst", {
-                defaultValue: "Oldest First",
+                defaultValue: "Plus anciennes d'abord",
               })}
         </Button>
       </div>
@@ -542,7 +542,7 @@ export default function TransactionsPage() {
       <AnalyticsCardGrid className="lg:grid-cols-4">
         <AnalyticsCard
           title={t("transactions.stats.totalIncome", {
-            defaultValue: "Total Income",
+            defaultValue: "Revenus totaux",
           })}
           value={formatCurrency(summary.totalIncome)}
           icon={TrendingUp}
@@ -554,23 +554,23 @@ export default function TransactionsPage() {
         />
         <AnalyticsCard
           title={t("transactions.stats.totalExpenses", {
-            defaultValue: "Total Expenses",
+            defaultValue: "Dépenses totales",
           })}
           value={formatCurrency(summary.totalExpenses)}
           icon={TrendingDown}
           iconColor="error"
         />
         <AnalyticsCard
-          title={t("transactions.stats.netAmount", {
-            defaultValue: "Net Amount",
+          title={t("transactions.stats.netMontant", {
+            defaultValue: "Net Montant",
           })}
-          value={formatCurrency(summary.netAmount)}
+          value={formatCurrency(summary.netMontant)}
           icon={DollarSign}
           iconColor="primary"
         />
         <AnalyticsCard
           title={t("transactions.stats.outstanding", {
-            defaultValue: "Outstanding",
+            defaultValue: "Impayés",
           })}
           value={formatCurrency(summary.outstanding)}
           icon={AlertTriangle}
@@ -594,7 +594,7 @@ export default function TransactionsPage() {
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("transactions.header.bankSubtitle", {
-                    defaultValue: "Confirmed bank-level money movement only",
+                    defaultValue: "Uniquement les mouvements bancaires confirmés",
                   })}
                 </p>
               </div>
@@ -611,7 +611,7 @@ export default function TransactionsPage() {
                 <Download className="h-4 w-4 mr-2" />
               )}
               {t("transactions.actions.exportStatement", {
-                defaultValue: "Statement Export",
+                defaultValue: "Exporter le relevé",
               })}
             </Button>
           </div>
@@ -620,7 +620,7 @@ export default function TransactionsPage() {
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
               <GlobalSearch
                 placeholder={t("transactions.filters.searchPlaceholder", {
-                  defaultValue: "Search transactions...",
+                  defaultValue: "Rechercher des transactions...",
                 })}
                 initialValue={search}
                 debounceDelay={300}
@@ -632,7 +632,7 @@ export default function TransactionsPage() {
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-white dark:bg-gray-800"
                 ariaLabel={t("transactions.filters.searchAriaLabel", {
-                  defaultValue: "Search transactions",
+                  defaultValue: "Rechercher des transactions",
                 })}
               />
 
@@ -646,14 +646,14 @@ export default function TransactionsPage() {
                 <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("transactions.filters.allTypes", {
-                      defaultValue: "All Types",
+                      defaultValue: "Tous les types",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("transactions.filters.allTypes", {
-                      defaultValue: "All Types",
+                      defaultValue: "Tous les types",
                     })}
                   </SelectItem>
                   <SelectItem value={TransactionType.INCOME}>
@@ -668,40 +668,40 @@ export default function TransactionsPage() {
               <Select
                 value={categoryFilter}
                 onValueChange={(val) => {
-                  setCategoryFilter(val);
+                  setCatégorieFilter(val);
                   setPage(1);
                 }}
               >
                 <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("transactions.filters.allCategories", {
-                      defaultValue: "All Categories",
+                      defaultValue: "Toutes les catégories",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("transactions.filters.allCategories", {
-                      defaultValue: "All Categories",
+                      defaultValue: "Toutes les catégories",
                     })}
                   </SelectItem>
                   <SelectItem value="rent">
-                    {getCategoryLabel("rent")}
+                    {getCatégorieLabel("rent")}
                   </SelectItem>
                   <SelectItem value="security_deposit">
-                    {getCategoryLabel("security_deposit")}
+                    {getCatégorieLabel("security_deposit")}
                   </SelectItem>
                   <SelectItem value="late_fee">
-                    {getCategoryLabel("late_fee")}
+                    {getCatégorieLabel("late_fee")}
                   </SelectItem>
                   <SelectItem value="utility">
-                    {getCategoryLabel("utility")}
+                    {getCatégorieLabel("utility")}
                   </SelectItem>
                   <SelectItem value="maintenance">
-                    {getCategoryLabel("maintenance")}
+                    {getCatégorieLabel("maintenance")}
                   </SelectItem>
                   <SelectItem value="other">
-                    {getCategoryLabel("other")}
+                    {getCatégorieLabel("other")}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -713,13 +713,13 @@ export default function TransactionsPage() {
                   onClick={() => {
                     setSearch("");
                     setTypeFilter("all");
-                    setCategoryFilter("all");
+                    setCatégorieFilter("all");
                     setPage(1);
                   }}
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("transactions.filters.clear", { defaultValue: "Clear" })}
+                  {t("transactions.filters.clear", { defaultValue: "Effacer" })}
                 </Button>
               )}
             </div>
@@ -737,15 +737,15 @@ export default function TransactionsPage() {
                 <ArrowLeftRight className="h-12 w-12 text-muted-foreground" />
               ),
               title: t("transactions.empty.title", {
-                defaultValue: "No transactions found",
+                defaultValue: "Aucune transaction trouvée",
               }),
               description: hasActiveFilters
                 ? t("transactions.empty.filtered", {
-                    defaultValue: "Try adjusting your filters",
+                    defaultValue: "Essayez de modifier vos filtres",
                   })
                 : t("transactions.empty.default", {
                     defaultValue:
-                      "Transactions will appear here once payments or invoices are created",
+                      "Les transactions apparaîtront ici une fois les paiements ou factures créés",
                   }),
             }}
           />
@@ -760,13 +760,13 @@ export default function TransactionsPage() {
                 setLimit(newLimit);
                 setPage(1);
               }}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              surLabel={t("common.sur", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading}
             />

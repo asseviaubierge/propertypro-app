@@ -104,52 +104,52 @@ export function MaintenanceDashboardCards({
   return (
     <AnalyticsCardGrid>
       <AnalyticsCard
-        title="Total Requests"
+        title="Total des demandes"
         value={data.totalRequests}
-        description={`${data.pendingRequests} pending, ${data.inProgressRequests} in progress`}
+        description={`${data.pendingRequests} en attente, ${data.inProgressRequests} en cours`}
         icon={Wrench}
         iconColor="primary"
         trend={{
-          value: `${requestsChange.value}% from last period`,
+          value: `${requestsChange.value}% par rapport à la période précédente`,
           isPositive: requestsChange.isPositive,
           icon: requestsChange.isPositive ? TrendingUp : TrendingDown,
         }}
       />
 
       <AnalyticsCard
-        title="Total Cost"
+        title="Coût total"
         value={formatCurrency(data.totalCost)}
-        description={`Avg: ${formatCurrency(data.avgCost)} per request`}
+        description={`Moy. : ${formatCurrency(data.avgCost)} par demande`}
         icon={DollarSign}
         iconColor="success"
         trend={{
-          value: `${costChange.value}% from last period`,
+          value: `${costChange.value}% par rapport à la période précédente`,
           isPositive: !costChange.isPositive,
           icon: costChange.isPositive ? TrendingUp : TrendingDown,
         }}
       />
 
       <AnalyticsCard
-        title="Avg Completion Time"
+        title="Temps moyen de résolution"
         value={formatDuration(data.avgCompletionTime)}
-        description="Average time to complete"
+        description="Temps moyen nécessaire pour terminer une demande"
         icon={Timer}
         iconColor="warning"
         trend={{
-          value: `${timeChange.value}% from last period`,
+          value: `${timeChange.value}% par rapport à la période précédente`,
           isPositive: !timeChange.isPositive,
           icon: timeChange.isPositive ? TrendingUp : TrendingDown,
         }}
       />
 
       <AnalyticsCard
-        title="Completion Rate"
+        title="Taux de résolution"
         value={formatPercentage(data.completionRate)}
-        description={`${data.completedRequests} completed requests`}
+        description={`${data.completedRequests} demandes terminées`}
         icon={Target}
         iconColor="info"
         trend={{
-          value: `${completionChange.value}% from last period`,
+          value: `${completionChange.value}% par rapport à la période précédente`,
           isPositive: completionChange.isPositive,
           icon: completionChange.isPositive ? TrendingUp : TrendingDown,
         }}

@@ -47,8 +47,11 @@ export const GET = withAccessAndDB({
 
       // Find the property
       const property = await Property.findById(id)
-        .populate("ownerId", "firstName lastName email")
-        .populate("managerId", "firstName lastName email");
+        .populate(
+  "ownerId",
+  "firstName lastName email accountType businessName cip ifu rccm"
+)
+.populate("managerId", "firstName lastName email");
 
       if (!property) {
         return createErrorResponse("Property not found", 404);
@@ -170,9 +173,16 @@ export const PUT = withPermissionAndDB("property_edit")(
 
       // Populate owner and manager information
       await property.populate([
-        { path: "ownerId", select: "firstName lastName email" },
-        { path: "managerId", select: "firstName lastName email" },
-      ]);
+  {
+    path: "ownerId",
+    select:
+      "firstName lastName email accountType businessName cip ifu rccm",
+  },
+  {
+    path: "managerId",
+    select: "firstName lastName email",
+  },
+]);
 
       return createSuccessResponse(property, "Property updated successfully");
     } catch (error) {

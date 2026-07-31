@@ -1,5 +1,5 @@
 /**
- * PropertyPro - Tenant Ledger Component
+ * PropertyPro - Grand livre du locataire Component
  * Component for displaying comprehensive tenant financial ledger
  */
 
@@ -47,7 +47,7 @@ interface LedgerEntry {
   reference: string;
   debitAmount: number;
   creditAmount: number;
-  runningBalance: number;
+  runningSolde: number;
   status: string;
 }
 import { formatCurrency } from "@/lib/utils/formatting";
@@ -59,13 +59,13 @@ interface LedgerSummary {
   periodEnd: string;
   totalDebits: number;
   totalCredits: number;
-  currentBalance: number;
+  currentSolde: number;
   breakdown: Record<string, { debits: number; credits: number }>;
   statusCounts: {
     paidInvoices: number;
     unpaidInvoices: number;
     overdueInvoices: number;
-    totalPayments: number;
+    totalPaiements: number;
   };
 }
 
@@ -82,7 +82,7 @@ export default function TenantLedger({
 }: TenantLedgerProps) {
   const [ledgerData, setLedgerData] = useState<{
     summary: LedgerSummary;
-    entries: LedgerEntry[];
+    entrées: LedgerEntry[];
     pagination: any;
   } | null>(null);
 
@@ -119,11 +119,11 @@ export default function TenantLedger({
       if (data.success && data.data) {
         setLedgerData(data.data);
       } else {
-        toast.error("Failed to load ledger data");
+        toast.error("Impossible de charger le grand livre");
       }
     } catch (error) {
       console.error("Error fetching ledger:", error);
-      toast.error("Failed to load ledger data");
+      toast.error("Impossible de charger le grand livre");
     } finally {
       setLoading(false);
     }
@@ -151,13 +151,13 @@ export default function TenantLedger({
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        toast.success("Ledger exported successfully");
+        toast.success("Grand livre exporté avec succès");
       } else {
-        toast.error("Failed to export ledger");
+        toast.error("Impossible d'exporter le grand livre");
       }
     } catch (error) {
       console.error("Error exporting ledger:", error);
-      toast.error("Failed to export ledger");
+      toast.error("Impossible d'exporter le grand livre");
     }
   };
 
@@ -176,13 +176,13 @@ export default function TenantLedger({
     );
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatutBadge = (status: string) => {
     const statusConfig = {
-      paid: { variant: "default" as const, label: "Paid" },
-      issued: { variant: "secondary" as const, label: "Issued" },
-      overdue: { variant: "destructive" as const, label: "Overdue" },
-      partial: { variant: "outline" as const, label: "Partial" },
-      completed: { variant: "default" as const, label: "Completed" },
+      paid: { variant: "default" as const, label: "Payé" },
+      issued: { variant: "secondary" as const, label: "Émis" },
+      overdue: { variant: "destructive" as const, label: "En retard" },
+      partial: { variant: "outline" as const, label: "Partiel" },
+      completed: { variant: "default" as const, label: "Terminé" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || {
@@ -198,7 +198,7 @@ export default function TenantLedger({
       <Card className={className}>
         <CardContent className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          Loading ledger data...
+          Chargement du grand livre...
         </CardContent>
       </Card>
     );
@@ -210,7 +210,7 @@ export default function TenantLedger({
         <CardContent className="py-8">
           <Alert>
             <AlertDescription>
-              No ledger data available for this tenant.
+              Aucune donnée de grand livre disponible pour ce locataire.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -225,45 +225,45 @@ export default function TenantLedger({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Current Balance
+              Solde actuel
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div
               className={`text-2xl font-bold ${
-                ledgerData.summary.currentBalance > 0
+                ledgerData.summary.currentSolde > 0
                   ? "text-red-600"
                   : "text-green-600"
               }`}
             >
-              {formatCurrency(Math.abs(ledgerData.summary.currentBalance))}
+              {formatCurrency(Math.abs(ledgerData.summary.currentSolde))}
             </div>
             <p className="text-xs text-muted-foreground">
-              {ledgerData.summary.currentBalance > 0
-                ? "Amount Owed"
-                : "Credit Balance"}
+              {ledgerData.summary.currentSolde > 0
+                ? "Montant dû"
+                : "Solde créditeur"}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Charges</CardTitle>
+            <CardTitle className="text-sm font-medium">Total des charges</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(ledgerData.summary.totalDebits)}
             </div>
-            <p className="text-xs text-muted-foreground">Period total</p>
+            <p className="text-xs text-muted-foreground">Total de la période</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Payments
+              Total des paiements
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -272,21 +272,21 @@ export default function TenantLedger({
               {formatCurrency(ledgerData.summary.totalCredits)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {ledgerData.summary.statusCounts.totalPayments} payments
+              {ledgerData.summary.statusCounts.totalPaiements} paiements
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue Items</CardTitle>
+            <CardTitle className="text-sm font-medium">En retard Items</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               {ledgerData.summary.statusCounts.overdueInvoices}
             </div>
-            <p className="text-xs text-muted-foreground">Invoices overdue</p>
+            <p className="text-xs text-muted-foreground">Factures en retard</p>
           </CardContent>
         </Card>
       </div>
@@ -296,17 +296,17 @@ export default function TenantLedger({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Tenant Ledger
+            Grand livre du locataire
           </CardTitle>
           <CardDescription>
-            Financial history for {ledgerData.summary.tenantName} at{" "}
+            Historique financier de {ledgerData.summary.tenantName} at{" "}
             {ledgerData.summary.propertyName}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4 mb-6">
             <div className="flex items-center gap-2">
-              <Label htmlFor="startDate">From:</Label>
+              <Label htmlFor="startDate">Du :</Label>
               <Input
                 id="startDate"
                 type="date"
@@ -319,7 +319,7 @@ export default function TenantLedger({
             </div>
 
             <div className="flex items-center gap-2">
-              <Label htmlFor="endDate">To:</Label>
+              <Label htmlFor="endDate">Au :</Label>
               <Input
                 id="endDate"
                 type="date"
@@ -337,7 +337,7 @@ export default function TenantLedger({
               className="ml-auto"
             >
               <Download className="h-4 w-4 mr-2" />
-              Export CSV
+              Exporter en CSV
             </Button>
           </div>
 
@@ -349,11 +349,11 @@ export default function TenantLedger({
                   <TableHead>Date</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead className="text-right">Charges</TableHead>
-                  <TableHead className="text-right">Payments</TableHead>
-                  <TableHead className="text-right">Balance</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Référence</TableHead>
+                  <TableHead className="text-right">Débits</TableHead>
+                  <TableHead className="text-right">Paiements</TableHead>
+                  <TableHead className="text-right">Solde</TableHead>
+                  <TableHead>Statut</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -384,14 +384,14 @@ export default function TenantLedger({
                     </TableCell>
                     <TableCell
                       className={`text-right font-medium ${
-                        entry.runningBalance > 0
+                        entry.runningSolde > 0
                           ? "text-red-600"
                           : "text-green-600"
                       }`}
                     >
-                      {formatCurrency(Math.abs(entry.runningBalance))}
+                      {formatCurrency(Math.abs(entry.runningSolde))}
                     </TableCell>
-                    <TableCell>{getStatusBadge(entry.status)}</TableCell>
+                    <TableCell>{getStatutBadge(entry.status)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -402,7 +402,7 @@ export default function TenantLedger({
           {ledgerData.pagination?.pages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <div className="text-sm text-muted-foreground">
-                Showing{" "}
+                Affichage{" "}
                 {(ledgerData.pagination.page - 1) *
                   ledgerData.pagination.limit +
                   1}{" "}
@@ -411,7 +411,7 @@ export default function TenantLedger({
                   ledgerData.pagination.page * ledgerData.pagination.limit,
                   ledgerData.pagination.total
                 )}{" "}
-                of {ledgerData.pagination.total} entries
+                of {ledgerData.pagination.total} entrées
               </div>
 
               <div className="flex gap-2">
@@ -423,7 +423,7 @@ export default function TenantLedger({
                   }
                   disabled={ledgerData.pagination.page <= 1}
                 >
-                  Previous
+                  Précédent
                 </Button>
                 <Button
                   variant="outline"
@@ -435,7 +435,7 @@ export default function TenantLedger({
                     ledgerData.pagination.page >= ledgerData.pagination.pages
                   }
                 >
-                  Next
+                  Suivant
                 </Button>
               </div>
             </div>

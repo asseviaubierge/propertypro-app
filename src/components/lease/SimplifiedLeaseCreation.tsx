@@ -1091,7 +1091,7 @@ export default function SimplifiedLeaseCreation({
                       parseFloat(e.target.value) || 0
                     )
                   }
-                  placeholder="2000.00"
+                  placeholder="2000,00"
                   required
                 />
                 {fieldErrors.rentAmount && (
@@ -1117,7 +1117,7 @@ export default function SimplifiedLeaseCreation({
                       parseFloat(e.target.value) || 0
                     )
                   }
-                  placeholder="2000.00"
+                  placeholder="2000,00"
                 />
                 {fieldErrors.securityDeposit && (
                   <p className="text-destructive text-sm">
@@ -1184,7 +1184,7 @@ export default function SimplifiedLeaseCreation({
                       parseFloat(e.target.value) || 0
                     )
                   }
-                  placeholder="50.00"
+                  placeholder="50,00"
                 />
                 {fieldErrors.lateFeeAmount && (
                   <p className="text-destructive text-sm">

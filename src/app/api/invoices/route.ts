@@ -174,6 +174,7 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
                 _id: 1,
                 name: 1,
                 address: 1,
+                ownerId: 1,
                 deletedAt: 1,
               })
               .toArray()
@@ -230,7 +231,7 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
 // Supports both lease-based and standalone invoices
 // ============================================================================
 export const POST = withPermissionAndDB("financial_management")(
-  async (user, request: NextRequest) => {
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
     const body = await request.json();
     const {
@@ -374,7 +375,15 @@ export const POST = withPermissionAndDB("financial_management")(
     // Populate the response
     const populatedInvoice = await Invoice.findById(invoice._id)
       .populate("tenantId", "firstName lastName email")
-      .populate("propertyId", "name address")
+      .populate({
+  path: "propertyId",
+  select: "name address ownerId",
+  populate: {
+    path: "ownerId",
+    select:
+      "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
+  },
+})
       .populate({
         path: "leaseId",
         select: "startDate endDate propertyId",
@@ -397,7 +406,7 @@ export const POST = withPermissionAndDB("financial_management")(
 // PATCH /api/invoices - Bulk update invoices
 // ============================================================================
 export const PATCH = withPermissionAndDB("financial_management")(
-  async (_user, request: NextRequest) => {
+  async (_user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
     const body = await request.json();
     const { invoiceIds, updates } = body;
@@ -440,7 +449,7 @@ export const PATCH = withPermissionAndDB("financial_management")(
 // DELETE /api/invoices - Bulk soft delete invoices
 // ============================================================================
 export const DELETE = withPermissionAndDB("financial_management")(
-  async (_user, request: NextRequest) => {
+  async (_user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const invoiceIds = searchParams.get("ids")?.split(",") || [];

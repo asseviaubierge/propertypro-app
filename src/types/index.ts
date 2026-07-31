@@ -15,6 +15,12 @@ export enum UserRole {
   TENANT = "tenant", // Tenant - Limited access to own data
 }
 
+export enum AccountType {
+  DIRECT_OWNER = "direct_owner",
+  AGENCY = "agency",
+  E_IMMO = "e_immo",
+}
+
 // ============================================================================
 // ROLE MANAGEMENT TYPES
 // ============================================================================
@@ -74,6 +80,13 @@ export interface IUser extends Document, IUserMethods {
   lastName: string;
   phone?: string;
   role: string;
+  // Professional / management identity
+  accountType?: AccountType;
+  cip?: string;
+  businessName?: string;
+  businessLogo?: string;
+  ifu?: string;
+  rccm?: string;
   avatar?: string;
   bio?: string;
   location?: string;

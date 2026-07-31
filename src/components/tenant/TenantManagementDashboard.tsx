@@ -34,7 +34,7 @@ import {
   Users,
   UserPlus,
   Mail,
-  Phone,
+  Téléphone,
   Calendar,
   DollarSign,
   AlertTriangle,
@@ -223,8 +223,8 @@ export default function TenantManagementDashboard() {
   });
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterProperty, setFilterProperty] = useState<string>("all");
+  const [filterStatut, setFilterStatut] = useState<string>("all");
+  const [filterPropriété, setFilterPropriété] = useState<string>("all");
 
   // const formatCurrency = (amount: number) => {
   //   return new Intl.NumberFormat("en-US", {
@@ -233,7 +233,7 @@ export default function TenantManagementDashboard() {
   //   }).format(amount);
   // };
 
-  const getStatusBadge = (status: Tenant["status"]) => {
+  const getStatutBadge = (status: Tenant["status"]) => {
     const statusConfig = {
       active: { label: "Active", variant: "default" },
       notice_given: { label: "Notice Given", variant: "secondary" },
@@ -245,7 +245,7 @@ export default function TenantManagementDashboard() {
     return <Badge variant={config.variant as any}>{config.label}</Badge>;
   };
 
-  const getLeaseStatusBadge = (status: Tenant["lease"]["status"]) => {
+  const getLeaseStatutBadge = (status: Tenant["lease"]["status"]) => {
     const statusConfig = {
       active: { label: "Active", variant: "default" },
       expiring: { label: "Expiring Soon", variant: "secondary" },
@@ -273,12 +273,12 @@ export default function TenantManagementDashboard() {
       tenant?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tenant?.unit?.number?.includes(searchQuery);
 
-    const matchesStatus =
-      filterStatus === "all" || tenant?.status === filterStatus;
-    const matchesProperty =
-      filterProperty === "all" || tenant?.unit?.propertyName === filterProperty;
+    const matchesStatut =
+      filterStatut === "all" || tenant?.status === filterStatut;
+    const matchesPropriété =
+      filterPropriété === "all" || tenant?.unit?.propertyName === filterPropriété;
 
-    return matchesSearch && matchesStatus && matchesProperty;
+    return matchesSearch && matchesStatut && matchesPropriété;
   });
 
   const handleSendMessage = (tenantId: string) => {};
@@ -291,10 +291,10 @@ export default function TenantManagementDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">
-            Tenant Management
+            Gestion des locataires
           </h2>
           <p className="text-muted-foreground">
-            Manage tenant information, leases, and communications
+            Gérez les informations, les baux et les communications des locataires
           </p>
         </div>
         <div className="flex gap-2">
@@ -302,27 +302,27 @@ export default function TenantManagementDashboard() {
             <DialogTrigger asChild>
               <Button>
                 <UserPlus className="h-4 w-4 mr-2" />
-                Add Tenant
+                Ajouter un locataire
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Add New Tenant</DialogTitle>
+                <DialogTitle>Ajouter un nouveau locataire</DialogTitle>
                 <DialogDescription>
-                  Add a new tenant to your property portfolio
+                  Ajoutez un nouveau locataire à votre portefeuille immobilier
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="Enter first name" />
+                    <Label htmlFor="first-name">Prénom</Label>
+                    <Input id="first-name" placeholder="Saisissez le prénom" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Enter last name" />
+                    <Label htmlFor="last-name">Nom</Label>
+                    <Input id="last-name" placeholder="Saisissez le nom" />
                   </div>
                 </div>
 
@@ -337,16 +337,16 @@ export default function TenantManagementDashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
+                    <Label htmlFor="phone">Téléphone</Label>
                     <Input id="phone" placeholder="+1 (555) 123-4567" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="unit">Unit Assignment</Label>
+                  <Label htmlFor="unit">Attribution du logement</Label>
                   <Select>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select unit" />
+                      <SelectValue placeholder="Sélectionnez un logement" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="unit_1">
@@ -361,31 +361,31 @@ export default function TenantManagementDashboard() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="lease-start">Lease Start Date</Label>
+                    <Label htmlFor="lease-start">Date de début du bail</Label>
                     <Input id="lease-start" type="date" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="lease-end">Lease End Date</Label>
+                    <Label htmlFor="lease-end">Date de fin du bail</Label>
                     <Input id="lease-end" type="date" />
                   </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="monthly-rent">Monthly Rent</Label>
+                    <Label htmlFor="monthly-rent">Loyer mensuel</Label>
                     <Input id="monthly-rent" type="number" placeholder="1500" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="deposit">Security Deposit</Label>
+                    <Label htmlFor="deposit">Dépôt de garantie</Label>
                     <Input id="deposit" type="number" placeholder="1500" />
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Add Tenant</Button>
+                  <Button variant="outline">Annuler</Button>
+                  <Button>Ajouter un locataire</Button>
                 </div>
               </div>
             </DialogContent>
@@ -397,7 +397,7 @@ export default function TenantManagementDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+            <CardTitle className="text-sm font-medium">Total des locataires</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -410,21 +410,21 @@ export default function TenantManagementDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rent</CardTitle>
+            <CardTitle className="text-sm font-medium">Loyer moyen</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(metrics.averageRent)}
             </div>
-            <p className="text-xs text-muted-foreground">Per unit per month</p>
+            <p className="text-xs text-muted-foreground">Par logement et par mois</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              On-Time Payment Rate
+              Taux de paiement à temps
             </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -442,22 +442,22 @@ export default function TenantManagementDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Leases Expiring
+              Baux arrivant à échéance
             </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.leasesExpiring}</div>
-            <p className="text-xs text-muted-foreground">Next 90 days</p>
+            <p className="text-xs text-muted-foreground">90 prochains jours</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="tenants" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="tenants">All Tenants</TabsTrigger>
-          <TabsTrigger value="leases">Lease Management</TabsTrigger>
-          <TabsTrigger value="applications">Applications</TabsTrigger>
+          <TabsTrigger value="tenants">Tous les locataires</TabsTrigger>
+          <TabsTrigger value="leases">Gestion des baux</TabsTrigger>
+          <TabsTrigger value="applications">Demandes</TabsTrigger>
           <TabsTrigger value="communications">Communications</TabsTrigger>
         </TabsList>
 
@@ -470,7 +470,7 @@ export default function TenantManagementDashboard() {
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search tenants..."
+                      placeholder="Rechercher un locataire..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-8"
@@ -478,12 +478,12 @@ export default function TenantManagementDashboard() {
                   </div>
                 </div>
 
-                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <Select value={filterStatut} onValueChange={setFilterStatut}>
                   <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="all">All Statut</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="notice_given">Notice Given</SelectItem>
                     <SelectItem value="moving_out">Moving Out</SelectItem>
@@ -492,14 +492,14 @@ export default function TenantManagementDashboard() {
                 </Select>
 
                 <Select
-                  value={filterProperty}
-                  onValueChange={setFilterProperty}
+                  value={filterPropriété}
+                  onValueChange={setFilterPropriété}
                 >
                   <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Property" />
+                    <SelectValue placeholder="Propriété" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Properties</SelectItem>
+                    <SelectItem value="all">Toutes les propriétés</SelectItem>
                     <SelectItem value="Sunset Apartments">
                       Sunset Apartments
                     </SelectItem>
@@ -531,7 +531,7 @@ export default function TenantManagementDashboard() {
                         {tenant?.unit?.number ?? ""}
                       </CardDescription>
                     </div>
-                    {getStatusBadge(tenant?.status)}
+                    {getStatutBadge(tenant?.status)}
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -543,7 +543,7 @@ export default function TenantManagementDashboard() {
                         <span>{tenant?.email ?? ""}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Phone className="h-3 w-3 text-muted-foreground" />
+                        <Téléphone className="h-3 w-3 text-muted-foreground" />
                         <span>{tenant?.phone ?? ""}</span>
                       </div>
                     </div>
@@ -552,28 +552,28 @@ export default function TenantManagementDashboard() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">
-                          Lease Status
+                          Lease Statut
                         </span>
-                        {getLeaseStatusBadge(tenant?.lease?.status)}
+                        {getLeaseStatutBadge(tenant?.lease?.status)}
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Monthly Rent:</span>
+                        <span>Loyer mensuel:</span>
                         <span className="font-medium">
                           {formatCurrency(tenant?.lease?.monthlyRent ?? 0)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Lease Ends:</span>
+                        <span>Fin du bail :</span>
                         <span>
                           {tenant?.lease?.endDate?.toLocaleDateString() ?? ""}
                         </span>
                       </div>
                     </div>
 
-                    {/* Payment Score */}
+                    {/* Score de paiement */}
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>Payment Score</span>
+                        <span>Score de paiement</span>
                         <span>{getPaymentScore(tenant).toFixed(0)}%</span>
                       </div>
                       <Progress value={getPaymentScore(tenant)} />
@@ -584,7 +584,7 @@ export default function TenantManagementDashboard() {
                       <Alert>
                         <AlertTriangle className="h-4 w-4" />
                         <AlertDescription>
-                          Outstanding balance:{" "}
+                          Solde impayé :{" "}
                           {formatCurrency(
                             tenant.paymentHistory.outstandingBalance
                           )}
@@ -596,7 +596,7 @@ export default function TenantManagementDashboard() {
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" className="flex-1">
                         <Eye className="h-4 w-4 mr-2" />
-                        View
+                        Voir
                       </Button>
                       <Button
                         size="sm"
@@ -619,9 +619,9 @@ export default function TenantManagementDashboard() {
         <TabsContent value="leases" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Lease Management</CardTitle>
+              <CardTitle>Gestion des baux</CardTitle>
               <CardDescription>
-                Track lease renewals, expirations, and terms
+                Suivez les renouvellements, expirations et conditions des baux
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -639,19 +639,19 @@ export default function TenantManagementDashboard() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                   <Button variant="outline" className="h-20 flex-col space-y-2">
                     <FileText className="h-6 w-6" />
-                    <span>Generate Lease</span>
+                    <span>Générer un bail</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex-col space-y-2">
                     <Calendar className="h-6 w-6" />
-                    <span>Renewal Notices</span>
+                    <span>Avis de renouvellement</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex-col space-y-2">
                     <Bell className="h-6 w-6" />
-                    <span>Expiration Alerts</span>
+                    <span>Alertes d'expiration</span>
                   </Button>
                   <Button variant="outline" className="h-20 flex-col space-y-2">
                     <CreditCard className="h-6 w-6" />
-                    <span>Rent Increases</span>
+                    <span>Augmentations de loyer</span>
                   </Button>
                 </div>
 
@@ -659,39 +659,39 @@ export default function TenantManagementDashboard() {
                 <div className="grid gap-4 md:grid-cols-3">
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Active Leases</CardTitle>
+                      <CardTitle className="text-sm">Baux actifs</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">42</div>
                       <p className="text-xs text-muted-foreground">
-                        Currently active
+                        Actuellement actifs
                       </p>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Renewal Rate</CardTitle>
+                      <CardTitle className="text-sm">Taux de renouvellement</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
                         {(metrics.renewalRate * 100).toFixed(0)}%
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Last 12 months
+                        12 derniers mois
                       </p>
                     </CardContent>
                   </Card>
 
                   <Card>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Avg. Tenancy</CardTitle>
+                      <CardTitle className="text-sm">Durée moyenne de location</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
                         {metrics.averageTenancy}
                       </div>
-                      <p className="text-xs text-muted-foreground">Months</p>
+                      <p className="text-xs text-muted-foreground">Mois</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -703,16 +703,16 @@ export default function TenantManagementDashboard() {
         <TabsContent value="applications" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Tenant Applications</CardTitle>
+              <CardTitle>Tenant Demandes</CardTitle>
               <CardDescription>
-                Review and process new tenant applications
+                Examinez et traitez les nouvelles demandes
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  No Pending Applications
+                  No Pending Demandes
                 </h3>
                 <p className="text-muted-foreground mb-4">
                   All applications have been processed. New applications will
@@ -720,7 +720,7 @@ export default function TenantManagementDashboard() {
                 </p>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Application
+                  Ajouter une demande
                 </Button>
               </div>
             </CardContent>
@@ -730,28 +730,28 @@ export default function TenantManagementDashboard() {
         <TabsContent value="communications" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Tenant Communications</CardTitle>
+              <CardTitle>Communications des locataires</CardTitle>
               <CardDescription>
-                Manage communications with tenants
+                Gérez les communications avec les locataires
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <Mail className="h-6 w-6" />
-                  <span>Send Email</span>
+                  <span>Envoyer un e-mail</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <MessageSquare className="h-6 w-6" />
-                  <span>Send SMS</span>
+                  <span>Envoyer un SMS</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <Bell className="h-6 w-6" />
-                  <span>Announcements</span>
+                  <span>Annonces</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <FileText className="h-6 w-6" />
-                  <span>Notices</span>
+                  <span>Avis</span>
                 </Button>
               </div>
             </CardContent>

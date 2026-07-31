@@ -2,7 +2,6 @@
   "settings.pageTitle": "Paramètres",
   "settings.pageDescription": "Gérez les paramètres et préférences de votre compte",
   "settings.refreshButton": "Actualiser",
-
   "settings.display.pageTitle": "Affichage et apparence",
   "settings.display.pageDescription": "Personnalisez l'apparence de votre interface.",
   "settings.display.language.title": "Langue",
@@ -10,12 +9,10 @@
   "settings.display.language.label": "Langue de l'interface",
   "settings.display.language.placeholder": "Sélectionner une langue",
   "settings.display.language.helper": "La langue est appliquée par utilisateur et n'affecte pas les autres membres de l'équipe.",
-
   "settings.display.theme.title": "Thème et apparence",
   "settings.display.theme.description": "Personnalisez le thème et l'apparence de votre interface.",
   "settings.display.theme.label": "Thème",
   "settings.display.theme.badgeActive": "Actif",
-
   "settings.display.currency.title": "Devise",
   "settings.display.currency.description": "Définissez votre devise préférée pour l'affichage des montants.",
   "settings.display.currency.label": "Devise",
@@ -30,12 +27,10 @@
   "settings.display.currency.details.position": "Position du symbole :",
   "settings.display.currency.details.before": "Avant le montant",
   "settings.display.currency.details.after": "Après le montant",
-
   "settings.display.footer.unsavedChanges": "Modifications non enregistrées",
   "settings.display.footer.lastSaved": "Dernier enregistrement :",
   "settings.display.footer.resetTooltip": "Réinitialiser au dernier enregistrement",
   "settings.display.footer.saveButton": "Enregistrer les paramètres",
-
   "settings.profile.pageTitle": "Paramètres du Profil",
   "settings.profile.pageDescription": "Gérez vos informations personnelles et les détails de votre compte",
   "settings.profile.validation.firstNameRequired": "Le prénom est obligatoire",
@@ -126,7 +121,6 @@
   "settings.profile.accountInfo.role": "Rôle",
   "settings.profile.accountInfo.memberSince": "Membre Depuis",
   "settings.profile.accountInfo.notAvailable": "N/D",
-
   "settings.display.branding.title": "Image de Marque et Logos",
   "settings.display.branding.description": "Télécharger et gérer les logos et couleurs de votre marque",
   "settings.display.branding.dialogToggle": "Ouvrir le téléchargeur dans une boîte de dialogue",
@@ -168,7 +162,6 @@
   "settings.display.branding.toast.removeFailed": "Échec de la suppression du logo",
   "settings.display.branding.toast.resetSuccess": "Paramètres de marque réinitialisés aux valeurs par défaut",
   "settings.display.branding.toast.resetFailed": "Échec de la réinitialisation des paramètres de marque",
-
   "settings.security.pageTitle": "Paramètres de sécurité",
   "settings.security.pageDescription": "Gérez votre mot de passe et votre e-mail de connexion",
   "settings.security.password.title": "Changer le mot de passe",

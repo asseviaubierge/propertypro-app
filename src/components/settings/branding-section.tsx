@@ -14,6 +14,7 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -253,6 +254,8 @@ export function BrandingSection({
         secondaryColor: "#64748B",
         companyName: "",
         companyAddress: "",
+        whatsappNumber: "",
+        whatsappEnabled: false,
         r2: {},
       });
 
@@ -306,6 +309,8 @@ export function BrandingSection({
   const secondaryColor = form.watch("branding.secondaryColor");
   const companyName = form.watch("branding.companyName");
   const companyAddress = form.watch("branding.companyAddress");
+  const whatsappNumber = form.watch("branding.whatsappNumber");
+  const whatsappEnabled = form.watch("branding.whatsappEnabled");
 
   return (
     <Card>
@@ -664,6 +669,57 @@ export function BrandingSection({
                 </FormItem>
               )}
             />
+            
+            <FormField
+  control={form.control}
+  name="branding.whatsappNumber"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>WhatsApp officiel</FormLabel>
+      <FormControl>
+        <Input
+          {...field}
+          placeholder="+229 01 91 86 86 86"
+          disabled={disabled}
+          onChange={(e) => {
+            field.onChange(e);
+            onFormChange?.();
+          }}
+        />
+      </FormControl>
+      <FormDescription>
+        Numéro WhatsApp officiel de GESTION E-IMMO
+      </FormDescription>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
+<FormField
+  control={form.control}
+  name="branding.whatsappEnabled"
+  render={({ field }) => (
+    <FormItem className="flex items-center justify-between rounded-lg border p-3">
+      <div className="space-y-0.5">
+        <FormLabel>Activer WhatsApp</FormLabel>
+        <FormDescription>
+          Active les fonctions WhatsApp de GESTION E-IMMO
+        </FormDescription>
+      </div>
+
+      <FormControl>
+        <Switch
+          checked={field.value ?? false}
+          onCheckedChange={(checked) => {
+            field.onChange(checked);
+            onFormChange?.();
+          }}
+          disabled={disabled}
+        />
+      </FormControl>
+    </FormItem>
+  )}
+/>
           </div>
 
           {/* Company Info Preview */}

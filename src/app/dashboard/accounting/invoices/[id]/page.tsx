@@ -38,7 +38,7 @@ import PaymentRecordDialog from "@/components/invoice/PaymentRecordDialog";
 import { showSimpleError, showSimpleSuccess } from "@/lib/toast-notifications";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
-interface InvoiceLineItem {
+interface FactureLineItem {
   description: string;
   amount: number;
   type: string;
@@ -47,7 +47,7 @@ interface InvoiceLineItem {
   dueDate?: string;
 }
 
-interface Invoice {
+interface Facture {
   _id: string;
   invoiceNumber: string;
   tenantId: {
@@ -60,6 +60,7 @@ interface Invoice {
   propertyId: {
     _id: string;
     name: string;
+    ownerId?: any;
     address:
       | {
           street: string;
@@ -84,7 +85,7 @@ interface Invoice {
   totalAmount: number;
   amountPaid: number;
   balanceRemaining: number;
-  lineItems: InvoiceLineItem[];
+  lineItems: FactureLineItem[];
   notes?: string;
 }
 
@@ -156,7 +157,7 @@ export default function InvoiceDetailsPage() {
   const { t, formatCurrency, formatDate } = useLocalizationContext();
   const invoiceId = params.id as string;
 
-  const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [invoice, setInvoice] = useState<Facture | null>(null);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -164,19 +165,55 @@ export default function InvoiceDetailsPage() {
   const [deleting, setDeleting] = useState(false);
 
   const preparePrintableInvoice =
-    useCallback(async (): Promise<PrintableInvoice> => {
-      if (!invoice) throw new Error("Invoice data not loaded");
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const info = await getCompanyInfo();
-      const normalized = normalizeInvoiceForPrint(invoice, {
-        companyInfo: info || undefined,
-      });
-      return (await resolveInvoiceLogo(normalized)) as PrintableInvoice;
-    }, [invoice]);
+  useCallback(async (): Promise<PrintableInvoice> => {
+    if (!invoice) throw new Error("Facture data not loaded");
+
+    const { getCompanyInfo } = await import("@/lib/utils/company-info");
+
+    const fallback = await getCompanyInfo();
+
+    const owner = (invoice.propertyId as any)?.ownerId;
+
+    const ownerCompany =
+      owner && typeof owner === "object"
+        ? {
+            name:
+              owner.businessName ||
+              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
+
+            address:
+              typeof invoice.propertyId?.address === "string"
+                ? invoice.propertyId.address
+                : invoice.propertyId?.address
+                  ? [
+                      invoice.propertyId.address.street,
+                      invoice.propertyId.address.city,
+                      invoice.propertyId.address.state,
+                      invoice.propertyId.address.zipCode,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")
+                  : "",
+
+            phone: owner.phone || "",
+            email: owner.email || "",
+            logo: owner.businessLogo || "",
+            cip: owner.cip || "",
+            ifu: owner.ifu || "",
+            rccm: owner.rccm || "",
+          }
+        : undefined;
+
+    const normalized = normalizeInvoiceForPrint(invoice, {
+      companyInfo: ownerCompany ?? fallback ?? undefined,
+    });
+
+    return (await resolveInvoiceLogo(normalized)) as PrintableInvoice;
+  }, [invoice]);
 
   useEffect(() => {
     if (!invoiceId) return;
-    fetchInvoiceDetails();
+    fetchFactureDetails();
     (async () => {
       const { getCompanyInfo } = await import("@/lib/utils/company-info");
       setCompanyInfo(await getCompanyInfo());
@@ -193,10 +230,10 @@ export default function InvoiceDetailsPage() {
 
     const finishAndRefresh = () => {
       showSimpleSuccess(
-        "Payment received",
-        "Your payment has been processed.",
+        "Paiement reçu",
+        "Votre paiement a été traité.",
       );
-      fetchInvoiceDetails();
+      fetchFactureDetails();
       router.replace(`/dashboard/accounting/invoices/${invoiceId}`);
     };
 
@@ -229,13 +266,13 @@ export default function InvoiceDetailsPage() {
         }
       })();
     } else if (paymentParam === "canceled") {
-      showSimpleError("Payment canceled", "The checkout was canceled.");
+      showSimpleError("Paiement annulé", "Le paiement a été annulé.");
       router.replace(`/dashboard/accounting/invoices/${invoiceId}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId, searchParams]);
 
-  const fetchInvoiceDetails = async () => {
+  const fetchFactureDetails = async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/invoices/${invoiceId}`);
@@ -244,14 +281,14 @@ export default function InvoiceDetailsPage() {
         setInvoice(data.data);
       } else {
         showSimpleError(
-          "Load Error",
+          "Erreur de chargement",
           data?.error || t("leases.invoices.details.toasts.fetchError"),
         );
         router.push("/dashboard/accounting/invoices");
       }
     } catch {
       showSimpleError(
-        "Load Error",
+        "Erreur de chargement",
         t("leases.invoices.details.toasts.fetchError"),
       );
       router.push("/dashboard/accounting/invoices");
@@ -273,7 +310,7 @@ export default function InvoiceDetailsPage() {
 <html lang="${document.documentElement.lang || "en"}">
   <head>
     <meta charset="utf-8" />
-    <title>Invoice ${printable.invoiceNumber}</title>
+    <title>Facture ${printable.invoiceNumber}</title>
     <style>
       * { box-sizing: border-box; }
       body { font-family: Arial, sans-serif; color: #111827; margin: 24px; background-color: #f9fafb; }
@@ -287,7 +324,7 @@ export default function InvoiceDetailsPage() {
     } catch (error) {
       console.error(error);
       showSimpleError(
-        "Preview Failed",
+        "Échec de l'aperçu",
         t("leases.invoices.details.toasts.previewError"),
       );
     } finally {
@@ -302,13 +339,13 @@ export default function InvoiceDetailsPage() {
       const printable = await preparePrintableInvoice();
       await downloadInvoiceAsPDF(printable);
       showSimpleSuccess(
-        "Download Complete",
+        "Téléchargement terminé",
         t("leases.invoices.details.toasts.downloadSuccess"),
       );
     } catch (error) {
       console.error(error);
       showSimpleError(
-        "Download Failed",
+        "Échec du téléchargement",
         t("leases.invoices.details.toasts.downloadError"),
       );
     } finally {
@@ -318,7 +355,7 @@ export default function InvoiceDetailsPage() {
 
   const handleEmail = async () => {
     if (!invoice?.tenantId?.email) {
-      showSimpleError("No Recipient", "Tenant email is not available.");
+      showSimpleError("Aucun destinataire", "L'adresse e-mail du locataire n'est pas disponible.");
       return;
     }
     setActionLoading("email");
@@ -332,22 +369,22 @@ export default function InvoiceDetailsPage() {
           tenantName:
             `${invoice.tenantId?.firstName || ""} ${invoice.tenantId?.lastName || ""}`.trim(),
           invoiceNumber: invoice.invoiceNumber,
-          subject: `Invoice ${invoice.invoiceNumber}`,
-          message: `Please find attached your invoice ${invoice.invoiceNumber}.`,
+          subject: `Facture ${invoice.invoiceNumber}`,
+          message: `Veuillez trouver ci-joint votre facture ${invoice.invoiceNumber}.`,
         }),
       });
       const data = await res.json();
       if (res.ok && data?.success) {
         showSimpleSuccess(
-          "Email Sent",
+          "E-mail envoyé",
           t("leases.invoices.toasts.emailSuccess"),
         );
-        fetchInvoiceDetails();
+        fetchFactureDetails();
       } else {
-        throw new Error(data?.error || "Email failed");
+        throw new Error(data?.error || "E-mail failed");
       }
     } catch {
-      showSimpleError("Email Failed", t("leases.invoices.toasts.emailError"));
+      showSimpleError("Échec de l'envoi de l'e-mail", t("leases.invoices.toasts.emailError"));
     } finally {
       setActionLoading(null);
     }
@@ -362,13 +399,13 @@ export default function InvoiceDetailsPage() {
       });
       const data = await res.json();
       if (res.ok && data?.success) {
-        showSimpleSuccess("Invoice Deleted", "");
+        showSimpleSuccess("Facture Supprimerd", "");
         router.push("/dashboard/accounting/invoices");
       } else {
-        throw new Error(data?.error || "Delete failed");
+        throw new Error(data?.error || "Supprimer failed");
       }
     } catch {
-      showSimpleError("Delete Failed", "Could not delete invoice.");
+      showSimpleError("Échec de la suppression", "Impossible de supprimer la facture.");
     } finally {
       setDeleting(false);
     }
@@ -450,7 +487,7 @@ export default function InvoiceDetailsPage() {
           onClick={() => router.push("/dashboard/accounting/invoices")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Invoices
+          Retour aux factures
         </Button>
       </div>
 
@@ -463,7 +500,7 @@ export default function InvoiceDetailsPage() {
           disabled={actionLoading === "print"}
         >
           <Printer className="mr-2 h-4 w-4" />
-          Print
+          Imprimer
         </Button>
         <Button
           variant="outline"
@@ -481,7 +518,7 @@ export default function InvoiceDetailsPage() {
           disabled={actionLoading === "email"}
         >
           <Mail className="mr-2 h-4 w-4" />
-          Email
+          E-mail
         </Button>
         <Button
           variant="outline"
@@ -491,7 +528,7 @@ export default function InvoiceDetailsPage() {
           }
         >
           <Pencil className="mr-2 h-4 w-4" />
-          Edit
+          Modifier
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -501,25 +538,25 @@ export default function InvoiceDetailsPage() {
               className="text-red-600 hover:text-red-700"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              Supprimer
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete invoice?</AlertDialogTitle>
+              <AlertDialogTitle>Supprimer invoice?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete invoice {invoice.invoiceNumber}.
-                This action cannot be undone.
+                Cette action supprimera définitivement la facture {invoice.invoiceNumber}.
+                Cette action est irréversible.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={deleting}>Annuler</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={deleting}
                 className="bg-red-600 text-white hover:bg-red-700"
               >
-                {deleting ? "Deleting…" : "Delete"}
+                {deleting ? "Suppression…" : "Supprimer"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -532,27 +569,27 @@ export default function InvoiceDetailsPage() {
           disabled={(invoice.balanceRemaining ?? 0) <= 0}
         >
           <CreditCard className="mr-2 h-4 w-4" />
-          Collect Payment
+          Enregistrer un paiement
         </Button>
       </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Invoice Total</p>
+          <p className="text-xs text-muted-foreground">Facture Total</p>
           <p className="mt-1 text-2xl font-semibold">
             {formatCurrency(invoice.totalAmount ?? 0)}
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Collected</p>
+          <p className="text-xs text-muted-foreground">Montant encaissé</p>
           <p className="mt-1 text-2xl font-semibold text-emerald-600">
             {formatCurrency(invoice.amountPaid ?? 0)}
           </p>
         </div>
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
           <p className="text-xs text-amber-700 dark:text-amber-400">
-            Outstanding
+            Solde impayé
           </p>
           <p className="mt-1 text-2xl font-semibold text-amber-700 dark:text-amber-400">
             {formatCurrency(invoice.balanceRemaining ?? 0)}
@@ -560,10 +597,10 @@ export default function InvoiceDetailsPage() {
         </div>
       </div>
 
-      {/* Invoice document */}
+      {/* Facture document */}
       <div className="rounded-lg border bg-card p-6 sm:p-8">
         <div className="flex items-start justify-between">
-          <h2 className="text-2xl font-semibold">Invoice</h2>
+          <h2 className="text-2xl font-semibold">Facture</h2>
           {companyInfo?.logo ? (
             <div className="relative h-10 w-10 overflow-hidden rounded-md">
               <Image
@@ -578,20 +615,20 @@ export default function InvoiceDetailsPage() {
         </div>
 
         <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 text-sm">
-          <dt className="font-medium">Invoice number</dt>
+          <dt className="font-medium">Facture number</dt>
           <dd className="text-muted-foreground">{invoice.invoiceNumber}</dd>
 
-          <dt className="font-medium">Date of issue</dt>
+          <dt className="font-medium">Date d’émission</dt>
           <dd className="text-muted-foreground">
             {formatSafeDate(invoice.issueDate, formatDate)}
           </dd>
 
-          <dt className="font-medium">Date due</dt>
+          <dt className="font-medium">Date d’échéance</dt>
           <dd className="text-muted-foreground">
             {formatSafeDate(invoice.dueDate, formatDate)}
           </dd>
 
-          <dt className="font-medium">Status</dt>
+          <dt className="font-medium">Statut</dt>
           <dd>
             <Badge
               variant="outline"
@@ -607,25 +644,33 @@ export default function InvoiceDetailsPage() {
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Bill From
+              Facturé par
             </p>
             <div className="mt-2 space-y-0.5 text-sm">
-              <p className="font-semibold">{companyInfo?.name || "—"}</p>
-              {companyInfo?.address ? (
-                <p className="text-muted-foreground">{companyInfo.address}</p>
+              <p className="font-semibold">
+                {(invoice.propertyId as any)?.ownerId?.businessName ||
+                 `${(invoice.propertyId as any)?.ownerId?.firstName ?? ""} ${(invoice.propertyId as any)?.ownerId?.lastName ?? ""}`.trim() ||
+                 "—"}
+              </p>
+              <p className="text-muted-foreground">
+                {formatAddress(invoice.propertyId?.address)}
+              </p>
+              {(invoice.propertyId as any)?.ownerId?.phone ? (
+                <p className="text-muted-foreground">
+                  {(invoice.propertyId as any).ownerId.phone}
+                </p>
               ) : null}
-              {companyInfo?.phone ? (
-                <p className="text-muted-foreground">{companyInfo.phone}</p>
-              ) : null}
-              {companyInfo?.email ? (
-                <p className="text-muted-foreground">{companyInfo.email}</p>
+              {(invoice.propertyId as any)?.ownerId?.email ? (
+                <p className="text-muted-foreground">
+                  {(invoice.propertyId as any).ownerId.email}
+                </p>
               ) : null}
             </div>
           </div>
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Bill To
+              Facturé à
             </p>
             <div className="mt-2 space-y-0.5 text-sm">
               <p className="font-semibold">{tenantName}</p>
@@ -648,7 +693,7 @@ export default function InvoiceDetailsPage() {
         </div>
 
         <div className="mt-8">
-          <h3 className="text-sm font-semibold">Invoice details</h3>
+          <h3 className="text-sm font-semibold">Facture details</h3>
           <div className="mt-3 overflow-x-auto rounded-md border">
             <table className="w-full text-sm">
               <thead>
@@ -660,10 +705,10 @@ export default function InvoiceDetailsPage() {
                     Description
                   </th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">
-                    Qty
+                    Qté
                   </th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">
-                    Unit price
+                    Prix unitaire
                   </th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">
                     Total
@@ -700,7 +745,7 @@ export default function InvoiceDetailsPage() {
                       colSpan={5}
                       className="px-3 py-6 text-center text-muted-foreground"
                     >
-                      No line items
+                      Aucune ligne de facture
                     </td>
                   </tr>
                 )}
@@ -711,12 +756,12 @@ export default function InvoiceDetailsPage() {
           <div className="mt-4 flex justify-end">
             <dl className="w-full max-w-xs space-y-2 text-sm">
               <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotal</dt>
+                <dt className="text-muted-foreground">Sous-total</dt>
                 <dd>{formatCurrency(invoice.subtotal ?? 0)}</dd>
               </div>
               {invoice.taxAmount ? (
                 <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Tax</dt>
+                  <dt className="text-muted-foreground">Taxe</dt>
                   <dd>{formatCurrency(invoice.taxAmount)}</dd>
                 </div>
               ) : null}
@@ -747,7 +792,7 @@ export default function InvoiceDetailsPage() {
         }}
         onPaymentRecorded={() => {
           setCollectOpen(false);
-          fetchInvoiceDetails();
+          fetchFactureDetails();
         }}
       />
     </div>

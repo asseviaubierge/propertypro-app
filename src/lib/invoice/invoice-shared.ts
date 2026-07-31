@@ -106,20 +106,20 @@ export interface NormalizeInvoiceOptions {
 }
 
 export const DEFAULT_COMPANY_INFO: InvoiceCompanyInfo = {
-  name: "PropertyPro Management",
-  address: "123 Business Ave, Suite 100, City, State 12345",
-  phone: "+1 (555) 123-4567",
-  email: "info@PropertyPro.com",
-  website: "www.PropertyPro.com",
+  name: "GESTION E-IMMO",
+  address: "Carré 58, Rue 9232, Ménotin, Cotonou, Bénin",
+  phone: "+2290191868686",
+  email: "contact@e-immo.bj",
+  website: "gestion.e-immo.bj",
 };
 
 export const DEFAULT_INVOICE_NOTES =
-  "We appreciate your business. Should you need us to add VAT or extra notes let us know!";
+  "Nous vous remercions de votre confiance. Si vous souhaitez des informations complémentaires, n'hésitez pas à nous le faire savoir!";
 
 const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   paid: {
     value: "paid",
-    label: "Paid",
+    label: "Payée",
     badgeBackground: "#dcfce7",
     badgeColor: "#166534",
     textColor: "#166534",
@@ -127,7 +127,7 @@ const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   },
   partial: {
     value: "partial",
-    label: "Partially Paid",
+    label: "Partiellement payée",
     badgeBackground: "#fef3c7",
     badgeColor: "#b45309",
     textColor: "#b45309",
@@ -135,7 +135,7 @@ const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   },
   overdue: {
     value: "overdue",
-    label: "Overdue",
+    label: "En retard",
     badgeBackground: "#fee2e2",
     badgeColor: "#991b1b",
     textColor: "#991b1b",
@@ -143,7 +143,7 @@ const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   },
   cancelled: {
     value: "cancelled",
-    label: "Cancelled",
+    label: "Annulée",
     badgeBackground: "#e5e7eb",
     badgeColor: "#374151",
     textColor: "#374151",
@@ -151,7 +151,7 @@ const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   },
   scheduled: {
     value: "scheduled",
-    label: "Scheduled",
+    label: "Planifiée",
     badgeBackground: "#dbeafe",
     badgeColor: "#1d4ed8",
     textColor: "#1d4ed8",
@@ -159,7 +159,7 @@ const STATUS_META_MAP: Record<string, InvoiceStatusMeta> = {
   },
   issued: {
     value: "issued",
-    label: "Issued",
+    label: "Émise",
     badgeBackground: "#dbeafe",
     badgeColor: "#1d4ed8",
     textColor: "#1d4ed8",
@@ -174,7 +174,7 @@ function toNumber(value: unknown, fallback = 0): number {
 }
 
 function roundCurrency(value: number): number {
-  // Round to 2 decimal places; avoid -0 representation
+  // Arrondir à 2 décimales ; éviter la représentation -0
   const rounded = Math.round((value + Number.EPSILON) * 100) / 100;
   return Object.is(rounded, -0) ? 0 : rounded;
 }
@@ -291,7 +291,7 @@ function normalizeLineItems(items: unknown[]): InvoiceLineItemInfo[] {
   return items.map((item) => {
     if (!item || typeof item !== "object") {
       return {
-        description: "Item",
+        description: "Article",
         quantity: 1,
         unitPrice: 0,
         total: 0,
@@ -323,7 +323,7 @@ function normalizeLineItems(items: unknown[]): InvoiceLineItemInfo[] {
           ? source.description
           : typeof source["name"] === "string"
           ? (source["name"] as string)
-          : "Item",
+          : "Article",
       quantity,
       unitPrice,
       total,
@@ -350,12 +350,12 @@ interface InvoiceStatusInput {
 }
 
 /**
- * Computes the status an invoice should have *right now* without persisting.
- * Mirrors the transitions in Invoice.updateStatus + pre-save middleware so
- * read paths can surface an accurate status even when nothing has saved the
- * invoice since the due date passed.
+ * Calcule le statut qu'une facture devrait avoir *maintenant* sans persistance.
+ *reflète les transitions dans Invoice.updateStatus + le middleware pre-save afin que
+ *les chemins de lecture puissent afficher un statut précis même si rien n'a sauvegardé la
+ *facture depuis le dépassement de la date d'échéance.
  *
- * CANCELLED and PAID are terminal and never transition.
+ * CANCELLED (Annulée) et PAID (Payée) sont des états finaux qui ne changent jamais.
  */
 export function computeEffectiveInvoiceStatus(
   invoice: InvoiceStatusInput,
@@ -383,8 +383,8 @@ export function computeEffectiveInvoiceStatus(
 }
 
 /**
- * Returns a shallow copy of the invoice-shaped object with `status` replaced
- * by the effective status. Safe on lean docs, hydrated docs, or plain objects.
+ * Renvoie une copie superficielle de l'objet de type facture avec le champ `status` remplacé
+ * par le statut effectif. Sûr pour les documents "lean", hydratés ou les objets simples.
  */
 export function withEffectiveInvoiceStatus<T extends InvoiceStatusInput>(
   invoice: T,
@@ -432,14 +432,14 @@ export function normalizeInvoiceForPrint(
       []
   );
 
-  // Calculate subtotal from line items
+  // Calculer le sous-total à partir des lignes d'articles
   const subtotalFromLines = lineItems.reduce(
     (acc, item) => acc + item.total,
     0
   );
   const subtotalRaw = toNumber(source.subtotal, subtotalFromLines);
 
-  // Extract financial components
+  // Extraire les composants financiers
   const taxAmountRaw = toNumber(
     source.taxAmount ?? source["tax"] ?? source["tax_total"],
     0
@@ -460,15 +460,15 @@ export function normalizeInvoiceForPrint(
     0
   );
 
-  // Normalize signs and apply currency rounding for display/consistency
+  // Normaliser les signes et appliquer l'arrondi monétaire pour l'affichage/la cohérence
   const subtotal = roundCurrency(subtotalRaw);
   const taxAmount = roundCurrency(taxAmountRaw);
   const shippingAmount = roundCurrency(shippingAmountRaw);
-  const discountAmount = roundCurrency(Math.abs(discountAmountRaw)); // discounts reduce total
-  const adjustmentsAmount = roundCurrency(adjustmentsAmountRaw); // signed (+charge, -credit)
+  const discountAmount = roundCurrency(Math.abs(discountAmountRaw)); // les remises réduisent le total
+  const adjustmentsAmount = roundCurrency(adjustmentsAmountRaw); // signé (+frais, -crédit)
 
-  // Calculate display total using correct accounting formula
-  // Total = Subtotal + Tax + Shipping - Discount + Adjustments
+  // Calculer le total d'affichage en utilisant la formule comptable correcte
+  // Total = Sous-total + Taxe + Frais de port - Remise + Ajustements
   const computedDisplayTotal = roundCurrency(
     Math.max(
       0,
@@ -476,10 +476,10 @@ export function normalizeInvoiceForPrint(
     )
   );
 
-  // Persisted total from source (DB) if present, fall back to computed display total
+  // Total persistant provenant de la source (BD) s'il est présent, sinon retomber sur le total d'affichage calculé
   const totalAmount = toNumber(source.totalAmount, computedDisplayTotal);
 
-  // Calculate payment status
+  // Calculer le statut de paiement
   const amountPaidRaw = toNumber(source.amountPaid ?? source["paid"], 0);
   const amountPaid = roundCurrency(amountPaidRaw);
   const computedDisplayBalanceDue = roundCurrency(
@@ -526,7 +526,7 @@ export function normalizeInvoiceForPrint(
       (source.invoiceNumber as string | undefined) ??
       (source["number"] as string | undefined) ??
       (source._id as string | undefined) ??
-      "Invoice",
+      "Facture",
     issueDate,
     dueDate,
     status: statusMeta.value,
@@ -536,7 +536,7 @@ export function normalizeInvoiceForPrint(
     property,
     lineItems,
     totals: {
-      // Display-ready, consistently rounded financial breakdown
+      // Répartition financière prête pour l'affichage, arrondie de manière cohérente
       subtotal,
       taxAmount,
       discountAmount,

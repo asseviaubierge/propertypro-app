@@ -19,7 +19,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitre,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
@@ -39,14 +39,14 @@ import {
 import { DeleteConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import {
   Plus,
-  Edit,
+  Modifier,
   Trash2,
   MoreHorizontal,
   Search,
-  RefreshCw,
+  ActualiserCw,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MaintenanceStatus, MaintenancePriority } from "@/types";
+import { MaintenanceStatut, MaintenancePriorité } from "@/types";
 import { formatCurrency } from "@/lib/utils/formatting";
 
 interface MaintenanceRequest {
@@ -54,10 +54,10 @@ interface MaintenanceRequest {
   title: string;
   description: string;
   category: string;
-  priority: MaintenancePriority;
-  status: MaintenanceStatus;
-  estimatedCost?: number;
-  actualCost?: number;
+  priority: MaintenancePriorité;
+  status: MaintenanceStatut;
+  estimatedCoût?: number;
+  actualCoût?: number;
   createdAt: string;
   updatedAt: string;
   propertyId: {
@@ -87,10 +87,10 @@ export function MaintenanceCrudOperations({
   const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [statusFilter, setStatutFilter] = useState<string>("all");
+  const [priorityFilter, setPrioritéFilter] = useState<string>("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isModifierDialogOpen, setIsModifierDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<MaintenanceRequest | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
@@ -98,8 +98,8 @@ export function MaintenanceCrudOperations({
     title: "",
     description: "",
     category: "",
-    priority: MaintenancePriority.LOW,
-    estimatedCost: "",
+    priority: MaintenancePriorité.LOW,
+    estimatedCoût: "",
   });
 
   useEffect(() => {
@@ -113,14 +113,14 @@ export function MaintenanceCrudOperations({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to fetch maintenance requests");
+        throw new Error(result.error || "Impossible de récupérer les demandes de maintenance");
       }
 
       setRequests(result.data.requests || []);
     } catch (error) {
-      toast.error("Failed to load maintenance requests", {
+      toast.error("Impossible de charger les demandes de maintenance", {
         description:
-          error instanceof Error ? error.message : "Please try again",
+          error instanceof Error ? error.message : "Veuillez réessayer",
       });
     } finally {
       setLoading(false);
@@ -136,8 +136,8 @@ export function MaintenanceCrudOperations({
         },
         body: JSON.stringify({
           ...formData,
-          estimatedCost: formData.estimatedCost
-            ? parseFloat(formData.estimatedCost)
+          estimatedCoût: formData.estimatedCoût
+            ? parseFloat(formData.estimatedCoût)
             : undefined,
         }),
       });
@@ -145,18 +145,18 @@ export function MaintenanceCrudOperations({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to create maintenance request");
+        throw new Error(result.error || "Impossible de créer la demande de maintenance");
       }
 
-      toast.success("Maintenance request created successfully");
+      toast.success("Demande de maintenance créée avec succès");
       setIsCreateDialogOpen(false);
       resetForm();
       fetchRequests();
       onDataChange?.();
     } catch (error) {
-      toast.error("Failed to create maintenance request", {
+      toast.error("Impossible de créer la demande de maintenance", {
         description:
-          error instanceof Error ? error.message : "Please try again",
+          error instanceof Error ? error.message : "Veuillez réessayer",
       });
     }
   };
@@ -172,8 +172,8 @@ export function MaintenanceCrudOperations({
         },
         body: JSON.stringify({
           ...formData,
-          estimatedCost: formData.estimatedCost
-            ? parseFloat(formData.estimatedCost)
+          estimatedCoût: formData.estimatedCoût
+            ? parseFloat(formData.estimatedCoût)
             : undefined,
         }),
       });
@@ -181,19 +181,19 @@ export function MaintenanceCrudOperations({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to update maintenance request");
+        throw new Error(result.error || "Impossible de mettre à jour la demande de maintenance");
       }
 
-      toast.success("Maintenance request updated successfully");
-      setIsEditDialogOpen(false);
+      toast.success("Demande de maintenance mise à jour avec succès");
+      setIsModifierDialogOpen(false);
       setSelectedRequest(null);
       resetForm();
       fetchRequests();
       onDataChange?.();
     } catch (error) {
-      toast.error("Failed to update maintenance request", {
+      toast.error("Impossible de mettre à jour la demande de maintenance", {
         description:
-          error instanceof Error ? error.message : "Please try again",
+          error instanceof Error ? error.message : "Veuillez réessayer",
       });
     }
   };
@@ -208,16 +208,16 @@ export function MaintenanceCrudOperations({
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to delete maintenance request");
+        throw new Error(result.error || "Impossible de supprimer la demande de maintenance");
       }
 
-      toast.success("Maintenance request deleted successfully");
+      toast.success("Demande de maintenance supprimée avec succès");
       fetchRequests();
       onDataChange?.();
     } catch (error) {
-      toast.error("Failed to delete maintenance request", {
+      toast.error("Impossible de supprimer la demande de maintenance", {
         description:
-          error instanceof Error ? error.message : "Please try again",
+          error instanceof Error ? error.message : "Veuillez réessayer",
       });
     } finally {
       setDeleteLoading(null);
@@ -229,33 +229,33 @@ export function MaintenanceCrudOperations({
       title: "",
       description: "",
       category: "",
-      priority: MaintenancePriority.LOW,
-      estimatedCost: "",
+      priority: MaintenancePriorité.LOW,
+      estimatedCoût: "",
     });
   };
 
-  const openEditDialog = (request: MaintenanceRequest) => {
+  const openModifierDialog = (request: MaintenanceRequest) => {
     setSelectedRequest(request);
     setFormData({
       title: request.title,
       description: request.description,
       category: request.category,
       priority: request.priority,
-      estimatedCost: request.estimatedCost?.toString() || "",
+      estimatedCoût: request.estimatedCoût?.toString() || "",
     });
-    setIsEditDialogOpen(true);
+    setIsModifierDialogOpen(true);
   };
 
-  const getStatusBadge = (status: MaintenanceStatus) => {
+  const getStatutBadge = (status: MaintenanceStatut) => {
     const variants = {
-      [MaintenanceStatus.SUBMITTED]:
+      [MaintenanceStatut.SUBMITTED]:
         "bg-yellow-100 text-yellow-800 border-yellow-200",
-      [MaintenanceStatus.ASSIGNED]: "bg-blue-100 text-blue-800 border-blue-200",
-      [MaintenanceStatus.IN_PROGRESS]:
+      [MaintenanceStatut.ASSIGNED]: "bg-blue-100 text-blue-800 border-blue-200",
+      [MaintenanceStatut.IN_PROGRESS]:
         "bg-purple-100 text-purple-800 border-purple-200",
-      [MaintenanceStatus.COMPLETED]:
+      [MaintenanceStatut.COMPLETED]:
         "bg-green-100 text-green-800 border-green-200",
-      [MaintenanceStatus.CANCELLED]: "bg-red-100 text-red-800 border-red-200",
+      [MaintenanceStatut.CANCELLED]: "bg-red-100 text-red-800 border-red-200",
     };
 
     return (
@@ -265,14 +265,14 @@ export function MaintenanceCrudOperations({
     );
   };
 
-  const getPriorityBadge = (priority: MaintenancePriority) => {
+  const getPrioritéBadge = (priority: MaintenancePriorité) => {
     const variants = {
-      [MaintenancePriority.LOW]: "bg-green-100 text-green-800 border-green-200",
-      [MaintenancePriority.MEDIUM]:
+      [MaintenancePriorité.LOW]: "bg-green-100 text-green-800 border-green-200",
+      [MaintenancePriorité.MEDIUM]:
         "bg-yellow-100 text-yellow-800 border-yellow-200",
-      [MaintenancePriority.HIGH]:
+      [MaintenancePriorité.HIGH]:
         "bg-orange-100 text-orange-800 border-orange-200",
-      [MaintenancePriority.EMERGENCY]: "bg-red-100 text-red-800 border-red-200",
+      [MaintenancePriorité.EMERGENCY]: "bg-red-100 text-red-800 border-red-200",
     };
 
     return (
@@ -284,14 +284,14 @@ export function MaintenanceCrudOperations({
 
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
-      request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
+      request.title.toFaibleerCase().includes(searchTerm.toFaibleerCase()) ||
+      request.description.toFaibleerCase().includes(searchTerm.toFaibleerCase());
+    const matchesStatut =
       statusFilter === "all" || request.status === statusFilter;
-    const matchesPriority =
+    const matchesPriorité =
       priorityFilter === "all" || request.priority === priorityFilter;
 
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesSearch && matchesStatut && matchesPriorité;
   });
 
   return (
@@ -300,16 +300,16 @@ export function MaintenanceCrudOperations({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            Maintenance Requests
+            Demandes de maintenance
           </h2>
           <p className="text-muted-foreground">
-            Manage and track maintenance requests
+            Gérer et suivre les demandes de maintenance
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={fetchRequests} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            <ActualiserCw className="h-4 w-4 mr-2" />
+            Actualiser
           </Button>
           <Dialog
             open={isCreateDialogOpen}
@@ -318,25 +318,25 @@ export function MaintenanceCrudOperations({
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Create Request
+                Créer une demande
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>Create Maintenance Request</DialogTitle>
+                <DialogTitre>Créer une demande de maintenance</DialogTitre>
                 <DialogDescription>
-                  Create a new maintenance request for tracking and management.
+                  Créez une nouvelle demande de maintenance.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">Title</label>
+                  <label className="text-sm font-medium">Titre</label>
                   <Input
                     value={formData.title}
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="Enter request title"
+                    placeholder="Saisissez le titre de la demande"
                   />
                 </div>
                 <div>
@@ -346,13 +346,13 @@ export function MaintenanceCrudOperations({
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Describe the maintenance issue"
+                    placeholder="Décrivez le problème de maintenance"
                     rows={3}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium">Category</label>
+                    <label className="text-sm font-medium">Catégorie</label>
                     <Select
                       value={formData.category}
                       onValueChange={(value) =>
@@ -360,26 +360,26 @@ export function MaintenanceCrudOperations({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder="Sélectionnez une catégorie" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="plumbing">Plumbing</SelectItem>
-                        <SelectItem value="electrical">Electrical</SelectItem>
+                        <SelectItem value="plumbing">Plomberie</SelectItem>
+                        <SelectItem value="electrical">Électricité</SelectItem>
                         <SelectItem value="hvac">HVAC</SelectItem>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="appliances">Appliances</SelectItem>
-                        <SelectItem value="flooring">Flooring</SelectItem>
+                        <SelectItem value="general">Général</SelectItem>
+                        <SelectItem value="appliances">Appareils</SelectItem>
+                        <SelectItem value="flooring">Revêtement de sol</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Priority</label>
+                    <label className="text-sm font-medium">Priorité</label>
                     <Select
                       value={formData.priority}
                       onValueChange={(value) =>
                         setFormData({
                           ...formData,
-                          priority: value as MaintenancePriority,
+                          priority: value as MaintenancePriorité,
                         })
                       }
                     >
@@ -387,34 +387,34 @@ export function MaintenanceCrudOperations({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={MaintenancePriority.LOW}>
-                          Low
+                        <SelectItem value={MaintenancePriorité.LOW}>
+                          Faible
                         </SelectItem>
-                        <SelectItem value={MaintenancePriority.MEDIUM}>
-                          Medium
+                        <SelectItem value={MaintenancePriorité.MEDIUM}>
+                          Moyenne
                         </SelectItem>
-                        <SelectItem value={MaintenancePriority.HIGH}>
-                          High
+                        <SelectItem value={MaintenancePriorité.HIGH}>
+                          Élevée
                         </SelectItem>
-                        <SelectItem value={MaintenancePriority.EMERGENCY}>
-                          Emergency
+                        <SelectItem value={MaintenancePriorité.EMERGENCY}>
+                          Urgence
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Estimated Cost</label>
+                  <label className="text-sm font-medium">Coût estimé</label>
                   <Input
                     type="number"
-                    value={formData.estimatedCost}
+                    value={formData.estimatedCoût}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        estimatedCost: e.target.value,
+                        estimatedCoût: e.target.value,
                       })
                     }
-                    placeholder="0.00"
+                    placeholder="0,00"
                   />
                 </div>
               </div>
@@ -423,9 +423,9 @@ export function MaintenanceCrudOperations({
                   variant="outline"
                   onClick={() => setIsCreateDialogOpen(false)}
                 >
-                  Cancel
+                  Annuler
                 </Button>
-                <Button onClick={handleCreate}>Create Request</Button>
+                <Button onClick={handleCreate}>Créer une demande</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -438,45 +438,45 @@ export function MaintenanceCrudOperations({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search requests..."
+              placeholder="Rechercher des demandes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={setStatutFilter}>
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Statut" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value={MaintenanceStatus.SUBMITTED}>
-              Submitted
+            <SelectItem value="all">All Statut</SelectItem>
+            <SelectItem value={MaintenanceStatut.SUBMITTED}>
+              Soumise
             </SelectItem>
-            <SelectItem value={MaintenanceStatus.ASSIGNED}>Assigned</SelectItem>
-            <SelectItem value={MaintenanceStatus.IN_PROGRESS}>
-              In Progress
+            <SelectItem value={MaintenanceStatut.ASSIGNED}>Assignée</SelectItem>
+            <SelectItem value={MaintenanceStatut.IN_PROGRESS}>
+              En cours
             </SelectItem>
-            <SelectItem value={MaintenanceStatus.COMPLETED}>
-              Completed
+            <SelectItem value={MaintenanceStatut.COMPLETED}>
+              Terminée
             </SelectItem>
-            <SelectItem value={MaintenanceStatus.CANCELLED}>
-              Cancelled
+            <SelectItem value={MaintenanceStatut.CANCELLED}>
+              Annulerled
             </SelectItem>
           </SelectContent>
         </Select>
-        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+        <Select value={priorityFilter} onValueChange={setPrioritéFilter}>
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Priority" />
+            <SelectValue placeholder="Priorité" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Priority</SelectItem>
-            <SelectItem value={MaintenancePriority.LOW}>Low</SelectItem>
-            <SelectItem value={MaintenancePriority.MEDIUM}>Medium</SelectItem>
-            <SelectItem value={MaintenancePriority.HIGH}>High</SelectItem>
-            <SelectItem value={MaintenancePriority.EMERGENCY}>
-              Emergency
+            <SelectItem value="all">All Priorité</SelectItem>
+            <SelectItem value={MaintenancePriorité.LOW}>Faible</SelectItem>
+            <SelectItem value={MaintenancePriorité.MEDIUM}>Moyenne</SelectItem>
+            <SelectItem value={MaintenancePriorité.HIGH}>Élevée</SelectItem>
+            <SelectItem value={MaintenancePriorité.EMERGENCY}>
+              Urgence
             </SelectItem>
           </SelectContent>
         </Select>
@@ -488,13 +488,13 @@ export function MaintenanceCrudOperations({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Property / Unit</TableHead>
-                <TableHead>Cost</TableHead>
-                <TableHead>Created</TableHead>
+                <TableHead>Titre</TableHead>
+                <TableHead>Catégorie</TableHead>
+                <TableHead>Priorité</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Propriété / Logement</TableHead>
+                <TableHead>Coût</TableHead>
+                <TableHead>Créée</TableHead>
                 <TableHead className="w-[70px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -502,13 +502,13 @@ export function MaintenanceCrudOperations({
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8">
-                    Loading maintenance requests...
+                    Chargement des demandes de maintenance...
                   </TableCell>
                 </TableRow>
               ) : filteredRequests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-8">
-                    No maintenance requests found
+                    Aucune demande de maintenance trouvée
                   </TableCell>
                 </TableRow>
               ) : (
@@ -520,8 +520,8 @@ export function MaintenanceCrudOperations({
                     <TableCell className="capitalize">
                       {request.category}
                     </TableCell>
-                    <TableCell>{getPriorityBadge(request.priority)}</TableCell>
-                    <TableCell>{getStatusBadge(request.status)}</TableCell>
+                    <TableCell>{getPrioritéBadge(request.priority)}</TableCell>
+                    <TableCell>{getStatutBadge(request.status)}</TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">
@@ -529,17 +529,17 @@ export function MaintenanceCrudOperations({
                         </div>
                         {request.unit && (
                           <div className="text-sm text-muted-foreground">
-                            Unit {request.unit.unitNumber} (
+                            Logement {request.unit.unitNumber} (
                             {request.unit.unitType})
                           </div>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      {request.actualCost
-                        ? formatCurrency(request.actualCost)
-                        : request.estimatedCost
-                        ? `~${formatCurrency(request.estimatedCost)}`
+                      {request.actualCoût
+                        ? formatCurrency(request.actualCoût)
+                        : request.estimatedCoût
+                        ? `~${formatCurrency(request.estimatedCoût)}`
                         : "N/A"}
                     </TableCell>
                     <TableCell>
@@ -554,10 +554,10 @@ export function MaintenanceCrudOperations({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
-                            onClick={() => openEditDialog(request)}
+                            onClick={() => openModifierDialog(request)}
                           >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
+                            <Modifier className="mr-2 h-4 w-4" />
+                            Modifier
                           </DropdownMenuItem>
                           {/* DISABLED: Delete functionality temporarily disabled */}
                           {/* <DeleteConfirmationDialog
@@ -585,24 +585,24 @@ export function MaintenanceCrudOperations({
         </CardContent>
       </Card>
 
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      {/* Modifier Dialog */}
+      <Dialog open={isModifierDialogOpen} onOpenChange={setIsModifierDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Maintenance Request</DialogTitle>
+            <DialogTitre>Modifier Maintenance Request</DialogTitre>
             <DialogDescription>
-              Update the maintenance request details.
+              Mettez à jour les informations de la demande de maintenance.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Title</label>
+              <label className="text-sm font-medium">Titre</label>
               <Input
                 value={formData.title}
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                placeholder="Enter request title"
+                placeholder="Saisissez le titre de la demande"
               />
             </div>
             <div>
@@ -612,13 +612,13 @@ export function MaintenanceCrudOperations({
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Describe the maintenance issue"
+                placeholder="Décrivez le problème de maintenance"
                 rows={3}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Category</label>
+                <label className="text-sm font-medium">Catégorie</label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) =>
@@ -626,26 +626,26 @@ export function MaintenanceCrudOperations({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Sélectionnez une catégorie" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="plumbing">Plumbing</SelectItem>
-                    <SelectItem value="electrical">Electrical</SelectItem>
+                    <SelectItem value="plumbing">Plomberie</SelectItem>
+                    <SelectItem value="electrical">Électricité</SelectItem>
                     <SelectItem value="hvac">HVAC</SelectItem>
-                    <SelectItem value="general">General</SelectItem>
-                    <SelectItem value="appliances">Appliances</SelectItem>
-                    <SelectItem value="flooring">Flooring</SelectItem>
+                    <SelectItem value="general">Général</SelectItem>
+                    <SelectItem value="appliances">Appareils</SelectItem>
+                    <SelectItem value="flooring">Revêtement de sol</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Priority</label>
+                <label className="text-sm font-medium">Priorité</label>
                 <Select
                   value={formData.priority}
                   onValueChange={(value) =>
                     setFormData({
                       ...formData,
-                      priority: value as MaintenancePriority,
+                      priority: value as MaintenancePriorité,
                     })
                   }
                 >
@@ -653,40 +653,40 @@ export function MaintenanceCrudOperations({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={MaintenancePriority.LOW}>Low</SelectItem>
-                    <SelectItem value={MaintenancePriority.MEDIUM}>
-                      Medium
+                    <SelectItem value={MaintenancePriorité.LOW}>Faible</SelectItem>
+                    <SelectItem value={MaintenancePriorité.MEDIUM}>
+                      Moyenne
                     </SelectItem>
-                    <SelectItem value={MaintenancePriority.HIGH}>
-                      High
+                    <SelectItem value={MaintenancePriorité.HIGH}>
+                      Élevée
                     </SelectItem>
-                    <SelectItem value={MaintenancePriority.EMERGENCY}>
-                      Emergency
+                    <SelectItem value={MaintenancePriorité.EMERGENCY}>
+                      Urgence
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium">Estimated Cost</label>
+              <label className="text-sm font-medium">Coût estimé</label>
               <Input
                 type="number"
-                value={formData.estimatedCost}
+                value={formData.estimatedCoût}
                 onChange={(e) =>
-                  setFormData({ ...formData, estimatedCost: e.target.value })
+                  setFormData({ ...formData, estimatedCoût: e.target.value })
                 }
-                placeholder="0.00"
+                placeholder="0,00"
               />
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
+              onClick={() => setIsModifierDialogOpen(false)}
             >
-              Cancel
+              Annuler
             </Button>
-            <Button onClick={handleUpdate}>Update Request</Button>
+            <Button onClick={handleUpdate}>Mettre à jour la demande</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

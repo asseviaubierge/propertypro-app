@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FileText, Receipt } from "lucide-react";
-import { LeaseInvoice } from "./LeaseInvoice";
+import { LeaseFacture } from "./LeaseFacture";
 import { LeaseResponse } from "@/lib/services/lease.service";
 import { getCompanyInfo, CompanyInfo } from "@/lib/utils/company-info";
 
-export interface LeaseInvoiceModalProps {
+export interface LeaseFactureModalProps {
   lease: LeaseResponse;
   trigger?: React.ReactNode;
   companyInfo?: {
@@ -31,14 +31,14 @@ export interface LeaseInvoiceModalProps {
   dueDate?: Date;
 }
 
-export function LeaseInvoiceModal({
+export function LeaseFactureModal({
   lease,
   trigger,
   companyInfo: propCompanyInfo,
   invoiceNumber,
   issueDate,
   dueDate,
-}: LeaseInvoiceModalProps) {
+}: LeaseFactureModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(
     propCompanyInfo || null
@@ -46,7 +46,7 @@ export function LeaseInvoiceModal({
   const [isLoadingCompanyInfo, setIsLoadingCompanyInfo] = useState(false);
   const [hasFetched, setHasFetched] = useState(false);
 
-  // Only fetch company info when dialog opens for the first time
+  // Charger les informations de l’entreprise uniquement à la première ouverture
   const fetchCompanyInfo = useCallback(async () => {
     if (propCompanyInfo || hasFetched) return;
 
@@ -57,14 +57,14 @@ export function LeaseInvoiceModal({
         setCompanyInfo(info);
       }
     } catch (error) {
-      console.error("Failed to fetch company info:", error);
+      console.error("Échec du chargement des informations de l’entreprise :", error);
     } finally {
       setIsLoadingCompanyInfo(false);
       setHasFetched(true);
     }
   }, [propCompanyInfo, hasFetched]);
 
-  // Fetch when dialog opens
+  // Charger les informations à l’ouverture de la fenêtre
   useEffect(() => {
     if (isOpen && !propCompanyInfo && !hasFetched) {
       fetchCompanyInfo();
@@ -78,7 +78,7 @@ export function LeaseInvoiceModal({
       className="flex items-center gap-2 border-none! shadow-none! text-gray-600!"
     >
       <Receipt className="h-4 w-4" />
-      Preview Invoice
+      Aperçu de la facture
     </Button>
   );
 
@@ -89,10 +89,10 @@ export function LeaseInvoiceModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Lease Invoice
+            Facture de location
           </DialogTitle>
           <DialogDescription>
-            Professional invoice for lease agreement and terms
+            Facture professionnelle relative au contrat et aux conditions de location
           </DialogDescription>
         </DialogHeader>
 
@@ -102,7 +102,7 @@ export function LeaseInvoiceModal({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <LeaseInvoice
+            <LeaseFacture
               lease={lease}
               companyInfo={companyInfo || undefined}
               invoiceNumber={invoiceNumber}
@@ -116,27 +116,27 @@ export function LeaseInvoiceModal({
   );
 }
 
-// Quick action component for lease cards/lists
-export interface QuickInvoiceButtonProps {
+// Composant d’action rapide pour les cartes/listes de locations
+export interface QuickFactureButtonProps {
   lease: LeaseResponse;
   variant?: "default" | "outline" | "ghost";
   size?: "sm" | "default" | "lg";
   className?: string;
 }
 
-export function QuickInvoiceButton({
+export function QuickFactureButton({
   lease,
   variant = "outline",
   size = "sm",
   className,
-}: QuickInvoiceButtonProps) {
+}: QuickFactureButtonProps) {
   return (
-    <LeaseInvoiceModal
+    <LeaseFactureModal
       lease={lease}
       trigger={
         <Button variant={variant} size={size} className={className}>
           <Receipt className="h-4 w-4" />
-          {size !== "sm" && <span className="ml-2">Invoice</span>}
+          {size !== "sm" && <span className="ml-2">Facture</span>}
         </Button>
       }
     />

@@ -109,20 +109,13 @@ const createTenantSchema = (t: (key: string) => string) =>
         required_error: t("tenants.form.validation.dateOfBirthRequired"),
       }),
       ssn: z
-        .string()
-        .optional()
-        .transform((val) => {
-          if (!val || val.trim() === "") return undefined;
-          return val.trim();
-        })
-        .refine(
-          (val) => {
-            if (!val) return true; // Allow empty/undefined values
-            return /^\d{3}-?\d{2}-?\d{4}$/.test(val);
-          },
-          { message: t("tenants.form.validation.ssnInvalid") }
-        ),
-
+  .string()
+  .trim()
+  .min(1, "Le numéro CIP est obligatoire")
+  .regex(
+    /^\d{5,15}$/,
+    "Le numéro CIP doit contenir entre 5 et 15 chiffres"
+  ),
       // Employment Information
       employer: z.string().optional(),
       position: z.string().optional(),
@@ -143,7 +136,7 @@ const createTenantSchema = (t: (key: string) => string) =>
         .or(z.literal("")),
 
       // Additional Information
-      creditScore: z.number().min(300).max(850).optional(),
+      creditScore: z.number().min(1).max(7).optional(),
 
       moveInDate: z
         .string()
@@ -693,13 +686,11 @@ export default function NewTenantPage() {
                         render={({ field }) => (
                           <FormItem className="space-y-3">
                             <FormLabel className="text-sm font-semibold text-muted-foreground">
-                              {t("tenants.form.fields.ssn.label")}
+                              Numéro CIP
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder={t(
-                                  "tenants.form.fields.ssn.placeholder"
-                                )}
+                                placeholder="Ex. : 021254585844"
                                 className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
                                 {...field}
                               />
@@ -1117,27 +1108,25 @@ export default function NewTenantPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-semibold text-muted-foreground">
-                            {t("tenants.form.fields.creditScore.label")}
+                            Nombre d'occupants
                           </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              placeholder={t(
-                                "tenants.form.fields.creditScore.placeholder"
-                              )}
-                              min="300"
-                              max="850"
-                              className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
-                              {...field}
-                              onChange={(e) =>
-                                field.onChange(
-                                  e.target.value
-                                    ? Number(e.target.value)
-                                    : undefined
-                                )
-                              }
-                            />
-                          </FormControl>
+                          <Select
+                            value={field.value ? String(field.value) : ""}
+                            onValueChange={(value) => field.onChange(Number(value))}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200">
+                                <SelectValue placeholder="Sélectionnez le nombre d'occupants" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="1">1 à 3 personnes</SelectItem>
+                              <SelectItem value="2">4 à 5 personnes</SelectItem>
+                              <SelectItem value="3">6 à 8 personnes</SelectItem>
+                              <SelectItem value="4">9 à 10 personnes</SelectItem>
+                              <SelectItem value="5">Plus de 10 personnes</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}

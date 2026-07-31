@@ -95,18 +95,17 @@ const TenantSchema = new Schema<ITenant>(
       },
     },
     ssn: {
-      type: String,
-      trim: true,
-      select: false, // Don't include in queries by default for security
-      validate: {
-        validator: function (ssn: string) {
-          if (!ssn) return true; // Optional field
-          // Basic SSN format validation (XXX-XX-XXXX)
-          return /^\d{3}-\d{2}-\d{4}$/.test(ssn);
-        },
-        message: "Please enter a valid SSN format (XXX-XX-XXXX)",
-      },
+  type: String,
+  trim: true,
+  select: false,
+  required: [true, "Le numéro CIP est obligatoire"],
+  validate: {
+    validator: function (cip: string) {
+      return /^\d{5,15}$/.test(cip);
     },
+    message: "Le numéro CIP doit contenir entre 5 et 15 chiffres",
+  },
+},
     employmentInfo: {
       type: EmploymentInfoSchema,
       default: null,

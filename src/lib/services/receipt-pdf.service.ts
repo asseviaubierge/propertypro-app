@@ -34,15 +34,28 @@ export interface ReceiptPaymentData {
     email?: string;
   };
   propertyId?: {
-    _id?: string | { toString: () => string };
-    name?: string;
-    address?: string | {
-      street?: string;
-      city?: string;
-      state?: string;
-      zipCode?: string;
-    };
+  _id?: string | { toString: () => string };
+  name?: string;
+  address?: string | {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
   };
+  ownerId?: {
+    _id?: string | { toString: () => string };
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    accountType?: string;
+    businessName?: string;
+    businessLogo?: string;
+    cip?: string;
+    ifu?: string;
+    rccm?: string;
+  };
+};
   invoiceApplications?: Array<{
     invoiceNumber: string;
     amountApplied: number;
@@ -157,9 +170,23 @@ function normalizePaymentToReceipt(
       email: tenantEmail,
     },
     property: {
-      name: propertyName,
-      address: propertyAddress,
-    },
+  name: propertyName,
+  address: propertyAddress,
+  owner: payment.propertyId?.ownerId
+    ? {
+        firstName: payment.propertyId.ownerId.firstName,
+        lastName: payment.propertyId.ownerId.lastName,
+        email: payment.propertyId.ownerId.email,
+        phone: payment.propertyId.ownerId.phone,
+        accountType: payment.propertyId.ownerId.accountType,
+        businessName: payment.propertyId.ownerId.businessName,
+        businessLogo: payment.propertyId.ownerId.businessLogo,
+        cip: payment.propertyId.ownerId.cip,
+        ifu: payment.propertyId.ownerId.ifu,
+        rccm: payment.propertyId.ownerId.rccm,
+      }
+    : undefined,
+},
     company: companyInfo,
   };
 }

@@ -38,9 +38,14 @@ export const GET = withPermissionAndDB("payment_portal")(
         tenantId: user.id,
       })
         .populate({
-          path: "propertyId",
-          select: "name address",
-        })
+  path: "propertyId",
+  select: "name address ownerId",
+  populate: {
+    path: "ownerId",
+    select:
+      "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
+  },
+})
         .populate({
           path: "tenantId",
           select: "firstName lastName email",
@@ -62,7 +67,7 @@ export const GET = withPermissionAndDB("payment_portal")(
       const pdfBuffer = await generateReceiptPdfBuffer(payment as any);
 
       // Return the PDF as a blob
-      return new Response(pdfBuffer, {
+      return new Response(new Uint8Array(pdfBuffer), {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="receipt-${id}.pdf"`,

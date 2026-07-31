@@ -62,9 +62,9 @@ export function ConversationList({
   }, [conversations, searchQuery, userId, activeTab]);
 
   const tabs: { key: FilterTab; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "unread", label: "Unread" },
-    { key: "groups", label: "Groups" },
+    { key: "all", label: "Tous" },
+    { key: "unread", label: "Non lus" },
+    { key: "groups", label: "Groupes" },
   ];
 
   if (loading) {
@@ -90,7 +90,7 @@ export function ConversationList({
         <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search Messenger"
+          placeholder="Rechercher une discussion"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-9 h-9 bg-muted/50 border-none rounded-full text-sm placeholder:text-muted-foreground/70"
@@ -121,17 +121,17 @@ export function ConversationList({
         <div className="flex flex-col items-center justify-center py-12 text-center px-4">
           <p className="text-sm text-muted-foreground">
             {searchQuery
-              ? "No conversations found"
+              ? "Aucune conversation trouvée"
               : activeTab === "unread"
-              ? "No unread messages"
+              ? "Aucun message non lu"
               : activeTab === "groups"
-              ? "No group conversations"
-              : "No conversations yet"}
+              ? "Aucune conversation de groupe"
+              : "Aucune conversation pour le moment"}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {searchQuery
-              ? "Try a different search term"
-              : "Start a new conversation to get started"}
+              ? "Essayez un autre terme de recherche"
+              : "Commencez une nouvelle conversation pour démarrer"}
           </p>
         </div>
       ) : (
@@ -190,7 +190,7 @@ export function ConversationList({
                   >
                     {others.length > 0
                       ? others.map((p) => p.name).join(", ")
-                      : "Unnamed Conversation"}
+                      : "Conversation sans nom"}
                   </p>
                 </div>
 
@@ -206,7 +206,7 @@ export function ConversationList({
                     {lastContent ? (
                       <>
                         {lastIsSelf && (
-                          <span className="font-medium">You: </span>
+                          <span className="font-medium">Vous : </span>
                         )}
                         {lastContent}
                       </>

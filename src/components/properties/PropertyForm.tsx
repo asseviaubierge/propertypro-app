@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -59,6 +59,8 @@ const enhancedPropertySchema = (t: (key: string, options?: any) => string) =>
     description: z.string().max(2000).optional(),
     type: z.nativeEnum(PropertyType),
     status: z.nativeEnum(PropertyStatus),
+    // Propriétaire du bien
+    ownerId: z.string().optional(),
 
     // Address
     address: z.object({
@@ -320,6 +322,15 @@ const getAmenityCategory = (amenityName: string): string => {
   return "Other";
 };
 
+interface PropertyOwnerOption {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  accountType?: string;
+  businessName?: string;
+}
+
 export function EnhancedPropertyForm({
   initialData,
   onSubmit,
@@ -329,6 +340,43 @@ export function EnhancedPropertyForm({
 }: EnhancedPropertyFormProps) {
   // Alert dialog state
   const [showAlert, setShowAlert] = useState(false);
+  
+  // Propriétaires disponibles
+const [propertyOwners, setPropertyOwners] = useState<PropertyOwnerOption[]>([]);
+const [ownersLoading, setOwnersLoading] = useState(true);
+
+useEffect(() => {
+  const loadPropertyOwners = async () => {
+    try {
+      setOwnersLoading(true);
+
+      const response = await fetch(
+        "/api/users?excludeTenant=true&companyStaffOnly=true&isActive=true&limit=100"
+      );
+
+      if (!response.ok) {
+        throw new Error("Impossible de charger les propriétaires");
+      }
+
+      const json = await response.json();
+
+      const users =
+        json?.data?.users ??
+        json?.data?.data?.users ??
+        json?.users ??
+        [];
+
+      setPropertyOwners(Array.isArray(users) ? users : []);
+    } catch (error) {
+      console.error("Erreur chargement propriétaires :", error);
+      setPropertyOwners([]);
+    } finally {
+      setOwnersLoading(false);
+    }
+  };
+
+  loadPropertyOwners();
+}, []);
 
   // Manage amenities state (features are now consolidated into amenities)
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(() => {
@@ -410,8 +458,9 @@ export function EnhancedPropertyForm({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
-      type: initialData?.type || PropertyType.APARTMENT,
+      type: initialData?.type || PropertyType.FURNISHED_APARTMENT,
       status: initialData?.status || PropertyStatus.AVAILABLE,
+      ownerId: initialData?.ownerId || "",
       address: {
         street: initialData?.address?.street || "",
         city: initialData?.address?.city || "",
@@ -620,6 +669,54 @@ export function EnhancedPropertyForm({
             </div>
 
             <div className="space-y-2">
+            <Label htmlFor="ownerId">
+            Propriétaire du bien
+            </Label>
+
+  <Select
+    value={form.watch("ownerId") || ""}
+    onValueChange={(value) =>
+      form.setValue("ownerId", value, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+    }
+    disabled={ownersLoading}
+  >
+    <SelectTrigger id="ownerId">
+      <SelectValue
+        placeholder={
+          ownersLoading
+            ? "Chargement des propriétaires..."
+            : "Sélectionner un propriétaire"
+        }
+      />
+    </SelectTrigger>
+
+    <SelectContent>
+      {propertyOwners.map((owner) => (
+        <SelectItem key={owner._id} value={owner._id}>
+          {owner.businessName ||
+            `${owner.firstName} ${owner.lastName}`}
+          {owner.accountType === "direct_owner"
+            ? " — Propriétaire direct"
+            : owner.accountType === "agency"
+              ? " — Agence immobilière"
+              : owner.accountType === "e_immo"
+                ? " — E-IMMO"
+                : ""}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+
+  {form.formState.errors.ownerId && (
+    <p className="text-sm text-red-600">
+      {form.formState.errors.ownerId.message}
+    </p>
+  )}
+</div>
+      <div className="space-y-2">
               <Label htmlFor="yearBuilt">
                 {t("properties.form.fields.yearBuilt.label")}
               </Label>

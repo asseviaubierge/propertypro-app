@@ -469,6 +469,17 @@ export default function TenantDetailPage() {
                   </p>
                 </div>
               )}
+              
+              {tenant.ssn && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                   Numéro CIP
+                  </label>
+                  <p className="text-sm">
+             {tenant.ssn}
+                 </p>
+               </div>
+             )}
               {tenant.creditScore && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">

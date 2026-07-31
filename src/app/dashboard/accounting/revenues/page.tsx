@@ -86,17 +86,17 @@ const PIE_COLORS = [
 
 const MONTH_NAMES = [
   "Jan",
-  "Feb",
+  "Fév",
   "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
+  "Avr",
+  "Mai",
+  "Juin",
+  "Juil",
+  "Aoû",
   "Sep",
   "Oct",
   "Nov",
-  "Dec",
+  "Déc",
 ];
 
 export default function RevenuesPage() {
@@ -121,7 +121,7 @@ export default function RevenuesPage() {
         setMonthlyTrends(data?.data?.monthlyTrends || []);
       }
     } catch (error) {
-      console.error("Failed to fetch revenue data:", error);
+      console.error("Échec du chargement des données de revenus :", error);
     } finally {
       setLoading(false);
     }
@@ -146,12 +146,12 @@ export default function RevenuesPage() {
   const propertyColumns: DataTableColumn<RevenueByProperty>[] = [
     {
       id: "property",
-      header: t("revenues.table.property", { defaultValue: "Property" }),
+      header: t("revenues.table.property", { defaultValue: "Bien" }),
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Building2 className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium text-sm">
-            {row?.propertyName || "Unknown Property"}
+            {row?.propertyName || "Bien inconnu"}
           </span>
         </div>
       ),
@@ -160,7 +160,7 @@ export default function RevenuesPage() {
     {
       id: "revenue",
       header: t("revenues.table.totalRevenue", {
-        defaultValue: "Total Revenue",
+        defaultValue: "Revenus totaux",
       }),
       cell: (row) => (
         <span className="font-semibold text-sm">
@@ -172,7 +172,7 @@ export default function RevenuesPage() {
     },
     {
       id: "collected",
-      header: t("revenues.table.collected", { defaultValue: "Collected" }),
+      header: t("revenues.table.collected", { defaultValue: "Montant encaissé" }),
       cell: (row) => (
         <span className="text-sm text-success font-medium">
           {formatCurrency(row.collected)}
@@ -183,7 +183,7 @@ export default function RevenuesPage() {
     },
     {
       id: "outstanding",
-      header: t("revenues.table.outstanding", { defaultValue: "Outstanding" }),
+      header: t("revenues.table.outstanding", { defaultValue: "Impayés" }),
       cell: (row) => (
         <span className="text-sm text-warning font-medium">
           {formatCurrency(row.outstanding)}
@@ -194,7 +194,7 @@ export default function RevenuesPage() {
     },
     {
       id: "collectionRate",
-      header: t("revenues.table.rate", { defaultValue: "Collection Rate" }),
+      header: t("revenues.table.rate", { defaultValue: "Taux de recouvrement" }),
       cell: (row) => (
         <Badge
           variant="outline"
@@ -240,12 +240,12 @@ export default function RevenuesPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          {t("nav.accounting.revenues", { defaultValue: "Revenues" })}
+          {t("nav.accounting.revenues", { defaultValue: "Revenus" })}
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base">
           {t("revenues.subtitle", {
             defaultValue:
-              "Track income from rent, late fees, deposits, and other sources",
+              "Suivez les revenus provenant des loyers, pénalités, dépôts et autres sources",
           })}
         </p>
       </div>
@@ -254,21 +254,21 @@ export default function RevenuesPage() {
       <AnalyticsCardGrid className="lg:grid-cols-4">
         <AnalyticsCard
           title={t("revenues.stats.totalRevenue", {
-            defaultValue: "Total Revenue",
+            defaultValue: "Revenus totaux",
           })}
           value={formatCurrency(summary?.totalRevenue || 0)}
           icon={DollarSign}
           iconColor="primary"
         />
         <AnalyticsCard
-          title={t("revenues.stats.collected", { defaultValue: "Collected" })}
+          title={t("revenues.stats.collected", { defaultValue: "Montant encaissé" })}
           value={formatCurrency(summary?.totalCollected || 0)}
           icon={CheckCircle}
           iconColor="success"
         />
         <AnalyticsCard
           title={t("revenues.stats.outstanding", {
-            defaultValue: "Outstanding",
+            defaultValue: "Impayés",
           })}
           value={formatCurrency(summary?.totalOutstanding || 0)}
           icon={AlertCircle}
@@ -276,13 +276,13 @@ export default function RevenuesPage() {
         />
         <AnalyticsCard
           title={t("revenues.stats.collectionRate", {
-            defaultValue: "Collection Rate",
+            defaultValue: "Taux de recouvrement",
           })}
           value={`${summary?.collectionRate || 0}%`}
           icon={Percent}
           iconColor="info"
           description={t("revenues.stats.ytd", {
-            defaultValue: "YTD: {amount}",
+            defaultValue: "Cumul annuel : {amount}",
             values: { amount: formatCurrency(summary?.yearToDate || 0) },
           })}
         />
@@ -300,12 +300,12 @@ export default function RevenuesPage() {
               <div>
                 <CardTitle className="text-base">
                   {t("revenues.charts.monthlyTrends", {
-                    defaultValue: "Monthly Revenue Trends",
+                    defaultValue: "Évolution mensuelle des revenus",
                   })}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {t("revenues.charts.last12Months", {
-                    defaultValue: "Last 12 months",
+                    defaultValue: "12 derniers mois",
                   })}
                 </CardDescription>
               </div>
@@ -340,7 +340,7 @@ export default function RevenuesPage() {
                   <Bar
                     dataKey="collected"
                     name={t("revenues.charts.collected", {
-                      defaultValue: "Collected",
+                      defaultValue: "Montant encaissé",
                     })}
                     fill="#10b981"
                     radius={[4, 4, 0, 0]}
@@ -359,14 +359,14 @@ export default function RevenuesPage() {
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
                 {t("revenues.charts.noData", {
-                  defaultValue: "No revenue data available",
+                  defaultValue: "Aucune donnée de revenus disponible",
                 })}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Revenue by Category Pie Chart */}
+        {/* Revenus par catégorie Pie Chart */}
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-3">
@@ -376,12 +376,12 @@ export default function RevenuesPage() {
               <div>
                 <CardTitle className="text-base">
                   {t("revenues.charts.byCategory", {
-                    defaultValue: "Revenue by Category",
+                    defaultValue: "Revenus par catégorie",
                   })}
                 </CardTitle>
                 <CardDescription className="text-xs">
                   {t("revenues.charts.breakdown", {
-                    defaultValue: "Income source breakdown",
+                    defaultValue: "Répartition des sources de revenus",
                   })}
                 </CardDescription>
               </div>
@@ -426,7 +426,7 @@ export default function RevenuesPage() {
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
                 {t("revenues.charts.noData", {
-                  defaultValue: "No revenue data available",
+                  defaultValue: "Aucune donnée de revenus disponible",
                 })}
               </div>
             )}
@@ -434,7 +434,7 @@ export default function RevenuesPage() {
         </Card>
       </div>
 
-      {/* Revenue by Property Table */}
+      {/* Revenue by Bien Table */}
       <Card className="gap-2">
         <CardHeader>
           <div className="flex items-center gap-3">
@@ -444,13 +444,13 @@ export default function RevenuesPage() {
             <div>
               <CardTitle className="text-base">
                 {t("revenues.table.title", {
-                  defaultValue: "Revenue by Property",
+                  defaultValue: "Revenus par bien",
                 })}
               </CardTitle>
               <CardDescription className="text-xs">
                 {t("revenues.table.subtitle", {
                   defaultValue:
-                    "Income breakdown and collection rates per property",
+                    "Répartition des revenus et taux de recouvrement par bien",
                 })}
               </CardDescription>
             </div>
@@ -467,11 +467,11 @@ export default function RevenuesPage() {
                 <Building2 className="h-12 w-12 text-muted-foreground" />
               ),
               title: t("revenues.table.empty", {
-                defaultValue: "No property revenue data",
+                defaultValue: "Aucune donnée de revenus par bien",
               }),
               description: t("revenues.table.emptyDescription", {
                 defaultValue:
-                  "Revenue data will appear here once payments are recorded",
+                  "Les données de revenus apparaîtront une fois les paiements enregistrés",
               }),
             }}
           />

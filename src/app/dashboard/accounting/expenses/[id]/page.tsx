@@ -70,12 +70,12 @@ export default function ExpenseDetailPage() {
         if (data?.success) {
           setExpense(data?.data ?? null);
         } else {
-          toast.error(data?.error || "Expense not found");
+          toast.error(data?.error || "Dépense introuvable");
           router.push("/dashboard/accounting/expenses");
         }
       } catch (error) {
-        console.error("Failed to fetch expense:", error);
-        toast.error("Failed to load expense");
+        console.error("Échec du chargement de la dépense :", error);
+        toast.error("Échec du chargement de la dépense");
         router.push("/dashboard/accounting/expenses");
       } finally {
         setLoading(false);
@@ -91,7 +91,7 @@ export default function ExpenseDetailPage() {
     if (
       !confirm(
         t("expenses.actions.confirmDelete", {
-          defaultValue: "Are you sure you want to delete this expense?",
+          defaultValue: "Êtes-vous sûr de vouloir supprimer cette dépense ?",
         }),
       )
     )
@@ -104,15 +104,15 @@ export default function ExpenseDetailPage() {
       if (res.ok) {
         toast.success(
           t("expenses.toasts.deleteSuccess", {
-            defaultValue: "Expense deleted successfully",
+            defaultValue: "Dépense supprimée avec succès",
           }),
         );
         router.push("/dashboard/accounting/expenses");
       } else {
-        toast.error("Failed to delete expense");
+        toast.error("Échec de la suppression de la dépense");
       }
     } catch (error) {
-      toast.error("Failed to delete expense");
+      toast.error("Échec de la suppression de la dépense");
     }
   };
 
@@ -172,7 +172,7 @@ export default function ExpenseDetailPage() {
           </h1>
           <p className="text-muted-foreground text-sm">
             {t("expenses.detail.subtitle", {
-              defaultValue: "Expense details and information",
+              defaultValue: "Détails et informations de la dépense",
             })}
           </p>
         </div>
@@ -180,13 +180,13 @@ export default function ExpenseDetailPage() {
           <Link href="/dashboard/accounting/expenses">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("common.back", { defaultValue: "Back" })}
+              {t("common.back", { defaultValue: "Retour" })}
             </Button>
           </Link>
           <Link href={`/dashboard/accounting/expenses/${expense._id}/edit`}>
             <Button variant="outline" size="sm">
               <Edit className="h-4 w-4 mr-2" />
-              {t("common.edit", { defaultValue: "Edit" })}
+              {t("common.edit", { defaultValue: "Modifier" })}
             </Button>
           </Link>
           <Button
@@ -196,7 +196,7 @@ export default function ExpenseDetailPage() {
             className="text-destructive hover:text-destructive"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            {t("common.delete", { defaultValue: "Delete" })}
+            {t("common.delete", { defaultValue: "Supprimer" })}
           </Button>
         </div>
       </div>
@@ -208,7 +208,7 @@ export default function ExpenseDetailPage() {
             <div className="flex items-center justify-between">
               <CardTitle>
                 {t("expenses.detail.information", {
-                  defaultValue: "Expense Information",
+                  defaultValue: "Informations sur la dépense",
                 })}
               </CardTitle>
               <Badge
@@ -224,7 +224,7 @@ export default function ExpenseDetailPage() {
               <DetailRow
                 icon={Tag}
                 label={t("expenses.detail.category", {
-                  defaultValue: "Category",
+                  defaultValue: "Catégorie",
                 })}
                 value={
                   <span className="capitalize">
@@ -235,7 +235,7 @@ export default function ExpenseDetailPage() {
               <DetailRow
                 icon={DollarSign}
                 label={t("expenses.detail.amount", {
-                  defaultValue: "Amount",
+                  defaultValue: "Montant",
                 })}
                 value={
                   <span className="font-semibold text-error">
@@ -251,7 +251,7 @@ export default function ExpenseDetailPage() {
               <DetailRow
                 icon={Building2}
                 label={t("expenses.detail.property", {
-                  defaultValue: "Property",
+                  defaultValue: "Bien",
                 })}
                 value={
                   expense.propertyId ? (
@@ -271,7 +271,7 @@ export default function ExpenseDetailPage() {
               <DetailRow
                 icon={CreditCard}
                 label={t("expenses.detail.paymentMethod", {
-                  defaultValue: "Payment Method",
+                  defaultValue: "Mode de paiement",
                 })}
                 value={
                   expense.paymentMethod ? (
@@ -286,21 +286,21 @@ export default function ExpenseDetailPage() {
               <DetailRow
                 icon={Hash}
                 label={t("expenses.detail.reference", {
-                  defaultValue: "Reference",
+                  defaultValue: "Référence",
                 })}
                 value={expense.referenceNumber || "—"}
               />
               <DetailRow
                 icon={CheckCircle}
                 label={t("expenses.detail.taxDeductible", {
-                  defaultValue: "Tax Deductible",
+                  defaultValue: "Déductible des impôts",
                 })}
-                value={expense.taxDeductible ? "Yes" : "No"}
+                value={expense.taxDeductible ? "Oui" : "Non"}
               />
               <DetailRow
                 icon={User}
                 label={t("expenses.detail.createdBy", {
-                  defaultValue: "Created By",
+                  defaultValue: "Créé par",
                 })}
                 value={
                   expense.createdBy
@@ -345,20 +345,20 @@ export default function ExpenseDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
-                {t("expenses.detail.timeline", { defaultValue: "Timeline" })}
+                {t("expenses.detail.timeline", { defaultValue: "Historique" })}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  {t("expenses.detail.created", { defaultValue: "Created" })}
+                  {t("expenses.detail.created", { defaultValue: "Créé le" })}
                 </span>
                 <span>{formatDate(expense.createdAt)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {t("expenses.detail.updated", {
-                    defaultValue: "Last Updated",
+                    defaultValue: "Dernière mise à jour",
                   })}
                 </span>
                 <span>{formatDate(expense.updatedAt)}</span>
@@ -366,7 +366,7 @@ export default function ExpenseDetailPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   {t("expenses.detail.expenseDate", {
-                    defaultValue: "Expense Date",
+                    defaultValue: "Date de la dépense",
                   })}
                 </span>
                 <span>{formatDate(expense.date)}</span>

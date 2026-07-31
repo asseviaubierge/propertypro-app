@@ -47,7 +47,7 @@ export function MessageThread({
     return (
       <div className="flex-1 flex items-center justify-center p-4">
         <p className="text-muted-foreground text-center text-sm">
-          No messages yet. Start the conversation!
+          Aucun message pour le moment. Commencez la conversation !
         </p>
       </div>
     );
@@ -77,7 +77,7 @@ export function MessageThread({
                     {message.senderAvatar ? (
                       <AvatarImage
                         src={message.senderAvatar}
-                        alt={message.senderName || "User"}
+                        alt={message.senderName || "Utilisateur"}
                       />
                     ) : null}
                     <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs font-semibold">
@@ -107,7 +107,7 @@ export function MessageThread({
                   )}
                 >
                   {message.isDeleted ? (
-                    <p className="italic text-xs">[Message deleted]</p>
+                    <p className="italic text-xs">[Message supprimé]</p>
                   ) : (
                     <p className="text-sm whitespace-pre-wrap leading-relaxed">
                       {message.content}
@@ -169,7 +169,7 @@ export function MessageThread({
                   {formatTimestamp(new Date(message.createdAt))}
                   {isOwn && message.status === "read" && (
                     <span className="ml-1.5 text-blue-600 dark:text-blue-400 font-medium">
-                      Seen
+                      Vu
                     </span>
                   )}
                 </span>

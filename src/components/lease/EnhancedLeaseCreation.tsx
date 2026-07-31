@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Chèquebox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +28,7 @@ import {
   Clock,
   CreditCard,
   AlertTriangle,
-  CheckCircle,
+  ChèqueCircle,
   Calculator,
   FileText,
 } from "lucide-react";
@@ -224,10 +224,10 @@ export default function EnhancedLeaseCreation() {
 
       // Required field validation
       const requiredFields = [
-        { value: leaseData.tenantName, name: "Tenant Name" },
-        { value: leaseData.propertyAddress, name: "Property Address" },
-        { value: leaseData.leaseStartDate, name: "Lease Start Date" },
-        { value: leaseData.leaseEndDate, name: "Lease End Date" },
+        { value: leaseData.tenantName, name: "Nom du locataire" },
+        { value: leaseData.propertyAddress, name: "Adresse de la propriété" },
+        { value: leaseData.leaseStartDate, name: "Date de début du bail" },
+        { value: leaseData.leaseEndDate, name: "Date de fin du bail" },
       ];
 
       requiredFields.forEach((field) => {
@@ -459,30 +459,30 @@ export default function EnhancedLeaseCreation() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Create New Lease</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Créer un nouveau bail</h2>
         <p className="text-muted-foreground">
-          Set up lease terms with automated payment configuration
+          Configurez le bail avec une gestion automatisée des paiements
         </p>
       </div>
 
       <Tabs defaultValue="basic" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="payment">Payment Config</TabsTrigger>
-          <TabsTrigger value="schedule">Payment Schedule</TabsTrigger>
-          <TabsTrigger value="review">Review & Save</TabsTrigger>
+          <TabsTrigger value="basic">Informations générales</TabsTrigger>
+          <TabsTrigger value="payment">Configuration des paiements</TabsTrigger>
+          <TabsTrigger value="schedule">Échéancier des paiements</TabsTrigger>
+          <TabsTrigger value="review">Vérifier et enregistrer</TabsTrigger>
         </TabsList>
 
         <TabsContent value="basic" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Lease Information</CardTitle>
-              <CardDescription>Basic lease details and dates</CardDescription>
+              <CardTitle>Informations sur le bail</CardTitle>
+              <CardDescription>Informations et dates du bail</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="tenant-name">Tenant Name</Label>
+                  <Label htmlFor="tenant-name">Nom du locataire</Label>
                   <Input
                     id="tenant-name"
                     value={leaseData.tenantName}
@@ -494,7 +494,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="property-address">Property Address</Label>
+                  <Label htmlFor="property-address">Adresse de la propriété</Label>
                   <Input
                     id="property-address"
                     value={leaseData.propertyAddress}
@@ -509,7 +509,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="unit-number">Unit Number</Label>
+                  <Label htmlFor="unit-number">Numéro du logement</Label>
                   <Input
                     id="unit-number"
                     value={leaseData.unitNumber}
@@ -521,7 +521,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="security-deposit">Security Deposit</Label>
+                  <Label htmlFor="security-deposit">Dépôt de garantie</Label>
                   <Input
                     id="security-deposit"
                     type="number"
@@ -539,7 +539,7 @@ export default function EnhancedLeaseCreation() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="lease-start">Lease Start Date</Label>
+                  <Label htmlFor="lease-start">Date de début du bail</Label>
                   <Input
                     id="lease-start"
                     type="date"
@@ -554,7 +554,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lease-end">Lease End Date</Label>
+                  <Label htmlFor="lease-end">Date de fin du bail</Label>
                   <Input
                     id="lease-end"
                     type="date"
@@ -569,7 +569,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="move-in">Move-in Date</Label>
+                  <Label htmlFor="move-in">Date d'entrée</Label>
                   <Input
                     id="move-in"
                     type="date"
@@ -590,12 +590,12 @@ export default function EnhancedLeaseCreation() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5" />
-                  Rent & Fees
+                  Loyer et frais
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="monthly-rent">Base Monthly Rent</Label>
+                  <Label htmlFor="monthly-rent">Loyer mensuel de base</Label>
                   <Input
                     id="monthly-rent"
                     type="number"
@@ -611,7 +611,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Late Fee Structure</Label>
+                  <Label>Frais de retard</Label>
                   <div className="grid gap-2">
                     <div className="flex gap-2">
                       <Input
@@ -644,14 +644,14 @@ export default function EnhancedLeaseCreation() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="percentage">Percentage</SelectItem>
+                          <SelectItem value="fixed">Montant fixe</SelectItem>
+                          <SelectItem value="percentage">Pourcentage</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      <span className="text-sm">After</span>
+                      <span className="text-sm">Après</span>
                       <Input
                         type="number"
                         className="w-20"
@@ -666,14 +666,14 @@ export default function EnhancedLeaseCreation() {
                           })
                         }
                       />
-                      <span className="text-sm">day grace period</span>
+                      <span className="text-sm">jours de grâce</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="returned-payment-fee">
-                    Returned Payment Fee
+                    Frais de paiement rejeté
                   </Label>
                   <Input
                     id="returned-payment-fee"
@@ -695,16 +695,16 @@ export default function EnhancedLeaseCreation() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calculator className="h-5 w-5" />
-                  Annual Increase & Incentives
+                  Augmentation annuelle et avantages
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <Checkbox
+                    <Chèquebox
                       id="annual-increase"
                       checked={paymentConfig.annualIncrease.enabled}
-                      onCheckedChange={(checked) =>
+                      onChèqueedChange={(checked) =>
                         setPaymentConfig({
                           ...paymentConfig,
                           annualIncrease: {
@@ -715,7 +715,7 @@ export default function EnhancedLeaseCreation() {
                       }
                     />
                     <Label htmlFor="annual-increase">
-                      Enable Annual Rent Increase
+                      Activer l'augmentation annuelle du loyer
                     </Label>
                   </div>
 
@@ -753,14 +753,14 @@ export default function EnhancedLeaseCreation() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="percentage">
-                              Percentage
+                              Pourcentage
                             </SelectItem>
-                            <SelectItem value="fixed">Fixed Amount</SelectItem>
+                            <SelectItem value="fixed">Montant fixe</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">Starting year</span>
+                        <span className="text-sm">À partir de l'année</span>
                         <Input
                           type="number"
                           className="w-20"
@@ -782,10 +782,10 @@ export default function EnhancedLeaseCreation() {
 
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <Checkbox
+                    <Chèquebox
                       id="autopay-discount"
                       checked={paymentConfig.autoPayDiscount.enabled}
-                      onCheckedChange={(checked) =>
+                      onChèqueedChange={(checked) =>
                         setPaymentConfig({
                           ...paymentConfig,
                           autoPayDiscount: {
@@ -795,7 +795,7 @@ export default function EnhancedLeaseCreation() {
                         })
                       }
                     />
-                    <Label htmlFor="autopay-discount">Auto-pay Discount</Label>
+                    <Label htmlFor="autopay-discount">Remise pour paiement automatique</Label>
                   </div>
 
                   {paymentConfig.autoPayDiscount.enabled && (
@@ -819,24 +819,24 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Preferred Payment Methods</Label>
+                  <Label>Modes de paiement préférés</Label>
                   <div className="space-y-2">
                     {[
                       { id: "auto_pay", label: "Auto-pay (ACH)" },
-                      { id: "online", label: "Online Payment" },
-                      { id: "check", label: "Check" },
-                      { id: "money_order", label: "Money Order" },
+                      { id: "online", label: "Paiement en ligne" },
+                      { id: "check", label: "Chèque" },
+                      { id: "money_order", label: "Mandat" },
                     ].map((method) => (
                       <div
                         key={method.id}
                         className="flex items-center space-x-2"
                       >
-                        <Checkbox
+                        <Chèquebox
                           id={method.id}
                           checked={paymentConfig.preferredPaymentMethods.includes(
                             method.id
                           )}
-                          onCheckedChange={(checked) => {
+                          onChèqueedChange={(checked) => {
                             if (checked) {
                               setPaymentConfig({
                                 ...paymentConfig,
@@ -871,14 +871,14 @@ export default function EnhancedLeaseCreation() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calculator className="h-5 w-5" />
-                  Prorated First Month Calculation
+                  Calcul du premier mois au prorata
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Move-in Date:</span>
+                      <span>Date d'entrée:</span>
                       <span className="font-medium">
                         {proration.moveInDate.toLocaleDateString()}
                       </span>
@@ -910,7 +910,7 @@ export default function EnhancedLeaseCreation() {
                       </span>
                     </div>
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Prorated Amount:</span>
+                      <span>Au prorata Amount:</span>
                       <span className="text-green-600">
                         {formatCurrency(proration.proratedAmount)}
                       </span>
@@ -927,10 +927,10 @@ export default function EnhancedLeaseCreation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Payment Schedule Preview
+                Échéancier des paiements Preview
               </CardTitle>
               <CardDescription>
-                First 12 months of payment schedule
+                12 premiers mois de l'échéancier
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -955,7 +955,7 @@ export default function EnhancedLeaseCreation() {
                           Due: {payment.dueDate.toLocaleDateString()}
                         </span>
                         {payment.type === "prorated" && (
-                          <Badge variant="secondary">Prorated</Badge>
+                          <Badge variant="secondary">Au prorata</Badge>
                         )}
                       </div>
                       <div className="text-right">
@@ -986,13 +986,13 @@ export default function EnhancedLeaseCreation() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Lease Summary
+                Résumé du bail
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <h4 className="font-semibold mb-2">Lease Details</h4>
+                  <h4 className="font-semibold mb-2">Détails du bail</h4>
                   <div className="space-y-1 text-sm">
                     <div>Tenant: {leaseData.tenantName}</div>
                     <div>Property: {leaseData.propertyAddress}</div>
@@ -1006,7 +1006,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Payment Configuration</h4>
+                  <h4 className="font-semibold mb-2">Configuration des paiementsuration</h4>
                   <div className="space-y-1 text-sm">
                     <div>
                       Monthly Rent:{" "}
@@ -1018,12 +1018,12 @@ export default function EnhancedLeaseCreation() {
                       after {paymentConfig?.lateFee?.gracePeriodDays ?? 0} days
                     </div>
                     <div>
-                      Security Deposit:{" "}
+                      Dépôt de garantie:{" "}
                       {formatCurrency(leaseData?.securityDeposit ?? 0)}
                     </div>
                     {proration && (
                       <div>
-                        First Month (Prorated):{" "}
+                        First Month (Au prorata):{" "}
                         {formatCurrency(proration?.proratedAmount ?? 0)}
                       </div>
                     )}
@@ -1032,10 +1032,10 @@ export default function EnhancedLeaseCreation() {
               </div>
 
               <Alert>
-                <CheckCircle className="h-4 w-4" />
+                <ChèqueCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Review all details carefully before creating the lease.
-                  Payment schedule will be automatically generated.
+                  Vérifiez toutes les informations avant de créer le bail.
+                  L'échéancier des paiements sera généré automatiquement.
                 </AlertDescription>
               </Alert>
 
@@ -1048,14 +1048,14 @@ export default function EnhancedLeaseCreation() {
                   {isSaving ? (
                     <>
                       <Clock className="h-4 w-4 mr-2 animate-spin" />
-                      Creating Lease...
+                      Création du bail...
                     </>
                   ) : (
-                    "Create Lease & Generate Payments"
+                    "Créer le bail et générer les paiements"
                   )}
                 </Button>
                 <Button variant="outline" disabled={isSaving}>
-                  Save as Draft
+                  Enregistrer comme brouillon
                 </Button>
               </div>
             </CardContent>

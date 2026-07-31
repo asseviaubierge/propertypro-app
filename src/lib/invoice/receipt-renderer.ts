@@ -29,6 +29,18 @@ export interface ReceiptTenantInfo {
 export interface ReceiptPropertyInfo {
   name: string;
   address: string;
+  owner?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    accountType?: string;
+    businessName?: string;
+    businessLogo?: string;
+    cip?: string;
+    ifu?: string;
+    rccm?: string;
+  };
 }
 
 export interface ReceiptInvoiceApplication {
@@ -76,7 +88,27 @@ export async function renderReceiptPdf(
     // ========================================================================
     // HEADER - Company Logo & Info
     // ========================================================================
-    const companyInitials = deriveCompanyInitials(receipt.company.name);
+    // Property owner / professional identity
+const owner = receipt.property.owner;
+
+const ownerFullName = owner
+  ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
+  : "";
+
+const professionalName =
+  owner?.businessName?.trim() ||
+  ownerFullName ||
+  receipt.company.name;
+
+const professionalType =
+  owner?.accountType === "direct_owner"
+    ? "Propriétaire direct"
+    : owner?.accountType === "agency"
+      ? "Agence immobilière"
+      : owner?.accountType === "e_immo"
+        ? "E-IMMO"
+        : "";
+    const companyInitials = deriveCompanyInitials(professionalName);
     let logoRendered = false;
 
     if (receipt.company.logo) {
@@ -108,26 +140,51 @@ export async function renderReceiptPdf(
       pdf.rect(15, 15, 20, 20, "F");
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(12);
-      pdf.setFont(undefined, "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.text(companyInitials, 25, 26, { align: "center" });
-      pdf.setFont(undefined, "normal");
+      pdf.setFont("helvetica", "normal");
     }
 
-    // Company info (left side)
-    pdf.setTextColor(...textColor);
-    pdf.setFontSize(14);
-    pdf.setFont(undefined, "bold");
-    pdf.text(receipt.company.name, 38, 20);
-    pdf.setFont(undefined, "normal");
+    // Property owner / agency info (left side)
+pdf.setTextColor(...textColor);
+pdf.setFontSize(14);
+pdf.setFont("helvetica", "bold");
+pdf.text(professionalName, 38, 20);
+pdf.setFont("helvetica", "normal");
 
-    pdf.setFontSize(9);
-    pdf.setTextColor(...grayColor);
-    pdf.text(receipt.company.address, 38, 26);
-    pdf.text(receipt.company.phone, 38, 31);
-    pdf.text(receipt.company.email, 38, 36);
-    if (receipt.company.website) {
-      pdf.text(receipt.company.website, 38, 41);
-    }
+pdf.setFontSize(9);
+pdf.setTextColor(...grayColor);
+
+let ownerInfoY = 26;
+
+if (professionalType) {
+  pdf.text(professionalType, 38, ownerInfoY);
+  ownerInfoY += 5;
+}
+
+if (owner?.cip) {
+  pdf.text(`CIP : ${owner.cip}`, 38, ownerInfoY);
+  ownerInfoY += 5;
+}
+
+if (owner?.ifu) {
+  pdf.text(`IFU : ${owner.ifu}`, 38, ownerInfoY);
+  ownerInfoY += 5;
+}
+
+if (owner?.rccm) {
+  pdf.text(`RCCM : ${owner.rccm}`, 38, ownerInfoY);
+  ownerInfoY += 5;
+}
+
+if (owner?.phone) {
+  pdf.text(owner.phone, 38, ownerInfoY);
+  ownerInfoY += 5;
+}
+
+if (owner?.email) {
+  pdf.text(owner.email, 38, ownerInfoY);
+}
 
     // Receipt meta info (right side) - Better aligned
     pdf.setFontSize(9);
@@ -140,13 +197,13 @@ export async function renderReceiptPdf(
     pdf.text("Payment Method:", labelX, 32);
 
     pdf.setTextColor(...textColor);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text(receipt.receiptNumber, valueX, 20, { align: "right" });
     pdf.text(receipt.paymentDate.toLocaleDateString(), valueX, 26, {
       align: "right",
     });
     pdf.text(receipt.paymentMethod, valueX, 32, { align: "right" });
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     // ========================================================================
     // RECEIPT TITLE - Centered and prominent
@@ -154,9 +211,9 @@ export async function renderReceiptPdf(
     let y = 55;
     pdf.setTextColor(...textColor);
     pdf.setFontSize(22);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text("PAYMENT RECEIPT", 105, y, { align: "center" });
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     // Decorative line under title
     y += 5;
@@ -170,16 +227,16 @@ export async function renderReceiptPdf(
     y += 12;
     pdf.setFontSize(10);
     pdf.setTextColor(...grayColor);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text("RECEIVED FROM", 15, y);
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     y += 6;
     pdf.setTextColor(...textColor);
     pdf.setFontSize(10);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text(receipt.tenant.name, 15, y);
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     y += 5;
     pdf.setFontSize(9);
@@ -199,16 +256,16 @@ export async function renderReceiptPdf(
     y += 10;
     pdf.setFontSize(10);
     pdf.setTextColor(...grayColor);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text("PROPERTY", 15, y);
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     y += 6;
     pdf.setTextColor(...textColor);
     pdf.setFontSize(10);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text(receipt.property.name, 15, y);
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     y += 5;
     pdf.setFontSize(9);
@@ -226,9 +283,9 @@ export async function renderReceiptPdf(
     y += 15;
     pdf.setFontSize(12);
     pdf.setTextColor(...textColor);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text("PAYMENT DETAILS", 15, y);
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     // Table header with better styling
     y += 8;
@@ -240,10 +297,10 @@ export async function renderReceiptPdf(
 
     pdf.setFontSize(9);
     pdf.setTextColor(...grayColor);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.text("Description", 20, y + 6.5);
     pdf.text("Amount", 188, y + 6.5, { align: "right" });
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     // Table content with proper spacing
     y += 12;
@@ -254,11 +311,11 @@ export async function renderReceiptPdf(
       // Show invoice applications
       receipt.invoiceApplications.forEach((app, index) => {
         pdf.text(`Payment for Invoice ${app.invoiceNumber}`, 20, y + 3);
-        pdf.setFont(undefined, "bold");
+        pdf.setFont("helvetica", "bold");
         pdf.text(formatCurrency(app.amountApplied), 188, y + 3, {
           align: "right",
         });
-        pdf.setFont(undefined, "normal");
+        pdf.setFont("helvetica", "normal");
 
         // Row separator (except for last row)
         if (index < receipt.invoiceApplications.length - 1) {
@@ -273,11 +330,11 @@ export async function renderReceiptPdf(
       const description = receipt.description || "Payment received";
       const descLines = pdf.splitTextToSize(description, 140);
       pdf.text(descLines, 20, y + 3);
-      pdf.setFont(undefined, "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.text(formatCurrency(receipt.amount), 188, y + 3, {
         align: "right",
       });
-      pdf.setFont(undefined, "normal");
+      pdf.setFont("helvetica", "normal");
       y += 10;
     }
 
@@ -293,12 +350,12 @@ export async function renderReceiptPdf(
     pdf.rect(15, y - 5, 180, 14, "F");
 
     pdf.setFontSize(12);
-    pdf.setFont(undefined, "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.setTextColor(255, 255, 255); // White text
     pdf.text("TOTAL PAID", 20, y + 3);
     pdf.setFontSize(14);
     pdf.text(formatCurrency(receipt.amount), 188, y + 3, { align: "right" });
-    pdf.setFont(undefined, "normal");
+    pdf.setFont("helvetica", "normal");
 
     // ========================================================================
     // FOOTER - Thank you message and generation info
@@ -309,9 +366,9 @@ export async function renderReceiptPdf(
       // Thank you message
       pdf.setFontSize(11);
       pdf.setTextColor(...textColor);
-      pdf.setFont(undefined, "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.text("Thank you for your payment!", 105, y, { align: "center" });
-      pdf.setFont(undefined, "normal");
+      pdf.setFont("helvetica", "normal");
 
       y += 8;
       pdf.setFontSize(9);

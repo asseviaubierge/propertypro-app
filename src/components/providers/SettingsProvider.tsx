@@ -36,6 +36,8 @@ export interface BrandingSettings {
   favicon: string;
   companyName?: string;
   companyAddress?: string;
+  whatsappNumber?: string;
+  whatsappEnabled?: boolean;
   r2?: Record<string, any>;
 }
 
