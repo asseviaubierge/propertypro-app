@@ -35,7 +35,7 @@ import {
   DollarSign,
   FileText,
   Search,
-  ActualiserCw,
+  RefreshCw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/formatting";
 
@@ -65,8 +65,8 @@ interface Lease {
   daysUntilExpiration: number;
   daysUntilStart: number;
   isActif: boolean;
-  isÀ venir: boolean;
-  isExpiré: boolean;
+  isAVenir: boolean;
+  isExpire: boolean;
   documents?: string[];
   signedDate?: string;
   renewalOptions?: {
@@ -328,7 +328,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
             onClick={fetchLeaseData}
             className="gap-2"
           >
-            <ActualiserCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4" />
             Actualiser
           </Button>
         </div>

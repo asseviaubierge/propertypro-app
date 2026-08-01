@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FileText, Receipt } from "lucide-react";
-import { LeaseFacture } from "./LeaseFacture";
+import { LeaseInvoice } from "./LeaseInvoice";
 import { LeaseResponse } from "@/lib/services/lease.service";
 import { getCompanyInfo, CompanyInfo } from "@/lib/utils/company-info";
 
-export interface LeaseFactureModalProps {
+export interface LeaseInvoiceModalProps {
   lease: LeaseResponse;
   trigger?: React.ReactNode;
   companyInfo?: {
@@ -31,14 +31,14 @@ export interface LeaseFactureModalProps {
   dueDate?: Date;
 }
 
-export function LeaseFactureModal({
+export function LeaseInvoiceModal({
   lease,
   trigger,
   companyInfo: propCompanyInfo,
   invoiceNumber,
   issueDate,
   dueDate,
-}: LeaseFactureModalProps) {
+}: LeaseInvoiceModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(
     propCompanyInfo || null
@@ -102,7 +102,7 @@ export function LeaseFactureModal({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <LeaseFacture
+            <LeaseInvoice
               lease={lease}
               companyInfo={companyInfo || undefined}
               invoiceNumber={invoiceNumber}
@@ -117,21 +117,21 @@ export function LeaseFactureModal({
 }
 
 // Composant d’action rapide pour les cartes/listes de locations
-export interface QuickFactureButtonProps {
+export interface QuickInvoiceButtonProps {
   lease: LeaseResponse;
   variant?: "default" | "outline" | "ghost";
   size?: "sm" | "default" | "lg";
   className?: string;
 }
 
-export function QuickFactureButton({
+export function QuickInvoiceButton({
   lease,
   variant = "outline",
   size = "sm",
   className,
-}: QuickFactureButtonProps) {
+}: QuickInvoiceButtonProps) {
   return (
-    <LeaseFactureModal
+    <LeaseInvoiceModal
       lease={lease}
       trigger={
         <Button variant={variant} size={size} className={className}>

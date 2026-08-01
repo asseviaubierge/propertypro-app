@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Wallet, Loader2 } from "lucide-react";
-import { ExpenseCatégorie, ExpenseStatut, PaymentMethod } from "@/types";
+import { ExpenseCategory, ExpenseStatus, PaymentMethod } from "@/types";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
 interface Bien {
@@ -44,13 +44,13 @@ export default function EditExpensePage() {
   const [properties, setProperties] = useState<Bien[]>([]);
 
   // Form state
-  const [category, setCatégorie] = useState("");
+  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
-  const [amount, setMontant] = useState("");
+  const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
-  const [propertyId, setBienId] = useState("");
+  const [propertyId, setPropertyId] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [status, setStatut] = useState<ExpenseStatut>(ExpenseStatut.PAID);
+  const [status, setStatus] = useState<ExpenseStatus>(ExpenseStatus.PAID);
   const [referenceNumber, setReferenceNumber] = useState("");
   const [notes, setNotes] = useState("");
   const [taxDeductible, setTaxDeductible] = useState(false);
@@ -81,18 +81,18 @@ export default function EditExpensePage() {
           const exp = data?.data;
           if (exp) {
             setExpenseNumber(exp.expenseNumber || "");
-            setCatégorie(exp.category || "");
+            setCategory(exp.category || "");
             setDescription(exp.description || "");
-            setMontant(String(exp.amount || ""));
+            setAmount(String(exp.amount || ""));
             const parsedDate = exp?.date ? new Date(exp.date) : null;
             setDate(
               parsedDate && !Number.isNaN(parsedDate.getTime())
                 ? parsedDate.toISOString().split("T")[0]
                 : "",
             );
-            setBienId(exp.propertyId?._id || "none");
+            setPropertyId(exp.propertyId?._id || "none");
             setPaymentMethod(exp.paymentMethod || "");
-            setStatut(exp.status || ExpenseStatut.PAID);
+            setStatus(exp.status || ExpenseStatus.PAID);
             setReferenceNumber(exp.referenceNumber || "");
             setNotes(exp.notes || "");
             setTaxDeductible(exp.taxDeductible || false);
@@ -171,10 +171,10 @@ export default function EditExpensePage() {
     }
   };
 
-  const getCatégorieLabel = (cat?: string | null) => {
-    const normalizedCatégorie = (cat ?? "unknown").toLowerCase();
-    return t(`expenses.categories.${normalizedCatégorie}`, {
-      defaultValue: normalizedCatégorie.replace(/_/g, " "),
+  const getCategoryLabel = (cat?: string | null) => {
+    const normalizedCategory = (cat ?? "unknown").toLowerCase();
+    return t(`expenses.categories.${normalizedCategory}`, {
+      defaultValue: normalizedCategory.replace(/_/g, " "),
     });
   };
 
@@ -253,19 +253,19 @@ export default function EditExpensePage() {
                 <Label htmlFor="category">
                   {t("expenses.form.category", { defaultValue: "Catégorie" })} *
                 </Label>
-                <Select value={category} onValueChange={setCatégorie}>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger id="category">
                     <SelectValue
-                      placeholder={t("expenses.form.selectCatégorie", {
+                      placeholder={t("expenses.form.selectCategory", {
                         defaultValue: "Sélectionner une catégorie",
                       })}
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(ExpenseCatégorie).map((cat) => (
+                    {Object.values(ExpenseCategory).map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         <span className="capitalize">
-                          {getCatégorieLabel(cat)}
+                          {getCategoryLabel(cat)}
                         </span>
                       </SelectItem>
                     ))}
@@ -279,13 +279,13 @@ export default function EditExpensePage() {
                 </Label>
                 <Select
                   value={status}
-                  onValueChange={(val) => setStatut(val as ExpenseStatut)}
+                  onValueChange={(val) => setStatus(val as ExpenseStatus)}
                 >
                   <SelectTrigger id="status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.values(ExpenseStatut).map((s) => (
+                    {Object.values(ExpenseStatus).map((s) => (
                       <SelectItem key={s} value={s}>
                         <span className="capitalize">
                           {s.replace(/_/g, " ")}
@@ -328,7 +328,7 @@ export default function EditExpensePage() {
                   step="0.01"
                   min="0.01"
                   value={amount}
-                  onChange={(e) => setMontant(e.target.value)}
+                  onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
                 />
               </div>
@@ -352,17 +352,17 @@ export default function EditExpensePage() {
                 <Label htmlFor="property">
                   {t("expenses.form.property", { defaultValue: "Bien" })}
                 </Label>
-                <Select value={propertyId} onValueChange={setBienId}>
+                <Select value={propertyId} onValueChange={setPropertyId}>
                   <SelectTrigger id="property">
                     <SelectValue
-                      placeholder={t("expenses.form.selectBien", {
+                      placeholder={t("expenses.form.selectProperty", {
                         defaultValue: "Sélectionner un bien (facultatif)",
                       })}
                     />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
-                      {t("expenses.form.noBien", {
+                      {t("expenses.form.noProperty", {
                         defaultValue: "Aucun bien spécifique",
                       })}
                     </SelectItem>

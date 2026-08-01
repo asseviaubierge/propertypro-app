@@ -67,7 +67,7 @@ interface Invoice {
   status: string;
   totalMontant: number;
   balanceRemaining: number;
-  joursEn retard: number;
+  joursEnRetard: number;
   lineItems: Array<{
     description: string;
     amount: number;
@@ -147,20 +147,20 @@ export default function InvoiceTable({
     }
   };
 
-  const getEn retardDisplay = (invoice: Invoice) => {
+  const getEnRetardDisplay = (invoice: Invoice) => {
     if (invoice.status === "paid") {
       return <span className="text-sm text-green-600">Payée</span>;
     }
 
-    if (invoice.daysEn retard > 0) {
+    if (invoice.daysEnRetard > 0) {
       return (
         <span className="text-sm text-red-600 font-medium">
-          {invoice.daysEn retard} jours de retard
+          {invoice.daysEnRetard} jours de retard
         </span>
       );
     }
 
-    const joursUntilDue = Math.ceil(
+    const daysUntilDue = Math.ceil(
       (new Date(invoice.dueDate).getTime() - new Date().getTime()) /
         (1000 * 60 * 60 * 24)
     );
@@ -276,7 +276,7 @@ export default function InvoiceTable({
                           </div>
                         </TableCell>
                         <TableCell>{getStatutBadge(invoice)}</TableCell>
-                        <TableCell>{getEn retardDisplay(invoice)}</TableCell>
+                        <TableCell>{getEnRetardDisplay(invoice)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
