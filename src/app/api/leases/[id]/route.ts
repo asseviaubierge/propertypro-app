@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Lease, Property } from "@/models";
+import { Lease, Property, User } from "@/models";
 import { LeaseStatus } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -25,6 +25,7 @@ import {
   LEASE_PATCH_ACCESS,
   LEASE_READ_ACCESS,
   canManageLeases,
+  canAccessLease,
   isLeaseTenantUser,
 } from "@/lib/lease-access";
 
@@ -45,34 +46,46 @@ export const GET = withAccessAndDB(LEASE_READ_ACCESS)(
         return createErrorResponse("Invalid lease ID", 400);
       }
 
-      // Find the lease
-      const lease = await Lease.findById(id)
-        .populate({
-          path: "propertyId",
-          select:
-            "name address type bedrooms bathrooms squareFootage ownerId managerId",
-          populate: [
-            { path: "ownerId", select: "firstName lastName email" },
-            { path: "managerId", select: "firstName lastName email" },
-          ],
-        })
-        .populate({
-          path: "tenantId",
-          select:
-            "firstName lastName email phone avatar dateOfBirth employmentInfo emergencyContacts creditScore backgroundCheckStatus moveInDate moveOutDate applicationDate",
-        });
-
+      const lease = await Lease.findById(id).lean();
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
-      // Role-based authorization
-      if (user.isTenant && !isLeaseTenantUser(user, lease)) {
-        return createErrorResponse("You can only view your own leases", 403);
+      if (!(await canAccessLease(user, lease))) {
+        return createErrorResponse("Accès refusé", 403);
       }
-      // Admin and manager can view all leases (single-company architecture)
 
-      return createSuccessResponse(lease, "Lease retrieved successfully");
+      const [property, tenant] = await Promise.all([
+        Property.findById(lease.propertyId).lean(),
+        User.findById(lease.tenantId)
+          .select("firstName lastName email phone avatar dateOfBirth employmentInfo emergencyContacts tenantStatus")
+          .lean(),
+      ]);
+
+      let owner = null;
+      let manager = null;
+      if (property) {
+        const ownerId = (property as any).ownerId;
+        const managerId = (property as any).managerId;
+        [owner, manager] = await Promise.all([
+          ownerId ? User.findById(ownerId).select("firstName lastName businessName accountType email phone address website ifu rccm cip").lean() : null,
+          managerId ? User.findById(managerId).select("firstName lastName businessName accountType email phone address website ifu rccm cip").lean() : null,
+        ]);
+      }
+
+      const unit = (property as any)?.units?.find(
+        (item: any) => item?._id?.toString() === lease.unitId?.toString()
+      );
+
+      return createSuccessResponse(
+        {
+          ...lease,
+          propertyId: property ? { ...property, ownerId: owner, managerId: manager } : lease.propertyId,
+          tenantId: tenant || lease.tenantId,
+          unit: unit || undefined,
+        },
+        "Bail récupéré avec succès"
+      );
     } catch (error) {
       return handleApiError(error);
     }
@@ -105,6 +118,10 @@ export const PUT = withPermissionAndDB(["lease_edit", "lease_management"])(
       const lease = await Lease.findById(id);
       if (!lease) {
         return createErrorResponse("Lease not found", 404);
+      }
+
+      if (!(await canAccessLease(user, lease))) {
+        return createErrorResponse("Access denied", 403);
       }
 
       // Prevent updating active leases
@@ -202,6 +219,10 @@ export const DELETE = withPermissionAndDB(["lease_edit", "lease_management"])(
         return createErrorResponse("Lease not found", 404);
       }
 
+      if (!(await canAccessLease(user, lease))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
       // Only draft leases can be deleted. Anything that has progressed beyond
       // draft (active/pending/terminated/expired) has or may have financial
       // records, so it must be terminated and/or archived instead of deleted.
@@ -256,9 +277,8 @@ export const PATCH = withAccessAndDB(LEASE_PATCH_ACCESS)(
         return createErrorResponse("Lease not found", 404);
       }
 
-      // Role-based authorization for tenant actions
-      if (user.isTenant && !isLeaseTenantUser(user, lease)) {
-        return createErrorResponse("You can only modify your own leases", 403);
+      if (!(await canAccessLease(user, lease))) {
+        return createErrorResponse("Access denied", 403);
       }
 
       // Handle specific patch operations

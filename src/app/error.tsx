@@ -228,7 +228,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                 className="gap-2"
               >
                 <RefreshCw className="size-4" />
-                Try Again
+                Réessayer
               </Button>
               <Button
                 onClick={() => router.back()}
@@ -237,7 +237,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                 className="gap-2"
               >
                 <ArrowLeft className="size-4" />
-                Go Back
+                Retour
               </Button>
               <Button
                 onClick={() => router.push("/")}

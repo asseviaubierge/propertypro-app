@@ -9,7 +9,6 @@ import {
   ILateFeeConfig,
 } from "@/types";
 import { formatCurrency } from "@/lib/utils/formatting";
-import { isTenantAccessRole } from "@/lib/model-access";
 
 // Payment Schedule subdocument schema
 const PaymentScheduleSchema = new Schema<IPaymentSchedule>(
@@ -483,7 +482,7 @@ const PaymentSchema = new Schema<IPayment>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },

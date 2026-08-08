@@ -261,7 +261,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
           <div className="content">
             <div className="alert">
-              <div className="alert-title">What happened?</div>
+              <div className="alert-title">Que s’est-il passé ?</div>
               <div className="alert-description">
                 A critical error occurred in the application's core system. This is usually
                 caused by a configuration issue, network problem, or temporary server error.
@@ -304,7 +304,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <div className="actions">
               <button onClick={() => reset()} className="btn btn-primary">
                 <RefreshCw style={{ width: '1rem', height: '1rem' }} />
-                Try Again
+                Réessayer
               </button>
               <a href="/" className="btn btn-secondary">
                 <Home style={{ width: '1rem', height: '1rem' }} />

@@ -491,43 +491,16 @@ export default function EditTenantPage() {
                             <FormLabel className="text-sm font-semibold text-foreground">
                               {t("tenants.form.fields.dateOfBirth.label")}
                             </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    className="h-11 w-full justify-start text-left font-normal border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                      format(field.value, "PPP")
-                                    ) : (
-                                      <span>
-                                        {t(
-                                          "tenants.form.fields.dateOfBirth.placeholder"
-                                        )}
-                                      </span>
-                                    )}
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-0"
-                                align="start"
-                              >
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) =>
-                                    date > new Date() ||
-                                    date < new Date("1900-01-01")
-                                  }
-                                  initialFocus
-                                  captionLayout="dropdown"
-                                />
-                              </PopoverContent>
-                            </Popover>
+                            <FormControl>
+                              <FormDatePicker
+                                value={field.value ? new Date(field.value) : undefined}
+                                onChange={field.onChange}
+                                placeholder={t("tenants.form.fields.dateOfBirth.placeholder")}
+                                fromYear={1920}
+                                toYear={new Date().getFullYear()}
+                                disabled={(date) => date > new Date()}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}

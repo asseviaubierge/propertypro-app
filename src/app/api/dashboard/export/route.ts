@@ -13,7 +13,7 @@ import { Property, Lease, User, MaintenanceRequest, Payment } from "@/models";
 import { formatCurrency } from "@/lib/utils/formatting";
 
 export const POST = withPermissionAndDB("data_export")(
-  async (request: NextRequest) => {
+  async (_user: any, request: NextRequest) => {
     try {
       const {
         format = "json",
@@ -54,7 +54,7 @@ export const POST = withPermissionAndDB("data_export")(
             )
             .lean(),
           User.find({
-            role: UserRole.TENANT,
+            role: "tenant",
             deletedAt: null,
             createdAt: { $gte: startDate, $lte: endDate },
           })
@@ -179,7 +179,7 @@ export const POST = withPermissionAndDB("data_export")(
         "Dashboard data exported successfully"
       );
     } catch (error) {
-      return handleApiError(error ?? "Failed to export dashboard data");
+      return handleApiError(error, "Failed to export dashboard data");
     }
   }
 );

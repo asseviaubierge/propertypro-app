@@ -42,7 +42,7 @@ export default function EnhancedNewPropertyPage() {
             ? errorDetails.join(", ")
             : JSON.stringify(errorDetails);
 
-        throw new Error(errorMessage || "Failed to create property");
+        throw new Error(errorMessage || "Impossible de créer le bien");
       }
 
       // The API returns data in result.data
@@ -55,9 +55,13 @@ export default function EnhancedNewPropertyPage() {
       );
 
       // Redirect to property details page
-      router.push(`/dashboard/properties/${property._id}`);
+      router.replace(`/dashboard/properties/${property._id}`);
+      router.refresh();
     } catch (error) {
-      console.error("Property creation error:", error);
+      console.warn(
+        "Création du bien interrompue :",
+        error instanceof Error ? error.message : String(error)
+      );
 
       const errorMessage =
         error instanceof Error
@@ -71,9 +75,7 @@ export default function EnhancedNewPropertyPage() {
       if (parsedErrors.length > 1 || parsedErrors.some((e) => e.field)) {
         showErrorToast({
           title: t("properties.newProperty.error.title"),
-          description: `${parsedErrors.length} validation ${
-            parsedErrors.length === 1 ? "error" : "errors"
-          } found`,
+          description: `${parsedErrors.length} erreur${parsedErrors.length > 1 ? "s" : ""} de validation détectée${parsedErrors.length > 1 ? "s" : ""}`,
           items: parsedErrors,
         });
       } else {
@@ -89,13 +91,13 @@ export default function EnhancedNewPropertyPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="min-w-0 space-y-4 px-3 py-4 sm:space-y-6 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-              <Building2 className="h-8 w-8" />
+            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:gap-3 sm:text-3xl">
+              <Building2 className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />
               {t("properties.newProperty.title")}
             </h1>
             <p className="text-muted-foreground">
@@ -103,9 +105,9 @@ export default function EnhancedNewPropertyPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 border rounded-lg">
+        <div className="flex w-full items-center rounded-lg border sm:w-auto">
           <Link href="/dashboard/properties">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("properties.newProperty.backToList")}
             </Button>

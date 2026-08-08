@@ -22,7 +22,8 @@ import {
   paginationSchema,
   validateSchema,
 } from "@/lib/validations";
-import { resolveAccessProfile } from "@/lib/server-permissions";
+import { maintenanceListScope, assertMaintenancePropertyAccess } from "@/lib/maintenance-access";
+import { ensureDefaultMaintenanceStaff } from "@/lib/default-maintenance-staff";
 
 const MAINTENANCE_READ_ACCESS = {
   roles: [UserRole.TENANT],
@@ -75,12 +76,14 @@ export const GET = withAccessAndDB(MAINTENANCE_READ_ACCESS)(
       }
 
       const filters = filterParams;
-      const query: Record<string, unknown> = {};
+      let query: Record<string, unknown> = await maintenanceListScope(user, { deletedAt: null });
 
-      if (user.isTenant) {
-        query.tenantId = user.id;
+      if (filters.propertyId) {
+        if (!user.isTenant && !(await assertMaintenancePropertyAccess(user, filters.propertyId))) {
+          return createErrorResponse("Forbidden property", 403);
+        }
+        query.propertyId = filters.propertyId;
       }
-
       if (filters.status) {
         query.status = filters.status;
       }
@@ -89,9 +92,6 @@ export const GET = withAccessAndDB(MAINTENANCE_READ_ACCESS)(
       }
       if (filters.category) {
         query.category = filters.category;
-      }
-      if (filters.propertyId) {
-        query.propertyId = filters.propertyId;
       }
       if (filters.unitId) {
         query.unitId = filters.unitId;
@@ -137,50 +137,57 @@ export const GET = withAccessAndDB(MAINTENANCE_READ_ACCESS)(
         paginationParams
       );
 
-      const populatedData = await MaintenanceRequest.populate(result.data, [
-        {
-          path: "propertyId",
-          select: "name address type isMultiUnit units",
-          options: { lean: true },
-        },
-        {
-          path: "tenantId",
-          select: "firstName lastName email phone tenantStatus",
-          options: { lean: true },
-        },
-        {
-          path: "assignedTo",
-          select: "firstName lastName email phone",
-          options: { lean: true },
-        },
+      // Resolve references manually. This avoids strict populate failures caused
+      // by legacy maintenance documents and embedded property units.
+      const rawRows = (result.data as any[]).map((row: any) =>
+        typeof row?.toObject === "function" ? row.toObject() : row
+      );
+      const propertyIds = [...new Set(rawRows.map((row) => String(row.propertyId?._id ?? row.propertyId ?? "")).filter(Boolean))];
+      const tenantIds = [...new Set(rawRows.map((row) => String(row.tenantId?._id ?? row.tenantId ?? "")).filter(Boolean))];
+      const staffIds = [...new Set(rawRows.map((row) => String(row.assignedTo?._id ?? row.assignedTo ?? "")).filter(Boolean))];
+
+      const [properties, tenants, staffRows] = await Promise.all([
+        propertyIds.length
+          ? Property.find({ _id: { $in: propertyIds } })
+              .select("name address type isMultiUnit units")
+              .lean()
+          : [],
+        tenantIds.length
+          ? User.find({ _id: { $in: tenantIds } })
+              .select("firstName lastName email phone tenantStatus")
+              .lean()
+          : [],
+        staffIds.length
+          ? User.find({ _id: { $in: staffIds } })
+              .select("firstName lastName email phone")
+              .lean()
+          : [],
       ]);
 
-      const transformedData = (populatedData as unknown as any[]).map(
-        (requestItem: any) => {
-          const requestObj = requestItem.toObject
-          ? requestItem.toObject()
-          : requestItem;
+      const propertyMap = new Map((properties as any[]).map((item) => [String(item._id), item]));
+      const tenantMap = new Map((tenants as any[]).map((item) => [String(item._id), item]));
+      const staffMap = new Map((staffRows as any[]).map((item) => [String(item._id), item]));
 
-          let unit = null;
-          if (requestObj.unitId && requestObj.propertyId?.units) {
-            unit = requestObj.propertyId.units.find(
-              (embeddedUnit: any) =>
-                embeddedUnit._id.toString() === requestObj.unitId.toString()
-            );
-          }
+      const transformedData = rawRows.map((requestObj: any) => {
+        const property = propertyMap.get(String(requestObj.propertyId?._id ?? requestObj.propertyId ?? "")) || null;
+        const tenant = tenantMap.get(String(requestObj.tenantId?._id ?? requestObj.tenantId ?? "")) || null;
+        const assignedTo = staffMap.get(String(requestObj.assignedTo?._id ?? requestObj.assignedTo ?? "")) || null;
+        const unit = requestObj.unitId && property?.units
+          ? property.units.find((embeddedUnit: any) =>
+              String(embeddedUnit?._id) === String(requestObj.unitId?._id ?? requestObj.unitId)
+            ) || null
+          : null;
 
-          return {
-            ...requestObj,
-            property: requestObj.propertyId,
-            unit,
-            tenant: requestObj.tenantId
-              ? {
-                  user: requestObj.tenantId || {},
-                }
-              : null,
-          };
-        }
-      );
+        return {
+          ...requestObj,
+          propertyId: property || requestObj.propertyId,
+          property,
+          unit,
+          tenantId: tenant || requestObj.tenantId,
+          tenant: tenant ? { user: tenant } : null,
+          assignedTo,
+        };
+      });
 
       return createSuccessResponse(
         transformedData,
@@ -216,8 +223,12 @@ export const POST = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
         return createErrorResponse("Property not found", 404);
       }
 
+      if (!user.isTenant && !(await assertMaintenancePropertyAccess(user, maintenanceData.propertyId))) {
+        return createErrorResponse("Forbidden property", 403);
+      }
+
       if (maintenanceData.unitId) {
-        const unitExists = property.units.some(
+        const unitExists = (property.units || []).some(
           (unit: any) => unit._id.toString() === maintenanceData.unitId
         );
         if (!unitExists) {
@@ -243,23 +254,13 @@ export const POST = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
         );
       }
 
-      if (maintenanceData.assignedTo) {
-        const assignedUser = await User.findById(maintenanceData.assignedTo);
-        if (!assignedUser) {
-          return createErrorResponse("Assigned user not found", 404);
-        }
-
-        const assigneeAccess = await resolveAccessProfile(assignedUser.role);
-        if (!assigneeAccess.isCompanyStaff) {
-          return createErrorResponse(
-            "User cannot be assigned maintenance requests",
-            400
-          );
-        }
-      }
+      // Every new request first enters the central E-IMMO maintenance queue.
+      // A Super Admin can reassign it to a real technician afterwards.
+      const defaultStaff = await ensureDefaultMaintenanceStaff();
 
       const maintenanceRequest = new MaintenanceRequest({
         ...maintenanceData,
+        assignedTo: defaultStaff._id,
         status: MaintenanceStatus.SUBMITTED,
       });
       await maintenanceRequest.save();

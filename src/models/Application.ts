@@ -307,8 +307,8 @@ const ApplicationSchema = new Schema<IApplication>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
-        delete ret.personalInfo?.ssn; // Never expose SSN in JSON
+        delete (ret as any).__v;
+        delete (ret as any).personalInfo?.ssn; // Never expose SSN in JSON
         return ret;
       },
     },
@@ -336,7 +336,7 @@ ApplicationSchema.virtual("applicationAge").get(function () {
 ApplicationSchema.methods.submit = function () {
   this.status = ApplicationStatus.SUBMITTED;
   this.submittedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IApplication>;
 };
 
 // Instance method to approve application
@@ -346,9 +346,9 @@ ApplicationSchema.methods.approve = function (
 ) {
   this.status = ApplicationStatus.APPROVED;
   this.reviewedAt = new Date();
-  this.reviewedBy = reviewerId;
+  this.reviewedBy = new mongoose.Types.ObjectId(reviewerId);
   if (notes) this.reviewNotes = notes;
-  return this.save();
+  return this.save() as Promise<IApplication>;
 };
 
 // Instance method to reject application
@@ -358,9 +358,9 @@ ApplicationSchema.methods.reject = function (
 ) {
   this.status = ApplicationStatus.REJECTED;
   this.reviewedAt = new Date();
-  this.reviewedBy = reviewerId;
+  this.reviewedBy = new mongoose.Types.ObjectId(reviewerId);
   if (notes) this.reviewNotes = notes;
-  return this.save();
+  return this.save() as Promise<IApplication>;
 };
 
 // Query middleware to exclude soft deleted documents

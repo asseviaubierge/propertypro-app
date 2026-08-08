@@ -141,7 +141,7 @@ const MaintenanceRequestSchema = new Schema<IMaintenanceRequest>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -196,7 +196,7 @@ MaintenanceRequestSchema.virtual("isOverdue").get(function () {
     return false;
   }
 
-  const daysSinceCreation = this.daysSinceCreation;
+  const daysSinceCreation = (this as any).daysSinceCreation;
 
   switch (this.priority) {
     case MaintenancePriority.EMERGENCY:

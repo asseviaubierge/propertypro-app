@@ -195,8 +195,8 @@ const TenantSchema = new Schema<ITenant>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
-        delete ret.ssn; // Never expose SSN in JSON
+        delete (ret as any).__v;
+        delete (ret as any).ssn; // Never expose SSN in JSON
         return ret;
       },
     },
@@ -216,24 +216,24 @@ TenantSchema.index({ createdAt: -1 });
 
 // Virtual for tenant age
 TenantSchema.virtual("age").get(function () {
-  if (!this.dateOfBirth) return null;
+  if (!(this as any).dateOfBirth) return null;
   const age =
-    (Date.now() - this.dateOfBirth.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+    (Date.now() - (this as any).dateOfBirth.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
   return Math.floor(age);
 });
 
 // Virtual for application status (based on move dates)
 TenantSchema.virtual("applicationStatus").get(function () {
-  if (this.moveOutDate) return "moved_out";
-  if (this.moveInDate) return "active";
+  if ((this as any).moveOutDate) return "moved_out";
+  if ((this as any).moveInDate) return "active";
   return "pending";
 });
 
 // Virtual for tenancy duration
 TenantSchema.virtual("tenancyDuration").get(function () {
-  if (!this.moveInDate) return null;
-  const endDate = this.moveOutDate || new Date();
-  const duration = endDate.getTime() - this.moveInDate.getTime();
+  if (!(this as any).moveInDate) return null;
+  const endDate = (this as any).moveOutDate || new Date();
+  const duration = endDate.getTime() - (this as any).moveInDate.getTime();
   return Math.floor(duration / (24 * 60 * 60 * 1000)); // Days
 });
 

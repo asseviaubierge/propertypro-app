@@ -303,28 +303,28 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
   }
 
   return (
-    <div className={`space-y-6 ${className ?? ""}`}>
+    <div className={`min-w-0 w-full space-y-4 sm:space-y-6 ${className ?? ""}`}>
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="break-words text-2xl font-bold leading-tight tracking-tight sm:text-3xl">
             {session?.user?.firstName
               ? `${greeting}, ${session.user.firstName}!`
               : `${greeting}!`}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="mt-1 break-words text-sm text-muted-foreground sm:text-base">
             {t("dashboard.tenant.welcome")}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
           {dashboardData?.hasMultipleLeases && (
             <LeaseSelector
               leases={dashboardData?.allLeases ?? []}
               selectedLeaseId={selectedLeaseId}
               onLeaseChange={setSelectedLeaseId}
               variant="compact"
-              className="w-72"
+              className="w-full min-w-0 sm:w-72"
             />
           )}
 
@@ -333,7 +333,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="gap-2"
+            className="w-full gap-2 sm:w-auto"
           >
             <RefreshCw
               className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
@@ -394,19 +394,19 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
           <CardContent>
             {selectedLease ? (
               <div className="space-y-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
+                <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm text-muted-foreground">
                       {t("dashboard.tenant.property")}
                     </p>
-                    <p className="text-lg font-semibold">
+                    <p className="break-words text-base font-semibold sm:text-lg">
                       {selectedLease.propertyId?.name ||
                         t("dashboard.tenant.property")}
                     </p>
                     {formatAddress(selectedLease.propertyId?.address) && (
-                      <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                        {formatAddress(selectedLease.propertyId?.address)}
+                      <p className="flex min-w-0 items-start gap-1 text-sm text-muted-foreground">
+                        <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                        <span className="min-w-0 break-words">{formatAddress(selectedLease.propertyId?.address)}</span>
                       </p>
                     )}
                   </div>
@@ -475,16 +475,16 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
                 {activityItems.map((item) => (
                   <div
                     key={item.id}
-                    className="border rounded-lg p-3 space-y-1"
+                    className="min-w-0 space-y-1 rounded-lg border p-3"
                   >
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{item.title}</p>
-                      <span className="text-xs text-muted-foreground">
+                    <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                      <p className="min-w-0 break-words font-medium">{item.title}</p>
+                      <span className="shrink-0 text-xs text-muted-foreground">
                         {formatDate(item.date)}
                       </span>
                     </div>
                     {item.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="break-words text-sm text-muted-foreground">
                         {item.description}
                       </p>
                     )}
@@ -521,13 +521,13 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
                 {dashboardData?.recentPayments?.slice(0, 3)?.map((payment) => (
                   <div
                     key={payment?._id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex min-w-0 flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
                       <p className="font-medium">
                         {formatCurrency(payment?.amount ?? 0)}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="break-words text-sm text-muted-foreground">
                         {t("dashboard.tenant.paidOn", {
                           values: {
                             date: formatDate(
@@ -574,13 +574,13 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
                   ?.map((payment) => (
                     <div
                       key={payment?._id}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="flex min-w-0 flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div>
                         <p className="font-medium">
                           {formatCurrency(payment?.amount ?? 0)}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="break-words text-sm text-muted-foreground">
                           {t("dashboard.tenant.dueOn", {
                             values: {
                               date: formatDate(payment?.dueDate ?? new Date()),

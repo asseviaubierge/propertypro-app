@@ -22,6 +22,7 @@ import {
   canViewTargetUser,
   canViewUsers,
   createAccessProfile,
+  hasPermission,
 } from "@/lib/permissions-manager";
 import { resolveAccessProfile } from "@/lib/server-permissions";
 import {
@@ -42,14 +43,31 @@ async function getRoleAccessMap(users: Array<{ role?: string | null }>) {
 // GET /api/users - Get all users with filtering and pagination
 // ============================================================================
 
-export const GET = withPermissionAndDB(["user_view", "user_management"])(
+export const GET = withPermissionAndDB([
+  "user_view",
+  "user_management",
+  "maintenance_view",
+])(
   async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
-    if (!canViewUsers(user)) {
-      return createErrorResponse("Insufficient permissions", 403);
+    const { searchParams } = new URL(request.url);
+    const companyStaffOnly = searchParams.get("companyStaffOnly") === "true";
+    const requestedRoles = (searchParams.get("role") || "")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+    const maintenanceStaffRequest =
+      companyStaffOnly &&
+      requestedRoles.length > 0 &&
+      requestedRoles.every((role) =>
+        ["maintenance_staff", "maintenance staff"].includes(role)
+      ) &&
+      hasPermission(user.permissions, "maintenance_view");
+
+    if (!canViewUsers(user) && !maintenanceStaffRequest) {
+      return createErrorResponse("Permissions insuffisantes", 403);
     }
 
-    const { searchParams } = new URL(request.url);
 
     // Parse query parameters
     const page = parseInt(searchParams.get("page") || "1");
@@ -58,7 +76,6 @@ export const GET = withPermissionAndDB(["user_view", "user_management"])(
     const role = searchParams.get("role") || "";
     const isActive = searchParams.get("isActive");
     const excludeTenant = searchParams.get("excludeTenant") === "true";
-    const companyStaffOnly = searchParams.get("companyStaffOnly") === "true";
 
     // Build filter query
     const filter: any = {
@@ -129,6 +146,17 @@ export const GET = withPermissionAndDB(["user_view", "user_management"])(
 
       if (companyStaffOnly && !targetAccess.isCompanyStaff) {
         return false;
+      }
+
+      // A user with maintenance_view may load only explicitly designated
+      // maintenance staff. This does not grant access to the general user list.
+      if (maintenanceStaffRequest) {
+        const normalizedTargetRole = String(targetUser.role || "")
+          .trim()
+          .toLowerCase();
+        return ["maintenance_staff", "maintenance staff"].includes(
+          normalizedTargetRole
+        );
       }
 
       return canViewTargetUser(user, targetAccess, {

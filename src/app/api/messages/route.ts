@@ -6,7 +6,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest } from "next/server";
-import { Message, User, Property, Conversation, MessageStatus } from "@/models";
+import { Message, User, Conversation, MessageStatus } from "@/models";
 import {
   AuthenticatedAccessUser,
   createSuccessResponse,
@@ -96,7 +96,7 @@ export const GET = withAccessAndDB({})(async (
       );
 
       // Update conversation read status
-      await (conversation as any).markAsReadForUser(user.id);
+      await (conversation as any).markAsReadForUser?.(user.id);
       await conversation.save();
 
       return createSuccessResponse({
@@ -175,7 +175,7 @@ export const POST = withAccessAndDB({})(async (
       }
 
       // Ensure reply is in the same conversation
-      if (originalMessage.conversationId.toString() !== conversationId) {
+      if (String(originalMessage.conversationId) !== conversationId) {
         return createErrorResponse(
           "Reply message must be in the same conversation",
           400,

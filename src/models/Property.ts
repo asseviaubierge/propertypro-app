@@ -323,15 +323,15 @@ const AddressSchema = new Schema<IAddress>(
     },
     zipCode: {
       type: String,
-      required: [true, "ZIP/Postal code is required"],
+      required: [true, "La localisation est obligatoire"],
       trim: true,
-      maxlength: [20, "ZIP/Postal code cannot exceed 20 characters"],
+      maxlength: [300, "La localisation ne peut pas dépasser 300 caractères"],
     },
     country: {
       type: String,
       required: [true, "Country is required"],
       trim: true,
-      default: "United States",
+      default: "Bénin",
       maxlength: [100, "Country cannot exceed 100 characters"],
     },
   },
@@ -517,7 +517,7 @@ const PropertySchema = new Schema<IProperty>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -550,7 +550,7 @@ try {
 
 // Virtual for full address
 PropertySchema.virtual("fullAddress").get(function () {
-  const address = this.address;
+  const address = (this as any).address;
   if (!address) return "";
 
   const { street, city, state, zipCode } = address;
@@ -565,7 +565,7 @@ PropertySchema.virtual("fullAddress").get(function () {
 
 // Virtual for rent per square foot (calculates from units)
 PropertySchema.virtual("rentPerSqFt").get(function () {
-  const units = this.units || [];
+  const units = (this as any).units || [];
   if (units.length === 0) return 0;
   const totalRent = units.reduce(
     (sum: number, unit: any) => sum + (unit.rentAmount || 0),
@@ -580,7 +580,7 @@ PropertySchema.virtual("rentPerSqFt").get(function () {
 
 // Virtual for property summary (calculates from units)
 PropertySchema.virtual("summary").get(function () {
-  const units = this.units || [];
+  const units = (this as any).units || [];
   if (units.length === 0) return "No units";
   const totalBedrooms = units.reduce(
     (sum: number, unit: any) => sum + (unit.bedrooms || 0),
@@ -829,7 +829,7 @@ PropertySchema.post("save", async function (doc) {
 
     // Clean up temporary tracking field
     if (doc._oldStatus) {
-      delete doc._oldStatus;
+      delete (doc as any)._oldStatus;
     }
   } catch {
     // Don't throw error to avoid breaking the save operation

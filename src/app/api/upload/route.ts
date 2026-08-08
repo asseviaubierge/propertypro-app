@@ -294,7 +294,10 @@ export const DELETE = withPermissionAndDB([
 // ============================================================================
 // GET /api/upload - Get upload configuration
 // ============================================================================
-export async function GET() {
+export const GET = withPermissionAndDB([
+  "file_management",
+  "document_management",
+])(async () => {
   try {
     return createSuccessResponse({
       maxFileSize: UPLOAD_CONFIG.maxFileSize,
@@ -305,4 +308,4 @@ export async function GET() {
     console.error("Get upload config error:", error);
     return handleApiError(error);
   }
-}
+});

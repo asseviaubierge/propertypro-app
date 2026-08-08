@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, type Model } from "mongoose";
 import { UserRole } from "@/types";
 
 export interface IAnnouncement extends mongoose.Document {
@@ -361,7 +361,7 @@ AnnouncementSchema.methods.addView = function (
     });
   }
 
-  return this.save();
+  return this.save() as Promise<IAnnouncement>;
 };
 
 AnnouncementSchema.methods.addReaction = function (
@@ -380,7 +380,7 @@ AnnouncementSchema.methods.addReaction = function (
     createdAt: new Date(),
   });
 
-  return this.save();
+  return this.save() as Promise<IAnnouncement>;
 };
 
 AnnouncementSchema.methods.removeReaction = function (userId: string) {
@@ -388,7 +388,7 @@ AnnouncementSchema.methods.removeReaction = function (userId: string) {
     (reaction: any) => reaction.userId.toString() !== userId
   );
 
-  return this.save();
+  return this.save() as Promise<IAnnouncement>;
 };
 
 // Static methods

@@ -312,7 +312,7 @@ DocumentTemplateSchema.virtual("isUsable").get(function () {
 DocumentTemplateSchema.methods.incrementUsage = function () {
   this.usageCount += 1;
   this.lastUsed = new Date();
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.addVariable = function (
@@ -324,14 +324,14 @@ DocumentTemplateSchema.methods.addVariable = function (
     throw new Error(`Variable '${variable.name}' already exists`);
   }
   this.variables.push(variable);
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.removeVariable = function (
   variableName: string
 ) {
   this.variables = this.variables.filter((v) => v.name !== variableName);
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.addSection = function (
@@ -340,30 +340,30 @@ DocumentTemplateSchema.methods.addSection = function (
   this.sections.push(section);
   // Sort sections by order
   this.sections.sort((a, b) => a.order - b.order);
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.removeSection = function (sectionId: string) {
   this.sections = this.sections.filter((s) => s.id !== sectionId);
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.softDelete = function () {
   this.deletedAt = new Date();
   this.status = "archived";
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 DocumentTemplateSchema.methods.restore = function () {
   this.deletedAt = null;
   this.status = "active";
-  return this.save();
+  return this.save() as Promise<IDocumentTemplate>;
 };
 
 // Query middleware to exclude soft deleted templates
 DocumentTemplateSchema.pre(/^find/, function () {
   // @ts-ignore
-  this.find({ deletedAt: null });
+  (this as any).find({ deletedAt: null });
 });
 
 // Create and export the model

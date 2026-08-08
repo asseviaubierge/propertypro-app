@@ -186,12 +186,12 @@ export default function LeaseSelector({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={cn("w-64 justify-between", className)}
+            className={cn("w-full min-w-0 justify-between sm:w-64", className)}
           >
             {selectedLease ? (
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4" />
-                <span className="truncate">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
+                <Building2 className="h-4 w-4 shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-left">
                   {selectedLease.propertyId?.name}
                 </span>
                 {getStatusBadge(selectedLease)}
@@ -204,7 +204,7 @@ export default function LeaseSelector({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0">
+        <PopoverContent className="w-[min(20rem,calc(100vw-1.5rem))] p-0">
           <Command>
             <CommandInput
               placeholder={t("leases.myLeases.filters.searchPlaceholder")}
@@ -281,7 +281,7 @@ export default function LeaseSelector({
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="font-medium">
@@ -293,7 +293,7 @@ export default function LeaseSelector({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                     <div>
                       <p className="font-medium">

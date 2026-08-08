@@ -613,3 +613,69 @@
 [data-nav-color="apparent"] .sidebar-scroll:hover {
   scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
 }
+
+/* Gestion E-IMMO : ergonomie application et responsive */
+.dashboard-layout main {
+  overscroll-behavior: contain;
+}
+
+.dashboard-layout button,
+.dashboard-layout a,
+.dashboard-layout [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dashboard-layout .app-card,
+.dashboard-layout [data-slot="card"] {
+  min-width: 0;
+}
+
+.dashboard-layout p,
+.dashboard-layout span,
+.dashboard-layout h1,
+.dashboard-layout h2,
+.dashboard-layout h3,
+.dashboard-layout h4,
+.dashboard-layout dd,
+.dashboard-layout dt {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .dashboard-layout main {
+    padding: 0.75rem;
+    padding-bottom: 5.75rem;
+  }
+
+  .dashboard-layout h1 {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .dashboard-layout h2 {
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .dashboard-layout [data-slot="card"] {
+    border-radius: 1rem;
+  }
+
+  .dashboard-layout table {
+    font-size: 0.8125rem;
+  }
+
+  .dashboard-layout input,
+  .dashboard-layout textarea,
+  .dashboard-layout select,
+  .dashboard-layout button {
+    max-width: 100%;
+  }
+}
+
+/* Pas de transitions décoratives de page : seules les animations fonctionnelles restent actives. */
+.dashboard-layout .animate-fade-in-up,
+.dashboard-layout .animate-in,
+.dashboard-layout .slide-in-from-bottom {
+  animation: none !important;
+}

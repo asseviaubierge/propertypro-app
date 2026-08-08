@@ -118,7 +118,7 @@ export default function MaintenanceRequestDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const { isTenant, isCompanyStaff } = useAuthorization();
+  const { isTenant, isCompanyStaff, isAdmin } = useAuthorization();
   const {
     t,
     formatCurrency,
@@ -146,13 +146,13 @@ export default function MaintenanceRequestDetailPage() {
   useEffect(() => {
     if (params.id && session) {
       fetchMaintenanceRequest();
-      if (isCompanyStaff) {
+      if (isAdmin) {
         fetchTechnicians();
       } else {
         setTechnicians([]);
       }
     }
-  }, [params.id, session, isCompanyStaff]);
+  }, [params.id, session, isAdmin]);
 
   const fetchMaintenanceRequest = async () => {
     try {
@@ -187,7 +187,7 @@ export default function MaintenanceRequestDetailPage() {
   };
 
   const fetchTechnicians = async () => {
-    if (!session?.user || !isCompanyStaff) {
+    if (!session?.user || !isAdmin) {
       setTechnicians([]);
       return;
     }
@@ -287,6 +287,31 @@ export default function MaintenanceRequestDetailPage() {
       default:
         return Clock;
     }
+  };
+
+  const getCategoryLabel = (category: string | undefined) => {
+    if (!category) return t("maintenance.details.labels.na");
+
+    const labels: Record<string, string> = {
+      Plumbing: "Plomberie",
+      Electrical: "Électricité",
+      HVAC: "Climatisation / ventilation",
+      Appliances: "Électroménager",
+      Flooring: "Revêtement de sol",
+      Painting: "Peinture",
+      Roofing: "Toiture",
+      Windows: "Fenêtres",
+      Doors: "Portes",
+      Landscaping: "Espaces verts",
+      Cleaning: "Nettoyage",
+      "Pest Control": "Lutte antiparasitaire",
+      Security: "Sécurité",
+      "General Repair": "Réparation générale",
+      Emergency: "Urgence",
+      Other: "Autre",
+    };
+
+    return labels[category] || category;
   };
 
   const formatCurrencyDisplay = (amount: number | undefined) => {
@@ -578,7 +603,7 @@ export default function MaintenanceRequestDetailPage() {
                 <DropdownMenuLabel>
                   {t("maintenance.details.header.actions")}
                 </DropdownMenuLabel>
-                {isCompanyStaff && (
+                {isAdmin && (
                     <>
                       {(!request?.assignedTo ||
                         request.status === MaintenanceStatus.SUBMITTED) && (
@@ -696,7 +721,7 @@ export default function MaintenanceRequestDetailPage() {
                     {t("maintenance.details.card.category")}
                   </h4>
                   <p className="text-muted-foreground">
-                    {request?.category || t("maintenance.details.labels.na")}
+                    {getCategoryLabel(request?.category)}
                   </p>
                 </div>
                 <div>
@@ -935,7 +960,7 @@ export default function MaintenanceRequestDetailPage() {
                   <p className="text-sm text-muted-foreground mb-3">
                     {t("maintenance.details.card.noTechnicianAssigned")}
                   </p>
-                  {isCompanyStaff && (
+                  {isAdmin && (
                       <Button
                         size="sm"
                         className="w-full"

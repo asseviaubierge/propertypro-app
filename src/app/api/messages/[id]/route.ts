@@ -47,8 +47,8 @@ export const GET = withAccessAndDB({})(
 
       // Check permissions - user must be sender or recipient
       const canAccess =
-        message.senderId._id.toString() === user.id ||
-        message.recipientId._id.toString() === user.id ||
+        String(message.senderId._id) === user.id ||
+        String(message.recipientId._id) === user.id ||
         user.isAdmin;
 
       if (!canAccess) {
@@ -57,10 +57,10 @@ export const GET = withAccessAndDB({})(
 
       // Mark as read if user is the recipient
       if (
-        message.recipientId._id.toString() === user.id &&
+        String(message.recipientId._id) === user.id &&
         message.status !== "read"
       ) {
-        await message.markAsRead();
+        await (message as any).markAsRead?.();
       }
 
       return createSuccessResponse({ message });
@@ -114,7 +114,7 @@ export const PUT = withAccessAndDB({})(
       switch (action) {
         case "mark_read":
           if (message.recipientId.toString() === user.id) {
-            await message.markAsRead();
+            await (message as any).markAsRead?.();
           } else {
             return createErrorResponse(
               "Only recipient can mark message as read",
@@ -125,7 +125,7 @@ export const PUT = withAccessAndDB({})(
 
         case "mark_delivered":
           if (message.recipientId.toString() === user.id) {
-            await message.markAsDelivered();
+            await (message as any).markAsDelivered?.();
           } else {
             return createErrorResponse(
               "Only recipient can mark message as delivered",

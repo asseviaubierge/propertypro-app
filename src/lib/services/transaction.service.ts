@@ -22,6 +22,7 @@ export interface TransactionQueryParams {
   type?: TransactionType;
   category?: string;
   propertyId?: string;
+  propertyIds?: string[];
   tenantId?: string;
   startDate?: Date;
   endDate?: Date;
@@ -61,8 +62,15 @@ export class TransactionService {
    */
   private buildPaymentMatch(params: TransactionQueryParams): any {
     const match: any = { deletedAt: null };
-    if (params.propertyId)
+    if (params.propertyId) {
       match.propertyId = new Types.ObjectId(params.propertyId);
+    } else if (params.propertyIds) {
+      match.propertyId = {
+        $in: params.propertyIds
+          .filter((id) => Types.ObjectId.isValid(id))
+          .map((id) => new Types.ObjectId(id)),
+      };
+    }
     if (params.tenantId)
       match.tenantId = new Types.ObjectId(params.tenantId);
     if (params.bankOnly) {
@@ -82,8 +90,15 @@ export class TransactionService {
    */
   private buildInvoiceMatch(params: TransactionQueryParams): any {
     const match: any = { deletedAt: null };
-    if (params.propertyId)
+    if (params.propertyId) {
       match.propertyId = new Types.ObjectId(params.propertyId);
+    } else if (params.propertyIds) {
+      match.propertyId = {
+        $in: params.propertyIds
+          .filter((id) => Types.ObjectId.isValid(id))
+          .map((id) => new Types.ObjectId(id)),
+      };
+    }
     if (params.tenantId)
       match.tenantId = new Types.ObjectId(params.tenantId);
     if (params.startDate || params.endDate) {
@@ -99,8 +114,15 @@ export class TransactionService {
    */
   private buildExpenseMatch(params: TransactionQueryParams): any {
     const match: any = { deletedAt: null };
-    if (params.propertyId)
+    if (params.propertyId) {
       match.propertyId = new Types.ObjectId(params.propertyId);
+    } else if (params.propertyIds) {
+      match.propertyId = {
+        $in: params.propertyIds
+          .filter((id) => Types.ObjectId.isValid(id))
+          .map((id) => new Types.ObjectId(id)),
+      };
+    }
     if (params.bankOnly) {
       match.status = ExpenseStatus.PAID;
     }

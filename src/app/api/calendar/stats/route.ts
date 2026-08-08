@@ -259,7 +259,7 @@ export const GET = withPermissionAndDB("profile_management")(async (
 
     return createSuccessResponse(
       stats,
-      "Calendar statistics retrieved successfully",
+      "Statistiques du calendrier récupérées avec succès",
     );
   } catch (error) {
     return handleApiError(error);

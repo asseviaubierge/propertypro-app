@@ -143,7 +143,7 @@ const MessageStatusSchema = new Schema<IMessageStatus>(
         _doc,
         ret: Record<string, unknown> & { __v?: number }
       ) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -186,7 +186,7 @@ const TypingIndicatorSchema = new Schema<ITypingIndicator>(
         _doc,
         ret: Record<string, unknown> & { __v?: number }
       ) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -225,7 +225,7 @@ const OnlineStatusSchema = new Schema<IOnlineStatus>(
         _doc,
         ret: Record<string, unknown> & { __v?: number }
       ) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -280,7 +280,7 @@ MessageStatusSchema.methods.addReaction = function (
     createdAt: new Date(),
   });
 
-  return this;
+  return this as IMessageStatus;
 };
 
 // Instance method to remove reaction
@@ -299,7 +299,7 @@ MessageStatusSchema.methods.removeReaction = function (
     );
   }
 
-  return this;
+  return this as IMessageStatus;
 };
 
 // Instance method to mark as delivered
@@ -308,7 +308,7 @@ MessageStatusSchema.methods.markAsDelivered = function () {
     this.status = "delivered";
     this.deliveredAt = new Date();
   }
-  return this;
+  return this as IMessageStatus;
 };
 
 // Instance method to mark as read
@@ -320,7 +320,7 @@ MessageStatusSchema.methods.markAsRead = function () {
       this.deliveredAt = new Date();
     }
   }
-  return this;
+  return this as IMessageStatus;
 };
 
 // Static method to get conversation status

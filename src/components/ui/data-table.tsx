@@ -203,7 +203,7 @@ function DataTable<T>({
               onClick={error.onRetry}
               className="mt-4"
             >
-              {error.retryLabel || "Try Again"}
+              {error.retryLabel || "Réessayer"}
             </Button>
           )}
         </div>

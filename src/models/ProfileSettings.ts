@@ -141,7 +141,7 @@ profileSettingsSchema.methods.updateProfile = function (
   Object.assign(this, profileData);
   this.version += 1;
   this.updatedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IProfileSettings>;
 };
 
 profileSettingsSchema.methods.getPublicProfile = function () {

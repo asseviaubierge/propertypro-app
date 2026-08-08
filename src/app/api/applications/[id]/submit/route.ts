@@ -50,7 +50,7 @@ export const POST = withAccessAndDB({
       // Check permissions - only the applicant or authorized staff can submit
       // Single company architecture - Managers can submit all applications
       const canSubmit =
-        user.isCompanyStaff || application.applicantId._id.toString() === user.id;
+        user.isCompanyStaff || String((application.applicantId as any)._id) === user.id;
 
       if (!canSubmit) {
         return createErrorResponse("Access denied", 403);
@@ -94,7 +94,7 @@ export const POST = withAccessAndDB({
       }
 
       // Submit the application
-      await (application as any).submit();
+      await (application as any).submit?.();
 
       return createSuccessResponse(
         { application },

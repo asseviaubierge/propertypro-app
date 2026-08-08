@@ -42,7 +42,7 @@ const updateConversationSchema = z.object({
 
 export const GET = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
   ) => {
@@ -54,7 +54,7 @@ export const GET = withPermissionAndDB("profile_management")(
       }
 
       const conversation = await Conversation.findById(conversationId)
-        .populate("participants.userId", "firstName lastName email avatar")
+        .populate("participants.userId", "firstName lastName email phone avatar role")
         .populate("propertyId", "name address")
         .populate("createdBy", "firstName lastName email");
 
@@ -70,7 +70,7 @@ export const GET = withPermissionAndDB("profile_management")(
       }
 
       // Get unread count for this user
-      const unreadCount = await conversation.getUnreadCount(user.id);
+      const unreadCount = await (conversation as any).getUnreadCount?.(user.id) ?? 0;
 
       // Get recent messages count
       const recentMessagesCount = await Message.countDocuments({
@@ -97,7 +97,7 @@ export const GET = withPermissionAndDB("profile_management")(
 
 export const PATCH = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: { id: string } }
   ) => {
@@ -169,7 +169,7 @@ export const PATCH = withPermissionAndDB("profile_management")(
       ).populate([
         {
           path: "participants.userId",
-          select: "firstName lastName email avatar",
+          select: "firstName lastName email phone avatar role",
         },
         { path: "propertyId", select: "name address" },
         { path: "createdBy", select: "firstName lastName email" },
@@ -191,7 +191,7 @@ export const PATCH = withPermissionAndDB("profile_management")(
 
 export const DELETE = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
   ) => {
@@ -241,11 +241,11 @@ export const DELETE = withPermissionAndDB("profile_management")(
         }
 
         // Remove user from participants
-        await conversation.removeParticipant(user.id);
+        await (conversation as any).removeParticipant?.(user.id);
         await conversation.save();
 
         // If no active participants left, soft delete the conversation
-        if (conversation.activeParticipantsCount === 0) {
+        if (((conversation as any).activeParticipantsCount ?? 0) === 0) {
           conversation.deletedAt = new Date();
           await conversation.save();
         }

@@ -173,13 +173,13 @@ export const addressSchema = z.object({
   state: z.string().min(1, "State is required").max(50, "State name too long"),
   zipCode: z
     .string()
-    .min(1, "ZIP/Postal code is required")
-    .max(20, "ZIP/Postal code is too long"),
+    .min(1, "La localisation est obligatoire")
+    .max(300, "La localisation est trop longue"),
   country: z
     .string()
     .min(1, "Country is required")
     .max(100, "Country name too long")
-    .default("United States"),
+    .default("Bénin"),
 });
 
 export const amenitySchema = z.object({
@@ -333,14 +333,6 @@ export const propertyCreateSchema = z.object({
   // Property Type Configuration
   isMultiUnit: z.boolean().default(false),
   totalUnits: z.number().min(1).max(1000).default(1),
-
-  // Embedded Units array (unified approach)
-  units: z
-    .array(unitSchema)
-    .default([])
-    .refine((units) => units.length <= 1000, {
-      message: "Cannot have more than 1000 units",
-    }),
 
   // Note: bedrooms, bathrooms, squareFootage, rentAmount, securityDeposit
   // are now stored only at the unit level in the units array
@@ -609,6 +601,7 @@ export const leaseSchema = z
       })
       .optional(),
     notes: z.string().max(2000, "Notes too long").optional(),
+    contractText: z.string().max(30000, "Le contrat est trop long").optional(),
   })
   .refine((data) => data.endDate > data.startDate, {
     message: "End date must be after start date",
@@ -654,6 +647,7 @@ export const leaseUpdateSchema = z.object({
     })
     .optional(),
   notes: z.string().max(2000, "Notes too long").optional(),
+  contractText: z.string().max(30000, "Le contrat est trop long").optional(),
 });
 
 // ============================================================================

@@ -47,32 +47,32 @@ export function CalendarStats() {
         }
       }
     } catch (error) {
-      console.error("Failed to load calendar stats:", error);
+      console.error("Échec du chargement des statistiques du calendrier :", error);
     }
   };
 
   return (
     <AnalyticsCardGrid className="md:grid-cols-2 lg:grid-cols-4">
       <AnalyticsCard
-        title="Total Events"
+        title="Total des événements"
         value={stats.totalEvents}
         icon={CalendarDays}
         iconColor="primary"
       />
       <AnalyticsCard
-        title="Upcoming"
+        title="À venir"
         value={stats.upcomingEvents}
         icon={Clock}
         iconColor="success"
       />
       <AnalyticsCard
-        title="Today"
+        title="Aujourd’hui"
         value={stats.todayEvents}
         icon={TrendingUp}
         iconColor="warning"
       />
       <AnalyticsCard
-        title="Pending RSVPs"
+        title="Réponses en attente"
         value={stats.pendingRSVPs}
         icon={Users}
         iconColor="info"

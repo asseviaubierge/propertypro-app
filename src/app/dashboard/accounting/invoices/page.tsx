@@ -273,7 +273,7 @@ export default function FacturesPage() {
             if (!search) return matchesStatus;
             const haystack = [
               inv.invoiceNumber,
-              fullInvoice.propertyId?.name,
+              inv.propertyId?.name,
               inv.tenantId?.firstName,
               inv.tenantId?.lastName,
               inv.tenantId?.email,
@@ -383,7 +383,7 @@ export default function FacturesPage() {
             if (!search) return matchesStatus;
             const haystack = [
               inv.invoiceNumber,
-              fullInvoice.propertyId?.name,
+              inv.propertyId?.name,
               inv.tenantId?.firstName,
               inv.tenantId?.lastName,
               inv.tenantId?.email,
@@ -789,7 +789,7 @@ export default function FacturesPage() {
           {
             id: "tenant",
             header: t("leases.invoices.table.tenant"),
-            cell: (invoice: Invoice) => {
+            cell: (invoice: Facture) => {
               const tenantContent = (
                 <>
                   <Avatar className="h-8 w-8">
@@ -1657,10 +1657,10 @@ export default function FacturesPage() {
               )}
             </div>
           ) : (
-            <DataTable<Invoice>
+            <DataTable<Facture>
               columns={invoiceColumns}
               data={invoices}
-              getRowKey={(invoice: Invoice) => invoice._id}
+              getRowKey={(invoice: Facture) => invoice._id}
               selection={
                 !isTenant
                   ? {
@@ -1682,7 +1682,7 @@ export default function FacturesPage() {
                           );
                         }
                       },
-                      getRowId: (invoice: Invoice) => invoice._id,
+                      getRowId: (invoice: Facture) => invoice._id,
                       selectAllLabel: t("leases.invoices.selection.selectAll", {
                         defaultValue: "Select all",
                       }),

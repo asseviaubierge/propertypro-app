@@ -85,7 +85,7 @@ export const GET = withDatabase(async (request: NextRequest) => {
         "firstName lastName email",
       );
       if (!event) {
-        return createErrorResponse("Event not found", 400);
+        return createErrorResponse("Événement introuvable", 400);
       }
 
       // Handle external users (not registered in system)
@@ -173,7 +173,7 @@ export const POST = withDatabase(async (request: NextRequest) => {
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -229,7 +229,7 @@ export const PUT = withDatabase(async (request: NextRequest) => {
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -325,7 +325,7 @@ export async function sendEventReminders(
     const event = await Event.findById(eventId);
 
     if (!event) {
-      throw new Error("Event not found");
+      throw new Error("Événement introuvable");
     }
 
     const result = await calendarEmailService.sendEventReminders(

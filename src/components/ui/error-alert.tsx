@@ -35,7 +35,7 @@ export function ErrorAlert({
   variant = "error",
   onRetry,
   onDismiss,
-  retryText = "Try Again",
+  retryText = "Réessayer",
   className,
   showIcon = true,
 }: ErrorAlertProps) {
@@ -214,7 +214,7 @@ export function FixedErrorAlert({
   variant = "error",
   onRetry,
   onDismiss,
-  retryText = "Try Again",
+  retryText = "Réessayer",
   position = "top",
 }: ErrorAlertProps & { position?: "top" | "bottom" }) {
   const positionClasses = {

@@ -1,10 +1,10 @@
 /**
- * PropertyPro - Individual Payment API Routes
+ * Gestion E-Immo - Paiement individuel
  * CRUD operations for individual payments with Stripe integration
  */
 
 import { NextRequest } from "next/server";
-import { Payment } from "@/models";
+import { Payment, Property } from "@/models";
 import { UserRole, PaymentStatus } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -100,6 +100,24 @@ export const GET = withAccessAndDB(PAYMENT_READ_ACCESS)(
           return createErrorResponse("You can only view your own payments", 403);
         }
       }
+      
+      if (!user.isAdmin && !user.isTenant) {
+  const propertyId = resolveId(payment.propertyId);
+
+  const property = await Property.findById(propertyId).select(
+    "ownerId managerId"
+  );
+
+  if (
+    !property ||
+    (
+      property.ownerId?.toString() !== user.id &&
+      property.managerId?.toString() !== user.id
+    )
+  ) {
+    return createErrorResponse("Access denied", 403);
+  }
+}
 
       return createSuccessResponse(payment, "Payment retrieved successfully");
     } catch (error) {

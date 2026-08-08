@@ -79,12 +79,12 @@ PaymentNotificationSchema.index({ type: 1 });
 PaymentNotificationSchema.methods.markAsSent = function () {
   this.status = "sent";
   this.sentDate = new Date();
-  return this.save();
+  return this.save() as Promise<IPaymentNotification>;
 };
 
 PaymentNotificationSchema.methods.markAsFailed = function () {
   this.status = "failed";
-  return this.save();
+  return this.save() as Promise<IPaymentNotification>;
 };
 
 // Static Methods

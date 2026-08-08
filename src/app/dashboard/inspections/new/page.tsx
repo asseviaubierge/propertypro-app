@@ -1,582 +1,291 @@
 "use client";
 
-import { toast } from "sonner";
-import { InspectionType } from "@/types";
-import {
-  ArrowLeft,
-  ClipboardCheck,
-  FileText,
-  Home,
-  UserRound,
-} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { ArrowLeft, ClipboardCheck, FileText, Home, UserRound } from "lucide-react";
+import { InspectionType } from "@/types";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  SearchableSelect,
-  type SearchableSelectOption,
-} from "@/components/ui/searchable-select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SearchableSelect, type SearchableSelectOption } from "@/components/ui/searchable-select";
 import { useAuthorization } from "@/hooks/useAuthorization";
-import { createAccessProfile } from "@/lib/permissions-manager";
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
 interface PropertyOption {
   _id: string;
   name: string;
-  address: { street: string; city: string; state: string };
+  address?: { street?: string; city?: string; state?: string };
 }
-
-interface UserOption {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-interface TenantOption {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-type LeasePropertyRef =
-  | string
-  | {
-      _id?: string;
-      name?: string;
-      address?: PropertyOption["address"];
-    };
-
-type LeaseTenantRef =
-  | string
-  | {
-      _id?: string;
-      firstName?: string;
-      lastName?: string;
-      email?: string;
-    };
 
 interface LeaseOption {
   _id: string;
+  propertyId: string | { _id?: string; name?: string };
+  tenantId: string | { _id?: string; firstName?: string; lastName?: string; email?: string };
+  status: string;
   startDate: string;
   endDate: string;
-  status: string;
-  propertyId: LeasePropertyRef;
-  tenantId: LeaseTenantRef;
-  unit?: {
-    unitNumber?: string;
-  };
+  unit?: { _id?: string; unitNumber?: string; name?: string };
+  unitId?: string;
 }
 
-function formatAddress(address?: PropertyOption["address"]) {
-  return [address?.street, address?.city, address?.state]
-    .filter(Boolean)
-    .join(", ");
+function idOf(value: unknown): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return String((value as { _id?: unknown })._id ?? "");
 }
 
-function formatName(firstName?: string, lastName?: string) {
-  return [firstName, lastName].filter(Boolean).join(" ").trim();
+function formatName(value: LeaseOption["tenantId"]): string {
+  if (!value || typeof value === "string") return "Locataire du bail";
+  return [value.firstName, value.lastName].filter(Boolean).join(" ") || value.email || "Locataire du bail";
 }
 
-function getRefId(ref: LeasePropertyRef | LeaseTenantRef) {
-  return typeof ref === "string" ? ref : ref?._id;
+function buildDate(day: string, month: string, year: string, hour: string, minute: string): string {
+  if (!day || !month || !year || !hour || !minute) return "";
+  const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), 0, 0);
+  if (
+    date.getFullYear() !== Number(year) ||
+    date.getMonth() !== Number(month) - 1 ||
+    date.getDate() !== Number(day)
+  ) return "";
+  return date.toISOString();
 }
 
 export default function NewInspectionPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { isCompanyStaff } = useAuthorization();
-  const { t, formatDate: formatLocalizedDate } = useLocalizationContext();
-  const [submitting, setSubmitting] = useState(false);
-  const hasFetchedOptions = useRef(false);
 
-  // Form state
+  const now = useMemo(() => new Date(), []);
   const [propertyId, setPropertyId] = useState("");
-  const [tenantId, setTenantId] = useState("");
   const [leaseId, setLeaseId] = useState("");
   const [type, setType] = useState<string>("");
-  const [scheduledDate, setScheduledDate] = useState("");
-  const [inspectorId, setInspectorId] = useState("");
   const [notes, setNotes] = useState("");
-
-  // Options
+  const [day, setDay] = useState(String(now.getDate()));
+  const [month, setMonth] = useState(String(now.getMonth() + 1));
+  const [year, setYear] = useState(String(now.getFullYear()));
+  const [hour, setHour] = useState(String(now.getHours()).padStart(2, "0"));
+  const [minute, setMinute] = useState("00");
   const [properties, setProperties] = useState<PropertyOption[]>([]);
-  const [inspectors, setInspectors] = useState<UserOption[]>([]);
-  const [tenants, setTenants] = useState<TenantOption[]>([]);
   const [leases, setLeases] = useState<LeaseOption[]>([]);
-  const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchOptions = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoadingOptions(true);
-      const [propertiesRes, usersRes, tenantsRes, leasesRes] =
-        await Promise.all([
-          fetch("/api/properties?limit=100"),
-          fetch("/api/users?limit=100"),
-          fetch("/api/tenants?limit=100"),
-          fetch("/api/leases?limit=100"),
-        ]);
+      const [propertiesResponse, leasesResponse] = await Promise.all([
+        fetch("/api/properties?limit=100", { cache: "no-store" }),
+        fetch("/api/leases?limit=100&status=active", { cache: "no-store" }),
+      ]);
 
-      if (propertiesRes.ok) {
-        const data = await propertiesRes.json();
-        setProperties(data?.data ?? []);
-      }
+      if (!propertiesResponse.ok) throw new Error("Impossible de charger les propriétés.");
+      if (!leasesResponse.ok) throw new Error("Impossible de charger les baux actifs.");
 
-      if (usersRes.ok) {
-        const data = await usersRes.json();
-        const allUsers = Array.isArray(data?.data?.users)
-          ? data.data.users
-          : Array.isArray(data?.data)
-            ? data.data
-            : [];
+      const [propertiesPayload, leasesPayload] = await Promise.all([
+        propertiesResponse.json(),
+        leasesResponse.json(),
+      ]);
 
-        // Filter to company staff who can inspect
-        setInspectors(
-          allUsers.filter(
-            (u: any) =>
-              createAccessProfile(
-                u.role,
-                Array.isArray(u.permissions) ? u.permissions : [],
-              ).isCompanyStaff,
-          ),
-        );
-      }
-
-      if (tenantsRes.ok) {
-        const data = await tenantsRes.json();
-        setTenants(data?.data ?? []);
-      }
-
-      if (leasesRes.ok) {
-        const data = await leasesRes.json();
-        setLeases(data?.data ?? []);
-      }
+      setProperties(Array.isArray(propertiesPayload?.data) ? propertiesPayload.data : []);
+      setLeases(Array.isArray(leasesPayload?.data) ? leasesPayload.data : []);
     } catch (error) {
-      toast.error(t("inspections.create.toasts.failedToLoadOptions"));
+      toast.error(error instanceof Error ? error.message : "Impossible de charger les options.");
     } finally {
-      setLoadingOptions(false);
+      setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
-    if (status !== "authenticated") {
-      return;
-    }
-
+    if (status !== "authenticated") return;
     if (!isCompanyStaff) {
-      toast.info(t("inspections.create.toasts.accessDenied"));
+      toast.error("Accès refusé.");
       router.replace("/dashboard");
       return;
     }
+    void fetchOptions();
+  }, [status, isCompanyStaff, router, fetchOptions]);
 
-    if (hasFetchedOptions.current) {
-      return;
-    }
-
-    hasFetchedOptions.current = true;
-    fetchOptions();
-  }, [status, isCompanyStaff, router, fetchOptions, t]);
-
-  // Auto-set inspector to current user if they're admin/manager
   useEffect(() => {
-    const sessionUserId = session?.user?.id;
-    if (sessionUserId && !inspectorId) {
-      setInspectorId(sessionUserId);
-    }
-  }, [session?.user?.id, inspectorId]);
+    setLeaseId("");
+  }, [propertyId]);
 
-  const getLeaseStatusLabel = useCallback(
-    (statusValue: string | undefined) => {
-      if (!statusValue) return "";
-
-      const normalized = statusValue.toLowerCase();
-      const fallback = statusValue
-        .split("_")
-        .filter(Boolean)
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-        .join(" ");
-
-      return t(`leases.status.${normalized}`, { defaultValue: fallback });
-    },
-    [t],
+  const selectedLease = useMemo(
+    () => leases.find((lease) => lease._id === leaseId),
+    [leases, leaseId],
   );
 
-  const inspectionTypeOptions = useMemo<SearchableSelectOption[]>(
-    () => [
-      {
-        value: InspectionType.MOVE_IN,
-        label: t("inspections.create.options.moveInInspection"),
-        icon: <ClipboardCheck className="h-4 w-4 text-muted-foreground" />,
-      },
-      {
-        value: InspectionType.MOVE_OUT,
-        label: t("inspections.create.options.moveOutInspection"),
-        icon: <ClipboardCheck className="h-4 w-4 text-muted-foreground" />,
-      },
-      {
-        value: InspectionType.ROUTINE,
-        label: t("inspections.create.options.routineInspection"),
-        icon: <ClipboardCheck className="h-4 w-4 text-muted-foreground" />,
-      },
-      {
-        value: InspectionType.MAINTENANCE,
-        label: t("inspections.create.options.maintenanceInspection"),
-        icon: <ClipboardCheck className="h-4 w-4 text-muted-foreground" />,
-      },
-    ],
-    [t],
+  const filteredLeases = useMemo(
+    () => leases.filter((lease) => idOf(lease.propertyId) === propertyId && String(lease.status).toLowerCase() === "active"),
+    [leases, propertyId],
   );
 
   const propertyOptions = useMemo<SearchableSelectOption[]>(
-    () =>
-      properties.map((property) => ({
-        value: property._id,
-        label: property.name,
-        subtitle: formatAddress(property.address),
-        icon: <Home className="h-4 w-4 text-muted-foreground" />,
-      })),
+    () => properties.map((property) => ({
+      value: property._id,
+      label: property.name,
+      subtitle: [property.address?.street, property.address?.city, property.address?.state].filter(Boolean).join(", "),
+      icon: <Home className="h-4 w-4 text-muted-foreground" />,
+    })),
     [properties],
   );
 
-  const inspectorOptions = useMemo<SearchableSelectOption[]>(
-    () =>
-      inspectors.map((inspector) => {
-        const name = formatName(inspector.firstName, inspector.lastName);
-
-        return {
-          value: inspector._id,
-          label: name || inspector.email,
-          subtitle: inspector.email,
-          icon: <UserRound className="h-4 w-4 text-muted-foreground" />,
-        };
-      }),
-    [inspectors],
-  );
-
-  const tenantOptions = useMemo<SearchableSelectOption[]>(
-    () =>
-      tenants.map((tenant) => {
-        const name = formatName(tenant.firstName, tenant.lastName);
-
-        return {
-          value: tenant._id,
-          label: name || tenant.email,
-          subtitle: tenant.email,
-          icon: <UserRound className="h-4 w-4 text-muted-foreground" />,
-        };
-      }),
-    [tenants],
-  );
-
   const leaseOptions = useMemo<SearchableSelectOption[]>(
-    () =>
-      leases.map((lease) => {
-        const leasePropertyId = getRefId(lease.propertyId);
-        const leaseTenantId = getRefId(lease.tenantId);
-        const populatedProperty =
-          typeof lease.propertyId === "string" ? undefined : lease.propertyId;
-        const populatedTenant =
-          typeof lease.tenantId === "string" ? undefined : lease.tenantId;
-        const property = properties.find(
-          (propertyOption) => propertyOption._id === leasePropertyId,
-        );
-        const tenant = tenants.find(
-          (tenantOption) => tenantOption._id === leaseTenantId,
-        );
-        const propertyName = populatedProperty?.name || property?.name;
-        const tenantName = formatName(
-          populatedTenant?.firstName || tenant?.firstName,
-          populatedTenant?.lastName || tenant?.lastName,
-        );
-        const leaseStatus = getLeaseStatusLabel(lease.status);
-        const dateRange = [
-          formatLocalizedDate(lease.startDate, { format: "medium" }),
-          formatLocalizedDate(lease.endDate, { format: "medium" }),
-        ]
-          .filter(Boolean)
-          .join(` ${t("inspections.create.labels.to")} `);
-        const unitLabel = lease.unit?.unitNumber
-          ? t("inspections.create.labels.unit", {
-              values: { number: lease.unit.unitNumber },
-            })
-          : "";
-        const label =
-          [propertyName, unitLabel].filter(Boolean).join(" - ") ||
-          (leaseStatus
-            ? `${t("inspections.create.labels.lease")} (${leaseStatus})`
-            : t("inspections.create.labels.lease"));
-        const subtitle = [tenantName, leaseStatus, dateRange]
-          .filter(Boolean)
-          .join(" | ");
-
-        return {
-          value: lease._id,
-          label,
-          subtitle,
-          icon: <FileText className="h-4 w-4 text-muted-foreground" />,
-        };
-      }),
-    [leases, properties, tenants, formatLocalizedDate, t, getLeaseStatusLabel],
+    () => filteredLeases.map((lease) => ({
+      value: lease._id,
+      label: lease.unit?.unitNumber
+        ? `${lease.unit.unitNumber} — ${formatName(lease.tenantId)}`
+        : `Bail actif — ${formatName(lease.tenantId)}`,
+      subtitle: `${new Date(lease.startDate).toLocaleDateString("fr-FR")} au ${new Date(lease.endDate).toLocaleDateString("fr-FR")}`,
+      icon: <FileText className="h-4 w-4 text-muted-foreground" />,
+    })),
+    [filteredLeases],
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const typeOptions = useMemo<SearchableSelectOption[]>(() => [
+    { value: InspectionType.MOVE_IN, label: "Inspection d’entrée", icon: <ClipboardCheck className="h-4 w-4" /> },
+    { value: InspectionType.MOVE_OUT, label: "Inspection de sortie", icon: <ClipboardCheck className="h-4 w-4" /> },
+    { value: InspectionType.ROUTINE, label: "Inspection de routine", icon: <ClipboardCheck className="h-4 w-4" /> },
+    { value: InspectionType.MAINTENANCE, label: "Inspection de maintenance", icon: <ClipboardCheck className="h-4 w-4" /> },
+  ], []);
 
-    if (!propertyId || !type || !scheduledDate || !inspectorId) {
-      toast.error(t("inspections.create.toasts.requiredFields"));
+  const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
+  const years = Array.from({ length: 16 }, (_, index) => now.getFullYear() + index);
+  const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    const scheduledDate = buildDate(day, month, year, hour, minute);
+    if (!propertyId || !type || !scheduledDate) {
+      toast.error("La propriété, le type et la date sont obligatoires.");
       return;
     }
 
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-
-      const inspectionData: Record<string, unknown> = {
-        propertyId,
-        type,
-        scheduledDate: new Date(scheduledDate).toISOString(),
-        inspectorId,
-        notes: notes || undefined,
-      };
-
-      if (tenantId) inspectionData.tenantId = tenantId;
-      if (leaseId) inspectionData.leaseId = leaseId;
-
       const response = await fetch("/api/inspections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inspectionData),
+        body: JSON.stringify({
+          propertyId,
+          leaseId: leaseId || undefined,
+          type,
+          scheduledDate,
+          notes: notes || undefined,
+        }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error || t("inspections.create.toasts.createError"));
-      }
-
-      const createdInspectionId = data?.data?._id;
-      if (!createdInspectionId) {
-        throw new Error(t("inspections.create.toasts.missingId"));
-      }
-
-      toast.success(t("inspections.create.toasts.createSuccess"));
-      router.push(`/dashboard/inspections/${createdInspectionId}`);
-    } catch (error: any) {
-      toast.error(error?.message || t("inspections.create.toasts.scheduleError"));
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload?.error || "Impossible de planifier l’inspection.");
+      toast.success("Inspection planifiée avec succès.");
+      router.push(`/dashboard/inspections/${payload.data._id}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Impossible de planifier l’inspection.");
     } finally {
       setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <div className="flex w-full justify-center">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t("inspections.create.header.title")}
-            </h1>
-            <p className="text-muted-foreground">
-              {t("inspections.create.header.subtitle")}
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("inspections.details.actions.back")}
-          </Button>
+    <div className="mx-auto w-full max-w-2xl space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold sm:text-3xl">Planifier l’inspection</h1>
+          <p className="text-muted-foreground">Créer une nouvelle inspection de propriété</p>
         </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="w-full space-y-6 sm:mt-2 lg:mt-6"
-        >
-          {/* Property & Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("inspections.create.sections.details.title")}</CardTitle>
-              <CardDescription>
-                {t("inspections.create.sections.details.description")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="property">
-                  {t("inspections.create.labels.propertyRequired")}
-                </Label>
-                <SearchableSelect
-                  id="property"
-                  value={propertyId}
-                  onValueChange={setPropertyId}
-                  options={propertyOptions}
-                  placeholder={
-                    loadingOptions
-                      ? t("inspections.create.placeholders.loadingProperties")
-                      : t("inspections.create.placeholders.selectProperty")
-                  }
-                  searchPlaceholder={t("inspections.create.placeholders.searchProperties")}
-                  emptyMessage={t("inspections.create.placeholders.noPropertyFound")}
-                  disabled={loadingOptions}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="type">
-                  {t("inspections.create.labels.inspectionTypeRequired")}
-                </Label>
-                <SearchableSelect
-                  id="type"
-                  value={type}
-                  onValueChange={setType}
-                  options={inspectionTypeOptions}
-                  placeholder={t("inspections.create.placeholders.selectInspectionType")}
-                  searchPlaceholder={t(
-                    "inspections.create.placeholders.searchInspectionTypes",
-                  )}
-                  emptyMessage={t(
-                    "inspections.create.placeholders.noInspectionTypeFound",
-                  )}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="scheduledDate">
-                  {t("inspections.create.labels.scheduledDateRequired")}
-                </Label>
-                <Input
-                  id="scheduledDate"
-                  type="datetime-local"
-                  value={scheduledDate}
-                  onChange={(e) => setScheduledDate(e.target.value)}
-                  min={new Date().toISOString().slice(0, 16)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* People */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("inspections.create.sections.people.title")}</CardTitle>
-              <CardDescription>
-                {t("inspections.create.sections.people.description")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="inspector">
-                  {t("inspections.create.labels.inspectorRequired")}
-                </Label>
-                <SearchableSelect
-                  id="inspector"
-                  value={inspectorId}
-                  onValueChange={setInspectorId}
-                  options={inspectorOptions}
-                  placeholder={
-                    loadingOptions
-                      ? t("inspections.create.placeholders.loadingInspectors")
-                      : t("inspections.create.placeholders.selectInspector")
-                  }
-                  searchPlaceholder={t("inspections.create.placeholders.searchInspectors")}
-                  emptyMessage={t("inspections.create.placeholders.noInspectorFound")}
-                  disabled={loadingOptions}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tenant">
-                  {t("inspections.create.labels.tenantOptional")}
-                </Label>
-                <SearchableSelect
-                  id="tenant"
-                  value={tenantId}
-                  onValueChange={setTenantId}
-                  options={tenantOptions}
-                  placeholder={
-                    loadingOptions
-                      ? t("inspections.create.placeholders.loadingTenants")
-                      : t("inspections.create.placeholders.noTenant")
-                  }
-                  searchPlaceholder={t("inspections.create.placeholders.searchTenants")}
-                  emptyMessage={t("inspections.create.placeholders.noTenantFound")}
-                  disabled={loadingOptions}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="lease">
-                  {t("inspections.create.labels.leaseOptional")}
-                </Label>
-                <SearchableSelect
-                  id="lease"
-                  value={leaseId}
-                  onValueChange={setLeaseId}
-                  options={leaseOptions}
-                  placeholder={
-                    loadingOptions
-                      ? t("inspections.create.placeholders.loadingLeases")
-                      : t("inspections.create.placeholders.noLease")
-                  }
-                  searchPlaceholder={t("inspections.create.placeholders.searchLeases")}
-                  emptyMessage={t("inspections.create.placeholders.noLeaseFound")}
-                  disabled={loadingOptions}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notes */}
-          <Card className="gap-2">
-            <CardHeader>
-              <CardTitle>{t("inspections.create.sections.notes.title")}</CardTitle>
-              <CardDescription>
-                {t("inspections.create.sections.notes.description")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder={t("inspections.create.placeholders.notes")}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={4}
-                maxLength={2000}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {t("inspections.create.labels.charactersCount", {
-                  values: { count: notes.length, max: 2000 },
-                })}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Submit */}
-          <div className="flex items-center justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={submitting || loadingOptions}>
-              {submitting
-                ? t("inspections.create.actions.scheduling")
-                : t("inspections.create.actions.scheduleInspection")}
-            </Button>
-          </div>
-        </form>
+        <Button variant="outline" size="sm" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+        </Button>
       </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Détails de l’inspection</CardTitle>
+            <CardDescription>Choisissez d’abord la propriété, puis éventuellement son bail actif.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Propriété *</Label>
+              <SearchableSelect value={propertyId} onValueChange={setPropertyId} options={propertyOptions} placeholder="Sélectionner une propriété" disabled={loading} />
+            </div>
+            <div className="space-y-2">
+              <Label>Type d’inspection *</Label>
+              <SearchableSelect value={type} onValueChange={setType} options={typeOptions} placeholder="Sélectionner un type" />
+            </div>
+            <div className="space-y-2">
+              <Label>Date planifiée *</Label>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                <select className="h-10 rounded-md border bg-background px-3" value={day} onChange={(e) => setDay(e.target.value)}>
+                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((value) => <option key={value} value={value}>{value}</option>)}
+                </select>
+                <select className="h-10 rounded-md border bg-background px-3" value={month} onChange={(e) => setMonth(e.target.value)}>
+                  {months.map((label, index) => <option key={label} value={index + 1}>{label}</option>)}
+                </select>
+                <select className="h-10 rounded-md border bg-background px-3" value={year} onChange={(e) => setYear(e.target.value)}>
+                  {years.map((value) => <option key={value} value={value}>{value}</option>)}
+                </select>
+                <select className="h-10 rounded-md border bg-background px-3" value={hour} onChange={(e) => setHour(e.target.value)}>
+                  {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0")).map((value) => <option key={value} value={value}>{value} h</option>)}
+                </select>
+                <select className="h-10 rounded-md border bg-background px-3" value={minute} onChange={(e) => setMinute(e.target.value)}>
+                  {["00", "15", "30", "45"].map((value) => <option key={value} value={value}>{value} min</option>)}
+                </select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Personnes et bail</CardTitle>
+            <CardDescription>Le locataire et l’unité sont déterminés automatiquement par le bail choisi.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Inspecteur *</Label>
+              <div className="flex min-h-10 items-center rounded-md border bg-muted/40 px-3 font-medium">E-IMMO — Staff Gestion E-Immo</div>
+            </div>
+            <div className="space-y-2">
+              <Label>Bail actif de cette propriété (optionnel)</Label>
+              <SearchableSelect
+                value={leaseId}
+                onValueChange={setLeaseId}
+                options={leaseOptions}
+                placeholder={!propertyId ? "Choisissez d’abord une propriété" : filteredLeases.length ? "Sélectionner un bail actif" : "Aucun bail actif — inspection hors location"}
+                disabled={!propertyId || loading || filteredLeases.length === 0}
+              />
+              <p className="text-xs text-muted-foreground">Sans bail, l’inspection sera enregistrée comme inspection hors location.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Locataire</Label>
+                <div className="flex min-h-10 items-center rounded-md border bg-muted/40 px-3">
+                  <UserRound className="mr-2 h-4 w-4" /> {selectedLease ? formatName(selectedLease.tenantId) : "Aucun locataire"}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Unité</Label>
+                <div className="flex min-h-10 items-center rounded-md border bg-muted/40 px-3">
+                  <Home className="mr-2 h-4 w-4" /> {selectedLease?.unit?.unitNumber || "Aucune unité"}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Notes</CardTitle></CardHeader>
+          <CardContent>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} maxLength={2000} placeholder="Instructions ou observations particulières" />
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end gap-3">
+          <Button type="button" variant="outline" onClick={() => router.back()}>Annuler</Button>
+          <Button type="submit" disabled={submitting || loading}>{submitting ? "Planification…" : "Planifier l’inspection"}</Button>
+        </div>
+      </form>
     </div>
   );
 }

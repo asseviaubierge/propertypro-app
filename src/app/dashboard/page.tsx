@@ -161,10 +161,10 @@ const REVENUE_TREND_OPTIONS: Array<{
   value: DashboardRevenueTrendRange;
   label: string;
 }> = [
-  { value: "7d", label: "7 Days" },
-  { value: "30d", label: "30 Days" },
-  { value: "12m", label: "12 Months" },
-  { value: "lastYear", label: "Last Year" },
+  { value: "7d", label: "7 jours" },
+  { value: "30d", label: "30 jours" },
+  { value: "12m", label: "12 mois" },
+  { value: "lastYear", label: "Année précédente" },
 ];
 
 export default function DashboardPage() {
@@ -208,15 +208,16 @@ export default function DashboardPage() {
 
         const response = await fetch("/api/dashboard/overview", {
           signal: controller.signal,
+          cache: "no-store",
           headers: {
-            "Cache-Control": isRefresh ? "no-cache" : "max-age=300",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
           },
         });
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          const errorText = await response.text().catch(() => "Unknown error");
+          const errorText = await response.text().catch(() => "Erreur inconnue");
           throw new Error(
             `Dashboard load failed: ${response.status} ${errorText}`,
           );
@@ -226,7 +227,7 @@ export default function DashboardPage() {
         const data = (payload?.data ?? payload) as DashboardOverviewResponse;
 
         if (!data?.overview) {
-          throw new Error("Invalid dashboard response format");
+          throw new Error("Format de réponse du tableau de bord invalide");
         }
 
         setDashboardData(data);
@@ -239,7 +240,7 @@ export default function DashboardPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "Unable to load dashboard overview",
+            : "Impossible de charger le tableau de bord",
         );
       } finally {
         if (isRefresh) {
@@ -263,6 +264,29 @@ export default function DashboardPage() {
     }
 
     loadDashboardData();
+  }, [status, isDashboardAuthorized, loadDashboardData]);
+
+  // Keep the operational dashboard synchronized without requiring a manual
+  // page reload. It refreshes every 30 seconds and whenever the user returns
+  // to the tab/window.
+  useEffect(() => {
+    if (status !== "authenticated" || !isDashboardAuthorized) return;
+
+    const refresh = () => loadDashboardData({ isRefresh: true });
+    const intervalId = window.setInterval(refresh, 30_000);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    const handleFocus = () => refresh();
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [status, isDashboardAuthorized, loadDashboardData]);
 
   const { t, formatCurrency, formatPercentage, formatDate } =
@@ -342,14 +366,14 @@ export default function DashboardPage() {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "Unknown error");
+        const errorText = await response.text().catch(() => "Erreur inconnue");
         throw new Error(`Export failed: ${response.status} ${errorText}`);
       }
 
       const result = await response.json();
 
       if (!result.data) {
-        throw new Error("Invalid export data received");
+        throw new Error("Données d’exportation invalides");
       }
 
       const blob = new Blob([JSON.stringify(result.data, null, 2)], {

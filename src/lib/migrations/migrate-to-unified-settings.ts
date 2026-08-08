@@ -317,7 +317,7 @@ async function createDefaultSettings() {
       });
 
       if (!existingSettings) {
-        await Settings.createDefaultUserSettings(user._id.toString());
+        await (Settings as any).createDefaultUserSettings?.(user._id.toString());
         createdCount++;
       }
     }

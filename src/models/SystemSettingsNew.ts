@@ -177,7 +177,7 @@ const systemSettingsNewSchema = new Schema<ISystemSettingsNew>(
   {
     // Branding Settings
     branding: {
-      companyName: { type: String, default: "PropertyPro" },
+      companyName: { type: String, default: "Gestion E-Immo" },
       logo: { type: String }, // URL to uploaded logo
       favicon: { type: String }, // URL to uploaded favicon
       primaryColor: { type: String, default: "#3b82f6" },
@@ -305,7 +305,7 @@ const systemSettingsNewSchema = new Schema<ISystemSettingsNew>(
 
     // Application Settings
     application: {
-      siteName: { type: String, default: "PropertyPro" },
+      siteName: { type: String, default: "Gestion E-Immo" },
       siteUrl: { type: String, default: "http://localhost:3000" },
       timezone: { type: String, default: "America/New_York" },
       language: { type: String, default: "en" },
@@ -377,7 +377,7 @@ systemSettingsNewSchema.methods.updateSettings = function (
   Object.assign(this, settingsData);
   this.version += 1;
   this.updatedAt = new Date();
-  return this.save();
+  return this.save() as Promise<ISystemSettingsNew>;
 };
 
 systemSettingsNewSchema.methods.enableMaintenance = function (
@@ -387,13 +387,13 @@ systemSettingsNewSchema.methods.enableMaintenance = function (
   this.maintenance.enabled = true;
   if (message) this.maintenance.message = message;
   if (allowedIps) this.maintenance.allowedIps = allowedIps;
-  return this.save();
+  return this.save() as Promise<ISystemSettingsNew>;
 };
 
 systemSettingsNewSchema.methods.disableMaintenance = function () {
   this.maintenance.enabled = false;
-  this.maintenance.message = undefined;
-  return this.save();
+  this.maintenance.message = null as any;
+  return this.save() as Promise<ISystemSettingsNew>;
 };
 
 // Static Methods
@@ -404,7 +404,7 @@ systemSettingsNewSchema.statics.getSettings = function () {
 systemSettingsNewSchema.statics.createDefaultSettings = function () {
   return this.create({
     branding: {
-      companyName: "PropertyPro",
+      companyName: "Gestion E-Immo",
       primaryColor: "#3b82f6",
       secondaryColor: "#64748b",
       accentColor: "#06b6d4",
@@ -444,7 +444,7 @@ systemSettingsNewSchema.statics.createDefaultSettings = function () {
       showCountdown: true,
     },
     application: {
-      siteName: "PropertyPro",
+      siteName: "Gestion E-Immo",
       siteUrl: "http://localhost:3000",
       timezone: "America/New_York",
       language: "en",

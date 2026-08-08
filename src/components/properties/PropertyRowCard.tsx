@@ -158,7 +158,7 @@ export function PropertyRowCard({
   const rentRange = getRentRange(property?.units);
 
   return (
-    <Card className="group hover:shadow-md transition-all duration-200 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 p-0 gap-0 rounded-lg">
+    <Card className="group overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 p-0 gap-0 rounded-lg">
       <CardContent className="p-0">
         <div className="flex items-center h-24 sm:h-20">
           {/* Property Image */}
@@ -168,7 +168,7 @@ export function PropertyRowCard({
                 src={featuredImage!}
                 alt={propertyName}
                 fill
-                className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-300 m-0 p-0"
+                className="object-cover object-center w-full h-full  m-0 p-0"
                 sizes="(max-width: 640px) 96px, 128px"
                 priority={false}
               />
@@ -214,18 +214,18 @@ export function PropertyRowCard({
             <div className="sm:hidden">
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 min-w-0 mr-2">
-                  <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                  <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 line-clamp-2 break-words">
                     {onView ? (
                       <button
                         onClick={() => onView(property)}
-                        className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                        className="hover:text-blue-600 dark:hover:text-blue-400 text-left"
                       >
                         {propertyName}
                       </button>
                     ) : (
                       <Link
                         href={`/dashboard/properties/${propertyId}`}
-                        className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        className="hover:text-blue-600 dark:hover:text-blue-400"
                       >
                         {propertyName}
                       </Link>
@@ -352,14 +352,14 @@ export function PropertyRowCard({
                   {onView ? (
                     <button
                       onClick={() => onView(property)}
-                      className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors text-left"
+                      className="hover:text-blue-600 dark:hover:text-blue-400 text-left"
                     >
                       {propertyName}
                     </button>
                   ) : (
                     <Link
                       href={`/dashboard/properties/${propertyId}`}
-                      className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                      className="hover:text-blue-600 dark:hover:text-blue-400"
                     >
                       {propertyName}
                     </Link>

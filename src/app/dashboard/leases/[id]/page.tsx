@@ -86,7 +86,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
         t("leases.details.toasts.loadErrorTitle"),
         t("leases.details.toasts.fetchError"),
       );
-      router.push("/dashboard/leases");
+      setLease(null);
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
 
   if (loading) {
     return (
-      <div className="space-y-8 animate-fade-in-up">
+      <div className="space-y-8">
         <div className="flex items-center gap-6">
           <Skeleton className="h-12 w-24 rounded-xl" />
           <div className="space-y-3">
@@ -145,7 +145,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
 
   if (!lease) {
     return (
-      <div className="flex items-center justify-center min-h-[500px] animate-fade-in-up">
+      <div className="flex items-center justify-center min-h-[500px]">
         <div className="text-center p-8 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 shadow-lg">
           <div className="p-4 rounded-full bg-muted/50 w-fit mx-auto mb-6">
             <FileText className="h-16 w-16 text-muted-foreground" />
@@ -171,7 +171,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
   const daysRemaining = getDaysRemaining();
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-card/60 via-card/40 to-transparent backdrop-blur-sm border border-border/15 shadow-md">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6">
@@ -444,6 +444,34 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
                   </div>
                 </CardContent>
               </Card>
+
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Propriétaire / Gestionnaire du bien</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-2">
+                  {(() => {
+                    const party = lease.propertyId?.ownerId || lease.propertyId?.managerId;
+                    const name = party?.businessName || [party?.firstName, party?.lastName].filter(Boolean).join(" ") || "Non renseigné";
+                    return (<>
+                      <div className="min-w-0"><p className="text-sm text-muted-foreground">Nom / structure</p><p className="font-semibold break-words">{name}</p></div>
+                      <div className="min-w-0"><p className="text-sm text-muted-foreground">Type de compte</p><p className="font-medium break-words">{party?.accountType === "agency" ? "Agence immobilière" : party?.accountType === "platform" ? "Gestion E-IMMO" : "Propriétaire direct"}</p></div>
+                      <div className="min-w-0"><p className="text-sm text-muted-foreground">E-mail</p><p className="break-all">{party?.email || "Non renseigné"}</p></div>
+                      <div className="min-w-0"><p className="text-sm text-muted-foreground">Téléphone</p><p className="break-words">{party?.phone || "Non renseigné"}</p></div>
+                    </>);
+                  })()}
+                </CardContent>
+              </Card>
+
+              {lease.contractText && (
+                <Card>
+                  <CardHeader><CardTitle>Contrat de location</CardTitle><CardDescription>Version enregistrée lors de la création du bail.</CardDescription></CardHeader>
+                  <CardContent>
+                    <pre className="whitespace-pre-wrap break-words rounded-xl bg-muted/40 p-4 text-sm leading-6 font-sans">{lease.contractText}</pre>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Tenant Information */}
               <Card>

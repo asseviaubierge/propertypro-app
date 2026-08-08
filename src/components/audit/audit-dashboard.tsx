@@ -38,6 +38,7 @@ import {
   User,
   Database,
   FileText,
+  Settings,
 } from "lucide-react";
 
 interface AuditLog {

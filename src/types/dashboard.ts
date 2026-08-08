@@ -4,7 +4,12 @@
 
 export type DashboardAlertType = "payment" | "maintenance" | "lease" | "tenant";
 export type DashboardAlertSeverity = "low" | "medium" | "high" | "critical";
-export type DashboardActivityType = "payment" | "maintenance" | "lease" | "event";
+export type DashboardActivityType =
+  | "payment"
+  | "maintenance"
+  | "lease"
+  | "event"
+  | "application";
 export type DashboardTaskPriority = "low" | "medium" | "high" | "urgent";
 export type DashboardRevenueTrendRange = "7d" | "30d" | "12m" | "lastYear";
 export type DashboardTrendGranularity = "day" | "month";

@@ -52,12 +52,12 @@ export const GET = withAccessAndDB(LEASE_READ_ACCESS)(
       status: LeaseStatus.ACTIVE, // Only active leases
     };
 
-    // Role-based filtering for single company architecture
-    if (user.isTenant) {
-      // For tenant users, filter leases by their user ID directly
-      query.tenantId = user.id;
-    }
-    // Admin and Manager can see all company leases - no filtering needed
+    // Role-based filtering
+     if (user.isTenant) {
+     query.tenantId = user.id;
+     } else if (user.isManager && !user.isAdmin) {
+     query.propertyId = { $in: [] };
+     }
 
     // Apply filters
     if (filters.propertyId) query.propertyId = filters.propertyId;

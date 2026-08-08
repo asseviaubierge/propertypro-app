@@ -1,53 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Types } from "mongoose";
-import { auth } from "@/lib/auth";
-import connectDB from "@/lib/mongodb";
-import PushSubscription from "@/models/PushSubscription";
+import { NextRequest } from "next/server";
+import { PushSubscription } from "@/models";
+import { AuthenticatedAccessUser, createErrorResponse, createSuccessResponse, handleApiError, withPermissionAndDB } from "@/lib/api-utils";
 
-export const dynamic = "force-dynamic";
-
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (!Types.ObjectId.isValid(session.user.id)) {
-    return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
-  }
-
-  let body: any;
+export const POST = withPermissionAndDB("profile_management")(async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  const endpoint: string | undefined = body?.endpoint;
-  const p256dh: string | undefined = body?.keys?.p256dh;
-  const authKey: string | undefined = body?.keys?.auth;
-
-  if (!endpoint || !p256dh || !authKey) {
-    return NextResponse.json(
-      { error: "Missing subscription fields" },
-      { status: 400 }
+    const body = await request.json();
+    const endpoint = String(body?.endpoint || "");
+    const p256dh = String(body?.keys?.p256dh || "");
+    const auth = String(body?.keys?.auth || "");
+    if (!endpoint || !p256dh || !auth) return createErrorResponse("Abonnement push invalide", 400);
+    const subscription = await PushSubscription.findOneAndUpdate(
+      { endpoint },
+      { $set: { userId: user.id, endpoint, keys: { p256dh, auth }, userAgent: request.headers.get("user-agent") || undefined } },
+      { new: true, upsert: true, runValidators: true },
     );
-  }
-
-  await connectDB();
-
-  const userObjectId = new Types.ObjectId(session.user.id);
-  const userAgent = request.headers.get("user-agent") || undefined;
-
-  await PushSubscription.findOneAndUpdate(
-    { endpoint },
-    {
-      userId: userObjectId,
-      endpoint,
-      keys: { p256dh, auth: authKey },
-      userAgent,
-    },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
-
-  return NextResponse.json({ ok: true });
-}
+    return createSuccessResponse(subscription, "Notifications push activées");
+  } catch (error) { return handleApiError(error, "Impossible d’activer les notifications push"); }
+});

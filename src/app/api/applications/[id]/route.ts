@@ -52,7 +52,7 @@ export const GET = withAccessAndDB(APPLICATION_ACCESS)(
       }
 
       const canAccess =
-        user.isCompanyStaff || application.applicantId._id.toString() === user.id;
+        user.isCompanyStaff || String((application.applicantId as any)._id) === user.id;
 
       if (!canAccess) {
         return createErrorResponse("Access denied", 403);
@@ -94,7 +94,7 @@ export const PUT = withAccessAndDB(APPLICATION_ACCESS)(
 
       const canEdit =
         user.isCompanyStaff ||
-        (application.applicantId.toString() === user.id &&
+        (String(application.applicantId) === user.id &&
           [ApplicationStatus.DRAFT, ApplicationStatus.SUBMITTED].includes(
             application.status
           ));
@@ -105,7 +105,7 @@ export const PUT = withAccessAndDB(APPLICATION_ACCESS)(
 
       const validation = validateSchema(applicationUpdateSchema, body);
       if (!validation.success) {
-        return createErrorResponse(validation.errors.join(", "), 400);
+        return createErrorResponse(validation.issues.map((i:any)=>i.message).join(", "), 400);
       }
 
       const updateData = validation.data;
@@ -175,7 +175,7 @@ export const DELETE = withAccessAndDB(APPLICATION_ACCESS)(
 
       const canDelete =
         user.isCompanyStaff ||
-        (application.applicantId.toString() === user.id &&
+        (String(application.applicantId) === user.id &&
           [ApplicationStatus.DRAFT, ApplicationStatus.SUBMITTED].includes(
             application.status
           ));

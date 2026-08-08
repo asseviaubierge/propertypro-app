@@ -1,121 +1,34 @@
-/**
- * PropertyPro - Conversation Contacts API
- * Returns active users available to add to conversations
- */
-
 import { NextRequest } from "next/server";
+import { Types } from "mongoose";
 import {
   withPermissionAndDB,
   createErrorResponse,
   createSuccessResponse,
 } from "@/lib/api-utils";
-import { UserRole } from "@/types";
 import { User } from "@/models";
-
-const DEFAULT_VISIBLE_ROLES: Partial<Record<UserRole, UserRole[]>> = {
-  [UserRole.TENANT]: [
-    UserRole.ADMIN,
-    UserRole.ADMIN,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-  ],
-  [UserRole.MANAGER]: [
-    UserRole.ADMIN,
-    UserRole.ADMIN,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.TENANT,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-  ],
-  [UserRole.MANAGER]: [
-    UserRole.ADMIN,
-    UserRole.ADMIN,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.TENANT,
-  ],
-  [UserRole.MANAGER]: [
-    UserRole.ADMIN,
-    UserRole.ADMIN,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.TENANT,
-  ],
-  [UserRole.ADMIN]: [
-    UserRole.ADMIN,
-    UserRole.ADMIN,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.MANAGER,
-    UserRole.TENANT,
-  ],
-};
-
-const ALLOWED_ROLES = [
-  UserRole.ADMIN,
-  UserRole.ADMIN,
-  UserRole.MANAGER,
-  UserRole.MANAGER,
-  UserRole.MANAGER,
-  UserRole.MANAGER,
-  UserRole.MANAGER,
-  UserRole.TENANT,
-];
+import { resolveAccessProfile } from "@/lib/server-permissions";
+import { getAllowedMessagingUserIds } from "@/lib/messaging-access";
 
 export const GET = withPermissionAndDB("profile_management")(
   async (user, request: NextRequest) => {
     try {
-      const { searchParams } = new URL(request.url);
-      const search = searchParams.get("search")?.trim() ?? "";
-      const limit = Math.min(
-        Number.parseInt(searchParams.get("limit") ?? "50", 10) || 50,
-        200
-      );
+      const access = await resolveAccessProfile(user.role);
+      const params = new URL(request.url).searchParams;
+      const search = params.get("search")?.trim() ?? "";
+      const limit = Math.min(Math.max(Number.parseInt(params.get("limit") ?? "50", 10) || 50, 1), 200);
+      const allowedIds = await getAllowedMessagingUserIds({ ...access, id: String(user.id) });
 
-      const rolesParam = searchParams.get("roles");
-      const excludeRolesParam = searchParams.get("excludeRoles");
-
-      const roleFilterValues = rolesParam
-        ? rolesParam
-            .split(",")
-            .map((role) => role.trim())
-            .filter(Boolean)
-        : DEFAULT_VISIBLE_ROLES[user.role as UserRole] ?? undefined;
-
-      const excludeRoleValues = excludeRolesParam
-        ? excludeRolesParam
-            .split(",")
-            .map((role) => role.trim())
-            .filter(Boolean)
-        : undefined;
-
-      const filter: Record<string, unknown> = {
+      const filter: Record<string, any> = {
         _id: { $ne: user.id },
         isActive: true,
         deletedAt: null,
       };
 
-      if (roleFilterValues && roleFilterValues.length > 0) {
-        filter.role = { $in: roleFilterValues };
-      }
-
-      if (excludeRoleValues && excludeRoleValues.length > 0) {
-        filter.role = {
-          ...(filter.role as Record<string, unknown> | undefined),
-          $nin: excludeRoleValues,
-        };
+      if (allowedIds !== null) {
+        const ids = allowedIds
+          .filter((value) => Types.ObjectId.isValid(value) && value !== String(user.id))
+          .map((value) => new Types.ObjectId(value));
+        filter._id = { $in: ids };
       }
 
       if (search) {
@@ -123,32 +36,31 @@ export const GET = withPermissionAndDB("profile_management")(
           { firstName: { $regex: search, $options: "i" } },
           { lastName: { $regex: search, $options: "i" } },
           { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
         ];
       }
 
       const users = await User.find(filter)
-        .select("firstName lastName email role avatar isActive")
+        .select("firstName lastName email phone role avatar isActive")
         .sort({ firstName: 1, lastName: 1 })
         .limit(limit)
         .lean();
 
-      const formatted = users.map((u) => ({
-        id: u._id.toString(),
-        firstName: u.firstName,
-        lastName: u.lastName,
-        email: u.email,
-        role: u.role,
-        avatar: u.avatar ?? null,
-        isActive: u.isActive,
+      const formatted = users.map((entry: any) => ({
+        id: String(entry._id),
+        firstName: entry.firstName,
+        lastName: entry.lastName,
+        email: entry.email,
+        phone: entry.phone ?? null,
+        role: entry.role,
+        avatar: entry.avatar ?? null,
+        isActive: entry.isActive,
       }));
 
-      return createSuccessResponse({
-        users: formatted,
-        total: formatted.length,
-      });
+      return createSuccessResponse({ users: formatted, total: formatted.length });
     } catch (error) {
-      console.error("Failed to fetch conversation contacts:", error);
-      return createErrorResponse("Failed to fetch contacts", 500);
+      console.error("Chargement des contacts de messagerie:", error);
+      return createErrorResponse("Impossible de charger les contacts", 500);
     }
   }
 );

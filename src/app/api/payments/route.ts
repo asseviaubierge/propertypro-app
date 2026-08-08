@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Payment, Property } from "@/models";
+import { Payment } from "@/models";
 import { UserRole, PaymentStatus } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -15,6 +15,8 @@ import {
   withAccessAndDB,
   withPermissionAndDB,
 } from "@/lib/api-utils";
+import { buildPaymentScopeQuery } from "@/lib/payment-access";
+import { canAccessProperty } from "@/lib/property-scope";
 
 const PAYMENT_READ_ACCESS = {
   roles: [UserRole.TENANT],
@@ -38,11 +40,7 @@ export const GET = withAccessAndDB(PAYMENT_READ_ACCESS)(
       const search = (searchParams.get("search") || "").trim();
       const paymentMethod = searchParams.get("paymentMethod");
 
-      const query: Record<string, unknown> = {};
-
-      if (user.isTenant) {
-        query.tenantId = user.id;
-      }
+      let query: Record<string, unknown> = await buildPaymentScopeQuery(user);
 
       if (status && status !== "all") {
         if (status === PaymentStatus.OVERDUE) {
@@ -63,6 +61,9 @@ export const GET = withAccessAndDB(PAYMENT_READ_ACCESS)(
         query.type = type;
       }
       if (propertyId && !user.isTenant) {
+        if (!(await canAccessProperty(user, propertyId))) {
+          return createErrorResponse("Access denied for this property", 403);
+        }
         query.propertyId = propertyId;
       }
       if (tenantId && !user.isTenant) {
@@ -188,25 +189,11 @@ export const POST = withPermissionAndDB([
         );
       }
 
-      if (
-        user.isManager &&
-        !user.isAdmin &&
-        !user.permissions.includes("financial_management")
-      ) {
-        const property = await Property.findById(body.propertyId);
-        if (!property) {
-          return createErrorResponse("Property not found", 404);
-        }
-
-        const isOwner = property.ownerId?.toString() === user.id;
-        const isManager = property.managerId?.toString() === user.id;
-
-        if (!isOwner && !isManager) {
-          return createErrorResponse(
-            "You can only create payments for properties you own or manage",
-            403
-          );
-        }
+      if (!(await canAccessProperty(user, body.propertyId))) {
+        return createErrorResponse(
+          "You can only create payments for properties you own or manage",
+          403
+        );
       }
 
       const payment = new Payment({
@@ -248,8 +235,12 @@ export const PUT = withPermissionAndDB([
         return createErrorResponse("Updates object is required", 400);
       }
 
+      const scopedBulkQuery = await buildPaymentScopeQuery(user, {
+        _id: { $in: paymentIds },
+      });
+
       const result = await Payment.updateMany(
-        { _id: { $in: paymentIds } },
+        scopedBulkQuery,
         { $set: { ...updates, updatedBy: user.id, updatedAt: new Date() } }
       );
 
@@ -284,8 +275,12 @@ export const DELETE = withPermissionAndDB(
         return createErrorResponse("Payment IDs are required", 400);
       }
 
+      const scopedBulkQuery = await buildPaymentScopeQuery(user, {
+        _id: { $in: paymentIds },
+      });
+
       const result = await Payment.updateMany(
-        { _id: { $in: paymentIds } },
+        scopedBulkQuery,
         {
           $set: {
             status: PaymentStatus.CANCELLED,

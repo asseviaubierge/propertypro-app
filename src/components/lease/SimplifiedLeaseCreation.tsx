@@ -69,6 +69,7 @@ interface SimplifiedLeaseData {
   // Auto-generation Settings
   autoGenerateInvoices: boolean;
   autoEmailInvoices: boolean;
+  contractText: string;
 }
 
 interface Property {
@@ -81,6 +82,9 @@ interface Property {
     zipCode: string;
     country: string;
   };
+  type?: string;
+  ownerId?: { _id: string; firstName?: string; lastName?: string; businessName?: string; accountType?: string; email?: string; phone?: string };
+  managerId?: { _id: string; firstName?: string; lastName?: string; businessName?: string; accountType?: string; email?: string; phone?: string };
   units: Array<{
     _id: string;
     unitNumber: string;
@@ -122,6 +126,7 @@ const createInitialLeaseState = (): SimplifiedLeaseData => ({
   lateFeeType: "fixed",
   autoGenerateInvoices: true,
   autoEmailInvoices: false,
+  contractText: "",
 });
 
 const LEASE_DATE_FROM_YEAR = 1900;
@@ -208,11 +213,12 @@ export default function SimplifiedLeaseCreation({
 
   const fetchTenants = async () => {
     try {
-      const response = await fetch("/api/users?role=tenant&limit=100");
-      const data = await response.json();
-      if (data.success) {
-        setTenants(data.data?.users || []);
-      } else {
+      const response = await fetch("/api/tenants?limit=100");
+const data = await response.json();
+
+if (response.ok && data.success) {
+  setTenants(Array.isArray(data.data) ? data.data : []);
+} else {
         toast.error(
           t("leases.new.form.toasts.loadTenantsError"),
           data.error
@@ -258,6 +264,7 @@ export default function SimplifiedLeaseCreation({
         lateFeeConfig?.feeType === "percentage" ? "percentage" : "fixed",
       autoGenerateInvoices: paymentConfig?.autoGenerateInvoices ?? true,
       autoEmailInvoices: paymentConfig?.autoEmailInvoices ?? false,
+      contractText: (lease as any).contractText ?? "",
     };
   };
 
@@ -417,6 +424,7 @@ export default function SimplifiedLeaseCreation({
       lateFeeType: "lateFeeTypeSelect",
       autoGenerateInvoices: "autoGenerateInvoices",
       autoEmailInvoices: "autoEmailInvoices",
+      contractText: "contractText",
     };
     const id = idMap[field];
     if (!id) return;
@@ -545,6 +553,86 @@ export default function SimplifiedLeaseCreation({
     ),
   }));
 
+  const buildContractDraft = () => {
+    const property = getSelectedProperty();
+    const tenant = tenants.find((item) => item._id === leaseData.tenantId);
+    const owner = property?.ownerId || property?.managerId;
+    const ownerName = owner?.businessName || [owner?.firstName, owner?.lastName].filter(Boolean).join(" ") || "Le Bailleur";
+    const tenantName = tenant ? `${tenant.firstName} ${tenant.lastName}`.trim() : "Le Locataire";
+    const address = property ? [property.address?.street, property.address?.city, property.address?.state, property.address?.country].filter(Boolean).join(", ") : "Adresse du bien";
+    const fmt = (value: string) => value ? new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(`${value}T00:00:00`)) : "[date]";
+    return `CONTRAT DE LOCATION
+
+Entre les soussignés :
+
+1. LE BAILLEUR : ${ownerName}
+E-mail : ${owner?.email || "[à compléter]"}
+Téléphone : ${owner?.phone || "[à compléter]"}
+
+2. LE LOCATAIRE : ${tenantName}
+E-mail : ${tenant?.email || "[à compléter]"}
+
+3. L’INTERMÉDIAIRE : GESTION E-IMMO / E-IMMO
+La plateforme intervient comme intermédiaire technique et de gestion. Elle ne se substitue pas au bailleur dans ses obligations légales.
+
+PRÉAMBULE
+Les parties conviennent de la location du bien décrit ci-dessous. Le présent projet est établi en référence à la loi n° 2022-30 fixant le régime juridique du bail à usage d’habitation en République du Bénin. Il doit être relu et adapté par les parties avant validation et signature.
+
+ARTICLE 1 — DÉSIGNATION DU BIEN
+Bien : ${property?.name || "[nom du bien]"}
+Type : ${property?.type || "[type du bien]"}
+Adresse / localisation : ${address}
+Unité : ${getSelectedUnit()?.unitNumber || "[unité]"}
+
+ARTICLE 2 — DURÉE
+Le bail prend effet le ${fmt(leaseData.startDate)} et prend fin le ${fmt(leaseData.endDate)}.
+
+ARTICLE 3 — LOYER ET MODALITÉS DE PAIEMENT
+Loyer mensuel : ${formatCurrency(leaseData.rentAmount || 0)}.
+Échéance mensuelle : le ${leaseData.rentDueDay || 1} de chaque mois. Une quittance ou une preuve de paiement est remise au locataire.
+
+ARTICLE 4 — DÉPÔT DE GARANTIE
+Dépôt de garantie : ${formatCurrency(leaseData.securityDeposit || 0)}. Pour un bail d’habitation, le montant doit respecter les plafonds légaux applicables au Bénin.
+
+ARTICLE 5 — ÉTAT DES LIEUX
+Un état des lieux contradictoire d’entrée est établi lors de la remise des clés et annexé au présent contrat. Un état des lieux de sortie est établi à la restitution du bien.
+
+ARTICLE 6 — OBLIGATIONS DU BAILLEUR
+Le bailleur remet un bien en état d’usage, assure au locataire une jouissance paisible et réalise les réparations qui ne relèvent pas des réparations locatives.
+
+ARTICLE 7 — OBLIGATIONS DU LOCATAIRE
+Le locataire paie le loyer et les charges aux échéances convenues, use paisiblement des lieux, entretient le bien, signale les dommages importants et ne sous-loue pas sans autorisation écrite lorsque celle-ci est requise.
+
+ARTICLE 8 — ENTRETIEN, RÉPARATIONS ET CHARGES
+Les réparations locatives et charges récupérables sont précisées par les parties :
+[À compléter]
+
+ARTICLE 9 — RETARD ET IMPAYÉS
+Tout retard est traité conformément au contrat et aux règles légales applicables. Frais de retard convenus : ${formatCurrency(leaseData.lateFeeAmount || 0)}, après un délai de grâce de ${leaseData.lateFeeGracePeriodDays || 0} jour(s).
+
+ARTICLE 10 — RÉSILIATION ET PRÉAVIS
+Les conditions de préavis, de mise en demeure, de résiliation et de restitution des clés doivent respecter la législation béninoise applicable et les clauses validées ci-dessous :
+[À compléter]
+
+ARTICLE 11 — RÈGLEMENT DES LITIGES
+Les parties recherchent d’abord une solution amiable. À défaut, elles peuvent saisir l’organe de conciliation ou la juridiction béninoise compétente.
+
+ARTICLE 12 — ANNEXES
+État des lieux, inventaire, pièces d’identité, justificatifs de propriété ou mandat, règlement intérieur et autres pièces convenues.
+
+Fait à [ville], le [date].
+
+LE BAILLEUR                         LE LOCATAIRE                         E-IMMO
+Nom et signature                    Nom et signature                    Intermédiaire
+`;
+  };
+
+  useEffect(() => {
+    if (mode === "create" && leaseData.propertyId && leaseData.tenantId && !leaseData.contractText.trim()) {
+      setLeaseData((prev) => ({ ...prev, contractText: buildContractDraft() }));
+    }
+  }, [leaseData.propertyId, leaseData.unitId, leaseData.tenantId, leaseData.startDate, leaseData.endDate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { ok, messages, invalidFields } = validateAll();
@@ -571,6 +659,7 @@ export default function SimplifiedLeaseCreation({
       tenantId: leaseData.tenantId,
       startDate: leaseData.startDate,
       endDate: leaseData.endDate,
+      contractText: leaseData.contractText || buildContractDraft(),
       terms: {
         rentAmount: leaseData.rentAmount,
         securityDeposit: leaseData.securityDeposit,
@@ -679,6 +768,8 @@ export default function SimplifiedLeaseCreation({
         }
       }
 
+      window.dispatchEvent(new Event("lease-created"));
+      window.dispatchEvent(new Event("sidebar-counts-refresh"));
       setLeaseData(createInitialLeaseState());
       setOriginalLeaseData(createInitialLeaseState());
 
@@ -692,7 +783,7 @@ export default function SimplifiedLeaseCreation({
         }
       };
 
-      setTimeout(navigateAfterCreate, 2000);
+      navigateAfterCreate();
     } catch (error) {
       const fallbackMessage = t("leases.new.form.errors.saveLeaseGeneric");
       const message = error instanceof Error ? error.message : fallbackMessage;
@@ -989,7 +1080,7 @@ export default function SimplifiedLeaseCreation({
                     "leases.new.form.sections.dates.placeholders.startDate"
                   )}
                   fromYear={LEASE_DATE_FROM_YEAR}
-                  toYear={new Date().getFullYear() + 5}
+                  toYear={new Date().getFullYear() + 15}
                 />
                 {fieldErrors.startDate && (
                   <p className="text-destructive text-sm">
@@ -1029,6 +1120,7 @@ export default function SimplifiedLeaseCreation({
                   placeholder={t(
                     "leases.new.form.sections.dates.placeholders.endDate"
                   )}
+                  toYear={new Date().getFullYear() + 15}
                   disabled={(date) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -1298,6 +1390,27 @@ export default function SimplifiedLeaseCreation({
                 disabled={!leaseData.autoGenerateInvoices}
               />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Contrat de location modifiable</CardTitle>
+            <CardDescription>
+              Projet prérempli avec le bailleur, le locataire, E-IMMO, le bien et les conditions financières. Relisez et adaptez le texte avant validation.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <textarea
+              id="contractText"
+              value={leaseData.contractText}
+              onChange={(event) => handleInputChange("contractText", event.target.value)}
+              className="min-h-[520px] w-full resize-y rounded-xl border bg-background p-4 text-sm leading-6 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="Le contrat prérempli apparaîtra ici après la sélection du bien et du locataire."
+            />
+            <p className="text-xs text-muted-foreground">
+              Ce modèle facilite la préparation du bail, mais ne constitue pas un avis juridique. Les parties doivent vérifier le texte final avant signature.
+            </p>
           </CardContent>
         </Card>
 

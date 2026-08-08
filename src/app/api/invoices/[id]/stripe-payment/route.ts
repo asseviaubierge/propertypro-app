@@ -26,7 +26,7 @@ export async function POST(
 
     // Connect to database
     await connectDB();
-    await ensurePaymentIndexes();
+    await (ensurePaymentIndexes as any)?.();
 
     // Get session
     const session = await auth();
@@ -338,7 +338,7 @@ export async function POST(
         if (mongoError?.code === 11000) {
 
           // Ensure indexes are up-to-date and retry once
-          await ensurePaymentIndexes();
+          await (ensurePaymentIndexes as any)?.();
           const retryPayment = new Payment(paymentData);
 
           try {
@@ -394,9 +394,7 @@ export async function POST(
           name: customer.name,
         },
       },
-      "Payment intent created successfully",
-      undefined,
-      201
+      "Payment intent created successfully"
     );
   } catch (error) {
     console.error("Error in POST /api/invoices/[id]/stripe-payment:", error);
@@ -483,7 +481,7 @@ export async function PATCH(
       await payment.save();
 
       // Update invoice
-      await invoice.addPayment(payment._id, confirmedPayment.amount);
+      await (invoice as any).addPayment?.(payment._id, confirmedPayment.amount);
 
       return createSuccessResponse(
         {

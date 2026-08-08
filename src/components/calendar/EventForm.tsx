@@ -600,14 +600,14 @@ export default function EventForm({
                       name="onlinePlatform"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Platform</FormLabel>
+                          <FormLabel>Plateforme</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select platform" />
+                                <SelectValue placeholder="Sélectionner une plateforme" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -657,7 +657,7 @@ export default function EventForm({
 
                         return (
                           <FormItem>
-                            <FormLabel>Meeting Link</FormLabel>
+                            <FormLabel>Lien de réunion</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder={getPlaceholder()}
@@ -677,9 +677,9 @@ export default function EventForm({
                         name="meetingId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Meeting ID (Optional)</FormLabel>
+                            <FormLabel>Identifiant de réunion (facultatif)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Meeting ID" {...field} />
+                              <Input placeholder="Identifiant de réunion" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -691,10 +691,10 @@ export default function EventForm({
                         name="passcode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Passcode (Optional)</FormLabel>
+                            <FormLabel>Code d’accès (facultatif)</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Meeting passcode"
+                                placeholder="Code d’accès à la réunion"
                                 {...field}
                               />
                             </FormControl>

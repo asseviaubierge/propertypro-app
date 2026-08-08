@@ -26,6 +26,8 @@ import {
   validateSchema,
 } from "@/lib/validations";
 import { z } from "zod";
+import mongoose from "mongoose";
+import { getScopedPropertyIds } from "@/lib/property-scope";
 import {
   createEmailVerificationToken,
   sendEmailVerificationLink,
@@ -123,6 +125,31 @@ export const GET = withPermissionAndDB("tenant_view")(
         role: UserRole.TENANT, // Only fetch users with tenant role
         deletedAt: null, // Exclude soft-deleted tenants
       };
+
+      if (!user.isAdmin) {
+        const propertyIds = await getScopedPropertyIds(user);
+        const leasedTenantIds = propertyIds?.length
+          ? await Lease.distinct("tenantId", {
+              propertyId: { $in: propertyIds },
+              deletedAt: null,
+            })
+          : [];
+
+        // A newly created tenant may not have a lease yet. Keep it visible to
+        // the Property Manager who created it, while also including tenants
+        // attached to leases on properties within the manager's scope.
+        query.$and = [
+          ...(query.$and || []),
+          {
+            $or: [
+              { managerId: new mongoose.Types.ObjectId(user.id) },
+              { createdBy: new mongoose.Types.ObjectId(user.id) },
+              { _id: { $in: leasedTenantIds } },
+            ],
+          },
+        ];
+      }
+
 
       // Apply filters - support both legacy and new status filtering
       if (filters.status) {
@@ -338,9 +365,46 @@ export const POST = withPermissionAndDB("tenant_create")(
         return createErrorResponse("User with this email already exists", 409);
       }
 
-      // Create the tenant user
-      const tenant = new User(userData);
+      // Keep the tenant attached to the account that created it. This makes
+      // applications visible before a lease has been created.
+      if (!mongoose.Types.ObjectId.isValid(user.id)) {
+        return createErrorResponse("Identifiant du gestionnaire invalide", 400);
+      }
+
+      const managerObjectId = new mongoose.Types.ObjectId(user.id);
+
+      const tenant = new User({
+        ...userData,
+        createdBy: managerObjectId,
+        managerId: managerObjectId,
+      });
       await tenant.save();
+
+      // Double écriture volontaire via la collection native : elle évite qu'un
+      // ancien modèle Mongoose mis en cache par Turbopack ignore les nouveaux
+      // champs de rattachement pendant le développement.
+      await User.collection.updateOne(
+        { _id: tenant._id },
+        {
+          $set: {
+            createdBy: managerObjectId,
+            managerId: managerObjectId,
+          },
+        }
+      );
+
+      const ownershipCheck = await User.collection.findOne(
+        { _id: tenant._id },
+        { projection: { createdBy: 1, managerId: 1 } }
+      );
+
+      if (!ownershipCheck?.managerId) {
+        await User.collection.deleteOne({ _id: tenant._id });
+        return createErrorResponse(
+          "Le locataire n'a pas pu être rattaché au Property Manager",
+          500
+        );
+      }
       
             // Send the email verification link automatically after tenant creation.
       // Tenant creation remains successful even if sending the email fails.

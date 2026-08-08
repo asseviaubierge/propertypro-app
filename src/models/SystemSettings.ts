@@ -91,7 +91,7 @@ const SystemSettingsSchema = new Schema<ISystemSettings>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -250,7 +250,7 @@ SystemSettingsSchema.statics.getPublicBrandingSettings = function () {
 SystemSettingsSchema.pre("save", async function (next) {
   // Track changes for history
   if (this.isModified() && !this.isNew) {
-    const original = await this.constructor.findById(this._id);
+    const original = await (this.constructor as any).findById(this._id);
     if (original) {
       // Store original values for history tracking
       this.$locals.originalValue = original.value;
@@ -330,7 +330,7 @@ SystemSettingsSchema.pre("save", async function (next) {
   }
 
   // Validate against custom rules
-  if (!this.isValidValue(value)) {
+  if (!(this as any).isValidValue(value)) {
     return next(new Error("Value does not meet validation requirements"));
   }
 
@@ -354,10 +354,10 @@ SystemSettingsSchema.post("save", async function (doc) {
       {
         oldValue: doc.$locals.originalValue,
         newValue: doc.value,
-        oldDataType: doc.$locals.originalDataType,
+        oldDataType: doc.$locals.originalDataType as string | undefined,
         newDataType: doc.dataType,
-        source: doc.$locals.source || "ui",
-        batchId: doc.$locals.batchId,
+        source: String(doc.$locals.source ?? "ui"),
+        batchId: doc.$locals.batchId as string | undefined,
       }
     );
   } catch (error) {

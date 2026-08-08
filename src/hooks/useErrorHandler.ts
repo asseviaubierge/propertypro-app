@@ -173,11 +173,16 @@ export function useErrorHandler(options: ErrorHandlerOptions = {}) {
         onError(newErrorState.error!, newErrorState.errorType);
       }
 
-      console.error("Error handled:", {
-        error: newErrorState.error,
-        type: newErrorState.errorType,
-        statusCode: newErrorState.statusCode,
-      });
+      // The error is already represented in the UI and, when enabled, in a toast.
+      // console.error() triggers the Next.js development error overlay even for
+      // recovered/handled errors, so keep this as a non-blocking diagnostic.
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Erreur gérée :", {
+          message: newErrorState.error?.message,
+          type: newErrorState.errorType,
+          statusCode: newErrorState.statusCode,
+        });
+      }
     },
     [parseError, showToast, getErrorMessage, getToastMessage, onError]
   );

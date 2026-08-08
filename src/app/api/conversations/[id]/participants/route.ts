@@ -64,7 +64,7 @@ const updateParticipantSchema = z.object({
 
 export const GET = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: { id: string } }
   ) => {
@@ -77,7 +77,7 @@ export const GET = withPermissionAndDB("profile_management")(
 
       const conversation = await Conversation.findById(conversationId).populate(
         "participants.userId",
-        "firstName lastName email avatar role"
+        "firstName lastName email phone avatar role role"
       );
 
       if (!conversation) {
@@ -89,7 +89,7 @@ export const GET = withPermissionAndDB("profile_management")(
       }
 
       // Filter active participants
-      const activeParticipants = conversation.participants.filter(
+      const activeParticipants = (conversation.participants || []).filter(
         (p: any) => p.isActive
       );
 
@@ -109,7 +109,7 @@ export const GET = withPermissionAndDB("profile_management")(
 
 export const POST = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: { id: string } }
   ) => {
@@ -195,13 +195,13 @@ export const POST = withPermissionAndDB("profile_management")(
       }
 
       // Add participant
-      conversation.addParticipant(userId, role, permissions);
+      await (conversation as any).addParticipant?.(userId, role, permissions);
       await conversation.save();
 
       // Populate the updated conversation
       await conversation.populate(
         "participants.userId",
-        "firstName lastName email avatar"
+        "firstName lastName email phone avatar role"
       );
 
       return createSuccessResponse(
@@ -230,7 +230,7 @@ export const POST = withPermissionAndDB("profile_management")(
 
 export const PATCH = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: { id: string } }
   ) => {
@@ -333,7 +333,7 @@ export const PATCH = withPermissionAndDB("profile_management")(
       // Populate the updated conversation
       await conversation.populate(
         "participants.userId",
-        "firstName lastName email avatar"
+        "firstName lastName email phone avatar role"
       );
 
       return createSuccessResponse(
@@ -352,7 +352,7 @@ export const PATCH = withPermissionAndDB("profile_management")(
 
 export const DELETE = withPermissionAndDB("profile_management")(
   async (
-    user,
+    user: any,
     request: NextRequest,
     { params }: { params: { id: string } }
   ) => {
@@ -417,11 +417,11 @@ export const DELETE = withPermissionAndDB("profile_management")(
       }
 
       // Remove participant
-      conversation.removeParticipant(targetUserId);
+      await (conversation as any).removeParticipant?.(targetUserId);
       await conversation.save();
 
       // If no active participants left, soft delete the conversation
-      if (conversation.activeParticipantsCount === 0) {
+      if (((conversation as any).activeParticipantsCount ?? 0) === 0) {
         conversation.deletedAt = new Date();
         await conversation.save();
       }

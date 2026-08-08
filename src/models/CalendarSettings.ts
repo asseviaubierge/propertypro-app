@@ -235,7 +235,7 @@ const CalendarSettingsSchema = new Schema<ICalendarSettings>(
         _doc,
         ret: Record<string, unknown> & { __v?: number }
       ) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -264,7 +264,7 @@ CalendarSettingsSchema.methods.updateSetting = function (
   value: any
 ) {
   this.set(path, value);
-  return this.save();
+  return this.save() as Promise<ICalendarSettings>;
 };
 
 // Instance method to reset to defaults
@@ -282,7 +282,7 @@ CalendarSettingsSchema.methods.resetToDefaults = function () {
     }
   });
 
-  return this.save();
+  return this.save() as Promise<ICalendarSettings>;
 };
 
 // Create and export the model with safer initialization

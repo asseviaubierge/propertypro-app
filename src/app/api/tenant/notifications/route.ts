@@ -12,6 +12,7 @@ import {
   createErrorResponse as createApiErrorResponse,
   withPermissionAndDB,
 } from "@/lib/api-utils";
+import { canCreatePaymentNotification } from "@/lib/notification-access";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +37,11 @@ export const GET = withPermissionAndDB("payment_portal")(
   ) => {
     try {
       const { searchParams } = new URL(request.url);
-      const page = parseInt(searchParams.get("page") || "1");
-      const limit = parseInt(searchParams.get("limit") || "12");
+      const page = Math.max(parseInt(searchParams.get("page") || "1", 10) || 1, 1);
+      const limit = Math.min(
+        Math.max(parseInt(searchParams.get("limit") || "12", 10) || 12, 1),
+        100,
+      );
       const type = searchParams.get("type");
       const status = searchParams.get("status");
 
@@ -101,7 +105,7 @@ export const POST = withPermissionAndDB([
   "payment_processing",
   "financial_management",
 ])(
-  async (_user: AuthenticatedAccessUser, request: NextRequest) => {
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
     try {
       const body = await request.json();
       const {
@@ -131,9 +135,28 @@ export const POST = withPermissionAndDB([
 
       if (!["reminder", "overdue", "confirmation", "receipt"].includes(type)) {
         return createApiErrorResponse(
-          "Invalid notification type",
+          "Type de notification invalide",
           400,
-          "Invalid notification type"
+          "Type de notification invalide"
+        );
+      }
+
+      if (!(await canCreatePaymentNotification(user, paymentId, tenantId))) {
+        return createApiErrorResponse(
+          "Paiement ou locataire hors de votre périmètre",
+          403,
+          "Paiement ou locataire hors de votre périmètre"
+        );
+      }
+
+      const parsedScheduledDate = scheduledDate
+        ? new Date(scheduledDate)
+        : new Date();
+      if (Number.isNaN(parsedScheduledDate.getTime())) {
+        return createApiErrorResponse(
+          "Date de programmation invalide",
+          400,
+          "Date de programmation invalide"
         );
       }
 
@@ -142,7 +165,7 @@ export const POST = withPermissionAndDB([
         paymentId,
         type,
         status: "pending",
-        scheduledDate: scheduledDate || new Date(),
+        scheduledDate: parsedScheduledDate,
         emailAddress,
         subject,
         message,

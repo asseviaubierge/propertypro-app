@@ -1,309 +1,91 @@
-/**
- * PropertyPro - Payment Recording API
- * API endpoint for recording payments with automatic invoice linking
- */
-
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { paymentInvoiceLinkingService } from "@/lib/services/payment-invoice-linking.service";
-import { receiptGenerationService } from "@/lib/services/receipt-generation.service";
-import {
-  createSuccessResponse,
-  createErrorResponse,
-  handleApiError,
-} from "@/lib/api-utils";
+import { NextRequest } from "next/server";
 import { Types } from "mongoose";
+import {
+  AuthenticatedAccessUser,
+  createErrorResponse,
+  createSuccessResponse,
+  handleApiError,
+  withAccessAndDB,
+  withPermissionAndDB,
+} from "@/lib/api-utils";
+import { UserRole } from "@/types";
+import { canAccessTenant } from "@/lib/tenant-scope";
+import { paymentInvoiceLinkingService } from "@/lib/services/payment-invoice-linking.service";
 
-// ============================================================================
-// POST /api/payments/record - Record a new payment with invoice linking
-// ============================================================================
-export async function POST(request: NextRequest) {
-  try {
-    await connectDB();
+const READ_ACCESS = {
+  roles: [UserRole.TENANT],
+  permissions: ["payment_processing", "financial_management", "payment_history"],
+  match: "any" as const,
+};
 
-    const body = await request.json();
-    const {
-      tenantId,
-      leaseId,
-      amount,
-      paymentMethod,
-      paymentDate = new Date(),
-      notes,
-      specificInvoiceId,
-      transactionId,
-    } = body;
-
-    // Validate required fields
-    if (!tenantId) {
-      return createErrorResponse("Tenant ID is required", 400);
-    }
-
-    if (!amount || amount <= 0) {
-      return createErrorResponse("Valid payment amount is required", 400);
-    }
-
-    if (!paymentMethod) {
-      return createErrorResponse("Payment method is required", 400);
-    }
-
-    // Validate tenant ID format
-    if (!Types.ObjectId.isValid(tenantId)) {
-      return createErrorResponse("Invalid tenant ID format", 400);
-    }
-
-    // Validate lease ID format if provided
-    if (leaseId && !Types.ObjectId.isValid(leaseId)) {
-      return createErrorResponse("Invalid lease ID format", 400);
-    }
-
-    // Validate specific invoice ID if provided
-    if (specificInvoiceId && !Types.ObjectId.isValid(specificInvoiceId)) {
-      return createErrorResponse("Invalid invoice ID format", 400);
-    }
-
-    // Record the payment and link to invoices
-    const result = await paymentInvoiceLinkingService.recordManualPayment({
-      tenantId,
-      leaseId,
-      amount: parseFloat(amount),
-      paymentMethod,
-      paymentDate: new Date(paymentDate),
-      notes,
-      specificInvoiceId,
-    });
-
-    if (!result.success) {
-      return createErrorResponse(
-        `Payment recording failed: ${result.errors.join(", ")}`,
-        400
-      );
-    }
-
-    // Generate receipt automatically
-    let receiptResult = null;
+export const GET = withAccessAndDB(READ_ACCESS)(
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
     try {
-      receiptResult = await receiptGenerationService.generateReceiptForPayment(
-        result.paymentId,
-        true // Auto-email receipt
-      );
-    } catch (error) {
-      console.error("Failed to generate receipt:", error);
-      // Don't fail the payment if receipt generation fails
-    }
+      const params = new URL(request.url).searchParams;
+      const tenantId = params.get("tenantId") || (user.isTenant ? String(user.id) : "");
+      const leaseId = params.get("leaseId") || undefined;
+      const amount = Number(params.get("amount") || 0);
+      if (!tenantId || !Types.ObjectId.isValid(tenantId)) return createErrorResponse("Locataire invalide", 400);
+      if (!(await canAccessTenant(user, tenantId))) return createErrorResponse("Accès refusé à ce locataire", 403);
 
-    // Get updated payment allocation for the tenant
-    const allocation = await paymentInvoiceLinkingService.getPaymentAllocation(
-      tenantId,
-      leaseId
-    );
-
-    return createSuccessResponse(
-      {
-        payment: {
-          id: result.paymentId,
-          amount: amount,
-          amountApplied: result.totalAmountApplied,
-          remainingAmount: result.remainingPaymentAmount,
-        },
-        invoiceApplications: result.applicationsApplied,
-        receipt: receiptResult?.success
-          ? {
-              receiptId: receiptResult.receiptId,
-              receiptNumber: receiptResult.receiptNumber,
-              emailSent: receiptResult.emailSent,
-            }
-          : null,
-        tenantBalance: {
-          totalOutstanding: allocation.totalOutstanding,
-          invoiceCount: allocation.invoices.length,
-        },
-        warnings: result.errors.length > 0 ? result.errors : undefined,
-      },
-      "Payment recorded and applied to invoices successfully",
-      201
-    );
-  } catch (error) {
-    return handleApiError(error, "Failed to record payment");
-  }
-}
-
-// ============================================================================
-// GET /api/payments/record - Get payment allocation preview
-// ============================================================================
-export async function GET(request: NextRequest) {
-  try {
-    await connectDB();
-
-    const { searchParams } = new URL(request.url);
-    const tenantId = searchParams.get("tenantId");
-    const leaseId = searchParams.get("leaseId");
-    const amount = searchParams.get("amount");
-
-    if (!tenantId) {
-      return createErrorResponse("Tenant ID is required", 400);
-    }
-
-    if (!Types.ObjectId.isValid(tenantId)) {
-      return createErrorResponse("Invalid tenant ID format", 400);
-    }
-
-    // Get current payment allocation
-    const allocation = await paymentInvoiceLinkingService.getPaymentAllocation(
-      tenantId,
-      leaseId || undefined
-    );
-
-    // If amount is provided, calculate how it would be applied
-    let paymentPreview = null;
-    if (amount && parseFloat(amount) > 0) {
-      const paymentAmount = parseFloat(amount);
-      let remainingAmount = paymentAmount;
-      const applications = [];
-
-      for (const invoice of allocation.invoices) {
-        if (remainingAmount <= 0) break;
-
-        const amountToApply = Math.min(
-          remainingAmount,
-          invoice.balanceRemaining
-        );
-        applications.push({
-          invoiceId: invoice.invoiceId,
-          invoiceNumber: invoice.invoiceNumber,
-          dueDate: invoice.dueDate,
-          currentBalance: invoice.balanceRemaining,
-          amountToApply,
-          newBalance: invoice.balanceRemaining - amountToApply,
-          willBePaid: invoice.balanceRemaining - amountToApply === 0,
-        });
-
-        remainingAmount -= amountToApply;
+      const currentAllocation = await paymentInvoiceLinkingService.getPaymentAllocation(tenantId, leaseId);
+      let paymentPreview: any = null;
+      if (amount > 0) {
+        let remaining = amount;
+        const applications = currentAllocation.invoices.map((invoice) => {
+          const amountToApply = Math.min(remaining, invoice.balanceRemaining);
+          remaining -= amountToApply;
+          return {
+            invoiceId: invoice.invoiceId,
+            invoiceNumber: invoice.invoiceNumber,
+            dueDate: invoice.dueDate,
+            currentBalance: invoice.balanceRemaining,
+            amountToApply,
+            newBalance: Math.max(0, invoice.balanceRemaining - amountToApply),
+            willBePaid: invoice.balanceRemaining - amountToApply <= 0,
+          };
+        }).filter((item) => item.amountToApply > 0);
+        paymentPreview = {
+          paymentAmount: amount,
+          totalApplied: amount - remaining,
+          remainingAmount: remaining,
+          applications,
+        };
       }
-
-      paymentPreview = {
-        paymentAmount,
-        totalApplied: paymentAmount - remainingAmount,
-        remainingAmount,
-        applications,
-      };
+      return createSuccessResponse({ currentAllocation, paymentPreview }, "Affectation du paiement calculée");
+    } catch (error) {
+      return handleApiError(error, "Impossible de calculer l’affectation du paiement");
     }
+  },
+);
 
-    return createSuccessResponse(
-      {
-        tenantId,
-        leaseId,
-        currentAllocation: allocation,
-        paymentPreview,
-      },
-      "Payment allocation retrieved successfully"
-    );
-  } catch (error) {
-    return handleApiError(error, "Failed to get payment allocation");
-  }
-}
-
-// ============================================================================
-// PATCH /api/payments/record - Apply existing payment to invoices
-// ============================================================================
-export async function PATCH(request: NextRequest) {
-  try {
-    await connectDB();
-
-    const body = await request.json();
-    const { paymentId, tenantId, amount, leaseId, specificInvoiceId } = body;
-
-    // Validate required fields
-    if (!paymentId) {
-      return createErrorResponse("Payment ID is required", 400);
-    }
-
-    if (!tenantId) {
-      return createErrorResponse("Tenant ID is required", 400);
-    }
-
-    if (!amount || amount <= 0) {
-      return createErrorResponse("Valid payment amount is required", 400);
-    }
-
-    // Validate ID formats
-    if (!Types.ObjectId.isValid(paymentId)) {
-      return createErrorResponse("Invalid payment ID format", 400);
-    }
-
-    if (!Types.ObjectId.isValid(tenantId)) {
-      return createErrorResponse("Invalid tenant ID format", 400);
-    }
-
-    // Apply payment to invoices
-    const result = await paymentInvoiceLinkingService.applyPaymentToInvoices(
-      paymentId,
-      tenantId,
-      parseFloat(amount),
-      leaseId
-    );
-
-    if (!result.success) {
-      return createErrorResponse(
-        `Payment application failed: ${result.errors.join(", ")}`,
-        400
-      );
-    }
-
-    return createSuccessResponse(
-      {
+export const POST = withPermissionAndDB(["payment_processing", "financial_management"])(
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
+    try {
+      const body = await request.json();
+      if (!body?.tenantId || !Types.ObjectId.isValid(String(body.tenantId))) return createErrorResponse("Locataire invalide", 400);
+      if (!(await canAccessTenant(user, String(body.tenantId)))) return createErrorResponse("Accès refusé à ce locataire", 403);
+      const amount = Number(body.amount || 0);
+      if (!(amount > 0)) return createErrorResponse("Le montant doit être supérieur à zéro", 400);
+      const result = await paymentInvoiceLinkingService.recordManualPayment({
+        tenantId: String(body.tenantId),
+        leaseId: body.leaseId ? String(body.leaseId) : undefined,
+        amount,
+        paymentMethod: String(body.paymentMethod || "other"),
+        paymentDate: body.paymentDate ? new Date(body.paymentDate) : new Date(),
+        notes: body.notes ? String(body.notes) : undefined,
+        specificInvoiceId: body.specificInvoiceId ? String(body.specificInvoiceId) : undefined,
+      });
+      if (!result.success) return createErrorResponse(result.errors.join(", ") || "Échec de l’enregistrement du paiement", 400);
+      const currentAllocation = await paymentInvoiceLinkingService.getPaymentAllocation(String(body.tenantId), body.leaseId);
+      return createSuccessResponse({
         paymentId: result.paymentId,
-        totalAmountApplied: result.totalAmountApplied,
-        remainingAmount: result.remainingPaymentAmount,
         invoiceApplications: result.applicationsApplied,
-        warnings: result.errors.length > 0 ? result.errors : undefined,
-      },
-      "Payment applied to invoices successfully"
-    );
-  } catch (error) {
-    return handleApiError(error, "Failed to apply payment to invoices");
-  }
-}
-
-// ============================================================================
-// DELETE /api/payments/record - Reverse payment application
-// ============================================================================
-export async function DELETE(request: NextRequest) {
-  try {
-    await connectDB();
-
-    const { searchParams } = new URL(request.url);
-    const paymentId = searchParams.get("paymentId");
-
-    if (!paymentId) {
-      return createErrorResponse("Payment ID is required", 400);
+        tenantBalance: currentAllocation,
+        remainingPaymentAmount: result.remainingPaymentAmount,
+      }, "Paiement enregistré");
+    } catch (error) {
+      return handleApiError(error, "Impossible d’enregistrer le paiement");
     }
-
-    if (!Types.ObjectId.isValid(paymentId)) {
-      return createErrorResponse("Invalid payment ID format", 400);
-    }
-
-    // Reverse the payment application
-    const result = await paymentInvoiceLinkingService.reversePaymentApplication(
-      paymentId
-    );
-
-    if (!result.success) {
-      return createErrorResponse(
-        `Payment reversal failed: ${result.errors.join(", ")}`,
-        400
-      );
-    }
-
-    return createSuccessResponse(
-      {
-        paymentId,
-        reversedAmount: result.reversedAmount,
-        affectedInvoices: result.affectedInvoices,
-        warnings: result.errors.length > 0 ? result.errors : undefined,
-      },
-      "Payment application reversed successfully"
-    );
-  } catch (error) {
-    return handleApiError(error, "Failed to reverse payment application");
-  }
-}
+  },
+);

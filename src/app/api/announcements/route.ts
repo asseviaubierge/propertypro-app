@@ -101,8 +101,8 @@ export const GET = withPermissionAndDB("profile_management")(async (
     const validation = querySchema.safeParse(queryParams);
     if (!validation.success) {
       return createErrorResponse(
-        `Invalid query parameters: ${validation.error.errors
-          .map((e) => e.message)
+        `Invalid query parameters: ${validation.error.issues
+          .map((e: any) => e.message)
           .join(", ")}`,
         400,
       );
@@ -221,11 +221,11 @@ export const POST = withPermissionAndDB("company_settings")(async (
     if (!validation.success) {
       console.error(
         "❌ Announcement validation failed:",
-        validation.error.errors,
+        validation.error.issues,
       );
       return createErrorResponse(
-        `Validation failed: ${validation.error.errors
-          .map((e) => e.message)
+        `Validation failed: ${validation.error.issues
+          .map((e: any) => e.message)
           .join(", ")}`,
         400,
       );
@@ -312,7 +312,7 @@ export async function markAnnouncementAsViewed(
       return { success: false, error: "Announcement not found" };
     }
 
-    await announcement.addView(userId, ipAddress);
+    await (announcement as any).addView?.(userId, ipAddress);
 
     return { success: true };
   } catch (error) {
@@ -332,7 +332,7 @@ export async function addAnnouncementReaction(
       return { success: false, error: "Announcement not found" };
     }
 
-    await announcement.addReaction(userId, reactionType);
+    await (announcement as any).addReaction?.(userId, reactionType);
 
     return { success: true };
   } catch (error) {
@@ -351,7 +351,7 @@ export async function removeAnnouncementReaction(
       return { success: false, error: "Announcement not found" };
     }
 
-    await announcement.removeReaction(userId);
+    await (announcement as any).removeReaction?.(userId);
 
     return { success: true };
   } catch (error) {

@@ -315,7 +315,7 @@ const ConversationSchema = new Schema<IConversation>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -510,7 +510,7 @@ ConversationSchema.methods.addParticipant = function (
         ...permissions,
       };
     }
-    return this;
+    return this as IConversation;
   }
 
   const defaultPermissions =
@@ -527,7 +527,7 @@ ConversationSchema.methods.addParticipant = function (
   });
 
   this.metadata.totalParticipants = this.activeParticipantsCount;
-  return this;
+  return this as IConversation;
 };
 
 // Instance method to remove participant
@@ -566,7 +566,7 @@ ConversationSchema.methods.removeParticipant = function (userId: string) {
     this.metadata.totalParticipants = this.activeParticipantsCount;
   }
 
-  return this;
+  return this as IConversation;
 };
 
 // Instance method to update last message
@@ -581,7 +581,7 @@ ConversationSchema.methods.updateLastMessage = function (message: any) {
   };
   this.metadata.lastActivity = new Date();
   this.metadata.totalMessages += 1;
-  return this;
+  return this as IConversation;
 };
 
 // Instance method to mark as read for user
@@ -594,7 +594,7 @@ ConversationSchema.methods.markAsReadForUser = function (userId: string) {
     participant.lastReadAt = new Date();
   }
 
-  return this;
+  return this as IConversation;
 };
 
 // Static method to create individual conversation

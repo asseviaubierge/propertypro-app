@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useSettings } from "@/components/providers/SettingsProvider";
+import { useSettings, type BrandingSettings } from "@/components/providers/SettingsProvider";
 import {
   Loader2,
   Building2,
@@ -24,7 +24,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const DEFAULT_BRANDING: Branding = {
+const DEFAULT_BRANDING: BrandingSettings = {
   logoLight: "/images/logo-light.png",
   logoDark: "/images/logo-dark.png",
   favicon: "/favicon.ico",

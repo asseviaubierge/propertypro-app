@@ -95,9 +95,17 @@ const getStatusOptions = (t: (key: string) => string) => [
   },
 ];
 
+const normalizeStatus = (status?: string): TenantStatus => {
+  const normalized = String(status || "application_submitted").toLowerCase();
+  return (["submitted", "pending", "soumis"].includes(normalized)
+    ? "application_submitted"
+    : normalized) as TenantStatus;
+};
+
 const getAvailableTransitions = (
   currentStatus?: TenantStatus
 ): TenantStatus[] => {
+  currentStatus = normalizeStatus(currentStatus);
   const transitions: Record<TenantStatus, TenantStatus[]> = {
     application_submitted: ["under_review", "approved", "terminated"],
     under_review: ["approved", "terminated"],
@@ -173,7 +181,7 @@ export default function TenantStatusDialog({
   const canManageStatus = accessProfile.isSystemRole
     ? isCompanyStaff
     : hasAnyPermission(["tenant_management", "tenant_edit"]);
-  const currentStatus = tenant.tenantStatus || "application_submitted";
+  const currentStatus = normalizeStatus(tenant.tenantStatus);
   const availableTransitions = getAvailableTransitions(currentStatus);
   const currentStatusInfo = getStatusInfo(currentStatus, t);
   const selectedStatusInfo = selectedStatus

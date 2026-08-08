@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useAuthorization } from "./useAuthorization";
+import { E_IMMO_MAINTENANCE_EMAIL } from "@/lib/default-maintenance-staff";
 
 interface MaintenanceStaff {
   _id: string;
@@ -27,12 +28,12 @@ interface UseMaintenanceStaffReturn {
 
 export function useMaintenanceStaff(): UseMaintenanceStaffReturn {
   const { data: session } = useSession();
-  const { isCompanyStaff } = useAuthorization();
+  const { isAdmin } = useAuthorization();
   const [staff, setStaff] = useState<MaintenanceStaff[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const canFetchStaff = isCompanyStaff;
+  const canFetchStaff = isAdmin;
 
   const fetchStaff = async () => {
     // Don't fetch if user doesn't have permission
@@ -45,25 +46,26 @@ export function useMaintenanceStaff(): UseMaintenanceStaffReturn {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        "/api/users?excludeTenant=true&companyStaffOnly=true&isActive=true&limit=100"
-      );
+      const response = await fetch("/api/maintenance/staff?isActive=true", {
+        cache: "no-store",
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch maintenance staff");
+        throw new Error("Échec du chargement des techniciens");
       }
 
       const data = await response.json();
-      const staffList = data.users || data.data?.users || [];
+      const staffList = data.data?.staff || data.staff || [];
 
       const filteredStaff = staffList.filter(
-        (user: MaintenanceStaff) => user.isActive
+        (user: MaintenanceStaff) =>
+          user.isActive && user.email?.toLowerCase() !== E_IMMO_MAINTENANCE_EMAIL
       );
 
       setStaff(filteredStaff);
     } catch (err) {
-      console.error("Error fetching maintenance staff:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch staff");
+      console.warn("Chargement des techniciens indisponible :", err);
+      setError(err instanceof Error ? err.message : "Échec du chargement des techniciens");
     } finally {
       setIsLoading(false);
     }

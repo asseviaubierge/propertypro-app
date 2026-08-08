@@ -4,7 +4,6 @@
  */
 
 import { NextRequest } from "next/server";
-import { UserRole } from "@/types";
 import {
   createSuccessResponse,
   createErrorResponse,
@@ -26,7 +25,7 @@ import { formatCurrency } from "@/lib/utils/formatting";
 // POST /api/invoices/email - Send invoice PDF via email
 // ============================================================================
 
-export const POST = withPermissionAndDB("financial_management")(async (user, request: NextRequest) => {
+export const POST = withPermissionAndDB("financial_management")(async (user: any, request: NextRequest) => {
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
@@ -109,14 +108,14 @@ export const POST = withPermissionAndDB("financial_management")(async (user, req
       const { default: DisplaySettings } = await import(
         "@/models/DisplaySettings"
       );
-      const ds = await DisplaySettings.findByUserId(user.id);
+      const ds = await (DisplaySettings as any).findByUserId?.(user.id);
       if (ds?.currency) {
         currencyCode = ds.currency;
       } else {
         const { default: SystemSettingsNew } = await import(
           "@/models/SystemSettingsNew"
         );
-        const systemSettings = await SystemSettingsNew.getSettings();
+        const systemSettings = await (SystemSettingsNew as any).getSettings?.();
         currencyCode = systemSettings?.payment?.currency || currencyCode;
       }
     } catch {}

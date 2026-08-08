@@ -76,23 +76,6 @@ interface TenantApiResponse {
   };
 }
 
-interface TechnicianApiResponse {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role?: string;
-  specialties?: string[];
-}
-
-interface Technician {
-  id: string;
-  name: string;
-  email: string;
-  role?: string;
-  specialties?: string[];
-}
-
 interface LeaseItem {
   _id: string;
   propertyId?: {
@@ -117,7 +100,6 @@ export default function NewMaintenanceRequestPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [tenantLeases, setTenantLeases] = useState<LeaseItem[]>([]);
   const [tenantInitialData, setTenantInitialData] = useState<{
     propertyId?: string;
@@ -139,13 +121,10 @@ export default function NewMaintenanceRequestPage() {
     try {
       setDataLoading(true);
 
-      // Fetch properties, tenants, and potential assignees (managers/technicians) in parallel
-      const [propertiesRes, tenantsRes, techniciansRes] = await Promise.all([
+      // Assignment is handled centrally by E-IMMO. Only load properties and tenants.
+      const [propertiesRes, tenantsRes] = await Promise.all([
         fetch("/api/properties?limit=100"),
         fetch("/api/tenants?limit=100"),
-        fetch(
-          "/api/users?excludeTenant=true&companyStaffOnly=true&isActive=true&limit=100",
-        ),
       ]);
 
       if (propertiesRes.ok) {
@@ -194,35 +173,6 @@ export default function NewMaintenanceRequestPage() {
         toast.error(t("maintenance.new.toasts.loadTenantsError"));
       }
 
-      if (techniciansRes.ok) {
-        const techniciansData = await techniciansRes.json();
-        // Handle varying API response shapes
-        const usersArray = Array.isArray(techniciansData?.data)
-          ? techniciansData.data
-          : Array.isArray(techniciansData?.data?.users)
-            ? techniciansData.data.users
-            : Array.isArray(techniciansData?.users)
-              ? techniciansData.users
-              : [];
-
-        const assignees = usersArray
-          .filter((u: any) => {
-            if (!u || (!u._id && !u.id)) return false;
-            if (u.isActive === false) return false;
-            return true;
-          })
-          .map((tech: any) => ({
-            id: tech._id || tech.id,
-            name: `${tech.firstName || ""} ${tech.lastName || ""}`.trim(),
-            email: tech.email || "",
-            role: tech.role,
-            specialties: tech.specialties || [],
-          }));
-
-        setTechnicians(assignees);
-      } else {
-        toast.error(t("maintenance.new.toasts.loadTechniciansError"));
-      }
     } catch (error) {
       toast.error(t("maintenance.new.toasts.loadFormDataError"));
     } finally {
@@ -394,7 +344,6 @@ export default function NewMaintenanceRequestPage() {
             ? {}
             : {
                 tenantId: data.tenantId,
-                assignedTo: data.assignedTo || undefined,
                 estimatedCost: data.estimatedCost || undefined,
                 scheduledDate: data.scheduledDate || undefined,
               }),
@@ -496,11 +445,12 @@ export default function NewMaintenanceRequestPage() {
           isTenantView={isTenant}
           showPropertyTenantSection={true}
           showAssignmentSchedulingSection={!isTenant}
+          showAssigneeField={false}
+          defaultAssigneeLabel="E-IMMO — Staff Gestion E-Immo"
           submitLabel={t("maintenance.form.buttons.submitRequest")}
           submitDisabled={isTenant && !hasActiveLease}
           properties={properties}
           tenants={tenants}
-          technicians={technicians}
         />
       </div>
     </div>

@@ -20,6 +20,7 @@ import {
 import {
   LEASE_PATCH_ACCESS,
   canManageLeases,
+  canAccessLease,
   isLeaseTenantUser,
 } from "@/lib/lease-access";
 
@@ -57,8 +58,7 @@ export const POST = withAccessAndDB(LEASE_PATCH_ACCESS)(
       }
 
       // Check permissions
-      const canTerminate =
-        canManageLeases(user) || isLeaseTenantUser(user, lease);
+      const canTerminate = await canAccessLease(user, lease);
 
       if (!canTerminate) {
         return createErrorResponse("Access denied", 403);
@@ -205,7 +205,7 @@ export const GET = withAccessAndDB(LEASE_PATCH_ACCESS)(
       }
 
       // Check permissions
-      const canView = canManageLeases(user) || isLeaseTenantUser(user, lease);
+      const canView = await canAccessLease(user, lease);
 
       if (!canView) {
         return createErrorResponse("Access denied", 403);

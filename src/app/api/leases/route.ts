@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Lease, Property, User } from "@/models";
+import { Lease, Property, User, Notification } from "@/models";
 import { LeaseStatus } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -27,6 +27,7 @@ import {
   isLeaseTenantCandidate,
 } from "@/lib/lease-access";
 import { autoInvoiceGenerationService } from "@/lib/services/auto-invoice-generation.service";
+import { applyPropertyScope, canAccessProperty } from "@/lib/property-scope";
 
 // ============================================================================
 // GET /api/leases - Get all leases with pagination and filtering
@@ -65,16 +66,22 @@ export const GET = withAccessAndDB(LEASE_READ_ACCESS)(
     // working list stays clean).
     query.archivedAt = archived ? { $ne: null } : null;
 
-    // Role-based filtering for single company architecture
+    // Multi-tenant filtering: tenants see their leases; staff are scoped
+    // through the properties they actually manage or own.
     if (user.isTenant) {
-      // For tenant users, filter leases by their user ID directly
       query.tenantId = user.id;
+    } else {
+      query = await applyPropertyScope(user, query);
     }
-    // Admin and Manager can see all company leases - no filtering needed
 
     // Apply lease-specific filters
     if (status) query.status = status;
-    if (propertyId) query.propertyId = propertyId;
+    if (propertyId) {
+      if (!user.isTenant && !(await canAccessProperty(user, propertyId))) {
+        return createErrorResponse("Access denied", 403);
+      }
+      query.propertyId = propertyId;
+    }
     if (tenantId) query.tenantId = tenantId;
 
     // Handle expiring leases filter
@@ -112,11 +119,11 @@ export const GET = withAccessAndDB(LEASE_READ_ACCESS)(
       {
         path: "propertyId",
         select:
-          "name address type bedrooms bathrooms squareFootage units isMultiUnit totalUnits",
-        populate: {
-          path: "ownerId",
-          select: "firstName lastName email",
-        },
+          "name address type bedrooms bathrooms squareFootage units isMultiUnit totalUnits ownerId managerId",
+        populate: [
+          { path: "ownerId", select: "firstName lastName businessName accountType email phone" },
+          { path: "managerId", select: "firstName lastName businessName accountType email phone" },
+        ],
       },
       {
         path: "tenantId",
@@ -229,6 +236,10 @@ export const POST = withPermissionAndDB([
         return createErrorResponse("Property not found", 404);
       }
 
+      if (!(await canAccessProperty(user, property._id))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
       // Verify the specific unit exists and is available
       const unit = property.units.find(
         (u: any) => u._id?.toString() === leaseData.unitId.toString()
@@ -301,6 +312,27 @@ export const POST = withPermissionAndDB([
           }
         );
       }
+
+      // Notifications ciblées : le locataire et le gestionnaire/propriétaire concerné.
+      const recipientIds = new Set<string>([leaseData.tenantId]);
+      const propertyOwnerId = property.ownerId?.toString?.();
+      const propertyManagerId = property.managerId?.toString?.();
+      if (propertyOwnerId) recipientIds.add(propertyOwnerId);
+      if (propertyManagerId) recipientIds.add(propertyManagerId);
+      recipientIds.add(user.id);
+      await Notification.insertMany(
+        Array.from(recipientIds).map((recipientId) => ({
+          userId: recipientId,
+          title: lease.status === LeaseStatus.ACTIVE ? "Nouveau bail actif" : "Nouveau bail créé",
+          message: `Le bail du bien ${property.name} a été créé pour le locataire.`,
+          type: "lease",
+          priority: "high",
+          read: false,
+          actionUrl: `/dashboard/leases/${lease._id.toString()}`,
+          metadata: { leaseId: lease._id, propertyId: property._id, tenantId: lease.tenantId },
+        })),
+        { ordered: false }
+      ).catch(() => undefined);
 
       // Populate property and tenant information
       await lease.populate([

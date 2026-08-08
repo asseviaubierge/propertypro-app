@@ -29,7 +29,7 @@ export const POST = withPermissionAndDB("profile_management")(
 
     return createSuccessResponse(
       { disconnected: true },
-      "Google Calendar disconnected successfully"
+      "Google Agenda déconnecté avec succès"
     );
   } catch (error) {
     return handleApiError(error);

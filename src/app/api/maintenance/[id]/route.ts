@@ -1,25 +1,22 @@
-/**
- * PropertyPro - Individual Maintenance Request API Routes
- * CRUD operations for individual maintenance requests
- */
-
 import { NextRequest } from "next/server";
-import { MaintenanceRequest, User } from "@/models";
-import { UserRole, MaintenanceStatus } from "@/types";
+import mongoose from "mongoose";
+import { MaintenanceRequest, Property, User } from "@/models";
+import { MaintenanceStatus, UserRole } from "@/types";
 import {
   AuthenticatedAccessUser,
-  createSuccessResponse,
   createErrorResponse,
+  createSuccessResponse,
   handleApiError,
-  parseRequestBody,
   isValidObjectId,
+  parseRequestBody,
   withAccessAndDB,
-  withPermissionAndDB,
 } from "@/lib/api-utils";
-import { maintenanceRequestSchema, validateSchema } from "@/lib/validations";
-import { resolveAccessProfile } from "@/lib/server-permissions";
+import {
+  canAccessMaintenanceRequest,
+  assertMaintenancePropertyAccess,
+} from "@/lib/maintenance-access";
 
-const MAINTENANCE_READ_ACCESS = {
+const ACCESS = {
   roles: [UserRole.TENANT],
   permissions: [
     "maintenance_view",
@@ -30,10 +27,9 @@ const MAINTENANCE_READ_ACCESS = {
   match: "any" as const,
 };
 
-const MAINTENANCE_WRITE_ACCESS = {
+const WRITE = {
   roles: [UserRole.TENANT],
   permissions: [
-    "maintenance_create",
     "maintenance_management",
     "maintenance_assign",
     "work_orders",
@@ -41,68 +37,88 @@ const MAINTENANCE_WRITE_ACCESS = {
   match: "any" as const,
 };
 
-// ============================================================================
-// GET /api/maintenance/[id] - Get a specific maintenance request
-// ============================================================================
+function asId(value: unknown): string | null {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (value instanceof mongoose.Types.ObjectId) return value.toString();
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return asId(record._id ?? record.id);
+  }
+  return null;
+}
 
-export const GET = withAccessAndDB(MAINTENANCE_READ_ACCESS)(
+async function loadRaw(id: string) {
+  return MaintenanceRequest.findOne({ _id: id, deletedAt: null });
+}
+
+async function buildMaintenanceDetail(item: any) {
+  const raw = typeof item?.toObject === "function" ? item.toObject() : item;
+
+  const propertyId = asId(raw?.propertyId);
+  const tenantId = asId(raw?.tenantId);
+  const assignedToId = asId(raw?.assignedTo);
+  const unitId = asId(raw?.unitId);
+
+  const [property, tenantUser, assignedTo] = await Promise.all([
+    propertyId && mongoose.isValidObjectId(propertyId)
+      ? Property.findById(propertyId)
+          .select("name address type isMultiUnit units ownerId managerId")
+          .lean()
+      : null,
+    tenantId && mongoose.isValidObjectId(tenantId)
+      ? User.findById(tenantId)
+          .select("firstName lastName email phone avatar tenantStatus")
+          .lean()
+      : null,
+    assignedToId && mongoose.isValidObjectId(assignedToId)
+      ? User.findById(assignedToId)
+          .select("firstName lastName email phone avatar")
+          .lean()
+      : null,
+  ]);
+
+  const unit =
+    unitId && Array.isArray((property as any)?.units)
+      ? (property as any).units.find(
+          (candidate: any) => asId(candidate?._id) === unitId
+        ) ?? null
+      : null;
+
+  return {
+    ...raw,
+    propertyId: property ?? raw.propertyId,
+    property: property ?? null,
+    unitId: unit ?? raw.unitId,
+    unit,
+    tenantId: tenantUser ?? raw.tenantId,
+    tenant: tenantUser ? { user: tenantUser } : null,
+    assignedTo: assignedTo ?? raw.assignedTo ?? null,
+  };
+}
+
+export const GET = withAccessAndDB(ACCESS)(
   async (
     user: AuthenticatedAccessUser,
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
   ) => {
     try {
       const { id } = await params;
-
       if (!isValidObjectId(id)) {
         return createErrorResponse("Invalid maintenance request ID", 400);
       }
 
-      const maintenanceRequest = await MaintenanceRequest.findById(id)
-        .populate(
-          "propertyId",
-          "name address type ownerId managerId isMultiUnit units"
-        )
-        .populate("tenantId", "firstName lastName email phone avatar")
-        .populate("assignedTo", "firstName lastName email phone avatar");
-
-      if (!maintenanceRequest) {
+      const item = await loadRaw(id);
+      if (!item) {
         return createErrorResponse("Maintenance request not found", 404);
       }
-
-      if (
-        user.isTenant &&
-        !maintenanceRequest.tenantId._id.equals(user.id)
-      ) {
-        return createErrorResponse(
-          "You can only view your own maintenance requests",
-          403
-        );
-      }
-
-      const requestObj = (maintenanceRequest.toObject
-        ? maintenanceRequest.toObject()
-        : maintenanceRequest) as any;
-
-      let unit = null;
-      if (requestObj.unitId && requestObj.propertyId?.units) {
-        unit = requestObj.propertyId.units.find(
-          (embeddedUnit: any) =>
-            embeddedUnit._id.toString() === requestObj.unitId.toString()
-        );
+      if (!(await canAccessMaintenanceRequest(user, item))) {
+        return createErrorResponse("Forbidden", 403);
       }
 
       return createSuccessResponse(
-        {
-          ...requestObj,
-          property: requestObj.propertyId,
-          unit,
-          tenant: requestObj.tenantId
-            ? {
-                user: requestObj.tenantId,
-              }
-            : null,
-        },
+        await buildMaintenanceDetail(item),
         "Maintenance request retrieved successfully"
       );
     } catch (error) {
@@ -111,11 +127,7 @@ export const GET = withAccessAndDB(MAINTENANCE_READ_ACCESS)(
   }
 );
 
-// ============================================================================
-// PUT /api/maintenance/[id] - Update a maintenance request
-// ============================================================================
-
-export const PUT = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
+export const PATCH = withAccessAndDB(WRITE)(
   async (
     user: AuthenticatedAccessUser,
     request: NextRequest,
@@ -123,97 +135,96 @@ export const PUT = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
   ) => {
     try {
       const { id } = await params;
-
       if (!isValidObjectId(id)) {
         return createErrorResponse("Invalid maintenance request ID", 400);
       }
 
-      const { success, data: body, error } = await parseRequestBody(request);
-      if (!success) {
-        return createErrorResponse(error!, 400);
-      }
-
-      const maintenanceRequest = await MaintenanceRequest.findById(id);
-      if (!maintenanceRequest) {
+      const item = await loadRaw(id);
+      if (!item) {
         return createErrorResponse("Maintenance request not found", 404);
       }
+      if (!(await canAccessMaintenanceRequest(user, item))) {
+        return createErrorResponse("Forbidden", 403);
+      }
+
+      const parsed = await parseRequestBody(request);
+      if (!parsed.success) {
+        return createErrorResponse(parsed.error!, 400);
+      }
+      const body: any = parsed.data;
 
       if (user.isTenant) {
-        if (!maintenanceRequest.tenantId.equals(user.id)) {
-          return createErrorResponse(
-            "You can only update your own maintenance requests",
-            403
-          );
+        if (String(item.tenantId) !== user.id) {
+          return createErrorResponse("Forbidden", 403);
         }
-
-        if (maintenanceRequest.status === MaintenanceStatus.COMPLETED) {
+        if (![MaintenanceStatus.SUBMITTED].includes(item.status as MaintenanceStatus)) {
           return createErrorResponse(
-            "Cannot update completed maintenance request",
-            400
-          );
-        }
-      } else if (user.isManager && !user.isAdmin) {
-        if (
-          maintenanceRequest.assignedTo &&
-          !maintenanceRequest.assignedTo.equals(user.id)
-        ) {
-          return createErrorResponse(
-            "You can only update requests assigned to you",
-            403
+            "This request can no longer be edited by the tenant",
+            409
           );
         }
       }
 
-      const updateSchema = maintenanceRequestSchema.partial();
-      const validation = validateSchema(updateSchema, body);
-      if (!validation.success) {
-        return createErrorResponse(validation.errors.join(", "), 400);
-      }
-
-      const updateData = validation.data;
+      const forbidden = [
+        "_id",
+        "tenantId",
+        "createdAt",
+        "updatedAt",
+        "deletedAt",
+      ];
+      forbidden.forEach((key) => delete body[key]);
 
       if (user.isTenant) {
-        const restrictedFields = [
-          "assignedTo",
+        [
           "status",
+          "assignedTo",
           "estimatedCost",
           "actualCost",
-          "scheduledDate",
           "completedDate",
-        ] as const;
-
-        restrictedFields.forEach((field) => {
-          delete (updateData as Record<string, unknown>)[field];
-        });
+        ].forEach((key) => delete body[key]);
       }
 
-      if (user.isManager && !user.isAdmin) {
-        delete updateData.propertyId;
-        delete updateData.tenantId;
-        delete updateData.priority;
+      if (
+        body.propertyId &&
+        !(await assertMaintenancePropertyAccess(user, body.propertyId))
+      ) {
+        return createErrorResponse("Forbidden property", 403);
       }
 
-      Object.assign(maintenanceRequest, updateData);
-      await maintenanceRequest.save();
+      if (body.propertyId) {
+        const property = await Property.findById(body.propertyId)
+          .select("units")
+          .lean();
+        if (!property) {
+          return createErrorResponse("Property not found", 404);
+        }
+        if (
+          body.unitId &&
+          !(property.units || []).some(
+            (unit: any) => String(unit._id) === String(body.unitId)
+          )
+        ) {
+          return createErrorResponse(
+            "Unit not found in the specified property",
+            404
+          );
+        }
+      }
 
-      await maintenanceRequest.populate([
-        { path: "propertyId", select: "name address type" },
-        { path: "tenantId", select: "firstName lastName email phone" },
-        { path: "assignedTo", select: "firstName lastName email phone" },
-      ]);
+      if (body.assignedTo) {
+        const assignee = await User.findById(body.assignedTo)
+          .select("isActive")
+          .lean();
+        if (!assignee || !(assignee as any).isActive) {
+          return createErrorResponse("Assigned user not found", 404);
+        }
+      }
 
-      const requestObj = maintenanceRequest.toObject
-        ? maintenanceRequest.toObject()
-        : maintenanceRequest;
+      Object.assign(item, body);
+      await item.save();
 
       return createSuccessResponse(
-        {
-          ...requestObj,
-          property: requestObj.propertyId,
-          tenant: {
-            user: requestObj.tenantId || {},
-          },
-        },
+        await buildMaintenanceDetail(item),
         "Maintenance request updated successfully"
       );
     } catch (error) {
@@ -222,169 +233,40 @@ export const PUT = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
   }
 );
 
-// ============================================================================
-// DELETE /api/maintenance/[id] - Delete a maintenance request (soft delete)
-// ============================================================================
-
-export const DELETE = withPermissionAndDB([
-  "maintenance_management",
-  "maintenance_assign",
-  "work_orders",
-])(
+export const DELETE = withAccessAndDB(WRITE)(
   async (
     user: AuthenticatedAccessUser,
-    request: NextRequest,
+    _request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
   ) => {
     try {
       const { id } = await params;
-
       if (!isValidObjectId(id)) {
         return createErrorResponse("Invalid maintenance request ID", 400);
       }
 
-      const maintenanceRequest = await MaintenanceRequest.findById(id);
-      if (!maintenanceRequest) {
+      const item = await loadRaw(id);
+      if (!item) {
         return createErrorResponse("Maintenance request not found", 404);
       }
-
-      if (maintenanceRequest.status === MaintenanceStatus.COMPLETED) {
+      if (!(await canAccessMaintenanceRequest(user, item))) {
+        return createErrorResponse("Forbidden", 403);
+      }
+      if (item.status === MaintenanceStatus.COMPLETED) {
         return createErrorResponse(
-          "Cannot delete completed maintenance request.",
+          "Completed requests cannot be deleted",
           409
         );
       }
+      if (user.isTenant && String(item.tenantId) !== user.id) {
+        return createErrorResponse("Forbidden", 403);
+      }
 
-      maintenanceRequest.deletedAt = new Date();
-      await maintenanceRequest.save();
-
+      item.deletedAt = new Date();
+      await item.save();
       return createSuccessResponse(
-        { id: maintenanceRequest._id },
+        { id },
         "Maintenance request deleted successfully"
-      );
-    } catch (error) {
-      return handleApiError(error);
-    }
-  }
-);
-
-// ============================================================================
-// PATCH /api/maintenance/[id] - Partial update (status change, assignment, etc.)
-// ============================================================================
-
-export const PATCH = withAccessAndDB(MAINTENANCE_WRITE_ACCESS)(
-  async (
-    user: AuthenticatedAccessUser,
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) => {
-    try {
-      const { id } = await params;
-
-      if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid maintenance request ID", 400);
-      }
-
-      const { success, data: body, error } = await parseRequestBody(request);
-      if (!success) {
-        return createErrorResponse(error!, 400);
-      }
-
-      const maintenanceRequest = await MaintenanceRequest.findById(id);
-      if (!maintenanceRequest) {
-        return createErrorResponse("Maintenance request not found", 404);
-      }
-
-      if (user.isTenant && !maintenanceRequest.tenantId.equals(user.id)) {
-        return createErrorResponse(
-          "You can only modify your own maintenance requests",
-          403
-        );
-      }
-
-      const { action, ...data } = body;
-
-      switch (action) {
-        case "assign": {
-          if (user.isTenant) {
-            return createErrorResponse(
-              "Tenants cannot assign maintenance requests",
-              403
-            );
-          }
-          if (!data.assignedTo) {
-            return createErrorResponse("Assigned user ID is required", 400);
-          }
-
-          const assignedUser = await User.findById(data.assignedTo);
-          if (!assignedUser) {
-            return createErrorResponse("Assigned user not found", 404);
-          }
-
-          const assigneeAccess = await resolveAccessProfile(assignedUser.role);
-          if (!assigneeAccess.isCompanyStaff) {
-            return createErrorResponse(
-              "User cannot be assigned maintenance requests",
-              400
-            );
-          }
-
-          maintenanceRequest.assignedTo = data.assignedTo;
-          maintenanceRequest.status = MaintenanceStatus.ASSIGNED;
-          break;
-        }
-
-        case "startWork":
-          if (user.isTenant) {
-            return createErrorResponse(
-              "Tenants cannot start work on maintenance requests",
-              403
-            );
-          }
-          maintenanceRequest.status = MaintenanceStatus.IN_PROGRESS;
-          break;
-
-        case "complete":
-          if (user.isTenant) {
-            return createErrorResponse(
-              "Tenants cannot complete maintenance requests",
-              403
-            );
-          }
-          maintenanceRequest.status = MaintenanceStatus.COMPLETED;
-          maintenanceRequest.completedDate = new Date();
-          if (data.actualCost) {
-            maintenanceRequest.actualCost = data.actualCost;
-          }
-          break;
-
-        case "addNote": {
-          if (!data.note) {
-            return createErrorResponse("Note content is required", 400);
-          }
-
-          const currentNotes = maintenanceRequest.notes || "";
-          const timestamp = new Date().toISOString();
-          const userName = `${user.firstName || "User"} ${
-            user.lastName || ""
-          }`.trim();
-          const newNote = `[${timestamp}] ${userName}: ${data.note}`;
-
-          maintenanceRequest.notes = currentNotes
-            ? `${currentNotes}\n${newNote}`
-            : newNote;
-          break;
-        }
-
-        default:
-          return createErrorResponse("Invalid action specified", 400);
-      }
-
-      await maintenanceRequest.save();
-
-      return createSuccessResponse(
-        maintenanceRequest,
-        `Maintenance request ${action} completed successfully`
       );
     } catch (error) {
       return handleApiError(error);

@@ -95,7 +95,7 @@ const RoleSchema = new Schema<IRole>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete (ret as { __v?: number }).__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -161,7 +161,7 @@ RoleSchema.methods.softDelete = function (
   this.deletedAt = new Date();
   this.updatedBy = deletedBy;
   this.isActive = false;
-  return this.save();
+  return this.save() as Promise<IRole>;
 };
 
 // ============================================================================

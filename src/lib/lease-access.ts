@@ -6,6 +6,7 @@ import {
 } from "@/lib/api-utils";
 import { hasAnyPermission } from "./role-utils";
 import { resolveAccessProfile } from "./server-permissions";
+import { canAccessProperty } from "./property-scope";
 
 export const LEASE_VIEW_PERMISSIONS = [
   "lease_view",
@@ -112,6 +113,19 @@ export function canManageLeases(user: AuthenticatedAccessUser): boolean {
     user.isCompanyStaff &&
     hasAnyPermission(user.permissions, LEASE_MANAGE_PERMISSIONS)
   );
+}
+
+export async function canAccessLease(
+  user: AuthenticatedAccessUser,
+  leaseLike: { propertyId?: unknown; tenantId?: unknown } | null | undefined
+): Promise<boolean> {
+  if (!leaseLike) return false;
+  if (user.isAdmin) return true;
+  if (isLeaseTenantUser(user, leaseLike)) return true;
+  if (!canManageLeases(user)) return false;
+
+  const propertyId = resolveReferenceId(leaseLike.propertyId);
+  return propertyId ? canAccessProperty(user, propertyId) : false;
 }
 
 export function canManageLeaseDocuments(

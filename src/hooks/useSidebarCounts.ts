@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 
 export interface SidebarCounts {
   applications: number;
+  activeLeases: number;
   expiringLeases: number;
   emergencyMaintenance: number;
   overduePayments: number;
@@ -27,6 +28,7 @@ interface UseSidebarCountsReturn {
 
 const defaultCounts: SidebarCounts = {
   applications: 0,
+  activeLeases: 0,
   expiringLeases: 0,
   emergencyMaintenance: 0,
   overduePayments: 0,
@@ -86,7 +88,7 @@ export function useSidebarCounts(
         throw new Error(data?.message || "Failed to fetch sidebar counts");
       }
     } catch (err) {
-      console.error("Error fetching sidebar counts:", err);
+      console.warn("Comptages du menu indisponibles:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
       // Keep previous counts on error
     } finally {

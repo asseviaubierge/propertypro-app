@@ -41,7 +41,9 @@ export default function TenantStats({ tenants }: TenantStatsProps) {
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
 
-    const active = tenants.filter((t) => t.tenantStatus === "active").length;
+    const active = tenants.filter(
+      (t) => t.tenantStatus === "approved" || t.tenantStatus === "active"
+    ).length;
     const pending = tenants.filter(
       (t) =>
         t.tenantStatus === "application_submitted" ||

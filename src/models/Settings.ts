@@ -325,7 +325,7 @@ const privacySettingsSchema = new Schema(
 const systemSettingsSchema = new Schema(
   {
     branding: {
-      companyName: { type: String, default: "PropertyPro" },
+      companyName: { type: String, default: "Gestion E-Immo" },
       logo: { type: String }, // URL to uploaded logo
       favicon: { type: String }, // URL to uploaded favicon
       primaryColor: { type: String, default: "#3b82f6" },
@@ -482,7 +482,7 @@ settingsSchema.pre("save", function (next) {
   }
 
   // Check if the expected field has data
-  if (!this[expectedField] || Object.keys(this[expectedField]).length === 0) {
+  if (!(this as any)[expectedField] || Object.keys((this as any)[expectedField]).length === 0) {
     return next(
       new Error(
         `${expectedField} data is required for category ${this.category}`
@@ -492,9 +492,9 @@ settingsSchema.pre("save", function (next) {
 
   // Clear other fields to ensure data integrity
   Object.keys(categoryFieldMap).forEach((category) => {
-    const field = categoryFieldMap[category];
-    if (field !== expectedField && this[field]) {
-      this[field] = undefined;
+    const field = (categoryFieldMap as Record<string,string>)[category];
+    if (field !== expectedField && (this as any)[field]) {
+      (this as any)[field] = undefined;
     }
   });
 
@@ -557,7 +557,7 @@ settingsSchema.statics.findByUserId = async function (userId: string) {
     return null;
   }
 
-  const consolidated = {
+  const consolidated: any = {
     _id: userSettings[0]._id,
     userId: userId,
     profile: {},
@@ -570,7 +570,7 @@ settingsSchema.statics.findByUserId = async function (userId: string) {
   };
 
   // Merge all category settings
-  userSettings.forEach((setting) => {
+  userSettings.forEach((setting: any) => {
     if (setting.category === SettingsCategory.PROFILE && setting.profile) {
       consolidated.profile = setting.profile;
     } else if (
@@ -721,13 +721,13 @@ settingsSchema.statics.createDefaultSettings = async function (userId: string) {
   }
 
   // Return in UserSettings format
-  return this.findByUserId(userId);
+  return (this as any).findByUserId(userId);
 };
 
 settingsSchema.statics.createDefaultUserSettings = async function (
   userId: string
 ) {
-  return this.createDefaultSettings(userId);
+  return (this as any).createDefaultSettings(userId);
 };
 
 // Instance methods
@@ -735,7 +735,7 @@ settingsSchema.methods.updateSetting = function (
   data: any,
   updatedBy?: string
 ) {
-  Object.assign(this[this.category], data);
+  Object.assign((this as any)[this.category], data);
   this.version += 1;
   if (updatedBy) {
     this.updatedBy = new mongoose.Types.ObjectId(updatedBy);

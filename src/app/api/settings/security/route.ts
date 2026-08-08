@@ -114,7 +114,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
     // Validate the request body
     const validation = securitySettingsSchema.safeParse(sanitizedBody);
     if (!validation.success) {
-      const errors = validation.error.errors.map((e) => e.message).join(", ");
+      const errors = validation.error.issues.map((e: any) => e.message).join(", ");
       return createErrorResponse(`Validation failed: ${errors}`, 400);
     }
 
@@ -132,7 +132,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
       });
     } else {
       // Update existing settings
-      await securitySettings.updateSecurity({
+      await (securitySettings as any).updateSecurity?.({
         ...securityData,
         updatedBy: userId,
       });
@@ -200,7 +200,7 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
       .partial()
       .safeParse(sanitizedBody);
     if (!validation.success) {
-      const errors = validation.error.errors.map((e) => e.message).join(", ");
+      const errors = validation.error.issues.map((e: any) => e.message).join(", ");
       return createErrorResponse(`Validation failed: ${errors}`, 400);
     }
 
@@ -213,13 +213,13 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
       // Create new settings if they don't exist
       securitySettings = await SecuritySettings.createDefaultSecurity(userId);
       // Apply the partial update
-      await securitySettings.updateSecurity({
+      await (securitySettings as any).updateSecurity?.({
         ...securityData,
         createdBy: userId,
       });
     } else {
       // Update existing settings
-      await securitySettings.updateSecurity({
+      await (securitySettings as any).updateSecurity?.({
         ...securityData,
         updatedBy: userId,
       });

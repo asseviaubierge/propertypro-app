@@ -33,40 +33,37 @@ export async function generateInvoicePdfBuffer(
 ): Promise<Buffer> {
   const invoice = ensureInvoiceObject(invoiceInput);
 
-// Informations générales de la plateforme (fallback)
-const defaultCompanyInfo = await getCompanyInfoServer();
+  // Platform information is only a fallback. Each invoice primarily displays
+  // the professional identity of the owner of the billed property.
+  const defaultCompanyInfo = await getCompanyInfoServer();
+  // Prefer the account that issued the invoice. Existing invoices fall back to
+  // the property's owner, then the assigned manager, then the platform identity.
+  const owner = (invoice as any).issuer || invoice.propertyId?.ownerId || invoice.propertyId?.managerId;
+  const ownerFullName = owner
+    ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
+    : "";
+  const ownerAddress = [owner?.address, owner?.city].filter(Boolean).join(", ");
 
-// Propriétaire réel du bien
-const owner = invoice.propertyId?.ownerId;
-console.log("========== PDF OWNER DEBUG ==========");
-console.log("propertyId =", invoice.propertyId);
-console.log("ownerId =", invoice.propertyId?.ownerId);
-console.log("businessName =", invoice.propertyId?.ownerId?.businessName);
-console.log("accountType =", invoice.propertyId?.ownerId?.accountType);
-console.log("=====================================");
-const ownerFullName = owner
-  ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
-  : "";
-
-// Si le bien possède un propriétaire, son identité devient
-// l'identité professionnelle utilisée sur la facture.
-const companyInfo = owner
-  ? {
-      ...(defaultCompanyInfo ?? {}),
-      name:
-        owner.businessName?.trim() ||
-        ownerFullName ||
-        defaultCompanyInfo?.name ||
-        "GESTION E-IMMO",
-      phone: owner.phone || defaultCompanyInfo?.phone || "",
-      email: owner.email || defaultCompanyInfo?.email || "",
-      logo: owner.businessLogo || defaultCompanyInfo?.logo,
-      accountType: owner.accountType,
-      cip: owner.cip,
-      ifu: owner.ifu,
-      rccm: owner.rccm,
-    }
-  : defaultCompanyInfo;
+  const companyInfo = owner
+    ? {
+        ...(defaultCompanyInfo ?? {}),
+        name:
+          owner.businessName?.trim() ||
+          ownerFullName ||
+          defaultCompanyInfo?.name ||
+          "Propriétaire du bien",
+        legalName: ownerFullName || undefined,
+        address: ownerAddress || defaultCompanyInfo?.address || "",
+        phone: owner.phone || defaultCompanyInfo?.phone || "",
+        email: owner.email || defaultCompanyInfo?.email || "",
+        website: owner.website || defaultCompanyInfo?.website || "",
+        logo: owner.businessLogo || defaultCompanyInfo?.logo,
+        accountType: owner.accountType,
+        cip: owner.cip,
+        ifu: owner.ifu,
+        rccm: owner.rccm,
+      }
+    : defaultCompanyInfo;
 
   let currencyCode: string | undefined = currencyCodeOverride;
   try {

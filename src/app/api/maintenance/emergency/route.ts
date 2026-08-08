@@ -18,6 +18,7 @@ import {
   paginateQuery,
   parseRequestBody,
 } from "@/lib/api-utils";
+import { maintenanceListScope, assertMaintenancePropertyAccess } from "@/lib/maintenance-access";
 import {
   maintenanceRequestSchema,
   paginationSchema,
@@ -87,8 +88,13 @@ export const GET = withPermissionAndDB("maintenance_management")(async (user: Au
       };
     }
 
-    // Apply property filter
+    baseQuery = await maintenanceListScope(user, baseQuery);
+
+    // Apply property filter without allowing scope bypass.
     if (propertyId) {
+      if (!(await assertMaintenancePropertyAccess(user, propertyId))) {
+        return createErrorResponse("Forbidden property", 403);
+      }
       baseQuery.propertyId = propertyId;
     }
 
@@ -586,11 +592,11 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
     }
 
     const tenant = await User.findById(emergencyData.tenantId);
-    if (!tenant || !tenant.isActive) {
+    if (!tenant || !(tenant as any).isActive) {
       return createErrorResponse("Tenant not found", 404);
     }
 
-    const tenantAccessProfile = await resolveAccessProfile(tenant.role);
+    const tenantAccessProfile = await resolveAccessProfile((tenant as any).role);
     if (!tenantAccessProfile.isTenant) {
       return createErrorResponse("Selected user is not a tenant account", 400);
     }
@@ -602,12 +608,12 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
         .sort({ createdAt: 1 });
 
       for (const staffUser of availableStaff) {
-        const staffAccessProfile = await resolveAccessProfile(staffUser.role);
+        const staffAccessProfile = await resolveAccessProfile((staffUser as any).role);
         if (!canHandleEmergencyMaintenance(staffAccessProfile)) {
           continue;
         }
 
-        assignedTo = staffUser._id.toString();
+        assignedTo = String(staffUser._id);
         break;
       }
     }

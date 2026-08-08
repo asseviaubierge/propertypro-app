@@ -222,6 +222,23 @@ const UserSchema = new Schema<
       type: Date,
       default: null,
     },
+    // Account/user that originally created this record. For tenant users this
+    // preserves visibility before the first lease is assigned.
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+    // Property Manager responsible for this tenant application. Unlike
+    // createdBy, this field has a single business meaning and is used by the
+    // tenant scope before the first lease exists.
+    managerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
     // Tenant-specific fields (only applicable when role is 'tenant')
     dateOfBirth: {
       type: Date,
@@ -604,9 +621,9 @@ const UserSchema = new Schema<
     toJSON: {
       virtuals: true,
       transform: function (_doc, ret: any) {
-        delete ret.password;
-        delete ret.__v;
-        delete ret.ssn; // Never expose SSN in JSON
+        delete (ret as any).password;
+        delete (ret as any).__v;
+        delete (ret as any).ssn; // Never expose SSN in JSON
         return ret;
       },
     },
@@ -826,7 +843,13 @@ UserSchema.methods.changeStatus = function (
     terminated: [], // Terminal state
   };
 
-  const currentStatus = this.tenantStatus || "application_submitted";
+  const rawCurrentStatus = String(this.tenantStatus || "application_submitted").toLowerCase();
+  const currentStatus = ["submitted", "pending", "soumis"].includes(rawCurrentStatus)
+    ? "application_submitted"
+    : rawCurrentStatus;
+  if (this.tenantStatus !== currentStatus) {
+    this.tenantStatus = currentStatus as any;
+  }
   if (!validTransitions[currentStatus]?.includes(newStatus)) {
     throw new Error(
       `Invalid status transition from ${currentStatus} to ${newStatus}`
@@ -1061,7 +1084,7 @@ UserSchema.methods.softDelete = function (this: UserDocument) {
 
 // Static method to restore soft deleted user
 UserSchema.methods.restore = function (this: UserDocument) {
-  this.deletedAt = undefined;
+  this.deletedAt = null;
   this.isActive = true;
   return this.save({ validateBeforeSave: false });
 };

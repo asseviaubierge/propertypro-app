@@ -113,7 +113,7 @@ export function GoogleCalendarSync({
         // Handle specific error cases
         if (response.status === 503) {
           toast.error(
-            "Google Calendar integration is not configured. Please contact your administrator.",
+            "Google Agenda integration is not configured. Please contact your administrator.",
           );
         } else {
           toast.error(
@@ -125,19 +125,19 @@ export function GoogleCalendarSync({
         );
       }
     } catch (error) {
-      console.error("Failed to connect to Google Calendar:", error);
+      console.error("Failed to connect to Google Agenda:", error);
       const errorMessage = error instanceof Error ? error.message : "";
       if (
-        !errorMessage.includes("Google Calendar integration is not configured")
+        !errorMessage.includes("Google Agenda integration is not configured")
       ) {
-        toast.error("Failed to connect to Google Calendar");
+        toast.error("Failed to connect to Google Agenda");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDisconnect = async () => {
+  const handleDéconnecter = async () => {
     setLoading(true);
     try {
       const response = await fetch("/api/calendar/google/disconnect", {
@@ -153,13 +153,13 @@ export function GoogleCalendarSync({
           selectedCalendarId: null,
           syncDirection: "bidirectional",
         });
-        toast.success("Disconnected from Google Calendar");
+        toast.success("Déconnectered from Google Agenda");
       } else {
         throw new Error("Failed to disconnect");
       }
     } catch (error) {
       console.error("Failed to disconnect:", error);
-      toast.error("Failed to disconnect from Google Calendar");
+      toast.error("Failed to disconnect from Google Agenda");
     } finally {
       setLoading(false);
     }
@@ -198,7 +198,7 @@ export function GoogleCalendarSync({
       }
     } catch (error) {
       console.error("Sync failed:", error);
-      toast.error("Failed to sync with Google Calendar");
+      toast.error("Failed to sync with Google Agenda");
     } finally {
       setLoading(false);
     }
@@ -230,10 +230,10 @@ export function GoogleCalendarSync({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Google Calendar Integration
+            Google Agenda Integration
           </DialogTitle>
           <DialogDescription>
-            Sync your PropertyPro events with Google Calendar for seamless
+            Sync your Gestion E-Immo events with Google Agenda for seamless
             scheduling.
           </DialogDescription>
         </DialogHeader>
@@ -254,13 +254,13 @@ export function GoogleCalendarSync({
                     <>
                       <CheckCircle className="h-5 w-5 text-green-500" />
                       <span className="font-medium">
-                        Connected to Google Calendar
+                        Connecté to Google Agenda
                       </span>
                     </>
                   ) : (
                     <>
                       <XCircle className="h-5 w-5 text-red-500" />
-                      <span className="font-medium">Not connected</span>
+                      <span className="font-medium">Non connecté</span>
                     </>
                   )}
                 </div>
@@ -268,11 +268,11 @@ export function GoogleCalendarSync({
                 {syncStatus.connected ? (
                   <Button
                     variant="outline"
-                    onClick={handleDisconnect}
+                    onClick={handleDéconnecter}
                     disabled={loading}
                   >
                     <Unlink className="h-4 w-4 mr-2" />
-                    Disconnect
+                    Déconnecter
                   </Button>
                 ) : (
                   <Button onClick={handleConnect} disabled={loading}>
@@ -284,24 +284,24 @@ export function GoogleCalendarSync({
 
               {syncStatus.lastSync && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  Last sync: {syncStatus.lastSync.toLocaleString()}
+                  Dernière synchronisation: {syncStatus.lastSync.toLocaleString()}
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* Calendar Selection */}
+          {/* Sélection du calendrier */}
           {syncStatus.connected && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Calendar Selection</CardTitle>
+                <CardTitle className="text-lg">Sélection du calendrier</CardTitle>
                 <CardDescription>
-                  Choose which Google Calendar to sync with PropertyPro.
+                  Choose which Google Agenda to sync with Gestion E-Immo.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="calendar-select">Select Calendar</Label>
+                  <Label htmlFor="calendar-select">Sélectionner un calendrier</Label>
                   <Select
                     value={syncStatus.selectedCalendarId ?? ""}
                     onValueChange={(value) =>
@@ -312,7 +312,7 @@ export function GoogleCalendarSync({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a calendar" />
+                      <SelectValue placeholder="Choisir un calendrier" />
                     </SelectTrigger>
                     <SelectContent>
                       {syncStatus.calendars.map((calendar) => (
@@ -332,7 +332,7 @@ export function GoogleCalendarSync({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="sync-direction">Sync Direction</Label>
+                  <Label htmlFor="sync-direction">Sens de synchronisation</Label>
                   <Select
                     value={syncStatus.syncDirection}
                     onValueChange={(value: any) =>
@@ -347,10 +347,10 @@ export function GoogleCalendarSync({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="import">
-                        Import from Google Calendar only
+                        Importer depuis Google Agenda only
                       </SelectItem>
                       <SelectItem value="export">
-                        Export to Google Calendar only
+                        Exporter vers Google Agenda only
                       </SelectItem>
                       <SelectItem value="bidirectional">
                         Two-way sync (recommended)
@@ -362,20 +362,20 @@ export function GoogleCalendarSync({
             </Card>
           )}
 
-          {/* Sync Controls */}
+          {/* Commandes de synchronisation */}
           {syncStatus.connected && syncStatus.selectedCalendarId && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Sync Controls</CardTitle>
+                <CardTitle className="text-lg">Commandes de synchronisation</CardTitle>
                 <CardDescription>
-                  Manage synchronization between PropertyPro and Google
+                  Manage synchronization between Gestion E-Immo and Google
                   Calendar.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="auto-sync">Automatic Sync</Label>
+                    <Label htmlFor="auto-sync">Synchronisation automatique</Label>
                     <p className="text-sm text-muted-foreground">
                       Automatically sync changes every 15 minutes
                     </p>
@@ -390,7 +390,7 @@ export function GoogleCalendarSync({
                 <Separator />
 
                 <div className="space-y-2">
-                  <Label>Manual Sync</Label>
+                  <Label>Synchronisation manuelle</Label>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -399,7 +399,7 @@ export function GoogleCalendarSync({
                       className="flex-1"
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Import from Google
+                      Importer depuis Google
                     </Button>
                     <Button
                       variant="outline"
@@ -408,7 +408,7 @@ export function GoogleCalendarSync({
                       className="flex-1"
                     >
                       <Upload className="h-4 w-4 mr-2" />
-                      Export to Google
+                      Exporter vers Google
                     </Button>
                     <Button
                       onClick={() => handleSync("bidirectional")}

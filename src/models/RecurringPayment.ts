@@ -159,7 +159,7 @@ RecurringPaymentSchema.methods.updateNextPaymentDate = function () {
       break;
   }
 
-  return this.save();
+  return this.save() as Promise<IRecurringPayment>;
 };
 
 RecurringPaymentSchema.methods.recordPayment = function () {
@@ -167,17 +167,17 @@ RecurringPaymentSchema.methods.recordPayment = function () {
   this.totalPaymentsMade += 1;
   this.failedPaymentCount = 0; // Reset failed count on successful payment
   this.updateNextPaymentDate();
-  return this.save();
+  return this.save() as Promise<IRecurringPayment>;
 };
 
 RecurringPaymentSchema.methods.recordFailedPayment = function () {
   this.failedPaymentCount += 1;
-  return this.save();
+  return this.save() as Promise<IRecurringPayment>;
 };
 
 RecurringPaymentSchema.methods.deactivate = function () {
   this.isActive = false;
-  return this.save();
+  return this.save() as Promise<IRecurringPayment>;
 };
 
 // Static Methods

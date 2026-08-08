@@ -35,7 +35,7 @@ export const GET = withPermissionAndDB("profile_management")(
           selectedCalendarId: null,
           syncDirection: "bidirectional",
         },
-        "Google Calendar not connected"
+        "Google Agenda n’est pas connecté"
       );
     }
 
@@ -74,7 +74,7 @@ export const GET = withPermissionAndDB("profile_management")(
           syncDirection: integration.syncDirection || "bidirectional",
           connectedAt: integration.connectedAt,
         },
-        "Status retrieved successfully"
+        "État récupéré avec succès"
       );
     } catch (error) {
       console.error("Failed to fetch calendar list:", error);
@@ -98,9 +98,9 @@ export const GET = withPermissionAndDB("profile_management")(
             calendars: [],
             selectedCalendarId: null,
             syncDirection: "bidirectional",
-            error: "Token expired, please reconnect",
+            error: "Jeton expiré, veuillez vous reconnecter",
           },
-          "Google Calendar token expired"
+          "Le jeton Google Agenda a expiré"
         );
       }
 

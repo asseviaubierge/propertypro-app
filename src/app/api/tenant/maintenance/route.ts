@@ -17,6 +17,7 @@ import {
   parseRequestBody,
 } from "@/lib/api-utils";
 import { maintenanceRequestSchema, validateSchema } from "@/lib/validations";
+import { ensureDefaultMaintenanceStaff } from "@/lib/default-maintenance-staff";
 
 // ============================================================================
 // GET /api/tenant/maintenance - Get tenant's maintenance requests
@@ -214,6 +215,10 @@ export const POST = withPermissionAndDB("maintenance_requests")(
       if (!validation.success) {
         return createErrorResponse(validation.errors.join(", "), 400);
       }
+
+      // Every request first enters the central E-IMMO maintenance queue.
+      const defaultStaff = await ensureDefaultMaintenanceStaff();
+      maintenanceData.assignedTo = defaultStaff._id;
 
       // Create the maintenance request
       const maintenanceRequest = new MaintenanceRequest(maintenanceData);

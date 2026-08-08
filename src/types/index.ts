@@ -226,6 +226,18 @@ export enum PropertyType {
   EVENT_HALL = "event_hall",
   PUBLIC_SPACE = "public_space",
   PERSONAL_PROPERTY = "personal_property",
+  UNFURNISHED_APARTMENT = "unfurnished_apartment",
+  STUDIO = "studio",
+  ROOM = "room",
+  VILLA = "villa",
+  WAREHOUSE = "warehouse",
+  WORKSHOP = "workshop",
+  KIOSK = "kiosk",
+  MARKET_STALL = "market_stall",
+  LAND = "land",
+  PARKING_GARAGE = "parking_garage",
+  SCHOOL_SPACE = "school_space",
+  HEALTH_SPACE = "health_space",
 }
 
 export enum PropertyStatus {
@@ -543,6 +555,9 @@ export interface IInspection extends Document {
   };
   photos: string[];
   notes?: string;
+  contractText?: string;
+  contractVersion?: number;
+  contractValidatedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

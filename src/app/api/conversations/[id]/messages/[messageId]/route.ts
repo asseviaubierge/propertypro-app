@@ -43,7 +43,7 @@ export const GET = withPermissionAndDB("profile_management")(
     const message = (await Message.findOne({
       _id: messageId,
       conversationId,
-    }).populate("senderId", "firstName lastName email avatar")) as any;
+    }).populate("senderId", "firstName lastName email phone avatar role")) as any;
 
     if (!message) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
@@ -118,7 +118,7 @@ export const PUT = withPermissionAndDB("profile_management")(
     message.editedAt = new Date();
 
     await message.save();
-    await message.populate("senderId", "firstName lastName email avatar");
+    await message.populate("senderId", "firstName lastName email phone avatar role");
 
     return createSuccessResponse({ message });
   } catch (error) {

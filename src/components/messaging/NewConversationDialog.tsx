@@ -46,6 +46,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string | null;
   role: string;
   avatar?: string;
   isActive: boolean;
@@ -140,6 +141,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
             firstName: u.firstName,
             lastName: u.lastName,
             email: u.email,
+            phone: u.phone ?? null,
             role: u.role,
             avatar: u.avatar ?? undefined,
             isActive: u.isActive ?? true,
@@ -167,7 +169,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   const loadProperties = async () => {
     try {
       setPropertiesError(null);
-      const response = await fetch("/api/properties?limit=100");
+      const response = await fetch("/api/conversations/properties");
       if (!response.ok) {
         const message = await response.text();
         throw new Error(
@@ -289,7 +291,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         <button
           onClick={() => setConversationType("individual")}
           className={cn(
-            "p-6 rounded-lg border-2 transition-all duration-200 text-left",
+            "p-6 rounded-lg border-2  text-left",
             conversationType === "individual"
               ? "border-blue-500 bg-blue-50"
               : "border-gray-200 hover:border-gray-300"
@@ -307,7 +309,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         <button
           onClick={() => setConversationType("group")}
           className={cn(
-            "p-6 rounded-lg border-2 transition-all duration-200 text-left",
+            "p-6 rounded-lg border-2  text-left",
             conversationType === "group"
               ? "border-blue-500 bg-blue-50"
               : "border-gray-200 hover:border-gray-300"

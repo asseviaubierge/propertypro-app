@@ -1,11 +1,10 @@
 /**
  * PropertyPro - Inspections API Routes
- * CRUD operations for property inspection management
+ * Scoped CRUD operations for property inspections.
  */
 
 import { NextRequest } from "next/server";
-import { Inspection, Property } from "@/models";
-import { UserRole } from "@/types";
+import { Inspection, Lease, Tenant } from "@/models";
 import {
   AuthenticatedAccessUser,
   createSuccessResponse,
@@ -14,237 +13,233 @@ import {
   parsePaginationParams,
   paginateQuery,
   parseRequestBody,
+  isValidObjectId,
   withAccessAndDB,
   withPermissionAndDB,
 } from "@/lib/api-utils";
+import { inspectionSchema, paginationSchema, validateSchema } from "@/lib/validations";
+import { UserRole } from "@/types";
 import {
-  inspectionSchema,
-  paginationSchema,
-  validateSchema,
-} from "@/lib/validations";
+  inspectionListScope,
+  validateInspectionRelations,
+} from "@/lib/inspection-access";
+import { canAccessProperty } from "@/lib/property-scope";
+import { ensureDefaultMaintenanceStaff } from "@/lib/default-maintenance-staff";
 
-const INSPECTION_READ_PERMISSIONS = [
-  "property_view",
-  "property_management",
-  "maintenance_view",
-  "maintenance_management",
-] as const;
+const READ_ACCESS = {
+  roles: [UserRole.TENANT],
+  permissions: [
+    "property_view",
+    "property_management",
+    "maintenance_view",
+    "maintenance_management",
+  ],
+  match: "any" as const,
+};
 
-const INSPECTION_WRITE_PERMISSIONS = [
-  "property_management",
-  "maintenance_management",
-] as const;
+const WRITE_PERMISSIONS = ["property_management", "maintenance_management"] as const;
 
-// ============================================================================
-// GET /api/inspections - Get all inspections with pagination and filtering
-// ============================================================================
+function validDate(value: string | null): Date | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
 
-export const GET = withPermissionAndDB([...INSPECTION_READ_PERMISSIONS])(
-  async (user: AuthenticatedAccessUser, request: NextRequest) => {
+function transformInspection(inspection: any) {
+  const object = inspection?.toObject ? inspection.toObject() : inspection;
+  return {
+    ...object,
+    property: object.propertyId,
+    tenant: object.tenantId ? { user: object.tenantId } : null,
+    inspector: object.inspectorId,
+    lease: object.leaseId || null,
+  };
+}
+
+export const GET = withAccessAndDB(READ_ACCESS)(async (
+  user: AuthenticatedAccessUser,
+  request: NextRequest,
+) => {
   try {
     const { searchParams } = new URL(request.url);
     const paginationParams = parsePaginationParams(searchParams);
-
     const validation = validateSchema(paginationSchema, paginationParams);
     if (!validation.success) {
       return createErrorResponse(validation.errors.join(", "), 400);
     }
 
-    // Build query with filters
-    const query: Record<string, unknown> = {};
+    let query: Record<string, any> = {};
 
-    const status = searchParams.get("status");
-    if (status) query.status = status;
+    for (const key of ["status", "type", "overallCondition"] as const) {
+      const value = searchParams.get(key);
+      if (value) query[key] = value;
+    }
 
-    const type = searchParams.get("type");
-    if (type) query.type = type;
-
-    const propertyId = searchParams.get("propertyId");
-    if (propertyId) query.propertyId = propertyId;
-
-    const inspectorId = searchParams.get("inspectorId");
-    if (inspectorId) query.inspectorId = inspectorId;
-
-    const tenantId = searchParams.get("tenantId");
-    if (tenantId) query.tenantId = tenantId;
-
-    const overallCondition = searchParams.get("overallCondition");
-    if (overallCondition) query.overallCondition = overallCondition;
-
-    // Date range filter
-    const fromDate = searchParams.get("fromDate");
-    const toDate = searchParams.get("toDate");
+    const fromRaw = searchParams.get("fromDate");
+    const toRaw = searchParams.get("toDate");
+    const fromDate = validDate(fromRaw);
+    const toDate = validDate(toRaw);
+    if ((fromRaw && !fromDate) || (toRaw && !toDate)) {
+      return createErrorResponse("Invalid date range", 400);
+    }
     if (fromDate || toDate) {
       query.scheduledDate = {};
-      if (fromDate)
-        (query.scheduledDate as Record<string, unknown>).$gte = new Date(
-          fromDate
-        );
-      if (toDate)
-        (query.scheduledDate as Record<string, unknown>).$lte = new Date(
-          toDate
-        );
+      if (fromDate) query.scheduledDate.$gte = fromDate;
+      if (toDate) query.scheduledDate.$lte = toDate;
+    }
+
+    query = await inspectionListScope(user, query);
+
+    // Tenant-supplied identifiers must never widen their own scope.
+    if (!user.isTenant) {
+      const propertyId = searchParams.get("propertyId");
+      if (propertyId) {
+        if (!isValidObjectId(propertyId)) {
+          return createErrorResponse("Invalid property ID", 400);
+        }
+        if (!(await canAccessProperty(user, propertyId))) {
+          return createErrorResponse("Access denied for this property", 403);
+        }
+        query.propertyId = propertyId;
+      }
+
+      for (const key of ["inspectorId", "tenantId"] as const) {
+        const value = searchParams.get(key);
+        if (value) {
+          if (!isValidObjectId(value)) {
+            return createErrorResponse(`Invalid ${key}`, 400);
+          }
+          query[key] = value;
+        }
+      }
     }
 
     const result = await paginateQuery(Inspection, query, paginationParams);
-
-    // Populate references
-    const populatedData = await Inspection.populate(result.data as any[], [
-      {
-        path: "propertyId",
-        select: "name address type isMultiUnit units",
-        options: { lean: true },
-      },
-      {
-        path: "tenantId",
-        select: "firstName lastName email phone",
-        options: { lean: true },
-      },
-      {
-        path: "inspectorId",
-        select: "firstName lastName email phone avatar",
-        options: { lean: true },
-      },
-      {
-        path: "leaseId",
-        select: "startDate endDate status",
-        options: { lean: true },
-      },
+    const populated = await Inspection.populate(result.data as any[], [
+      { path: "propertyId", select: "name address type isMultiUnit units", options: { lean: true } },
+      { path: "tenantId", populate: { path: "userId", select: "firstName lastName email phone avatar" }, options: { lean: true } },
+      { path: "inspectorId", select: "firstName lastName email phone avatar", options: { lean: true } },
+      { path: "leaseId", select: "startDate endDate status terms.rentAmount", options: { lean: true } },
     ]);
 
-    // Transform data
-    const transformedData = (populatedData as unknown as any[]).map(
-      (inspection: any) => ({
-        ...inspection,
-        property: inspection.propertyId,
-        tenant: inspection.tenantId
-          ? { user: inspection.tenantId }
-          : null,
-        inspector: inspection.inspectorId,
-        lease: inspection.leaseId || null,
-      })
-    );
-
     return createSuccessResponse(
-      transformedData,
+      (populated as any[]).map(transformInspection),
       "Inspections retrieved successfully",
-      result.pagination
+      result.pagination,
     );
   } catch (error) {
     return handleApiError(error);
   }
-  }
-);
+});
 
-// ============================================================================
-// POST /api/inspections - Create a new inspection
-// ============================================================================
-
-export const POST = withPermissionAndDB([...INSPECTION_WRITE_PERMISSIONS])(
+export const POST = withPermissionAndDB([...WRITE_PERMISSIONS])(
   async (user: AuthenticatedAccessUser, request: NextRequest) => {
-  try {
-    const { success, data: body, error } = await parseRequestBody(request);
-    if (!success) {
-      return createErrorResponse(error!, 400);
+    try {
+      const { success, data: body, error } = await parseRequestBody(request);
+      if (!success) return createErrorResponse(error!, 400);
+
+      const normalizedBody: any = { ...(body as any) };
+
+      // A JSON date always arrives as text. Convert it before Zod validation.
+      if (typeof normalizedBody.scheduledDate === "string") {
+        const parsedDate = new Date(normalizedBody.scheduledDate);
+        if (Number.isNaN(parsedDate.getTime())) {
+          return createErrorResponse("Date planifiée invalide", 400);
+        }
+        normalizedBody.scheduledDate = parsedDate;
+      }
+
+      // Every inspection is initially received by the E-IMMO staff account.
+      const eImmoStaff = await ensureDefaultMaintenanceStaff();
+      normalizedBody.inspectorId = eImmoStaff._id.toString();
+
+      if (normalizedBody.leaseId) {
+        const lease = await Lease.findOne({
+          _id: normalizedBody.leaseId,
+          deletedAt: null,
+          status: "active",
+        }).select("propertyId tenantId unitId status").lean();
+
+        if (!lease) {
+          return createErrorResponse("Le bail actif sélectionné est introuvable", 404);
+        }
+        if (String(lease.propertyId) !== String(normalizedBody.propertyId)) {
+          return createErrorResponse("Le bail sélectionné n’appartient pas à cette propriété", 400);
+        }
+
+        const tenantRecord = await Tenant.findOne({
+          userId: lease.tenantId,
+          deletedAt: null,
+        }).select("_id").lean();
+
+        if (!tenantRecord) {
+          return createErrorResponse("Le dossier locataire lié à ce bail est introuvable", 404);
+        }
+
+        // The tenant is always derived from the lease; never trust a free-form tenantId.
+        normalizedBody.tenantId = tenantRecord._id.toString();
+      } else {
+        // An inspection without a lease is an off-rental inspection.
+        delete normalizedBody.tenantId;
+      }
+
+      const validation = validateSchema(inspectionSchema as any, normalizedBody);
+      if (!validation.success) {
+        return createErrorResponse(validation.errors.join(", "), 400);
+      }
+
+      const data = validation.data as any;
+      const relationCheck = await validateInspectionRelations(user, data);
+      if (!relationCheck.ok) {
+        return createErrorResponse(relationCheck.message, relationCheck.status);
+      }
+
+      const inspection = await Inspection.create(data);
+      await inspection.populate([
+        { path: "propertyId", select: "name address type" },
+        { path: "tenantId", populate: { path: "userId", select: "firstName lastName email phone avatar" } },
+        { path: "inspectorId", select: "firstName lastName email phone avatar" },
+        { path: "leaseId", select: "startDate endDate status terms.rentAmount" },
+      ]);
+
+      return createSuccessResponse(transformInspection(inspection), "Inspection created successfully");
+    } catch (error) {
+      return handleApiError(error);
     }
-
-    const validation = validateSchema(inspectionSchema as any, body);
-    if (!validation.success) {
-      return createErrorResponse(validation.errors.join(", "), 400);
-    }
-
-    const inspectionData = validation.data as any;
-
-    // Verify property exists
-    const property = await Property.findById(inspectionData.propertyId);
-    if (!property) {
-      return createErrorResponse("Property not found", 404);
-    }
-
-    // Create inspection
-    const inspection = new Inspection(inspectionData);
-    await inspection.save();
-
-    // Populate references
-    await inspection.populate([
-      { path: "propertyId", select: "name address type" },
-      { path: "tenantId", select: "firstName lastName email phone" },
-      { path: "inspectorId", select: "firstName lastName email phone avatar" },
-      { path: "leaseId", select: "startDate endDate status" },
-    ]);
-
-    const inspectionObj = inspection.toObject
-      ? inspection.toObject()
-      : inspection;
-    const transformedInspection = {
-      ...inspectionObj,
-      property: inspectionObj.propertyId,
-      tenant: inspectionObj.tenantId
-        ? { user: inspectionObj.tenantId }
-        : null,
-      inspector: inspectionObj.inspectorId,
-      lease: inspectionObj.leaseId || null,
-    };
-
-    return createSuccessResponse(
-      transformedInspection,
-      "Inspection created successfully"
-    );
-  } catch (error) {
-    return handleApiError(error);
-  }
-  }
+  },
 );
-
-// ============================================================================
-// DELETE /api/inspections - Bulk delete inspections (admin only)
-// ============================================================================
 
 export const DELETE = withAccessAndDB({
   permissions: ["bulk_operations", "property_management"],
   requireAllPermissions: true,
-})(
-  async (user: AuthenticatedAccessUser, request: NextRequest) => {
+})(async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
-    if (!user.isAdmin) {
-      return createErrorResponse("Forbidden", 403);
+    const ids = (new URL(request.url).searchParams.get("ids") ?? "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    if (!ids.length || ids.some((id) => !isValidObjectId(id))) {
+      return createErrorResponse("Valid inspection IDs are required", 400);
     }
 
-    const { searchParams } = new URL(request.url);
-    const inspectionIds = searchParams.get("ids")?.split(",") || [];
-
-    if (inspectionIds.length === 0) {
-      return createErrorResponse("Inspection IDs are required", 400);
+    const scopedQuery = await inspectionListScope(user, { _id: { $in: ids } });
+    const inaccessibleCount = ids.length - (await Inspection.countDocuments(scopedQuery));
+    if (inaccessibleCount > 0) {
+      return createErrorResponse("One or more inspections are outside your scope", 403);
     }
 
-    // Prevent deleting completed inspections
-    const completedInspections = await Inspection.find({
-      _id: { $in: inspectionIds },
-      status: "completed",
-    });
-
-    if (completedInspections.length > 0) {
-      return createErrorResponse(
-        "Cannot delete completed inspections.",
-        409
-      );
+    const completed = await Inspection.exists({ ...scopedQuery, status: "completed" });
+    if (completed) {
+      return createErrorResponse("Cannot delete completed inspections", 409);
     }
 
-    // Soft delete
-    const result = await Inspection.updateMany(
-      { _id: { $in: inspectionIds } },
-      { $set: { deletedAt: new Date() } }
-    );
-
+    const result = await Inspection.updateMany(scopedQuery, { $set: { deletedAt: new Date() } });
     return createSuccessResponse(
-      {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount,
-      },
-      `${result.modifiedCount} inspections deleted successfully`
+      { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount },
+      `${result.modifiedCount} inspections deleted successfully`,
     );
   } catch (error) {
     return handleApiError(error);
   }
-  }
-);
+});

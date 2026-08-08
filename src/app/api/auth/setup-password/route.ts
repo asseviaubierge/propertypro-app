@@ -1,5 +1,5 @@
 /**
- * PropertyPro - Password Setup API
+ * Gestion E-Immo - Configuration du mot de passe
  * Handle tenant password setup from invitation tokens
  */
 
@@ -20,6 +20,7 @@ import {
 } from "@/lib/invitation-utils";
 import { emailService } from "@/lib/email-service";
 import { z } from "zod";
+import { UserRole } from "@/types";
 
 // Password setup validation schema
 const passwordSetupSchema = z

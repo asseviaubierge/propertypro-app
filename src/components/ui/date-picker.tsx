@@ -1,16 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 interface DatePickerProps {
   date?: Date;
@@ -24,46 +15,112 @@ interface DatePickerProps {
   id?: string;
 }
 
+const MONTHS = [
+  "Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
+  "Juil", "Août", "Sep", "Oct", "Nov", "Déc",
+];
+
+function daysInMonth(year: number, month: number) {
+  return new Date(year, month, 0).getDate();
+}
+
 export function DatePicker({
   date,
   onSelect,
-  placeholder = "Pick a date",
+  placeholder = "Sélectionner une date",
   disabled,
   className,
-  align = "start",
-  fromYear,
+  fromYear = 1920,
   toYear,
   id,
 }: DatePickerProps) {
+  const currentYear = new Date().getFullYear();
+  const firstYear = Math.max(1920, fromYear || 1920);
+  // Les formulaires de naissance restent limités à l'année courante par défaut,
+  // mais les formulaires métier (baux, échéances, etc.) peuvent explicitement
+  // autoriser des années futures avec `toYear`.
+  const requestedLastYear = toYear ?? currentYear;
+  const lastYear = Math.max(firstYear, requestedLastYear);
+
+  const [day, setDay] = React.useState(date ? date.getDate() : 0);
+  const [month, setMonth] = React.useState(date ? date.getMonth() + 1 : 0);
+  const [year, setYear] = React.useState(date ? date.getFullYear() : 0);
+
+  React.useEffect(() => {
+    setDay(date ? date.getDate() : 0);
+    setMonth(date ? date.getMonth() + 1 : 0);
+    setYear(date ? date.getFullYear() : 0);
+  }, [date?.getTime()]);
+
+  const maxDays = year && month ? daysInMonth(year, month) : 31;
+  const years = React.useMemo(
+    () => Array.from({ length: Math.max(0, lastYear - firstYear + 1) }, (_, i) => lastYear - i),
+    [firstYear, lastYear]
+  );
+
+  const emitDate = (nextDay: number, nextMonth: number, nextYear: number) => {
+    setDay(nextDay);
+    setMonth(nextMonth);
+    setYear(nextYear);
+
+    if (!nextDay || !nextMonth || !nextYear) {
+      onSelect?.(undefined);
+      return;
+    }
+
+    const safeDay = Math.min(nextDay, daysInMonth(nextYear, nextMonth));
+    if (safeDay !== nextDay) setDay(safeDay);
+
+    // Midi local évite le décalage d'un jour lors de la conversion ISO.
+    const selected = new Date(nextYear, nextMonth - 1, safeDay, 12, 0, 0, 0);
+    if (disabled?.(selected)) return;
+    onSelect?.(selected);
+  };
+
+  const selectClass = cn(
+    "h-11 min-w-0 rounded-md border-2 border-border/60 bg-background px-3 text-sm",
+    "focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20",
+    "disabled:cursor-not-allowed disabled:opacity-50"
+  );
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          variant="outline"
-          className={cn(
-            "h-11 w-full justify-start text-left font-normal border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200",
-            !date && "text-muted-foreground",
-            className
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>{placeholder}</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align={align}>
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={onSelect}
-          disabled={disabled}
-          initialFocus
-          captionLayout="dropdown"
-          fromYear={fromYear}
-          toYear={toYear}
-        />
-      </PopoverContent>
-    </Popover>
+    <div id={id} className={cn("grid w-full grid-cols-3 gap-2", className)} aria-label={placeholder}>
+      <select
+        className={selectClass}
+        value={day || ""}
+        onChange={(event) => emitDate(Number(event.target.value), month, year)}
+        aria-label="Jour"
+      >
+        <option value="">Jour</option>
+        {Array.from({ length: maxDays }, (_, index) => index + 1).map((value) => (
+          <option key={value} value={value}>{value}</option>
+        ))}
+      </select>
+
+      <select
+        className={selectClass}
+        value={month || ""}
+        onChange={(event) => emitDate(day, Number(event.target.value), year)}
+        aria-label="Mois"
+      >
+        <option value="">Mois</option>
+        {MONTHS.map((label, index) => (
+          <option key={label} value={index + 1}>{label}</option>
+        ))}
+      </select>
+
+      <select
+        className={selectClass}
+        value={year || ""}
+        onChange={(event) => emitDate(day, month, Number(event.target.value))}
+        aria-label="Année"
+      >
+        <option value="">Année</option>
+        {years.map((value) => (
+          <option key={value} value={value}>{value}</option>
+        ))}
+      </select>
+    </div>
   );
 }
 
@@ -79,28 +136,6 @@ interface FormDatePickerProps {
   id?: string;
 }
 
-export function FormDatePicker({
-  value,
-  onChange,
-  placeholder = "Pick a date",
-  disabled,
-  className,
-  align = "start",
-  fromYear,
-  toYear,
-  id,
-}: FormDatePickerProps) {
-  return (
-    <DatePicker
-      date={value}
-      onSelect={onChange}
-      placeholder={placeholder}
-      disabled={disabled}
-      className={className}
-      align={align}
-      fromYear={fromYear}
-      toYear={toYear}
-      id={id}
-    />
-  );
+export function FormDatePicker({ value, onChange, ...props }: FormDatePickerProps) {
+  return <DatePicker date={value} onSelect={onChange} {...props} />;
 }

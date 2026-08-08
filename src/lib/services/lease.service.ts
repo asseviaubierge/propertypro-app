@@ -55,6 +55,8 @@ export interface LeaseResponse {
       zipCode: string;
     };
     type: string;
+    ownerId?: { _id: string; firstName?: string; lastName?: string; businessName?: string; accountType?: string; email?: string; phone?: string };
+    managerId?: { _id: string; firstName?: string; lastName?: string; businessName?: string; accountType?: string; email?: string; phone?: string };
     bedrooms: number;
     bathrooms: number;
     squareFootage: number;
@@ -127,6 +129,9 @@ export interface LeaseResponse {
     terms?: string;
   };
   notes?: string;
+  contractText?: string;
+  contractVersion?: number;
+  contractValidatedAt?: string;
   createdAt: string;
   updatedAt: string;
   archivedAt?: string | null;
@@ -192,12 +197,6 @@ class LeaseService {
       },
       credentials: "include",
     });
-
-    console.log(
-      "response from getLeases => params: response => : ",
-      params,
-      response
-    );
 
     if (!response.ok) {
       const error = await response.json();

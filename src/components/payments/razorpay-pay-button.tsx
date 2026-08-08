@@ -36,7 +36,7 @@ export function RazorpayPayButton({
   verifyUrl,
   createBody,
   label = "Pay with Razorpay",
-  brandName = "PropertyPro",
+  brandName = "Gestion E-Immo",
   description,
   className,
   disabled,

@@ -37,7 +37,7 @@ export const POST = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -57,7 +57,7 @@ export const POST = withPermissionAndDB("profile_management")(async (
     // Check if user has Google Calendar connected
     const currentUser = await User.findById(user.id);
     if (!currentUser?.integrations?.googleCalendar?.connected) {
-      return createErrorResponse("Google Calendar not connected", 400);
+      return createErrorResponse("Google Agenda n’est pas connecté", 400);
     }
 
     // Update auto-sync settings
@@ -116,7 +116,7 @@ export const GET = withPermissionAndDB("profile_management")(async (
     const integration = currentUser?.integrations?.googleCalendar;
 
     if (!integration?.connected) {
-      return createErrorResponse("Google Calendar not connected", 400);
+      return createErrorResponse("Google Agenda n’est pas connecté", 400);
     }
 
     return createSuccessResponse(

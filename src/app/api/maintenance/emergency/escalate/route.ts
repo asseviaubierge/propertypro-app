@@ -19,6 +19,7 @@ import {
 import { hasAnyPermission } from "@/lib/role-utils";
 import { resolveAccessProfile } from "@/lib/server-permissions";
 import { z } from "zod";
+import { canAccessMaintenanceRequest, maintenanceListScope } from "@/lib/maintenance-access";
 
 // ============================================================================
 // POST /api/maintenance/emergency/escalate - Escalate emergency request
@@ -59,7 +60,7 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
     const validation = escalationSchema.safeParse(body);
     if (!validation.success) {
       return createErrorResponse(
-        validation.error.errors.map((e) => e.message).join(", "),
+        validation.error.issues.map((e) => e.message).join(", "),
         400
       );
     }
@@ -73,6 +74,10 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
       return createErrorResponse("Emergency request not found", 404);
     }
 
+    if (!(await canAccessMaintenanceRequest(user, emergencyRequest))) {
+      return createErrorResponse("Forbidden", 403);
+    }
+
     // Verify it's an emergency request
     if (emergencyRequest.priority !== "emergency") {
       return createErrorResponse("Request is not an emergency", 400);
@@ -81,11 +86,11 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
     let escalationTarget;
     if (escalateTo) {
       escalationTarget = await User.findById(escalateTo);
-      if (!escalationTarget || !escalationTarget.isActive) {
+      if (!escalationTarget || !(escalationTarget as any).isActive) {
         return createErrorResponse("Escalation target user not found", 404);
       }
 
-      const targetAccessProfile = await resolveAccessProfile(escalationTarget.role);
+      const targetAccessProfile = await resolveAccessProfile((escalationTarget as any).role);
       if (!canReceiveEmergencyAssignment(targetAccessProfile)) {
         return createErrorResponse(
           "Escalation target must be active maintenance staff",
@@ -98,7 +103,7 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
         .sort({ createdAt: 1 });
 
       for (const candidate of staffCandidates) {
-        const candidateAccessProfile = await resolveAccessProfile(candidate.role);
+        const candidateAccessProfile = await resolveAccessProfile((candidate as any).role);
         if (!canReceiveEmergencyAssignment(candidateAccessProfile)) {
           continue;
         }
@@ -217,12 +222,13 @@ export const GET = withPermissionAndDB("maintenance_management")(async (user: Au
 
     // In a real application, this would query an escalation log collection
     // For now, we'll return escalation info from maintenance request notes
-    const escalatedRequests = await MaintenanceRequest.find({
+    const scopedEscalationQuery = await maintenanceListScope(user, {
       priority: "emergency",
       notes: { $regex: "ESCALATED:", $options: "i" },
       deletedAt: null,
       ...query,
-    })
+    });
+    const escalatedRequests = await MaintenanceRequest.find(scopedEscalationQuery)
       .populate("propertyId", "name address")
       .populate({
         path: "tenantId",

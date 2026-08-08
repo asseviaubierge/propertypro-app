@@ -1,91 +1,48 @@
-/**
- * PropertyPro - Single Expense API Routes
- * GET/PUT/DELETE /api/accounting/expenses/[id]
- */
-
 import { NextRequest } from "next/server";
-import { UserRole } from "@/types";
-import {
-  withPermissionAndDB,
-  createSuccessResponse,
-  createErrorResponse,
-  isValidObjectId,
-} from "@/lib/api-utils";
-import { expenseService } from "@/lib/services/expense.service";
+import { Types } from "mongoose";
+import { Expense } from "@/models";
+import { AuthenticatedAccessUser, createErrorResponse, createSuccessResponse, handleApiError, withPermissionAndDB } from "@/lib/api-utils";
+import { canAccessProperty } from "@/lib/property-scope";
 
-export const GET = withPermissionAndDB("financial_management")(
-  async (
-    user: any,
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) => {
-    try {
-      const { id } = await params;
+async function loadAccessible(user: AuthenticatedAccessUser, id: string) {
+  if (!Types.ObjectId.isValid(id)) return null;
+  const expense: any = await Expense.findOne({ _id: id, deletedAt: null }).populate("propertyId", "name address ownerId managerId").populate("createdBy", "firstName lastName");
+  if (!expense) return null;
+  const propertyId = expense.propertyId?._id ?? expense.propertyId;
+  if (!user.isAdmin && propertyId && !(await canAccessProperty(user, String(propertyId)))) return false;
+  return expense;
+}
 
-      if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid expense ID", 400);
-      }
+export const GET = withPermissionAndDB("financial_management")(async (user: AuthenticatedAccessUser, _request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+  try {
+    const { id } = await params;
+    const expense = await loadAccessible(user, id);
+    if (expense === false) return createErrorResponse("Accès refusé", 403);
+    if (!expense) return createErrorResponse("Dépense introuvable", 404);
+    return createSuccessResponse(expense, "Dépense récupérée");
+  } catch (error) { return handleApiError(error); }
+});
 
-      const expense = await expenseService.getExpense(id);
-      if (!expense) {
-        return createErrorResponse("Expense not found", 404);
-      }
+export const PUT = withPermissionAndDB("financial_management")(async (user: AuthenticatedAccessUser, request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+  try {
+    const { id } = await params;
+    const current: any = await loadAccessible(user, id);
+    if (current === false) return createErrorResponse("Accès refusé", 403);
+    if (!current) return createErrorResponse("Dépense introuvable", 404);
+    const body = await request.json();
+    if (body.propertyId && (!Types.ObjectId.isValid(body.propertyId) || (!user.isAdmin && !(await canAccessProperty(user, body.propertyId))))) return createErrorResponse("Accès refusé à cette propriété", 403);
+    const updated = await Expense.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate("propertyId", "name address");
+    return createSuccessResponse(updated, "Dépense mise à jour");
+  } catch (error) { return handleApiError(error); }
+});
 
-      return createSuccessResponse(expense, "Expense retrieved successfully");
-    } catch (error) {
-      console.error("[Expense API] GET error:", error);
-      return createErrorResponse("Failed to fetch expense", 500);
-    }
-  }
-);
-
-export const PUT = withPermissionAndDB("financial_management")(
-  async (
-    user: any,
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) => {
-    try {
-      const { id } = await params;
-
-      if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid expense ID", 400);
-      }
-
-      const body = await request.json();
-      const expense = await expenseService.updateExpense(id, body);
-
-      if (!expense) {
-        return createErrorResponse("Expense not found", 404);
-      }
-
-      return createSuccessResponse(expense, "Expense updated successfully");
-    } catch (error) {
-      console.error("[Expense API] PUT error:", error);
-      return createErrorResponse("Failed to update expense", 500);
-    }
-  }
-);
-
-export const DELETE = withPermissionAndDB("financial_management")(
-  async (
-    user: any,
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-  ) => {
-    try {
-      const { id } = await params;
-
-      if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid expense ID", 400);
-      }
-
-      await expenseService.deleteExpense(id);
-
-      return createSuccessResponse(null, "Expense deleted successfully");
-    } catch (error) {
-      console.error("[Expense API] DELETE error:", error);
-      return createErrorResponse("Failed to delete expense", 500);
-    }
-  }
-);
+export const DELETE = withPermissionAndDB("financial_management")(async (user: AuthenticatedAccessUser, _request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+  try {
+    const { id } = await params;
+    const current: any = await loadAccessible(user, id);
+    if (current === false) return createErrorResponse("Accès refusé", 403);
+    if (!current) return createErrorResponse("Dépense introuvable", 404);
+    await Expense.findByIdAndUpdate(id, { deletedAt: new Date(), status: "cancelled" });
+    return createSuccessResponse({ id }, "Dépense supprimée");
+  } catch (error) { return handleApiError(error); }
+});

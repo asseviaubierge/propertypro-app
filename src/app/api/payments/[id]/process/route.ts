@@ -1,11 +1,19 @@
 /**
  * PropertyPro - Payment Processing API
- * Process individual payments with real-time synchronization
+ * Process individual payments with authentication and property scope checks.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import {
+  AuthenticatedAccessUser,
+  createErrorResponse,
+  isValidObjectId,
+  withAccessAndDB,
+} from "@/lib/api-utils";
+import { connectToDatabase } from "@/lib/mongodb";
+import { canAccessPayment } from "@/lib/payment-access";
+import { UserRole } from "@/types";
 import { triggerPaymentUpdate } from "../../stream/route";
 
 interface ProcessPaymentRequest {
@@ -16,229 +24,209 @@ interface ProcessPaymentRequest {
   notes?: string;
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const paymentId = params.id;
-    const body: ProcessPaymentRequest = await request.json();
+const PAYMENT_PROCESS_ACCESS = {
+  roles: [UserRole.TENANT],
+  permissions: ["payment_processing", "financial_management"],
+  match: "any" as const,
+};
 
+export const POST = withAccessAndDB(PAYMENT_PROCESS_ACCESS)(
+  async (
+    user: AuthenticatedAccessUser,
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    try {
+      const { id: paymentId } = await params;
 
-    // Validate request
-    if (!paymentId || !body.paymentMethodId || !body.amount) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+      if (!isValidObjectId(paymentId)) {
+        return createErrorResponse("Invalid payment ID", 400);
+      }
 
-    // Connect to database
-    const { db } = await connectToDatabase();
+      const body = (await request.json()) as ProcessPaymentRequest;
+      if (!body.paymentMethodId || !body.amount || body.amount <= 0) {
+        return createErrorResponse("Missing or invalid required fields", 400);
+      }
 
-    // Find the payment
-    const payment = await db.collection("payments").findOne({
-      _id: new ObjectId(paymentId),
-    });
+      const { db } = await connectToDatabase();
+      const objectId = new ObjectId(paymentId);
+      const payment = await db.collection("payments").findOne({ _id: objectId });
 
-    if (!payment) {
-      return NextResponse.json({ error: "Payment not found" }, { status: 404 });
-    }
+      if (!payment) {
+        return createErrorResponse("Payment not found", 404);
+      }
 
-    // Check if payment is already processed
-    if (payment.status === "paid") {
-      return NextResponse.json(
-        { error: "Payment already processed" },
-        { status: 400 }
-      );
-    }
+      if (!(await canAccessPayment(user, payment))) {
+        return createErrorResponse("Access denied", 403);
+      }
 
-    // Simulate payment processing
-    const processingResult = await processPaymentWithProvider(body);
+      if (payment.status === "paid") {
+        return createErrorResponse("Payment already processed", 400);
+      }
 
-    if (!processingResult.success) {
-      return NextResponse.json(
-        { error: processingResult.error },
-        { status: 400 }
-      );
-    }
+      if (body.amount > Number(payment.amount || 0)) {
+        return createErrorResponse(
+          "Processed amount cannot exceed the payment amount",
+          400
+        );
+      }
 
-    // Update payment status
-    const updatedPayment = await db.collection("payments").findOneAndUpdate(
-      { _id: new ObjectId(paymentId) },
-      {
-        $set: {
-          status: "paid",
-          paidAmount: body.amount,
-          paidDate: new Date(),
-          paymentMethod: body.paymentMethod,
-          paymentMethodId: body.paymentMethodId,
-          transactionId: processingResult.transactionId,
-          processingFee: processingResult.processingFee,
-          notes: body.notes,
-          updatedAt: new Date(),
-        },
-      },
-      { returnDocument: "after" }
-    );
+      const processingResult = await processPaymentWithProvider(body);
+      if (!processingResult.success) {
+        return createErrorResponse(
+          processingResult.error || "Payment processing failed",
+          400
+        );
+      }
 
-    if (!updatedPayment.value) {
-      return NextResponse.json(
-        { error: "Failed to update payment" },
-        { status: 500 }
-      );
-    }
-
-    // Update lease payment status if this is a rent payment
-    if (payment.type === "rent" && payment.leaseId) {
-      await updateLeasePaymentStatus(db, payment.leaseId, paymentId);
-    }
-
-    // Trigger real-time update
-    triggerPaymentUpdate(updatedPayment.value);
-
-    // Log payment processing
-    await db.collection("payment_logs").insertOne({
-      paymentId: new ObjectId(paymentId),
-      action: "payment_processed",
-      amount: body.amount,
-      paymentMethod: body.paymentMethod,
-      transactionId: processingResult.transactionId,
-      timestamp: new Date(),
-      notes: body.notes,
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        payment: updatedPayment.value,
-        transaction: {
-          id: processingResult.transactionId,
-          amount: body.amount,
-          processingFee: processingResult.processingFee,
-          status: "paid",
-        },
-      },
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-// Simulate payment processing with a payment provider (Stripe, etc.)
-async function processPaymentWithProvider(paymentData: ProcessPaymentRequest) {
-  // Simulate processing delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Simulate random success/failure (90% success rate)
-  const success = Math.random() > 0.1;
-
-  if (!success) {
-    return {
-      success: false,
-      error: "Payment declined by bank",
-    };
-  }
-
-  // Calculate processing fee
-  const processingFee = paymentData.paymentMethod === "credit_card" ? 2.95 : 0;
-
-  return {
-    success: true,
-    transactionId: `txn_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 9)}`,
-    processingFee,
-    amount: paymentData.amount,
-  };
-}
-
-// Update lease payment status when a payment is processed
-async function updateLeasePaymentStatus(
-  db: any,
-  leaseId: string,
-  paymentId: string
-) {
-  try {
-    // Find the lease
-    const lease = await db.collection("leases").findOne({
-      _id: new ObjectId(leaseId),
-    });
-
-    if (!lease) {
-      console.warn("Lease not found for payment update:", leaseId);
-      return;
-    }
-
-    // Update lease payment history
-    await db.collection("leases").updateOne(
-      { _id: new ObjectId(leaseId) },
-      {
-        $push: {
-          paymentHistory: {
-            paymentId: new ObjectId(paymentId),
+      const updatedPayment = await db.collection("payments").findOneAndUpdate(
+        { _id: objectId, status: { $ne: "paid" } },
+        {
+          $set: {
+            status: "paid",
+            amountPaid: body.amount,
             paidDate: new Date(),
-            amount: 0, // Will be updated with actual amount
+            paymentMethod: body.paymentMethod,
+            paymentMethodId: body.paymentMethodId,
+            transactionId: processingResult.transactionId,
+            processingFee: processingResult.processingFee,
+            notes: body.notes,
+            updatedAt: new Date(),
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      const updated = updatedPayment?.value ?? updatedPayment;
+      if (!updated) {
+        return createErrorResponse("Failed to update payment", 409);
+      }
+
+      if (payment.type === "rent" && payment.leaseId) {
+        await updateLeasePaymentStatus(
+          db,
+          String(payment.leaseId),
+          paymentId,
+          body.amount
+        );
+      }
+
+      triggerPaymentUpdate(updated);
+
+      await db.collection("payment_logs").insertOne({
+        paymentId: objectId,
+        action: "payment_processed",
+        amount: body.amount,
+        paymentMethod: body.paymentMethod,
+        transactionId: processingResult.transactionId,
+        performedBy: new ObjectId(user.id),
+        timestamp: new Date(),
+        notes: body.notes,
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          payment: updated,
+          transaction: {
+            id: processingResult.transactionId,
+            amount: body.amount,
+            processingFee: processingResult.processingFee,
             status: "paid",
           },
         },
-        $set: {
-          "status.lastPaymentDate": new Date(),
-          updatedAt: new Date(),
-        },
-      }
-    );
-
-
-  } catch (error) {
-    console.error("Error updating lease payment status:", error);
+      });
+    } catch (error) {
+      console.error("Payment processing error:", error);
+      return createErrorResponse("Internal server error", 500);
+    }
   }
+);
+
+export const GET = withAccessAndDB(PAYMENT_PROCESS_ACCESS)(
+  async (
+    user: AuthenticatedAccessUser,
+    _request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    try {
+      const { id: paymentId } = await params;
+      if (!isValidObjectId(paymentId)) {
+        return createErrorResponse("Invalid payment ID", 400);
+      }
+
+      const { db } = await connectToDatabase();
+      const objectId = new ObjectId(paymentId);
+      const payment = await db.collection("payments").findOne({ _id: objectId });
+
+      if (!payment) {
+        return createErrorResponse("Payment not found", 404);
+      }
+
+      if (!(await canAccessPayment(user, payment))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
+      const logs = await db
+        .collection("payment_logs")
+        .find({ paymentId: objectId })
+        .sort({ timestamp: -1 })
+        .limit(10)
+        .toArray();
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          payment,
+          logs,
+          canProcess: payment.status !== "paid",
+        },
+      });
+    } catch (error) {
+      console.error("Error retrieving payment status:", error);
+      return createErrorResponse("Internal server error", 500);
+    }
+  }
+);
+
+async function processPaymentWithProvider(paymentData: ProcessPaymentRequest) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const success = Math.random() > 0.1;
+
+  if (!success) {
+    return { success: false, error: "Payment declined by bank" };
+  }
+
+  return {
+    success: true,
+    transactionId: `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+    processingFee: paymentData.paymentMethod === "credit_card" ? 2.95 : 0,
+  };
 }
 
-// GET endpoint to retrieve payment processing status
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+async function updateLeasePaymentStatus(
+  db: any,
+  leaseId: string,
+  paymentId: string,
+  amount: number
 ) {
-  try {
-    const paymentId = params.id;
+  if (!ObjectId.isValid(leaseId)) return;
 
-    // Connect to database
-    const { db } = await connectToDatabase();
-
-    // Find the payment with processing details
-    const payment = await db.collection("payments").findOne({
-      _id: new ObjectId(paymentId),
-    });
-
-    if (!payment) {
-      return NextResponse.json({ error: "Payment not found" }, { status: 404 });
-    }
-
-    // Get processing logs
-    const logs = await db
-      .collection("payment_logs")
-      .find({ paymentId: new ObjectId(paymentId) })
-      .sort({ timestamp: -1 })
-      .limit(10)
-      .toArray();
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        payment,
-        logs,
-        canProcess: payment.status !== "paid",
+  await db.collection("leases").updateOne(
+    { _id: new ObjectId(leaseId) },
+    {
+      $push: {
+        paymentHistory: {
+          paymentId: new ObjectId(paymentId),
+          paidDate: new Date(),
+          amount,
+          status: "paid",
+        },
       },
-    });
-  } catch (error) {
-    console.error("Error retrieving payment status:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+      $set: {
+        "status.lastPaymentDate": new Date(),
+        updatedAt: new Date(),
+      },
+    }
+  );
 }

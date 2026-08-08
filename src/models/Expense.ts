@@ -129,7 +129,7 @@ ExpenseSchema.pre("save", async function (next) {
 // Query middleware to exclude soft deleted documents
 ExpenseSchema.pre(/^find/, function () {
   // @ts-ignore
-  this.find({ $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] });
+  (this as any).find({ $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] });
 });
 
 const Expense: Model<IExpense> =

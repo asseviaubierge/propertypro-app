@@ -14,6 +14,7 @@ import {
   isValidObjectId,
 } from "@/lib/api-utils";
 import { z } from "zod";
+import { canAccessMaintenanceRequest } from "@/lib/maintenance-access";
 
 // Validation schema for contact logging
 const contactLogSchema = z.object({
@@ -63,11 +64,15 @@ export const POST = withPermissionAndDB("maintenance_management")(
         );
       }
 
+      if (!(await canAccessMaintenanceRequest(user, maintenanceRequest))) {
+        return createErrorResponse("Forbidden", 403);
+      }
+
       // Create contact log entry
       const contactLog = {
         method,
         contactedAt: new Date(contactedAt),
-        contactedBy: user._id,
+        contactedBy: user.id,
         notes,
         successful,
         createdAt: new Date(),
@@ -80,7 +85,7 @@ export const POST = withPermissionAndDB("maintenance_management")(
         },
         lastContactedAt: new Date(contactedAt),
         updatedAt: new Date(),
-        updatedBy: user._id,
+        updatedBy: user.id,
       };
 
       await MaintenanceRequest.findByIdAndUpdate(id, updateData);

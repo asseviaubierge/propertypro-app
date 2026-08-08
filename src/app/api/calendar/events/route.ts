@@ -37,8 +37,8 @@ import { z } from "zod";
 
 const createEventSchema = z
   .object({
-    title: z.string().min(1, "Title is required").max(200, "Title too long"),
-    description: z.string().max(2000, "Description too long").optional(),
+    title: z.string().min(1, "Le titre est obligatoire").max(200, "Le titre est trop long"),
+    description: z.string().max(2000, "La description est trop longue").optional(),
     type: z.nativeEnum(EventType),
     priority: z.nativeEnum(EventPriority).optional(),
     startDate: z.string().transform((str) => new Date(str)),
@@ -100,7 +100,7 @@ const createEventSchema = z
       .optional(),
   })
   .refine((data) => data.endDate >= data.startDate, {
-    message: "End date must be after start date",
+    message: "La date de fin doit être postérieure à la date de début",
     path: ["endDate"],
   })
   .refine(
@@ -219,7 +219,7 @@ export const POST = withPermissionAndDB("property_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body

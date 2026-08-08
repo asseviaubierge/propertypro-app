@@ -413,13 +413,13 @@ DocumentSchema.virtual("isExpired").get(function () {
 DocumentSchema.methods.recordDownload = function () {
   this.downloadCount += 1;
   this.lastDownloadedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 // Query middleware to exclude soft deleted documents
 DocumentSchema.pre(/^find/, function () {
   // @ts-ignore
-  this.find({ deletedAt: null });
+  (this as any).find({ deletedAt: null });
 });
 
 // Create and export the model with safer initialization
@@ -449,39 +449,39 @@ DocumentSchema.statics.searchDocuments = function (searchTerm: string) {
 // Instance methods
 DocumentSchema.methods.softDelete = function () {
   this.deletedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.restore = function () {
   this.deletedAt = null;
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.approve = function () {
   this.status = "active";
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.reject = function () {
   this.status = "expired";
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.archive = function () {
   this.status = "archived";
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.addTag = function (tag: string) {
   if (!this.tags.includes(tag.toLowerCase())) {
     this.tags.push(tag.toLowerCase());
   }
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.removeTag = function (tag: string) {
   this.tags = this.tags.filter((t) => t !== tag.toLowerCase());
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 // Enhanced document methods
@@ -506,7 +506,7 @@ DocumentSchema.methods.createVersion = function (
   this.fileUrl = fileUrl;
   this.fileSize = fileSize;
   this.r2ObjectKey = r2ObjectKey;
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.addDigitalSignature = function (
@@ -533,7 +533,7 @@ DocumentSchema.methods.addDigitalSignature = function (
     this.status = "signed";
   }
 
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.logAccess = function (
@@ -561,7 +561,7 @@ DocumentSchema.methods.logAccess = function (
     }
   }
 
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.shareDocument = function (settings: {
@@ -574,13 +574,13 @@ DocumentSchema.methods.shareDocument = function (settings: {
   maxDownloads?: number;
 }) {
   Object.assign(this.sharing, settings);
-  return this.save();
+  return this.save() as Promise<IDocument>;
 };
 
 DocumentSchema.methods.verifySignature = function (signatureIndex: number) {
   if (this.digitalSignatures[signatureIndex]) {
     this.digitalSignatures[signatureIndex].verified = true;
-    return this.save();
+    return this.save() as Promise<IDocument>;
   }
   throw new Error("Signature not found");
 };

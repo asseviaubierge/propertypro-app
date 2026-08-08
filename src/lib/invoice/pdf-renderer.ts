@@ -246,7 +246,7 @@ export async function renderInvoicePdf(
     renderNotes(ctx, normalized);
   }
 
-  renderFooter(ctx);
+  renderFooter(ctx, normalized.companyInfo.name);
 
   return pdf;
 }
@@ -317,9 +317,17 @@ async function renderHeader(
   pdf.setFontSize(FONTS.SIZES.SMALL);
   setTextColor(pdf, COLORS.MUTED);
   let companyInfoY = logoY + 12;
-  pdf.text(company.address, companyTextX, companyInfoY);
-  companyInfoY += 4;
-  pdf.text(`${company.phone} • ${company.email}`, companyTextX, companyInfoY);
+  if (company.address) {
+    const addressLines = pdf.splitTextToSize(String(company.address), 82);
+    addressLines.slice(0, 2).forEach((line: string) => {
+      pdf.text(line, companyTextX, companyInfoY);
+      companyInfoY += 4;
+    });
+  }
+  const contactLine = [company.phone, company.email].filter(Boolean).join(" • ");
+  if (contactLine) {
+    pdf.text(contactLine, companyTextX, companyInfoY);
+  }
   if (company.website) {
     companyInfoY += 4;
     pdf.text(company.website, companyTextX, companyInfoY);
@@ -334,7 +342,7 @@ async function renderHeader(
   pdf.setFont(FONTS.FAMILY, "bold");
   pdf.setFontSize(FONTS.SIZES.TITLE);
   setTextColor(pdf, COLORS.PRIMARY);
-  pdf.text("INVOICE", rightX, logoY + 8, { align: "right" });
+  pdf.text("FACTURE", rightX, logoY + 8, { align: "right" });
 
   // Invoice number (prominent)
   pdf.setFontSize(FONTS.SIZES.SUBHEADING);
@@ -422,6 +430,7 @@ const accountTypeLabel =
 
 const fromLines = [
   company.name,
+  company.legalName && company.legalName !== company.name ? company.legalName : "",
   accountTypeLabel,
   company.cip ? `CIP : ${company.cip}` : "",
   company.ifu ? `IFU : ${company.ifu}` : "",
@@ -784,7 +793,7 @@ function renderNotes(ctx: RenderContext, normalized: NormalizedInvoice): void {
 }
 
 /** Render footer */
-function renderFooter(ctx: RenderContext): void {
+function renderFooter(ctx: RenderContext, companyName?: string): void {
   const { pdf, pageNumber } = ctx;
 
   // Footer position
@@ -796,7 +805,7 @@ function renderFooter(ctx: RenderContext): void {
 
   // Left side - generated message
   pdf.text(
-    "Généré par GESTION E-IMMO",
+    `Facture générée avec PropertyPro pour ${companyName || "le propriétaire"}`,
     PAGE.MARGIN_LEFT,
     footerY
   );

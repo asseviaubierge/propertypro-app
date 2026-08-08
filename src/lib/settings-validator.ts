@@ -14,8 +14,6 @@ import {
 } from "@/lib/validations";
 import {
   SettingsValidationError,
-  SettingsConflictError,
-  validateUserId,
   validateSettingsCategory,
 } from "@/lib/settings-error-handler";
 import { isAdminRole, resolveSystemRole } from "@/lib/permissions-manager";
@@ -81,7 +79,7 @@ export class SettingsValidator {
           warnings,
         };
       } else {
-        const errors = result.error.errors.map((err) => ({
+        const errors = result.error.issues.map((err) => ({
           field: err.path.join("."),
           message: err.message,
           code: err.code,

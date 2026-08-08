@@ -20,6 +20,7 @@ import { userSchema, validateSchema } from "@/lib/validations";
 import { z } from "zod";
 import { deleteFromR2 } from "@/lib/r2-server";
 import { isR2Url, extractObjectKey } from "@/lib/r2";
+import { canAccessTenant } from "@/lib/tenant-scope";
 
 // ============================================================================
 // GET /api/tenants/[id] - Get a specific tenant
@@ -42,40 +43,66 @@ export const GET = withAccessAndDB({
         return createErrorResponse("Invalid tenant ID", 400);
       }
 
-      // Find the tenant user
+      // Load the tenant without populate(). Some existing databases contain
+      // legacy records or stale model metadata that can make strict populate
+      // fail and turn the entire details page into an HTTP 500 response.
       const tenantUser = await User.findOne({
-  _id: id,
-  role: UserRole.TENANT,
-}).select("+ssn");
+        _id: id,
+        role: UserRole.TENANT,
+      })
+        .select("+ssn")
+        .lean();
 
       if (!tenantUser) {
         return createErrorResponse("Tenant not found", 404);
       }
 
-      // Role-based authorization
-      if (
-        user.isTenant &&
-        tenantUser._id.toString() !== user.id
-      ) {
-        return createErrorResponse(
-          "You can only view your own tenant profile",
-          403
-        );
+      if (!(await canAccessTenant(user, tenantUser._id))) {
+        return createErrorResponse("Access denied", 403);
       }
 
-      // Find the tenant profile
-      const tenantProfile = await Tenant.findOne({ userId: id });
+      const [tenantProfile, activeLeaseCount] = await Promise.all([
+        Tenant.findOne({ userId: id }).lean(),
+        Lease.countDocuments({
+          tenantId: id,
+          status: LeaseStatus.ACTIVE,
+          deletedAt: null,
+        }),
+      ]);
 
-      const activeLeaseCount = await Lease.countDocuments({
-        tenantId: id,
-        status: LeaseStatus.ACTIVE,
-        deletedAt: null,
-      });
+      const responsibleIds = [tenantUser.managerId, tenantUser.createdBy]
+        .filter(Boolean)
+        .map((value) => String(value));
 
-      // Combine user and tenant profile data
+      const responsibleUsers = responsibleIds.length
+        ? await User.find({ _id: { $in: responsibleIds } })
+            .select("firstName lastName email phone role accountType businessName companyName")
+            .lean()
+        : [];
+
+      const responsibleById = new Map(
+        responsibleUsers.map((responsible) => [
+          String(responsible._id),
+          responsible,
+        ])
+      );
+
+      const profileData = tenantProfile ? { ...tenantProfile } : {};
+      // Preserve the User document identity. Previously the Tenant profile
+      // `_id` could overwrite the user `_id` when both objects were spread.
+      delete (profileData as any)._id;
+      delete (profileData as any).userId;
+      delete (profileData as any).__v;
+
       const combinedTenantData = {
-        ...tenantUser.toObject(),
-        ...(tenantProfile ? tenantProfile.toObject() : {}),
+        ...tenantUser,
+        ...profileData,
+        managerId: tenantUser.managerId
+          ? responsibleById.get(String(tenantUser.managerId)) || null
+          : null,
+        createdBy: tenantUser.createdBy
+          ? responsibleById.get(String(tenantUser.createdBy)) || null
+          : null,
         hasActiveLease: activeLeaseCount > 0,
         activeLeaseCount,
       };
@@ -122,15 +149,8 @@ export const PUT = withAccessAndDB({
         return createErrorResponse("Tenant not found", 404);
       }
 
-      // Role-based authorization
-      if (
-        user.isTenant &&
-        tenantUser._id.toString() !== user.id
-      ) {
-        return createErrorResponse(
-          "You can only update your own tenant profile",
-          403
-        );
+      if (!(await canAccessTenant(user, tenantUser._id))) {
+        return createErrorResponse("Access denied", 403);
       }
 
       // Find or create the tenant profile
@@ -320,6 +340,10 @@ export const DELETE = withPermissionAndDB("tenant_edit")(
         return createErrorResponse("Tenant not found", 404);
       }
 
+      if (!(await canAccessTenant(user, tenant._id))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
       // Check if tenant has active leases
       const activeLeases = await Lease.find({
         tenantId: id,
@@ -413,6 +437,10 @@ export const PATCH = withPermissionAndDB("tenant_edit")(
       const tenant = await User.findOne({ _id: id, role: UserRole.TENANT });
       if (!tenant) {
         return createErrorResponse("Tenant not found", 404);
+      }
+
+      if (!(await canAccessTenant(user, tenant._id))) {
+        return createErrorResponse("Access denied", 403);
       }
 
       // Handle specific patch operations

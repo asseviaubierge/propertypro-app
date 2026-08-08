@@ -57,13 +57,18 @@ export const GET = withAccessAndDB({
         return createErrorResponse("Property not found", 404);
       }
 
-      // Role-based authorization for single company architecture
+      // Access control
       if (user.isTenant) {
-        // Tenants can only view properties they are associated with
-        // This would need additional logic to check tenant-property relationships
-        // For now, we'll allow all authenticated users to view properties
+      return createErrorResponse("Access denied", 403);
       }
-      // Admin and Manager can view all company properties
+
+      if (
+        !user.isAdmin &&
+        (property.ownerId?._id?.toString?.() ?? property.ownerId?.toString?.()) !== user.id &&
+        (property.managerId?._id?.toString?.() ?? property.managerId?.toString?.()) !== user.id
+      ) {
+        return createErrorResponse("Access denied", 403);
+      }
 
       // Convert to plain object to ensure proper JSON serialization
       const propertyObject = property.toObject ? property.toObject() : property;
@@ -126,9 +131,13 @@ export const PUT = withPermissionAndDB("property_edit")(
         return createErrorResponse("Property not found", 404);
       }
 
-      // Role-based authorization
-      // Managers can update all properties (single company architecture)
-      // Only admins can change ownership and manager assignments
+      if (
+        !user.isAdmin &&
+        (property.ownerId?._id?.toString?.() ?? property.ownerId?.toString?.()) !== user.id &&
+        (property.managerId?._id?.toString?.() ?? property.managerId?.toString?.()) !== user.id
+      ) {
+        return createErrorResponse("Access denied", 403);
+      }
 
       // Validate update data (partial schema)
       const validation = validateSchema(propertyUpdateSchema, body);
@@ -318,9 +327,13 @@ export const PATCH = withPermissionAndDB("property_edit")(
         return createErrorResponse("Property not found", 404);
       }
 
-      // Role-based authorization
-      // Managers can update all properties (single company architecture)
-      // Only admins can change ownership and manager assignments
+      if (
+        !user.isAdmin &&
+        (property.ownerId?._id?.toString?.() ?? property.ownerId?.toString?.()) !== user.id &&
+        (property.managerId?._id?.toString?.() ?? property.managerId?.toString?.()) !== user.id
+      ) {
+        return createErrorResponse("Access denied", 403);
+      }
 
       // Handle specific patch operations
       const { action, ...data } = body;

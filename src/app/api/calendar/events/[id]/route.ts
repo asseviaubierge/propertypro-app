@@ -36,10 +36,10 @@ const updateEventSchema = z
   .object({
     title: z
       .string()
-      .min(1, "Title is required")
-      .max(200, "Title too long")
+      .min(1, "Le titre est obligatoire")
+      .max(200, "Le titre est trop long")
       .optional(),
-    description: z.string().max(2000, "Description too long").optional(),
+    description: z.string().max(2000, "La description est trop longue").optional(),
     status: z.nativeEnum(EventStatus).optional(),
     priority: z.nativeEnum(EventPriority).optional(),
     startDate: z
@@ -77,7 +77,7 @@ const updateEventSchema = z
       return true;
     },
     {
-      message: "End date must be after start date",
+      message: "La date de fin doit être postérieure à la date de début",
       path: ["endDate"],
     },
   );
@@ -116,7 +116,7 @@ export const GET = withPermissionAndDB("property_management")(async (
     ]);
 
     if (!event) {
-      return createErrorResponse("Event not found", 404);
+      return createErrorResponse("Événement introuvable", 404);
     }
 
     // Check permissions
@@ -126,10 +126,10 @@ export const GET = withPermissionAndDB("property_management")(async (
     );
 
     if (user.isTenant && !isOrganizer && !isAttendee) {
-      return createErrorResponse("Access denied", 403);
+      return createErrorResponse("Accès refusé", 403);
     }
 
-    return createSuccessResponse(event, "Event retrieved successfully");
+    return createSuccessResponse(event, "Événement récupéré avec succès");
   } catch (error) {
     return handleApiError(error);
   }
@@ -149,12 +149,12 @@ export const PUT = withPermissionAndDB("property_management")(async (
 
     // Validate event ID
     if (!eventId || eventId === "undefined" || eventId === "null") {
-      return createErrorResponse("Invalid event ID provided", 400);
+      return createErrorResponse("Identifiant d’événement invalide", 400);
     }
 
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -175,14 +175,14 @@ export const PUT = withPermissionAndDB("property_management")(async (
     // Check if event exists and user has permission
     const existingEvent = await Event.findById(eventId);
     if (!existingEvent) {
-      return createErrorResponse("Event not found", 404);
+      return createErrorResponse("Événement introuvable", 404);
     }
 
     const isOrganizer =
       existingEvent.organizer.toString() === user.id.toString();
     if (!isOrganizer && !user.isAdmin) {
       return createErrorResponse(
-        "Only the event organizer can update this event",
+        "Seul l’organisateur peut modifier cet événement",
         403,
       );
     }
@@ -238,7 +238,7 @@ export const PUT = withPermissionAndDB("property_management")(async (
     );
 
     if (!updatedEvent) {
-      return createErrorResponse("Failed to update event", 500);
+      return createErrorResponse("Échec de la mise à jour de l’événement", 500);
     }
 
     // Send invitations to new external attendees if any
@@ -260,7 +260,7 @@ export const PUT = withPermissionAndDB("property_management")(async (
       }
     }
 
-    return createSuccessResponse(updatedEvent, "Event updated successfully");
+    return createSuccessResponse(updatedEvent, "Événement mis à jour avec succès");
   } catch (error) {
     return handleApiError(error);
   }
@@ -280,20 +280,20 @@ export const DELETE = withPermissionAndDB("property_management")(async (
 
     // Validate event ID
     if (!eventId || eventId === "undefined" || eventId === "null") {
-      return createErrorResponse("Invalid event ID provided", 400);
+      return createErrorResponse("Identifiant d’événement invalide", 400);
     }
 
     // Check if event exists and user has permission
     const existingEvent = await Event.findById(eventId);
     if (!existingEvent) {
-      return createErrorResponse("Event not found", 404);
+      return createErrorResponse("Événement introuvable", 404);
     }
 
     const isOrganizer =
       existingEvent.organizer.toString() === user.id.toString();
     if (!isOrganizer && !user.isAdmin) {
       return createErrorResponse(
-        "Only the event organizer can delete this event",
+        "Seul l’organisateur peut supprimer cet événement",
         403,
       );
     }
@@ -302,12 +302,12 @@ export const DELETE = withPermissionAndDB("property_management")(async (
     const deleted = await calendarService.deleteEvent(eventId);
 
     if (!deleted) {
-      return createErrorResponse("Failed to delete event", 500);
+      return createErrorResponse("Échec de la suppression de l’événement", 500);
     }
 
     return createSuccessResponse(
       { eventId, deleted: true },
-      "Event deleted successfully",
+      "Événement supprimé avec succès",
     );
   } catch (error) {
     return handleApiError(error);
@@ -328,12 +328,12 @@ export const PATCH = withPermissionAndDB("property_management")(async (
 
     // Validate event ID
     if (!eventId || eventId === "undefined" || eventId === "null") {
-      return createErrorResponse("Invalid event ID provided", 400);
+      return createErrorResponse("Identifiant d’événement invalide", 400);
     }
 
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     const { action, ...data } = body;
@@ -369,11 +369,11 @@ export const PATCH = withPermissionAndDB("property_management")(async (
 
       return createSuccessResponse(
         { eventId, status, notes },
-        "Response updated successfully",
+        "Réponse mise à jour avec succès",
       );
     }
 
-    return createErrorResponse("Invalid action", 400);
+    return createErrorResponse("Action invalide", 400);
   } catch (error) {
     return handleApiError(error);
   }

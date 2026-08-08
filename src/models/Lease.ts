@@ -390,6 +390,21 @@ const LeaseSchema = new Schema<ILease>(
       trim: true,
       maxlength: [2000, "Notes cannot exceed 2000 characters"],
     },
+    contractText: {
+      type: String,
+      trim: true,
+      maxlength: [30000, "Le contrat ne peut pas dépasser 30 000 caractères"],
+      default: "",
+    },
+    contractVersion: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
+    contractValidatedAt: {
+      type: Date,
+      default: null,
+    },
     deletedAt: {
       type: Date,
       default: null,
@@ -404,7 +419,7 @@ const LeaseSchema = new Schema<ILease>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -583,7 +598,7 @@ LeaseSchema.methods.terminate = function (
 ) {
   this.status = LeaseStatus.TERMINATED;
   this.terminatedDate = terminationDate;
-  this.terminatedBy = userId;
+  this.terminatedBy = new mongoose.Types.ObjectId(userId);
   this.terminationReason = reason;
   if (notice) this.terminationNotice = notice;
   return this.save();
@@ -602,7 +617,7 @@ LeaseSchema.methods.sign = function (
   ipAddress?: string
 ) {
   this.signedDate = new Date();
-  this.signedBy = userId;
+  this.signedBy = new mongoose.Types.ObjectId(userId);
   this.signatureData = signature;
   if (ipAddress) this.signatureIpAddress = ipAddress;
 

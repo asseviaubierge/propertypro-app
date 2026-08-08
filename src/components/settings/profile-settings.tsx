@@ -488,7 +488,7 @@ export function ProfileSettings({
       // Upload to R2 first
       const formData = new FormData();
       formData.append("files", file);
-      formData.append("folder", "PropertyPro/avatars");
+      formData.append("folder", "Gestion-E-Immo/avatars");
       formData.append("quality", "85");
       formData.append("maxWidth", "400");
       formData.append("maxHeight", "400");

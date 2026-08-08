@@ -17,6 +17,7 @@ import {
 } from "@/lib/api-utils";
 import { hasAnyPermission } from "@/lib/role-utils";
 import { resolveAccessProfile } from "@/lib/server-permissions";
+import { canAccessMaintenanceRequest } from "@/lib/maintenance-access";
 
 const MAINTENANCE_STATUS_READ_ACCESS = {
   roles: [UserRole.TENANT],
@@ -85,6 +86,10 @@ export const PATCH = withAccessAndDB(MAINTENANCE_STATUS_WRITE_ACCESS)(
         return createErrorResponse("Maintenance request not found", 404);
       }
 
+      if (!(await canAccessMaintenanceRequest(user, maintenanceRequest))) {
+        return createErrorResponse("Forbidden", 403);
+      }
+
       const canManage =
         user.isCompanyStaff &&
         hasAnyPermission(user.permissions, [
@@ -117,11 +122,11 @@ export const PATCH = withAccessAndDB(MAINTENANCE_STATUS_WRITE_ACCESS)(
           }
 
           const assignedUser = await User.findById(assignedTo);
-          if (!assignedUser || !assignedUser.isActive) {
+          if (!assignedUser || !(assignedUser as any).isActive) {
             return createErrorResponse("Assigned user not found", 404);
           }
 
-          const assignedUserAccess = await resolveAccessProfile(assignedUser.role);
+          const assignedUserAccess = await resolveAccessProfile((assignedUser as any).role);
           if (!canHandleMaintenance(assignedUserAccess)) {
             return createErrorResponse(
               "Can only assign to active maintenance staff",
@@ -213,9 +218,9 @@ export const PATCH = withAccessAndDB(MAINTENANCE_STATUS_WRITE_ACCESS)(
           );
 
           await propertyStatusSynchronizer.syncAfterMaintenanceStatusChange(
-            (maintenanceRequest.propertyId as any)._id.toString(),
-            maintenanceRequest._id.toString(),
-            maintenanceRequest.unitId.toString(),
+            String((maintenanceRequest.propertyId as any)?._id ?? maintenanceRequest.propertyId),
+            String(maintenanceRequest._id),
+            String(maintenanceRequest.unitId),
             oldStatus,
             maintenanceRequest.status,
             {
@@ -273,6 +278,10 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
 
       if (!maintenanceRequest) {
         return createErrorResponse("Maintenance request not found", 404);
+      }
+
+      if (!(await canAccessMaintenanceRequest(user, maintenanceRequest))) {
+        return createErrorResponse("Forbidden", 403);
       }
 
       const isRequestOwner =

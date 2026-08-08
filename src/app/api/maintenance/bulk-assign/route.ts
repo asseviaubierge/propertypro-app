@@ -16,6 +16,7 @@ import {
   isValidObjectId,
 } from "@/lib/api-utils";
 import { z } from "zod";
+import { maintenanceListScope } from "@/lib/maintenance-access";
 import { resolveAccessProfile } from "@/lib/server-permissions";
 
 // Validation schema for bulk assign request
@@ -58,7 +59,7 @@ export const POST = withPermissionAndDB([
       return createErrorResponse("Assignee not found", 404);
     }
 
-    const assigneeAccess = await resolveAccessProfile(assignee.role);
+    const assigneeAccess = await resolveAccessProfile((assignee as any).role);
     if (!assigneeAccess.isCompanyStaff) {
       return createErrorResponse(
         "Assignee must be maintenance staff or manager",
@@ -67,10 +68,8 @@ export const POST = withPermissionAndDB([
     }
 
     // Find all requests to be assigned
-    const requests = await MaintenanceRequest.find({
-      _id: { $in: requestIds },
-      deletedAt: null,
-    });
+    const scopedQuery = await maintenanceListScope(user, { _id: { $in: requestIds }, deletedAt: null });
+    const requests = await MaintenanceRequest.find(scopedQuery);
 
     if (requests.length === 0) {
       return createErrorResponse("No valid requests found", 404);
@@ -89,14 +88,10 @@ export const POST = withPermissionAndDB([
     };
 
     if (notes) {
-      updateData.$push = {
-          notes: {
-            content: notes,
-            createdBy: user.id,
-            createdAt: new Date(),
-          },
-        };
+      const stamp = new Date().toISOString();
+      updateData.notes = `[${stamp}] ${notes}`;
     }
+
 
     const result = await MaintenanceRequest.updateMany(
       { _id: { $in: requestIds } },
@@ -111,7 +106,7 @@ export const POST = withPermissionAndDB([
   } catch (error) {
     if (error instanceof z.ZodError) {
       return createErrorResponse(
-        `Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
+        `Validation error: ${error.issues.map((e) => e.message).join(", ")}`,
         400
       );
     }

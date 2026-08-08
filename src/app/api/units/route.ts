@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-
+import { getScopedPropertyIds } from "@/lib/property-scope";
 import { NextRequest } from "next/server";
 import { Property } from "@/models";
 import {
@@ -12,7 +12,7 @@ import {
 import { PropertyStatus, PropertyType } from "@/types";
 
 export const GET = withPermissionAndDB("property_view")(
-  async (_user: unknown, request: NextRequest) => {
+  async (user: any, request: NextRequest) => {
     try {
       const { searchParams } = new URL(request.url);
       const paginationParams = parsePaginationParams(searchParams);
@@ -38,7 +38,15 @@ export const GET = withPermissionAndDB("property_view")(
       const state = searchParams.get("state") || undefined;
       const city = searchParams.get("city") || undefined;
 
-      const match: any = { deletedAt: null };
+      const match: any = {};
+
+      // Super Admin sees all units.
+      // Property Manager sees only units from properties they own.
+      const propertyIds = await getScopedPropertyIds(user);
+
+      if (propertyIds !== null) {
+      match._id = { $in: propertyIds };
+      }
 
       if (type && Object.values(PropertyType).includes(type as any)) {
         match.type = type;
@@ -81,7 +89,20 @@ export const GET = withPermissionAndDB("property_view")(
           ]
         : undefined;
 
-      const basePipeline: any[] = [{ $match: match }, { $unwind: "$units" }];
+      const basePipeline: any[] = [
+  { $match: match },
+  {
+    $unwind: {
+      path: "$units",
+      preserveNullAndEmptyArrays: true,
+    },
+  },
+  {
+    $match: {
+      "units._id": { $exists: true },
+    },
+  },
+];
 
       if (searchOr) basePipeline.push({ $match: { $or: searchOr } });
       if (Object.keys(unitMatch).length > 0)
@@ -158,7 +179,9 @@ export const GET = withPermissionAndDB("property_view")(
           },
         },
       ];
-
+      
+      const debug = await Property.findOne({}, { name: 1, units: 1 }).lean();
+      console.log("DEBUG PROPERTY =", JSON.stringify(debug, null, 2));
       const data = await Property.aggregate(paginatedPipeline);
       const totalPages = Math.ceil(total / limit) || 1;
 

@@ -26,6 +26,7 @@ import {
   buildNotificationVisibilityFilter,
   mergeNotificationFilters,
 } from "@/lib/notification-visibility";
+import { canNotifyUser } from "@/lib/notification-access";
 
 export const dynamic = "force-dynamic";
 
@@ -231,7 +232,7 @@ export const GET = withPermissionAndDB("profile_management")(async (
 
 // POST /api/notifications - Send notification or create automation rule
 export const POST = withPermissionAndDB("company_settings")(async (
-  _user: AuthenticatedAccessUser,
+  user: AuthenticatedAccessUser,
   request: NextRequest,
 ) => {
   try {
@@ -244,13 +245,14 @@ export const POST = withPermissionAndDB("company_settings")(async (
 
     switch (action) {
       case "send-notification":
-        return await handleSendNotification(data);
+        return await handleSendNotification(user, data);
 
       case "create-automation-rule":
+        if (!user.isAdmin) return createErrorResponse("Réservé au Super Admin", 403);
         return await handleCreateAutomationRule(data);
 
       case "schedule-notification":
-        return await handleScheduleNotification(data);
+        return await handleScheduleNotification(user, data);
 
       default:
         return createErrorResponse("Invalid action", 400);
@@ -263,10 +265,11 @@ export const POST = withPermissionAndDB("company_settings")(async (
 
 // PUT /api/notifications - Update automation rule
 export const PUT = withPermissionAndDB("company_settings")(async (
-  _user: AuthenticatedAccessUser,
+  user: AuthenticatedAccessUser,
   request: NextRequest,
 ) => {
   try {
+    if (!user.isAdmin) return createErrorResponse("Réservé au Super Admin", 403);
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
       return createErrorResponse(error ?? "Invalid request body", 400);
@@ -402,8 +405,8 @@ export const DELETE = withPermissionAndDB("profile_management")(async (
       return createErrorResponse("Rule ID or notification IDs required", 400);
     }
 
-    if (user.isTenant) {
-      return createErrorResponse("Forbidden", 403);
+    if (!user.isAdmin) {
+      return createErrorResponse("Réservé au Super Admin", 403);
     }
 
     const deleted = notificationAutomation.removeRule(ruleId);
@@ -423,7 +426,10 @@ export const DELETE = withPermissionAndDB("profile_management")(async (
 });
 
 // Handle send notification
-async function handleSendNotification(data: any): Promise<NextResponse> {
+async function handleSendNotification(
+  user: AuthenticatedAccessUser,
+  data: any,
+): Promise<NextResponse> {
   const {
     type,
     priority = NotificationPriority.NORMAL,
@@ -438,6 +444,10 @@ async function handleSendNotification(data: any): Promise<NextResponse> {
       "Missing required fields: type, userId, title, message",
       400,
     );
+  }
+
+  if (!Types.ObjectId.isValid(userId) || !(await canNotifyUser(user, userId))) {
+    return createErrorResponse("Destinataire hors de votre périmètre", 403);
   }
 
   const success = await notificationService.sendNotification({
@@ -486,7 +496,10 @@ async function handleCreateAutomationRule(data: any): Promise<NextResponse> {
 }
 
 // Handle schedule notification
-async function handleScheduleNotification(data: any): Promise<NextResponse> {
+async function handleScheduleNotification(
+  user: AuthenticatedAccessUser,
+  data: any,
+): Promise<NextResponse> {
   const { type, userId, scheduledFor, notificationData = {} } = data;
 
   if (!type || !userId || !scheduledFor) {
@@ -494,6 +507,10 @@ async function handleScheduleNotification(data: any): Promise<NextResponse> {
       "Missing required fields: type, userId, scheduledFor",
       400,
     );
+  }
+
+  if (!Types.ObjectId.isValid(userId) || !(await canNotifyUser(user, userId))) {
+    return createErrorResponse("Destinataire hors de votre périmètre", 403);
   }
 
   const scheduledDate = new Date(scheduledFor);

@@ -343,7 +343,7 @@ EventSchema.virtual("isUpcoming").get(function (this: IEvent) {
 
 // Soft delete query helper
 EventSchema.pre(/^find/, function (this: any) {
-  this.where({
+  (this as any).where({
     $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
   });
 });

@@ -29,6 +29,7 @@ function extractParticipant(raw: any): Participant | null {
   const lastName = user?.lastName ?? raw.lastName ?? "";
   const email = user?.email ?? raw.email ?? "";
   const avatar = user?.avatar ?? raw.avatar ?? null;
+  const phone = user?.phone ?? raw.phone ?? null;
   const role = user?.role ?? raw.role ?? undefined;
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
@@ -36,6 +37,7 @@ function extractParticipant(raw: any): Participant | null {
     id,
     name: fullName || email || "Unknown",
     email,
+    phone,
     avatar: avatar || null,
     role,
   };

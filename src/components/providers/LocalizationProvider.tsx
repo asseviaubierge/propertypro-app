@@ -125,7 +125,7 @@ export function LocalizationProvider({
       setCurrency(localizationService.getCurrency(currencyCode));
 
       if (persist && typeof window !== "undefined") {
-        localStorage.setItem("PropertyPro-currency", currencyCode);
+        localStorage.setItem("GestionEImmo-currency", currencyCode);
       }
     },
     []
@@ -136,8 +136,8 @@ export function LocalizationProvider({
     const initializeLocalization = async () => {
       try {
         // Load user preferences from localStorage
-        const savedLocale = localStorage.getItem("PropertyPro-locale");
-        const savedCurrency = localStorage.getItem("PropertyPro-currency");
+        const savedLocale = localStorage.getItem("GestionEImmo-locale");
+        const savedCurrency = localStorage.getItem("GestionEImmo-currency");
 
         if (savedLocale && !initialLocale) {
           localizationService.setLocale(savedLocale);
@@ -173,7 +173,7 @@ export function LocalizationProvider({
       setCurrentLocale(localeCode);
       setLocale(localizationService.getLocale(localeCode));
 
-      localStorage.setItem("PropertyPro-locale", localeCode);
+      localStorage.setItem("GestionEImmo-locale", localeCode);
     },
     []
   );
@@ -192,7 +192,7 @@ export function LocalizationProvider({
     if (typeof window === "undefined") return;
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.key !== "PropertyPro-currency" || !event.newValue) return;
+      if (event.key !== "GestionEImmo-currency" || !event.newValue) return;
       if (event.newValue === currentCurrency) return;
       applyCurrency(event.newValue, false);
     };

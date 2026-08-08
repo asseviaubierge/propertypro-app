@@ -15,6 +15,7 @@ import {
   handleApiError,
   withPermissionAndDB,
 } from "@/lib/api-utils";
+import { maintenanceListScope, assertMaintenancePropertyAccess } from "@/lib/maintenance-access";
 
 // ============================================================================
 // GET /api/maintenance/emergency/stats - Get emergency statistics
@@ -36,17 +37,14 @@ export const GET = withPermissionAndDB("maintenance_management")(async (user: Au
       createdAt: { $gte: startDate },
     };
 
+    baseQuery = await maintenanceListScope(user, baseQuery);
     if (propertyId) {
+      if (!(await assertMaintenancePropertyAccess(user, propertyId))) {
+        return createErrorResponse("Accès refusé à cette propriété", 403);
+      }
       baseQuery.propertyId = propertyId;
     }
 
-    // Manager-equivalent roles are limited to their assigned and unassigned emergencies.
-    if (user.isManager && !user.isAdmin) {
-      baseQuery.$or = [
-        { assignedTo: user.id },
-        { assignedTo: { $exists: false } },
-      ];
-    }
 
     // Get comprehensive emergency statistics
     const stats = await MaintenanceRequest.aggregate([

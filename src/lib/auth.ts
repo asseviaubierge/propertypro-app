@@ -15,21 +15,24 @@ import {
   isTenantRole,
 } from "./role-utils";
 
-// MongoDB client for NextAuth adapter
-// Use lazy connection to avoid timeout during build
-const uri = process.env.MONGODB_URI!;
+// The application uses JWT sessions and a credentials provider. An adapter is
+// only needed when an OAuth provider is enabled. Keeping the adapter optional
+// prevents /api/auth/* from failing to load after a restart when MongoDB is
+// temporarily unavailable or when only credentials authentication is used.
+const uri = process.env.MONGODB_URI;
 const options = {
   serverSelectionTimeoutMS: 30000,
   connectTimeoutMS: 30000,
 };
 
-const clientPromise: Promise<MongoClient> = (() => {
+function getMongoClientPromise(): Promise<MongoClient> | null {
+  if (!uri) return null;
   if (!global._mongoClientPromise) {
     const client = new MongoClient(uri, options);
     global._mongoClientPromise = client.connect();
   }
   return global._mongoClientPromise;
-})();
+}
 
 // Create providers array conditionally
 const providers: Provider[] = [];
@@ -155,16 +158,23 @@ providers.push(
           isActive: user?.isActive,
         };
       } catch (error) {
-        console.error("Authentication error:", error);
-        throw new Error("Authentication failed");
+        const message = error instanceof Error ? error.message : "Échec de l’authentification";
+        console.warn("Authentification refusée :", message);
+        throw error instanceof Error ? error : new Error(message);
       }
     },
   })
 );
 
 export const authOptions: NextAuthConfig = {
-  // @ts-expect-error - Type mismatch between @auth/mongodb-adapter and next-auth adapter types
-  adapter: MongoDBAdapter(clientPromise),
+  // Explicitly support both Auth.js v5 and legacy NextAuth environment names.
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  ...(providers.some((provider: any) => provider?.id !== "credentials") && getMongoClientPromise()
+    ? {
+        // @ts-expect-error - Adapter package versions expose slightly different types.
+        adapter: MongoDBAdapter(getMongoClientPromise()!),
+      }
+    : {}),
   providers,
 
   // Trust host for development and production
@@ -192,6 +202,15 @@ export const authOptions: NextAuthConfig = {
   },
 
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      try {
+        const target = new URL(url);
+        if (target.origin === baseUrl) return url;
+      } catch {}
+      return `${baseUrl}/dashboard`;
+    },
+
     async jwt({ token, user, account }) {
       // Initial sign in
       if (account && user) {
@@ -235,7 +254,7 @@ export const authOptions: NextAuthConfig = {
             session.user.createdAt = user?.createdAt;
           }
         } catch (error) {
-          console.error("Session user fetch error:", error);
+          console.warn("Actualisation de session impossible :", error instanceof Error ? error.message : error);
         }
       }
 
@@ -272,7 +291,7 @@ export const authOptions: NextAuthConfig = {
 
         return true;
       } catch (error) {
-        console.error("Sign in error:", error);
+        console.warn("Connexion OAuth impossible :", error instanceof Error ? error.message : error);
         return false;
       }
     },

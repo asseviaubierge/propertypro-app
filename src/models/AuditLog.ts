@@ -281,7 +281,7 @@ AuditLogSchema.statics.logEvent = async function (
     timestamp: eventData.timestamp || new Date(),
   });
 
-  return await auditLog.save();
+  return (await auditLog.save()) as IAuditLog;
 };
 
 AuditLogSchema.statics.getActivityForUser = async function (
@@ -348,19 +348,19 @@ AuditLogSchema.methods.addTag = function (tag: string) {
   if (!this.tags.includes(tag)) {
     this.tags.push(tag);
   }
-  return this.save();
+  return this.save() as Promise<IAuditLog>;
 };
 
 AuditLogSchema.methods.removeTag = function (tag: string) {
   this.tags = this.tags.filter((t: string) => t !== tag);
-  return this.save();
+  return this.save() as Promise<IAuditLog>;
 };
 
 AuditLogSchema.methods.setRetentionDate = function (days: number) {
   const retentionDate = new Date();
   retentionDate.setDate(retentionDate.getDate() + days);
   this.retentionDate = retentionDate;
-  return this.save();
+  return this.save() as Promise<IAuditLog>;
 };
 
 // Pre-save middleware

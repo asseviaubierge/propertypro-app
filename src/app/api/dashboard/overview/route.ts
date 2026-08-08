@@ -3,6 +3,7 @@
  * Aggregates cross-domain metrics for the manager/owner dashboard
  */
 
+import { getScopedPropertyIds } from "@/lib/property-scope";
 import {
   createSuccessResponse,
   handleApiError,
@@ -38,20 +39,20 @@ const ALERT_COLOR_MAP = ["#0ea5e9", "#22c55e", "#f97316", "#ef4444", "#8b5cf6"];
 
 const MONTH_LABELS = [
   "Jan",
-  "Feb",
+  "Fév",
   "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
+  "Avr",
+  "Mai",
+  "Juin",
+  "Juil",
+  "Août",
+  "Sept",
   "Oct",
   "Nov",
-  "Dec",
+  "Déc",
 ];
 
-const DAY_LABEL_FORMATTER = new Intl.DateTimeFormat("en-US", {
+const DAY_LABEL_FORMATTER = new Intl.DateTimeFormat("fr-FR", {
   month: "short",
   day: "numeric",
 });
@@ -65,9 +66,14 @@ const buildDayKey = (year: number, month: number, day: number) =>
   `${year}-${padNumber(month)}-${padNumber(day)}`;
 
 export const GET = withPermissionAndDB("profile_management")(
-  async () => {
+  async (user: any) => {
     try {
       const now = new Date();
+      const propertyIds = await getScopedPropertyIds(user);
+      const scopedPropertyFilter =
+        propertyIds === null ? {} : { propertyId: { $in: propertyIds } };
+      const scopedPropertyDocumentFilter =
+        propertyIds === null ? {} : { _id: { $in: propertyIds } };
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const startOfYear = new Date(now.getFullYear(), 0, 1);
       const startOfToday = new Date(
@@ -93,7 +99,10 @@ export const GET = withPermissionAndDB("profile_management")(
       // -----------------------------------------------------------------------
       // Core portfolio information (properties, units, rent distribution)
       // -----------------------------------------------------------------------
-      const properties = await Property.find({ deletedAt: null })
+      const properties = await Property.find({
+        deletedAt: null,
+        ...scopedPropertyDocumentFilter,
+      })
         .select("type totalUnits units rentAmount isMultiUnit")
         .lean();
 
@@ -135,32 +144,55 @@ export const GET = withPermissionAndDB("profile_management")(
       // -----------------------------------------------------------------------
       // Lease and tenant metrics
       // -----------------------------------------------------------------------
-      const [activeLeasesCount, expiringLeasesCount, tenantStatusBuckets] =
+      const directTenantFilter = user.isAdmin
+        ? { role: UserRole.TENANT, deletedAt: null }
+        : {
+            role: UserRole.TENANT,
+            deletedAt: null,
+            $or: [{ managerId: user.id }, { createdBy: user.id }],
+          };
+
+      const [activeLeasesCount, expiringLeasesCount, leaseTenantIds, directTenantIds] =
         await Promise.all([
           Lease.countDocuments({
             status: LeaseStatus.ACTIVE,
             deletedAt: null,
+            ...scopedPropertyFilter,
           }),
           Lease.countDocuments({
             status: LeaseStatus.ACTIVE,
             endDate: { $gte: now, $lte: thirtyDaysFromNow },
             deletedAt: null,
+            ...scopedPropertyFilter,
           }),
-          User.aggregate([
-            {
-              $match: {
-                role: UserRole.TENANT,
-                deletedAt: null,
-              },
-            },
-            {
-              $group: {
-                _id: "$tenantStatus",
-                count: { $sum: 1 },
-              },
-            },
-          ]),
+          Lease.distinct("tenantId", {
+            deletedAt: null,
+            ...scopedPropertyFilter,
+          }),
+          User.distinct("_id", directTenantFilter),
         ]);
+
+      const scopedTenantIds = Array.from(
+        new Map(
+          [...leaseTenantIds, ...directTenantIds].map((id: any) => [id.toString(), id]),
+        ).values(),
+      );
+
+      const tenantStatusBuckets = await User.aggregate([
+        {
+          $match: {
+            _id: { $in: scopedTenantIds },
+            role: UserRole.TENANT,
+            deletedAt: null,
+          },
+        },
+        {
+          $group: {
+            _id: "$tenantStatus",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
 
       occupiedUnits = activeLeasesCount;
 
@@ -175,9 +207,13 @@ export const GET = withPermissionAndDB("profile_management")(
         (sum, current) => sum + current,
         0,
       );
-      const activeTenants = tenantStatusMap["active"] || 0;
+      const activeTenants =
+        (tenantStatusMap["active"] || 0) +
+        (tenantStatusMap["approved"] || 0);
       const pendingApplications =
         (tenantStatusMap["application_submitted"] || 0) +
+        (tenantStatusMap["submitted"] || 0) +
+        (tenantStatusMap["pending"] || 0) +
         (tenantStatusMap["under_review"] || 0);
 
       const occupancyRate =
@@ -190,6 +226,7 @@ export const GET = withPermissionAndDB("profile_management")(
         {
           $match: {
             deletedAt: null,
+            ...scopedPropertyFilter,
           },
         },
         {
@@ -276,6 +313,7 @@ export const GET = withPermissionAndDB("profile_management")(
         {
           $match: {
             deletedAt: null,
+            ...scopedPropertyFilter,
           },
         },
         {
@@ -389,6 +427,7 @@ export const GET = withPermissionAndDB("profile_management")(
         {
           $match: {
             deletedAt: null,
+            ...scopedPropertyFilter,
             status: PaymentStatus.PAID,
             $expr: {
               $and: [
@@ -414,6 +453,7 @@ export const GET = withPermissionAndDB("profile_management")(
         {
           $match: {
             deletedAt: null,
+            ...scopedPropertyFilter,
             status: PaymentStatus.PAID,
             $expr: {
               $and: [
@@ -452,6 +492,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               status: PaymentStatus.PAID,
               $expr: {
                 $and: [
@@ -480,6 +521,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               status: PaymentStatus.PAID,
               $expr: {
                 $and: [
@@ -509,6 +551,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               status: PaymentStatus.PAID,
               $expr: {
                 $and: [
@@ -537,6 +580,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               createdAt: { $gte: twelveMonthsAgo, $lte: now },
             },
           },
@@ -560,6 +604,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               createdAt: { $gte: thirtyDaysAgo, $lte: now },
             },
           },
@@ -584,6 +629,7 @@ export const GET = withPermissionAndDB("profile_management")(
           {
             $match: {
               deletedAt: null,
+              ...scopedPropertyFilter,
               createdAt: { $gte: startOfLastYear, $lte: endOfLastYear },
             },
           },
@@ -740,9 +786,9 @@ export const GET = withPermissionAndDB("profile_management")(
       // -----------------------------------------------------------------------
       // Recent activity feed (payments, maintenance, leases)
       // -----------------------------------------------------------------------
-      const [recentPayments, recentMaintenance, recentLeases] =
+      const [recentPayments, recentMaintenance, recentLeases, recentTenants] =
         await Promise.all([
-          Payment.find({ deletedAt: null })
+          Payment.find({ deletedAt: null, ...scopedPropertyFilter })
             .sort({ updatedAt: -1 })
             .limit(5)
             .select(
@@ -753,13 +799,13 @@ export const GET = withPermissionAndDB("profile_management")(
               { path: "propertyId", select: "name" },
             ])
             .lean(),
-          MaintenanceRequest.find({ deletedAt: null })
+          MaintenanceRequest.find({ deletedAt: null, ...scopedPropertyFilter })
             .sort({ updatedAt: -1 })
             .limit(5)
             .select("title priority status updatedAt propertyId")
             .populate({ path: "propertyId", select: "name" })
             .lean(),
-          Lease.find({ deletedAt: null })
+          Lease.find({ deletedAt: null, ...scopedPropertyFilter })
             .sort({ updatedAt: -1 })
             .limit(5)
             .select("status startDate endDate updatedAt tenantId propertyId")
@@ -767,6 +813,15 @@ export const GET = withPermissionAndDB("profile_management")(
               { path: "tenantId", select: "firstName lastName" },
               { path: "propertyId", select: "name" },
             ])
+            .lean(),
+          User.find({
+            _id: { $in: scopedTenantIds },
+            role: UserRole.TENANT,
+            deletedAt: null,
+          })
+            .sort({ updatedAt: -1 })
+            .limit(5)
+            .select("firstName lastName tenantStatus createdAt updatedAt")
             .lean(),
         ]);
 
@@ -827,6 +882,32 @@ export const GET = withPermissionAndDB("profile_management")(
             priority: request?.priority,
           };
         }),
+        ...recentTenants.map((tenant: any) => {
+          const tenantName = formatName(tenant);
+          const status = String(tenant?.tenantStatus || "submitted");
+          const statusLabels: Record<string, string> = {
+            application_submitted: "candidature soumise",
+            submitted: "candidature soumise",
+            pending: "candidature en attente",
+            under_review: "candidature en examen",
+            approved: "locataire approuvé",
+            active: "locataire actif",
+            rejected: "candidature rejetée",
+            terminated: "location résiliée",
+            moved_out: "locataire sorti",
+          };
+          const timestamp =
+            tenant?.updatedAt?.toISOString?.() ||
+            tenant?.createdAt?.toISOString?.() ||
+            new Date().toISOString();
+          return {
+            id: tenant?._id?.toString() ?? "unknown",
+            type: "application" as const,
+            description: `${tenantName} — ${statusLabels[status] || status.replace(/_/g, " ")}`,
+            timestamp,
+            status,
+          };
+        }),
         ...recentLeases.map((lease) => {
           const tenantName = formatName(lease?.tenantId);
           const propertyName = lease?.propertyId?.name || "Portfolio";
@@ -861,6 +942,7 @@ export const GET = withPermissionAndDB("profile_management")(
       ] = await Promise.all([
         Event.find({
           deletedAt: null,
+          ...scopedPropertyFilter,
           status: { $in: [EventStatus.SCHEDULED, EventStatus.CONFIRMED] },
           startDate: { $gte: now },
         })
@@ -869,6 +951,7 @@ export const GET = withPermissionAndDB("profile_management")(
           .select("title startDate priority type")
           .lean(),
         Lease.find({
+          ...scopedPropertyFilter,
           status: LeaseStatus.ACTIVE,
           endDate: { $gte: now, $lte: thirtyDaysFromNow },
           deletedAt: null,
@@ -883,6 +966,7 @@ export const GET = withPermissionAndDB("profile_management")(
           .lean(),
         MaintenanceRequest.find({
           deletedAt: null,
+          ...scopedPropertyFilter,
           status: {
             $in: [MaintenanceStatus.SUBMITTED, MaintenanceStatus.ASSIGNED],
           },
@@ -948,6 +1032,7 @@ export const GET = withPermissionAndDB("profile_management")(
 
       const overdueInvoicesCount = await Invoice.countDocuments({
         deletedAt: null,
+        ...scopedPropertyFilter,
         status: InvoiceStatus.OVERDUE,
         balanceRemaining: { $gt: 0 },
         dueDate: { $lt: now },
@@ -1019,8 +1104,8 @@ export const GET = withPermissionAndDB("profile_management")(
         ([type, count], index) => ({
           name:
             ({
-              furnished_apartment: "Appartement meublé",
-              multi_family: "Immeuble multifamilial",
+              furnished_apartment: "Appartement Meublé",
+              multi_family: "Plusieurs Ménages",
               private_house: "Maison individuelle",
               residence: "Résidence",
               single_family: "Maison individuelle",

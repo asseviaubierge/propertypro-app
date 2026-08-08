@@ -115,8 +115,8 @@ const EventInvitationSchema = new Schema<IEventInvitation>(
     toJSON: {
       virtuals: true,
       transform: function (doc, ret) {
-        delete ret.__v;
-        delete ret.invitationToken; // Don't expose token in JSON
+        delete (ret as any).__v;
+        delete (ret as any).invitationToken; // Don't expose token in JSON
         return ret;
       },
     },

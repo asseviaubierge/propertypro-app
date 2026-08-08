@@ -774,14 +774,14 @@ export function EventList({
       {/* <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Event</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer l’événement</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete "{eventToDelete?.title}"? This
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteEvent}
               className="bg-red-600 hover:bg-red-700"

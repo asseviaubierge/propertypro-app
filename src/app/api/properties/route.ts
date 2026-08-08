@@ -80,8 +80,12 @@ export const GET = withPermissionAndDB("property_view")(
         deletedAt: null, // Exclude soft-deleted properties
       };
 
-      // Single company architecture - Admin and Manager see all properties
-      // No role-based filtering needed for company staff
+      // Access rules:
+      // - Super Admin: all properties
+      // - Property Manager / Owner: only their own properties
+      if (!user.isAdmin) {
+        query.ownerId = user.id;
+      }
 
       // Apply filters
       if (filters.type) query.type = filters.type;
@@ -229,8 +233,17 @@ export const POST = withPermissionAndDB("property_create")(
         return createErrorResponse(error!, 400);
       }
 
+      // Inject ownership before validation
+      const requestBody = {
+        ...body,
+        ownerId: user.isAdmin ? (body.ownerId ?? user.id) : user.id,
+        managerId: user.isAdmin
+          ? (body.managerId ?? body.ownerId ?? user.id)
+          : user.id,
+      };
+
       // Validate request body
-      const validation = validateSchema(propertyCreateSchema, body);
+      const validation = validateSchema(propertyCreateSchema, requestBody);
       if (!validation.success) {
         return createErrorResponse(validation.errors.join(", "), 400);
       }
@@ -252,24 +265,38 @@ export const POST = withPermissionAndDB("property_create")(
         ...cleanPropertyData,
       };
 
+      // Build embedded units from creation form when unit fields are present
+      if (!Array.isArray(newPropertyData.units) || newPropertyData.units.length === 0) {
+        if (
+          _bedrooms !== undefined ||
+          _bathrooms !== undefined ||
+          _squareFootage !== undefined ||
+          _rentAmount !== undefined
+        ) {
+          newPropertyData.units = [{
+            unitNumber: "1",
+            unitType: cleanPropertyData.isMultiUnit ? "apartment" : "house",
+            bedrooms: _bedrooms ?? 0,
+            bathrooms: _bathrooms ?? 0,
+            squareFootage: _squareFootage ?? 0,
+            rentAmount: _rentAmount ?? 0,
+            securityDeposit: _securityDeposit ?? 0,
+            status: "available",
+          }];
+        }
+      }
+
       // Note: bedrooms, bathrooms, squareFootage, rentAmount, securityDeposit
       // are now stored only at the unit level - no property root level fields needed
 
-      // Single company architecture - Admin and Manager can create properties
-      // Set default owner to the creating user if not specified
-      newPropertyData.ownerId = propertyData.ownerId || user.id;
+      // Property Manager is the owner of the property.
+      // Super Admin may specify an owner, otherwise keeps current behavior.
+      newPropertyData.ownerId = user.isAdmin
+        ? (propertyData.ownerId || user.id)
+        : user.id;
 
-      // Managers can optionally assign themselves as manager
-      if (user.isManager && propertyData.managerId) {
-        newPropertyData.managerId = propertyData.managerId;
-      } else if (user.isManager) {
-        newPropertyData.managerId = user.id;
-      }
-
-      // Admins can assign any manager
-      if (user.isAdmin && propertyData.managerId) {
-        newPropertyData.managerId = propertyData.managerId;
-      }
+      // Keep managerId aligned with the property owner for manager-based routes.
+      newPropertyData.managerId = newPropertyData.ownerId;
 
       // Unified approach: units are embedded directly in the property document
       // No need to extract units - they're part of the property data
@@ -277,6 +304,8 @@ export const POST = withPermissionAndDB("property_create")(
       // Create the property with embedded units
       const property = new Property(newPropertyData);
       await property.save();
+      console.log("PROPERTY CREATED:", property._id);
+      console.log("UNITS SAVED:", JSON.stringify(property.units, null, 2));
 
       // Populate owner and manager information
       await property.populate([

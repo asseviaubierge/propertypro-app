@@ -7,6 +7,11 @@ export interface InvoiceCompanyInfo {
   email: string;
   website?: string;
   logo?: string;
+  legalName?: string;
+  accountType?: string;
+  cip?: string;
+  ifu?: string;
+  rccm?: string;
   [key: string]: unknown;
 }
 

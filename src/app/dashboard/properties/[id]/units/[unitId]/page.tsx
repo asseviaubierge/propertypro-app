@@ -637,7 +637,9 @@ export default function UnitDetailsPage() {
                       {t("properties.unitDetails.stats.squareFootage")}
                     </p>
                     <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                      {unit.squareFootage.toLocaleString()} ft²
+                      {typeof unit.squareFootage === "number"
+                      ? `${unit.squareFootage.toLocaleString()} ft²`
+                      : "0 ft²"}
                     </p>
                   </div>
                 </div>

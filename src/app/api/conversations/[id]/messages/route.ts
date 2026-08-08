@@ -52,7 +52,7 @@ export const GET = withPermissionAndDB("profile_management")(
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("senderId", "firstName lastName email avatar")
+        .populate("senderId", "firstName lastName email phone avatar role")
         .lean();
 
       // Get total count for pagination
@@ -182,7 +182,7 @@ export const POST = withPermissionAndDB("profile_management")(
       );
 
       // Populate sender information
-      await message.populate("senderId", "firstName lastName email avatar");
+      await message.populate("senderId", "firstName lastName email phone avatar role");
 
       const messagePayload = {
         _id: message._id,

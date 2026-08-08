@@ -124,13 +124,13 @@ const TicketSchema = new Schema<ITicket>(
     timestamps: true,
     toJSON: {
       transform: (_doc: any, ret: any) => {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
     toObject: {
       transform: (_doc: any, ret: any) => {
-        delete ret.__v;
+        delete (ret as any).__v;
         return ret;
       },
     },
@@ -204,12 +204,12 @@ TicketSchema.statics.findByCategory = function (category: TicketCategory) {
 // Instance methods
 TicketSchema.methods.softDelete = function () {
   this.deletedAt = new Date();
-  return this.save();
+  return this.save() as Promise<ITicket>;
 };
 
 TicketSchema.methods.restore = function () {
   this.deletedAt = null;
-  return this.save();
+  return this.save() as Promise<ITicket>;
 };
 
 // Indexes

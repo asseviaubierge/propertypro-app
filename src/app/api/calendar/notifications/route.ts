@@ -163,7 +163,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -229,7 +229,7 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     const { path, value } = body;

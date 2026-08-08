@@ -207,7 +207,7 @@ securitySettingsSchema.methods.updateSecurity = function (
   Object.assign(this, securityData);
   this.version += 1;
   this.updatedAt = new Date();
-  return this.save();
+  return this.save() as Promise<ISecuritySettings>;
 };
 
 securitySettingsSchema.methods.addTrustedDevice = function (deviceInfo: {
@@ -227,7 +227,7 @@ securitySettingsSchema.methods.addTrustedDevice = function (deviceInfo: {
     addedAt: new Date(),
   });
 
-  return this.save();
+  return this.save() as Promise<ISecuritySettings>;
 };
 
 securitySettingsSchema.methods.removeTrustedDevice = function (
@@ -236,7 +236,7 @@ securitySettingsSchema.methods.removeTrustedDevice = function (
   this.trustedDevices = this.trustedDevices.filter(
     (device: any) => device.deviceId !== deviceId
   );
-  return this.save();
+  return this.save() as Promise<ISecuritySettings>;
 };
 
 securitySettingsSchema.methods.isTrustedDevice = function (

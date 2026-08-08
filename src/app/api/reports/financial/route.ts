@@ -4,10 +4,10 @@
  */
 
 import { NextRequest } from "next/server";
-import { Payment, Property, Lease, Expense } from "@/models";
+import { Types } from "mongoose";
+import { Payment, Lease, Expense } from "@/models";
 import {
   PaymentStatus,
-  PaymentType,
   ExpenseStatus,
   LeaseStatus,
 } from "@/types";
@@ -17,6 +17,7 @@ import {
   handleApiError,
   withPermissionAndDB,
 } from "@/lib/api-utils";
+import { canAccessProperty, getScopedPropertyIds } from "@/lib/property-scope";
 
 const MONTH_LABELS = [
   "Jan",
@@ -34,8 +35,12 @@ const MONTH_LABELS = [
 ];
 
 export const GET = withPermissionAndDB("financial_reports")(
-  async (_user: any, request: NextRequest) => {
+  async (user: any, request: NextRequest) => {
     try {
+      if (user?.isTenant) {
+        return createErrorResponse("Vous n’êtes pas autorisé à consulter les rapports financiers", 403);
+      }
+
       const { searchParams } = request.nextUrl;
       const reportType = searchParams.get("type") || "income-expense";
       const startParam = searchParams.get("startDate");
@@ -44,32 +49,43 @@ export const GET = withPermissionAndDB("financial_reports")(
         ? new Date(startParam)
         : new Date(new Date().getFullYear(), 0, 1);
       const endDate = endParam ? new Date(endParam) : new Date();
-      if (
-        Number.isNaN(startDate.getTime()) ||
-        Number.isNaN(endDate.getTime())
-      ) {
-        return createErrorResponse("Invalid date range provided", 400);
+
+      if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+        return createErrorResponse("La période indiquée est invalide", 400);
       }
-      const propertyId = searchParams.get("propertyId");
+      if (endDate < startDate) {
+        return createErrorResponse("La date de fin doit être postérieure à la date de début", 400);
+      }
+
+      const requestedPropertyId = searchParams.get("propertyId");
+      if (requestedPropertyId && !Types.ObjectId.isValid(requestedPropertyId)) {
+        return createErrorResponse("L’identifiant du bien est invalide", 400);
+      }
+      if (
+        requestedPropertyId &&
+        !(await canAccessProperty(user, requestedPropertyId))
+      ) {
+        return createErrorResponse("Vous n’avez pas accès à ce bien", 403);
+      }
+
+      const scopedPropertyIds = requestedPropertyId
+        ? [new Types.ObjectId(requestedPropertyId)]
+        : await getScopedPropertyIds(user);
+
+      // null means unrestricted access for the Super Admin. An empty array
+      // deliberately produces an empty report for users without any property.
+      const propertyIds = scopedPropertyIds;
 
       switch (reportType) {
         case "income-expense":
-          return await generateIncomeExpenseReport(
-            startDate,
-            endDate,
-            propertyId
-          );
+          return await generateIncomeExpenseReport(startDate, endDate, propertyIds);
         case "rent-roll":
-          return await generateRentRollReport(propertyId);
+          return await generateRentRollReport(propertyIds);
         case "collections":
-          return await generateCollectionsReport(
-            startDate,
-            endDate,
-            propertyId
-          );
+          return await generateCollectionsReport(startDate, endDate, propertyIds);
         default:
           return createErrorResponse(
-            "Invalid report type. Valid types: income-expense, rent-roll, collections",
+            "Type de rapport invalide. Valeurs autorisées : income-expense, rent-roll, collections",
             400
           );
       }
@@ -79,6 +95,14 @@ export const GET = withPermissionAndDB("financial_reports")(
   }
 );
 
+function applyPropertyIds(
+  query: Record<string, any>,
+  propertyIds: Types.ObjectId[] | null
+) {
+  if (propertyIds === null) return query;
+  return { ...query, propertyId: { $in: propertyIds } };
+}
+
 // ============================================================================
 // INCOME & EXPENSE SUMMARY REPORT
 // ============================================================================
@@ -86,9 +110,9 @@ export const GET = withPermissionAndDB("financial_reports")(
 async function generateIncomeExpenseReport(
   startDate: Date,
   endDate: Date,
-  propertyId: string | null
+  propertyIds: Types.ObjectId[] | null
 ) {
-  const paymentMatch: any = {
+  const paymentMatch: any = applyPropertyIds({
     deletedAt: null,
     status: PaymentStatus.PAID,
     $or: [
@@ -98,18 +122,13 @@ async function generateIncomeExpenseReport(
         dueDate: { $gte: startDate, $lte: endDate },
       },
     ],
-  };
+  }, propertyIds);
 
-  const expenseMatch: any = {
+  const expenseMatch: any = applyPropertyIds({
     deletedAt: null,
     status: { $in: [ExpenseStatus.PAID, ExpenseStatus.APPROVED] },
     date: { $gte: startDate, $lte: endDate },
-  };
-
-  if (propertyId) {
-    paymentMatch.propertyId = propertyId;
-    expenseMatch.propertyId = propertyId;
-  }
+  }, propertyIds);
 
   // Run income and expense aggregations in parallel
   const [incomeByCategory, incomeByProperty, monthlyIncome, expenseByCategory, expenseByProperty, monthlyExpenses] =
@@ -142,7 +161,7 @@ async function generateIncomeExpenseReport(
         {
           $group: {
             _id: "$propertyId",
-            propertyName: { $first: { $ifNull: ["$property.name", "Unassigned"] } },
+            propertyName: { $first: { $ifNull: ["$property.name", "Non attribué"] } },
             amount: { $sum: "$amount" },
             count: { $sum: 1 },
           },
@@ -194,7 +213,7 @@ async function generateIncomeExpenseReport(
         {
           $group: {
             _id: "$propertyId",
-            propertyName: { $first: { $ifNull: ["$property.name", "Unassigned"] } },
+            propertyName: { $first: { $ifNull: ["$property.name", "Non attribué"] } },
             amount: { $sum: "$amount" },
             count: { $sum: 1 },
           },
@@ -278,7 +297,7 @@ async function generateIncomeExpenseReport(
         endDate: endDate.toISOString(),
       },
     },
-    "Income & expense report generated successfully"
+    "Rapport des revenus et dépenses généré avec succès"
   );
 }
 
@@ -286,15 +305,11 @@ async function generateIncomeExpenseReport(
 // RENT ROLL REPORT
 // ============================================================================
 
-async function generateRentRollReport(propertyId: string | null) {
-  const leaseMatch: any = {
+async function generateRentRollReport(propertyIds: Types.ObjectId[] | null) {
+  const leaseMatch: any = applyPropertyIds({
     status: LeaseStatus.ACTIVE,
     deletedAt: null,
-  };
-
-  if (propertyId) {
-    leaseMatch.propertyId = propertyId;
-  }
+  }, propertyIds);
 
   const rentRoll = await Lease.aggregate([
     { $match: leaseMatch },
@@ -319,7 +334,7 @@ async function generateRentRollReport(propertyId: string | null) {
     {
       $project: {
         propertyId: 1,
-        propertyName: { $ifNull: ["$property.name", "Unknown"] },
+        propertyName: { $ifNull: ["$property.name", "Inconnu"] },
         unitId: 1,
         tenantName: {
           $concat: [
@@ -358,7 +373,7 @@ async function generateRentRollReport(propertyId: string | null) {
       },
       generatedAt: new Date().toISOString(),
     },
-    "Rent roll report generated successfully"
+    "État locatif généré avec succès"
   );
 }
 
@@ -369,16 +384,12 @@ async function generateRentRollReport(propertyId: string | null) {
 async function generateCollectionsReport(
   startDate: Date,
   endDate: Date,
-  propertyId: string | null
+  propertyIds: Types.ObjectId[] | null
 ) {
-  const baseMatch: any = {
+  const baseMatch: any = applyPropertyIds({
     deletedAt: null,
     dueDate: { $gte: startDate, $lte: endDate },
-  };
-
-  if (propertyId) {
-    baseMatch.propertyId = propertyId;
-  }
+  }, propertyIds);
 
   const [collectionsByProperty, overdueAging, collectionSummary] =
     await Promise.all([
@@ -398,7 +409,7 @@ async function generateCollectionsReport(
           $group: {
             _id: "$propertyId",
             propertyName: {
-              $first: { $ifNull: ["$property.name", "Unassigned"] },
+              $first: { $ifNull: ["$property.name", "Non attribué"] },
             },
             totalDue: { $sum: "$amount" },
             collected: {
@@ -555,16 +566,16 @@ async function generateCollectionsReport(
 
   // Map aging bucket boundaries to labels
   const agingLabels: Record<string, string> = {
-    "0": "0-30 days",
-    "30": "30-60 days",
-    "60": "60-90 days",
-    "90": "90-180 days",
-    "180": "180+ days",
-    "180+": "180+ days",
+    "0": "0 à 30 jours",
+    "30": "30 à 60 jours",
+    "60": "60 à 90 jours",
+    "90": "90 à 180 jours",
+    "180": "Plus de 180 jours",
+    "180+": "Plus de 180 jours",
   };
 
   const overdueAgingFormatted = overdueAging.map((bucket) => ({
-    range: agingLabels[String(bucket._id)] || `${bucket._id}+ days`,
+    range: agingLabels[String(bucket._id)] || `${bucket._id} jours et plus`,
     count: bucket.count,
     amount: bucket.totalAmount,
   }));
@@ -585,6 +596,6 @@ async function generateCollectionsReport(
         endDate: endDate.toISOString(),
       },
     },
-    "Collections report generated successfully"
+    "Rapport des encaissements généré avec succès"
   );
 }

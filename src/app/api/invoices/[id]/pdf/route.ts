@@ -1,144 +1,95 @@
 /**
- * PropertyPro - Invoice PDF Generation API
- * Generate and download PDF invoices
+ * PropertyPro - Secure professional invoice PDF download
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { Invoice } from "@/models";
+import { Invoice, User } from "@/models";
+import { UserRole } from "@/types";
 import {
-  createSuccessResponse,
+  AuthenticatedAccessUser,
   createErrorResponse,
   handleApiError,
+  isValidObjectId,
+  withAccessAndDB,
 } from "@/lib/api-utils";
-import { Types } from "mongoose";
+import { canAccessInvoice } from "@/lib/invoice-access";
 import { generateInvoicePdfBuffer } from "@/lib/services/invoice-pdf.service";
 
-// ============================================================================
-// GET /api/invoices/[id]/pdf - Generate and download invoice PDF
-// ============================================================================
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await connectDB();
+const INVOICE_PDF_ACCESS = {
+  roles: [UserRole.TENANT],
+  permissions: ["financial_management", "financial_reports"],
+  match: "any" as const,
+};
 
-    const { id } = await params;
+function safeFilename(value: string): string {
+  return value.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/-+/g, "-");
+}
 
-    if (!Types.ObjectId.isValid(id)) {
-      return createErrorResponse("Invalid invoice ID", 400);
+export const GET = withAccessAndDB(INVOICE_PDF_ACCESS)(
+  async (
+    user: AuthenticatedAccessUser,
+    _request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+  ) => {
+    try {
+      const { id } = await params;
+      if (!isValidObjectId(id)) {
+        return createErrorResponse("Invalid invoice ID", 400);
+      }
+
+      const invoice = await Invoice.findOne({
+        _id: id,
+        $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+      })
+        .populate("tenantId", "firstName lastName email phone address city")
+        .populate({
+          path: "propertyId",
+          select: "name address type unit ownerId managerId",
+          populate: {
+            path: "ownerId",
+            select:
+              "firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm",
+          },
+        })
+        .populate("leaseId", "startDate endDate status propertyId")
+        .lean();
+
+      if (!invoice) return createErrorResponse("Invoice not found", 404);
+
+      const issuerId = (invoice as any)?.metadata?.createdByUserId;
+      const managerId = (invoice as any)?.propertyId?.managerId;
+      const issuer = issuerId
+        ? await User.findById(issuerId)
+            .select("firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm role")
+            .lean()
+        : managerId
+          ? await User.findById(managerId)
+              .select("firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm role")
+              .lean()
+          : null;
+      (invoice as any).issuer = issuer;
+
+      if (!(await canAccessInvoice(user, invoice))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
+      const pdfBuffer = await generateInvoicePdfBuffer(invoice as any);
+      const invoiceNumber = safeFilename(
+        String((invoice as any).invoiceNumber || id)
+      );
+
+      return new NextResponse(pdfBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="facture-${invoiceNumber}.pdf"`,
+          "Content-Length": String(pdfBuffer.length),
+          "Cache-Control": "private, no-store, max-age=0",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    } catch (error) {
+      return handleApiError(error);
     }
-
-    const invoice = await Invoice.findById(id)
-  .populate("tenantId", "firstName lastName email phone")
-  .populate({
-    path: "propertyId",
-    select: "name address ownerId",
-    populate: {
-      path: "ownerId",
-      select:
-        "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
-    },
-  })
-  .populate("leaseId", "startDate endDate terms");
-
-    if (!invoice) {
-      return createErrorResponse("Invoice not found", 404);
-    }
-    
-    console.log("========== INVOICE DEBUG ==========");
-    console.dir(invoice?.propertyId, { depth: 5 });
-    console.log("==================================");
-
-    // Generate the PDF using the same design used in the lease module
-    const pdfData = await generateInvoicePdfBuffer(invoice);
-
-    // Update invoice to mark PDF as generated
-    invoice.pdfGenerated = true;
-    invoice.pdfPath = `/invoices/${invoice._id}.pdf`;
-    await invoice.save();
-
-    return new NextResponse(new Uint8Array(pdfData), {
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="invoice-${invoice.invoiceNumber}.pdf"`,
-      },
-    });
-  } catch (error) {
-    return handleApiError(error, "Failed to generate PDF");
   }
-}
-
-// ============================================================================
-// POST /api/invoices/[id]/pdf - Generate PDF and save to server
-// ============================================================================
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    await connectDB();
-
-    const { id } = await params;
-
-    if (!Types.ObjectId.isValid(id)) {
-      return createErrorResponse("Invalid invoice ID", 400);
-    }
-
-    const invoice = await Invoice.findById(id)
-  .populate("tenantId", "firstName lastName email phone")
-  .populate({
-    path: "propertyId",
-    select: "name address ownerId",
-    populate: {
-      path: "ownerId",
-      select:
-        "firstName lastName email phone accountType businessName businessLogo cip ifu rccm",
-    },
-  })
-  .populate("leaseId", "startDate endDate terms");
-
-    if (!invoice) {
-      return createErrorResponse("Invoice not found", 404);
-    }
-
-    // Generate PDF and save to server
-    const pdfPath = await generateAndSaveInvoicePDF(invoice);
-
-    // Update invoice record
-    invoice.pdfGenerated = true;
-    invoice.pdfPath = pdfPath;
-    await invoice.save();
-
-    return createSuccessResponse(
-      {
-        pdfPath,
-        pdfGenerated: true,
-        downloadUrl: `/api/invoices/${id}/pdf`,
-      },
-      "PDF generated successfully"
-    );
-  } catch (error) {
-    return handleApiError(error, "Failed to generate PDF");
-  }
-}
-
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
-
-async function generateAndSaveInvoicePDF(invoice: any): Promise<string> {
-  // Generate PDF
-  const pdfBuffer = await generateInvoicePdfBuffer(invoice);
-
-  // In a real implementation, you would save this to a file system or cloud storage
-  // For now, we'll just return a mock path
-  const fileName = `invoice-${invoice.invoiceNumber}-${Date.now()}.pdf`;
-  const filePath = `/uploads/invoices/${fileName}`;
-
-  // TODO: Implement actual file saving
-  // await fs.writeFile(path.join(process.cwd(), 'public', filePath), pdfBuffer);
-
-  return filePath;
-}
+);

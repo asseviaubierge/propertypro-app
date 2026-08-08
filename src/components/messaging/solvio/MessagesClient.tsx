@@ -22,6 +22,7 @@ import {
   User,
   Users,
   Video,
+  MessageCircleMore,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,6 +36,7 @@ import { MessageThread } from "./MessageThread";
 import { useConversations, useMessages } from "./hooks";
 import { getInitials } from "./normalize";
 import type { Message } from "./types";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 type RightPanelView = "profile" | "media";
 type MediaTab = "media" | "files" | "links";
@@ -102,6 +104,14 @@ export function MessagesClient({ userId }: MessagesClientProps) {
       (selectedConversation.participants?.length || 0) > 2
     );
   }, [selectedConversation]);
+
+  const whatsappUrl = useMemo(() => {
+    if (!otherParticipant || isGroupChat) return null;
+    return buildWhatsAppUrl(
+      otherParticipant.phone,
+      `Bonjour ${otherParticipant.name}, je vous contacte depuis Gestion E-Immo.`
+    );
+  }, [otherParticipant, isGroupChat]);
 
   // Attachments & links derived from loaded messages
   const { mediaItems, fileItems, linkItems } = useMemo(() => {
@@ -306,10 +316,12 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
-                      title="Appel audio"
+                      className="h-8 w-8 rounded-full text-green-600 hover:bg-green-50 dark:hover:bg-green-950/40 disabled:opacity-40"
+                      title={whatsappUrl ? "Ouvrir WhatsApp" : "Numéro WhatsApp indisponible"}
+                      disabled={!whatsappUrl}
+                      onClick={() => whatsappUrl && window.open(whatsappUrl, "_blank", "noopener,noreferrer")}
                     >
-                      <Phone className="h-4 w-4" />
+                      <MessageCircleMore className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -419,6 +431,12 @@ export function MessagesClient({ userId }: MessagesClientProps) {
 
               <div className="flex items-center justify-center gap-6 px-4 pb-5 shrink-0">
                 <ActionButton icon={User} label="Profil" />
+                <ActionButton
+                  icon={MessageCircleMore}
+                  label="WhatsApp"
+                  disabled={!whatsappUrl}
+                  onClick={() => whatsappUrl && window.open(whatsappUrl, "_blank", "noopener,noreferrer")}
+                />
                 <ActionButton icon={BellOff} label="Muet" />
                 <ActionButton icon={Search} label="Rechercher" />
               </div>
@@ -653,14 +671,20 @@ function MenuLink({
 function ActionButton({
   icon: Icon,
   label,
+  onClick,
+  disabled = false,
 }: {
   icon: React.ElementType;
   label: string;
+  onClick?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
-      className="flex flex-col items-center gap-1.5 group"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex flex-col items-center gap-1.5 group disabled:opacity-40 disabled:cursor-not-allowed"
     >
       <div className="h-9 w-9 rounded-full bg-muted/60 flex items-center justify-center group-hover:bg-muted transition-colors">
         <Icon className="h-4 w-4 text-foreground" />

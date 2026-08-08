@@ -121,9 +121,17 @@ export default function TenantStatusManager({
     },
   ];
 
+  const normalizeStatus = (status?: string) => {
+    const normalized = String(status || "application_submitted").toLowerCase();
+    return ["submitted", "pending", "soumis"].includes(normalized)
+      ? "application_submitted"
+      : normalized;
+  };
+
   const getAvailableTransitions = (currentStatus: string) => {
+    currentStatus = normalizeStatus(currentStatus);
     const transitions = {
-      application_submitted: ["under_review", "terminated"],
+      application_submitted: ["under_review", "approved", "terminated"],
       under_review: ["approved", "terminated"],
       approved: ["active", "terminated"],
       active: ["inactive", "moved_out", "terminated"],
@@ -214,7 +222,7 @@ export default function TenantStatusManager({
     return colorMap[status] || "outline";
   };
 
-  const currentStatus = tenant.tenantStatus || "application_submitted";
+  const currentStatus = normalizeStatus(tenant.tenantStatus);
   const availableTransitions = getAvailableTransitions(currentStatus);
   const StatusIcon = getStatusIcon(currentStatus);
 

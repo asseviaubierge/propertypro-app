@@ -31,6 +31,7 @@ import {
   Zap,
   Phone,
   Mail,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MaintenanceStatus } from "@/types";

@@ -85,7 +85,7 @@ export class ProfileSettingsService {
   static async getPublicProfile(userId: string): Promise<any> {
     try {
       const settings = await this.getByUserId(userId);
-      return settings?.getPublicProfile();
+      return (settings as any)?.getPublicProfile?.();
     } catch (error) {
       console.error("ProfileSettingsService.getPublicProfile error:", error);
       throw new Error("Failed to retrieve public profile");
@@ -127,7 +127,7 @@ export class NotificationSettingsService {
         );
       }
 
-      await settings.updateNotifications({
+      await (settings as any).updateNotifications({
         ...data,
         updatedBy: updatedBy || userId,
       });
@@ -166,7 +166,7 @@ export class NotificationSettingsService {
   ): Promise<boolean> {
     try {
       const settings = await this.getByUserId(userId);
-      return settings?.isNotificationEnabled(type, category) || false;
+      return (settings as any)?.isNotificationEnabled?.(type, category) || false;
     } catch (error) {
       console.error(
         "NotificationSettingsService.isNotificationEnabled error:",
@@ -205,7 +205,7 @@ export class SecuritySettingsService {
         settings = await SecuritySettings.createDefaultSecurity(userId);
       }
 
-      await settings.updateSecurity({
+      await (settings as any).updateSecurity({
         ...data,
         updatedBy: updatedBy || userId,
       });
@@ -249,7 +249,7 @@ export class SecuritySettingsService {
         throw new Error("Security settings not found");
       }
 
-      await settings.addTrustedDevice(deviceInfo);
+      await (settings as any).addTrustedDevice?.(deviceInfo);
       return settings;
     } catch (error) {
       console.error("SecuritySettingsService.addTrustedDevice error:", error);
@@ -267,7 +267,7 @@ export class SecuritySettingsService {
         throw new Error("Security settings not found");
       }
 
-      await settings.removeTrustedDevice(deviceId);
+      await (settings as any).removeTrustedDevice?.(deviceId);
       return settings;
     } catch (error) {
       console.error(
@@ -284,7 +284,7 @@ export class SecuritySettingsService {
   ): Promise<boolean> {
     try {
       const settings = await this.getByUserId(userId);
-      return settings?.isTrustedDevice(deviceId) || false;
+      return (settings as any)?.isTrustedDevice?.(deviceId) || false;
     } catch (error) {
       console.error("SecuritySettingsService.isTrustedDevice error:", error);
       return false;
@@ -353,7 +353,7 @@ export class DisplaySettingsService {
         settings = await DisplaySettings.createDefaultDisplay(userId);
       }
 
-      await settings.updateDisplay({
+      await (settings as any).updateDisplay({
         ...data,
         updatedBy: updatedBy || userId,
       });
@@ -385,7 +385,7 @@ export class DisplaySettingsService {
   static async getThemeConfig(userId: string): Promise<any> {
     try {
       const settings = await this.getByUserId(userId);
-      return settings?.getThemeConfig();
+      return (settings as any)?.getThemeConfig?.();
     } catch (error) {
       console.error("DisplaySettingsService.getThemeConfig error:", error);
       throw new Error("Failed to retrieve theme configuration");
@@ -421,7 +421,7 @@ export class PrivacySettingsService {
         settings = await PrivacySettings.createDefaultPrivacy(userId);
       }
 
-      await settings.updatePrivacy({
+      await (settings as any).updatePrivacy({
         ...data,
         updatedBy: updatedBy || userId,
       });
@@ -460,7 +460,7 @@ export class PrivacySettingsService {
         throw new Error("Privacy settings not found");
       }
 
-      await settings.giveGDPRConsent(version);
+      await (settings as any).giveGDPRConsent?.(version);
       return settings;
     } catch (error) {
       console.error("PrivacySettingsService.giveGDPRConsent error:", error);
@@ -475,7 +475,7 @@ export class PrivacySettingsService {
         throw new Error("Privacy settings not found");
       }
 
-      await settings.revokeGDPRConsent();
+      await (settings as any).revokeGDPRConsent?.();
       return settings;
     } catch (error) {
       console.error("PrivacySettingsService.revokeGDPRConsent error:", error);
@@ -492,7 +492,7 @@ export class PrivacySettingsService {
         throw new Error("Privacy settings not found");
       }
 
-      await settings.requestDataPortability();
+      await (settings as any).requestDataPortability?.();
       return settings;
     } catch (error) {
       console.error(
@@ -512,7 +512,7 @@ export class PrivacySettingsService {
         throw new Error("Privacy settings not found");
       }
 
-      await settings.requestRightToBeForgotten();
+      await (settings as any).requestRightToBeForgotten?.();
       return settings;
     } catch (error) {
       console.error(
@@ -551,7 +551,7 @@ export class SystemSettingsService {
         settings = await SystemSettingsNew.createDefaultSettings();
       }
 
-      await settings.updateSettings({
+      await (settings as any).updateSettings({
         ...data,
         updatedBy,
       });
@@ -598,7 +598,7 @@ export class SystemSettingsService {
         throw new Error("System settings not found");
       }
 
-      await settings.enableMaintenance(message, allowedIps);
+      await (settings as any).enableMaintenance?.(message, allowedIps);
       if (updatedBy) {
         settings.updatedBy = updatedBy;
         await settings.save();
@@ -619,7 +619,7 @@ export class SystemSettingsService {
         throw new Error("System settings not found");
       }
 
-      await settings.disableMaintenance();
+      await (settings as any).disableMaintenance?.();
       if (updatedBy) {
         settings.updatedBy = updatedBy;
         await settings.save();

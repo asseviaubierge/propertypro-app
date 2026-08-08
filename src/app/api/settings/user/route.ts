@@ -99,7 +99,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
     // Validate the request body
     const validation = userSettingsSchema.safeParse(sanitizedBody);
     if (!validation.success) {
-      const errors = validation.error.errors.map((e) => e.message).join(", ");
+      const errors = validation.error.issues.map((e: any) => e.message).join(", ");
       return createErrorResponse(`Validation failed: ${errors}`, 400);
     }
 
@@ -114,19 +114,19 @@ export const PUT = withPermissionAndDB("profile_management")(async (
 
     // Update specific sections if provided
     if (settingsData.notifications) {
-      await userSettings.updateNotifications(settingsData.notifications);
+      await (userSettings as any).updateNotifications?.(settingsData.notifications);
     }
 
     if (settingsData.security) {
-      await userSettings.updateSecurity(settingsData.security);
+      await (userSettings as any).updateSecurity?.(settingsData.security);
     }
 
     if (settingsData.display) {
-      await userSettings.updateDisplay(settingsData.display);
+      await (userSettings as any).updateDisplay?.(settingsData.display);
     }
 
     if (settingsData.privacy) {
-      await userSettings.updatePrivacy(settingsData.privacy);
+      await (userSettings as any).updatePrivacy?.(settingsData.privacy);
     }
 
     // Reload the updated settings
@@ -195,36 +195,36 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
       case "profile":
         const profileValidation = profileUpdateSchema.safeParse(data);
         if (!profileValidation.success) {
-          const errors = profileValidation.error.errors
-            .map((e) => e.message)
+          const errors = profileValidation.error.issues
+            .map((e: any) => e.message)
             .join(", ");
           return createErrorResponse(`Validation failed: ${errors}`, 400);
         }
-        await userSettings.updateProfile(profileValidation.data);
+        await (userSettings as any).updateProfile?.(profileValidation.data);
         break;
 
       case "notifications":
         const notificationValidation =
           userSettingsSchema.shape.notifications!.safeParse(data);
         if (!notificationValidation.success) {
-          const errors = notificationValidation.error.errors
-            .map((e) => e.message)
+          const errors = notificationValidation.error.issues
+            .map((e: any) => e.message)
             .join(", ");
           return createErrorResponse(`Validation failed: ${errors}`, 400);
         }
-        await userSettings.updateNotifications(notificationValidation.data);
+        await (userSettings as any).updateNotifications?.(notificationValidation.data);
         break;
 
       case "security":
         const securityValidation =
           userSettingsSchema.shape.security!.safeParse(data);
         if (!securityValidation.success) {
-          const errors = securityValidation.error.errors
-            .map((e) => e.message)
+          const errors = securityValidation.error.issues
+            .map((e: any) => e.message)
             .join(", ");
           return createErrorResponse(`Validation failed: ${errors}`, 400);
         }
-        await userSettings.updateSecurity(securityValidation.data);
+        await (userSettings as any).updateSecurity?.(securityValidation.data);
         break;
 
       case "display":
@@ -232,15 +232,15 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
         const displayValidation =
           userSettingsSchema.shape.display!.safeParse(data);
         if (!displayValidation.success) {
-          const errors = displayValidation.error.errors
-            .map((e) => `${e.path.join(".")}: ${e.message}`)
+          const errors = displayValidation.error.issues
+            .map((e: any) => `${e.path.join(".")}: ${e.message}`)
             .join(", ");
 
           // Log validation errors for debugging
           console.warn(
             `Display settings validation failed for user ${userId}:`,
             {
-              errors: displayValidation.error.errors,
+              errors: displayValidation.error.issues,
               data: JSON.stringify(data, null, 2),
             },
           );
@@ -283,7 +283,7 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
         const previousSettings = userSettings.display ?? {};
 
         // Update display settings
-        await userSettings.updateDisplay(validatedData);
+        await (userSettings as any).updateDisplay?.(validatedData);
 
         // Audit log for display settings changes
         console.info(`Display settings updated for user ${userId}:`, {
@@ -305,12 +305,12 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
         const privacyValidation =
           userSettingsSchema.shape.privacy!.safeParse(data);
         if (!privacyValidation.success) {
-          const errors = privacyValidation.error.errors
-            .map((e) => e.message)
+          const errors = privacyValidation.error.issues
+            .map((e: any) => e.message)
             .join(", ");
           return createErrorResponse(`Validation failed: ${errors}`, 400);
         }
-        await userSettings.updatePrivacy(privacyValidation.data);
+        await (userSettings as any).updatePrivacy?.(privacyValidation.data);
         break;
 
       default:

@@ -193,7 +193,7 @@ notificationSettingsSchema.methods.isNotificationEnabled = function (
   type: string,
   category: string
 ): boolean {
-  const typeSettings = this[type as keyof INotificationSettings];
+  const typeSettings = (this as any)[type];
   if (!typeSettings || typeof typeSettings !== "object") return false;
 
   return (typeSettings as any).enabled && (typeSettings as any)[category];

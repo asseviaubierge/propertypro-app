@@ -79,8 +79,8 @@ const enhancedPropertySchema = (t: (key: string, options?: any) => string) =>
       zipCode: z
         .string()
         .min(1, t("properties.form.validation.zipRequired"))
-        .max(20, t("properties.form.validation.zipTooLong")),
-      country: z.string().optional().default("United States"),
+        .max(300, t("properties.form.validation.zipTooLong")),
+      country: z.string().optional().default("Bénin"),
     }),
 
     // Property-level details removed - units are now required to be configured explicitly
@@ -341,42 +341,10 @@ export function EnhancedPropertyForm({
   // Alert dialog state
   const [showAlert, setShowAlert] = useState(false);
   
-  // Propriétaires disponibles
-const [propertyOwners, setPropertyOwners] = useState<PropertyOwnerOption[]>([]);
-const [ownersLoading, setOwnersLoading] = useState(true);
-
-useEffect(() => {
-  const loadPropertyOwners = async () => {
-    try {
-      setOwnersLoading(true);
-
-      const response = await fetch(
-        "/api/users?excludeTenant=true&companyStaffOnly=true&isActive=true&limit=100"
-      );
-
-      if (!response.ok) {
-        throw new Error("Impossible de charger les propriétaires");
-      }
-
-      const json = await response.json();
-
-      const users =
-        json?.data?.users ??
-        json?.data?.data?.users ??
-        json?.users ??
-        [];
-
-      setPropertyOwners(Array.isArray(users) ? users : []);
-    } catch (error) {
-      console.error("Erreur chargement propriétaires :", error);
-      setPropertyOwners([]);
-    } finally {
-      setOwnersLoading(false);
-    }
-  };
-
-  loadPropertyOwners();
-}, []);
+  // Contexte du propriétaire : auto-sélection pour les comptes non administrateurs.
+  const [propertyOwners, setPropertyOwners] = useState<PropertyOwnerOption[]>([]);
+  const [ownersLoading, setOwnersLoading] = useState(true);
+  const [canSelectOwner, setCanSelectOwner] = useState(false);
 
   // Manage amenities state (features are now consolidated into amenities)
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(() => {
@@ -436,7 +404,7 @@ useEffect(() => {
     return [
       {
         id: `unit-${Date.now()}`,
-        unitNumber: "Unit 1",
+        unitNumber: "Logement 1",
         unitType: "apartment" as const,
         floor: 1,
         bedrooms: 1,
@@ -466,7 +434,7 @@ useEffect(() => {
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
         zipCode: initialData?.address?.zipCode || "",
-        country: initialData?.address?.country || "United States",
+        country: initialData?.address?.country || "Bénin",
       },
       yearBuilt: initialData?.yearBuilt,
       amenities: initialData?.amenities || [],
@@ -474,6 +442,63 @@ useEffect(() => {
       attachments: initialData?.attachments || [],
     },
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadOwnerContext = async () => {
+      try {
+        setOwnersLoading(true);
+        const response = await fetch("/api/properties/owner-options", {
+          method: "GET",
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        });
+
+        const json = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(
+            json?.message || json?.error || "Impossible de charger le propriétaire du bien"
+          );
+        }
+
+        if (cancelled) return;
+
+        const owners = Array.isArray(json?.data?.owners)
+          ? json.data.owners
+          : [];
+        const currentOwnerId = String(json?.data?.currentOwnerId || "");
+        const selectable = Boolean(json?.data?.canSelectOwner);
+
+        setPropertyOwners(owners);
+        setCanSelectOwner(selectable);
+
+        if (mode === "create" && currentOwnerId) {
+          form.setValue("ownerId", currentOwnerId, {
+            shouldDirty: false,
+            shouldValidate: true,
+          });
+        }
+      } catch (error) {
+        // Une erreur de contexte ne doit pas déclencher l'overlay Next.js.
+        console.warn(
+          "Chargement du propriétaire impossible :",
+          error instanceof Error ? error.message : String(error)
+        );
+        if (!cancelled) {
+          setPropertyOwners([]);
+          setCanSelectOwner(false);
+        }
+      } finally {
+        if (!cancelled) setOwnersLoading(false);
+      }
+    };
+
+    void loadOwnerContext();
+    return () => {
+      cancelled = true;
+    };
+  }, [form, mode]);
 
   const { watch, setValue } = form;
   const watchedValues = watch();
@@ -581,10 +606,10 @@ useEffect(() => {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="min-w-0 space-y-4 sm:space-y-6">
       {/* General Information - Modern Design */}
       <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
-        <CardHeader>
+        <CardHeader className="p-4 sm:p-6">
           <CardTitle className="flex items-center gap-3 text-xl font-semibold">
             <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/30">
               <Building2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -595,8 +620,8 @@ useEffect(() => {
             {t("properties.form.general.description")}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
+          <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">
                 {t("properties.form.fields.name.label")}
@@ -623,12 +648,12 @@ useEffect(() => {
                   setValue("type", value as PropertyType)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full min-w-0">
                   <SelectValue
                     placeholder={t("properties.form.fields.type.placeholder")}
                   />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-80 min-w-[var(--radix-select-trigger-width)]">
                   {Object.values(PropertyType).map((type) => (
                     <SelectItem key={type} value={type}>
                       {t(`properties.type.${type}`)}
@@ -648,7 +673,7 @@ useEffect(() => {
                   setValue("status", value as PropertyStatus)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full min-w-0">
                   <SelectValue
                     placeholder={t("properties.form.fields.status.placeholder")}
                   />
@@ -656,7 +681,7 @@ useEffect(() => {
                 <SelectContent>
                   {Object.values(PropertyStatus).map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      {t(`properties.status.${status}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -669,53 +694,60 @@ useEffect(() => {
             </div>
 
             <div className="space-y-2">
-            <Label htmlFor="ownerId">
-            Propriétaire du bien
-            </Label>
+              <Label htmlFor="ownerId">
+                {t("properties.form.fields.owner.label")}
+              </Label>
 
-  <Select
-    value={form.watch("ownerId") || ""}
-    onValueChange={(value) =>
-      form.setValue("ownerId", value, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-    }
-    disabled={ownersLoading}
-  >
-    <SelectTrigger id="ownerId">
-      <SelectValue
-        placeholder={
-          ownersLoading
-            ? "Chargement des propriétaires..."
-            : "Sélectionner un propriétaire"
-        }
-      />
-    </SelectTrigger>
+              <Select
+                value={form.watch("ownerId") || ""}
+                onValueChange={(value) =>
+                  form.setValue("ownerId", value, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
+                }
+                disabled={ownersLoading || !canSelectOwner}
+              >
+                <SelectTrigger id="ownerId">
+                  <SelectValue
+                    placeholder={
+                      ownersLoading
+                        ? t("properties.form.fields.owner.loading")
+                        : t("properties.form.fields.owner.placeholder")
+                    }
+                  />
+                </SelectTrigger>
 
-    <SelectContent>
-      {propertyOwners.map((owner) => (
-        <SelectItem key={owner._id} value={owner._id}>
-          {owner.businessName ||
-            `${owner.firstName} ${owner.lastName}`}
-          {owner.accountType === "direct_owner"
-            ? " — Propriétaire direct"
-            : owner.accountType === "agency"
-              ? " — Agence immobilière"
-              : owner.accountType === "e_immo"
-                ? " — E-IMMO"
-                : ""}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
+                <SelectContent>
+                  {propertyOwners.map((owner) => (
+                    <SelectItem key={owner._id} value={owner._id}>
+                      {owner.businessName ||
+                        `${owner.firstName} ${owner.lastName}`.trim() ||
+                        owner.email}
+                      {owner.accountType === "direct_owner"
+                        ? ` — ${t("properties.form.fields.owner.directOwner")}`
+                        : owner.accountType === "agency"
+                          ? ` — ${t("properties.form.fields.owner.agency")}`
+                          : owner.accountType === "e_immo"
+                            ? ` — ${t("properties.form.fields.owner.eImmo")}`
+                            : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-  {form.formState.errors.ownerId && (
-    <p className="text-sm text-red-600">
-      {form.formState.errors.ownerId.message}
-    </p>
-  )}
-</div>
+              {!ownersLoading && !canSelectOwner && form.watch("ownerId") && (
+                <p className="text-xs text-muted-foreground">
+                  {t("properties.form.fields.owner.autoAssigned")}
+                </p>
+              )}
+
+              {form.formState.errors.ownerId && (
+                <p className="text-sm text-red-600">
+                  {form.formState.errors.ownerId.message}
+                </p>
+              )}
+            </div>
       <div className="space-y-2">
               <Label htmlFor="yearBuilt">
                 {t("properties.form.fields.yearBuilt.label")}
@@ -762,7 +794,7 @@ useEffect(() => {
               </Label>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
               <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="street">
                   {t("properties.form.fields.street.label")}
@@ -815,11 +847,16 @@ useEffect(() => {
                 <Label htmlFor="zipCode">
                   {t("properties.form.fields.zipCode.label")}
                 </Label>
-                <Input
+                <Textarea
                   id="zipCode"
+                  rows={2}
+                  className="min-h-20 resize-y break-words"
                   placeholder={t("properties.form.fields.zipCode.placeholder")}
                   {...form.register("address.zipCode")}
                 />
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t("properties.form.fields.zipCode.help")}
+                </p>
                 {form.formState.errors.address?.zipCode && (
                   <p className="text-sm text-red-600">
                     {form.formState.errors.address.zipCode.message}
@@ -840,7 +877,7 @@ useEffect(() => {
 
       {/* Property Units - Unified Design */}
       <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50">
-        <CardHeader>
+        <CardHeader className="p-4 sm:p-6">
           <CardTitle className="flex items-center gap-3 text-xl font-semibold">
             <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/30">
               <Home className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -862,7 +899,7 @@ useEffect(() => {
             </p>
           </div>
           {units.map((unit, index) => (
-            <Card key={unit.id} className="p-4">
+            <Card key={unit.id} className="p-3 sm:p-4">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">
@@ -883,7 +920,7 @@ useEffect(() => {
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   <div className="space-y-2">
                     <Label>
                       {t("properties.form.units.fields.unitNumber")}
@@ -895,7 +932,7 @@ useEffect(() => {
                         newUnits[index].unitNumber = e.target.value;
                         setUnits(newUnits);
                       }}
-                      placeholder="Unit 101"
+                      placeholder="Logement 101"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1071,7 +1108,7 @@ useEffect(() => {
                     }}
                     existingImages={unit.images}
                     maxFiles={15}
-                    folder="PropertyPro/units"
+                    folder="Gestion-E-Immo/logements"
                     quality="auto"
                     disabled={isLoading}
                     className="w-full"
@@ -1081,7 +1118,7 @@ useEffect(() => {
                   {unit.images.length > 0 && (
                     <p className="text-sm text-muted-foreground">
                       {unit.images.length}{" "}
-                      {unit.images.length === 1 ? "image" : "images"} uploaded
+                      {unit.images.length === 1 ? "image téléversée" : "images téléversées"}
                     </p>
                   )}
                 </div>
@@ -1094,7 +1131,7 @@ useEffect(() => {
             onClick={() => {
               const newUnit = {
                 id: `unit-${Date.now()}`,
-                unitNumber: `Unit ${units.length + 1}`,
+                unitNumber: `Logement ${units.length + 1}`,
                 unitType: "apartment" as const,
                 bedrooms: 1,
                 bathrooms: 1,
@@ -1109,7 +1146,7 @@ useEffect(() => {
             className="w-full"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Unit
+            Ajouter un logement
           </Button>
         </CardContent>
       </Card>
@@ -1131,7 +1168,7 @@ useEffect(() => {
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Essential Amenities Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {ESSENTIAL_AMENITIES_AND_FEATURES.map((item) => {
               const translationKey = getAmenityTranslationKey(item);
               const labelKey = `properties.amenities.items.${translationKey}`;
@@ -1169,11 +1206,11 @@ useEffect(() => {
           </div>
 
           {/* Custom Amenity Input - Modern Design */}
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
             <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 block">
               {t("properties.form.amenities.custom.label")}
             </Label>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Input
                 placeholder={t("properties.form.amenities.custom.placeholder")}
                 value={customAmenity}
@@ -1200,7 +1237,7 @@ useEffect(() => {
 
           {/* Selected Items Display - Enhanced */}
           {selectedAmenities.length > 0 && (
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
               <Label className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-4 block">
                 {t("properties.form.amenities.selected.label", {
                   values: { count: selectedAmenities.length },
@@ -1262,7 +1299,7 @@ useEffect(() => {
             }}
             existingImages={propertyImages}
             maxFiles={20}
-            folder="PropertyPro/properties"
+            folder="Gestion-E-Immo/biens"
             quality="auto"
             disabled={isLoading}
             className="w-full"

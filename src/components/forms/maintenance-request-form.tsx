@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +32,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { FormDateTimePicker } from "@/components/ui/date-time-picker";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   SearchableSelect,
   type SearchableSelectOption,
@@ -82,6 +81,8 @@ interface MaintenanceRequestFormProps {
   isTenantView?: boolean;
   showPropertyTenantSection?: boolean;
   showAssignmentSchedulingSection?: boolean;
+  showAssigneeField?: boolean;
+  defaultAssigneeLabel?: string;
   submitLabel?: string;
   submitDisabled?: boolean;
   properties?: Array<{
@@ -144,6 +145,8 @@ export function MaintenanceRequestForm({
   isTenantView = false,
   showPropertyTenantSection,
   showAssignmentSchedulingSection,
+  showAssigneeField = true,
+  defaultAssigneeLabel = "E-IMMO — Staff Gestion E-Immo",
   submitLabel,
   submitDisabled = false,
   properties = [],
@@ -888,42 +891,48 @@ export function MaintenanceRequestForm({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="assignedTo"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {t("maintenance.form.assignedTo.label")}
-                        </FormLabel>
-                        <FormControl>
-                          <SearchableSelect
-                            value={field.value || "UNASSIGNED"}
-                            onValueChange={(value) =>
-                              field.onChange(value === "UNASSIGNED" ? "" : value)
-                            }
-                            options={technicianOptions}
-                            placeholder={t(
-                              "maintenance.form.assignedTo.placeholder"
-                            )}
-                            searchPlaceholder={t(
-                              "maintenance.form.assignedTo.searchPlaceholder",
-                              {
-                                defaultValue: "Search technicians...",
+                  {showAssigneeField ? (
+                    <FormField
+                      control={form.control}
+                      name="assignedTo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            {t("maintenance.form.assignedTo.label")}
+                          </FormLabel>
+                          <FormControl>
+                            <SearchableSelect
+                              value={field.value || "UNASSIGNED"}
+                              onValueChange={(value) =>
+                                field.onChange(value === "UNASSIGNED" ? "" : value)
                               }
-                            )}
-                            emptyMessage={t(
-                              "maintenance.form.assignedTo.emptyMessage",
-                              {
-                                defaultValue: "No technician found.",
-                              }
-                            )}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                              options={technicianOptions}
+                              placeholder={t(
+                                "maintenance.form.assignedTo.placeholder"
+                              )}
+                              searchPlaceholder={t(
+                                "maintenance.form.assignedTo.searchPlaceholder",
+                                { defaultValue: "Rechercher un technicien..." }
+                              )}
+                              emptyMessage={t(
+                                "maintenance.form.assignedTo.emptyMessage",
+                                { defaultValue: "Aucun technicien trouvé." }
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <FormItem>
+                      <FormLabel>Affectation initiale</FormLabel>
+                      <Input value={defaultAssigneeLabel} disabled readOnly />
+                      <p className="text-xs text-muted-foreground">
+                        La demande sera reçue par le staff E-IMMO. Le Super administrateur pourra ensuite l’affecter à un technicien.
+                      </p>
+                    </FormItem>
+                  )}
 
                   <FormField
                     control={form.control}
@@ -962,25 +971,96 @@ export function MaintenanceRequestForm({
                           {t("maintenance.form.scheduledDate.label")}
                         </FormLabel>
                         <FormControl>
-                          <FormDateTimePicker
-                            value={
-                              field.value ? new Date(field.value) : undefined
-                            }
-                            onChange={(date) => {
-                              if (date) {
-                                const formattedValue = format(
-                                  date,
-                                  "yyyy-MM-dd'T'HH:mm"
-                                );
-                                field.onChange(formattedValue);
-                              } else {
-                                field.onChange("");
+                          <div className="space-y-3">
+                            <DatePicker
+                              date={
+                                field.value ? new Date(field.value) : undefined
                               }
-                            }}
-                            placeholder={t(
-                              "maintenance.form.scheduledDate.placeholder"
-                            )}
-                          />
+                              onSelect={(selectedDate) => {
+                                if (!selectedDate) {
+                                  field.onChange("");
+                                  return;
+                                }
+
+                                const currentValue = field.value
+                                  ? new Date(field.value)
+                                  : undefined;
+                                const hours = currentValue && !Number.isNaN(currentValue.getTime())
+                                  ? currentValue.getHours()
+                                  : 9;
+                                const minutes = currentValue && !Number.isNaN(currentValue.getTime())
+                                  ? currentValue.getMinutes()
+                                  : 0;
+
+                                selectedDate.setHours(hours, minutes, 0, 0);
+                                const pad = (value: number) => String(value).padStart(2, "0");
+                                field.onChange(
+                                  `${selectedDate.getFullYear()}-${pad(selectedDate.getMonth() + 1)}-${pad(selectedDate.getDate())}T${pad(hours)}:${pad(minutes)}`
+                                );
+                              }}
+                              fromYear={new Date().getFullYear()}
+                              toYear={new Date().getFullYear() + 15}
+                              placeholder={t(
+                                "maintenance.form.scheduledDate.placeholder"
+                              )}
+                            />
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <select
+                                aria-label="Heure"
+                                className="h-11 min-w-0 rounded-md border-2 border-border/60 bg-background px-3 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={!field.value}
+                                value={
+                                  field.value && !Number.isNaN(new Date(field.value).getTime())
+                                    ? String(new Date(field.value).getHours()).padStart(2, "0")
+                                    : "09"
+                                }
+                                onChange={(event) => {
+                                  if (!field.value) return;
+                                  const date = new Date(field.value);
+                                  if (Number.isNaN(date.getTime())) return;
+                                  date.setHours(Number(event.target.value), date.getMinutes(), 0, 0);
+                                  const pad = (value: number) => String(value).padStart(2, "0");
+                                  field.onChange(
+                                    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+                                  );
+                                }}
+                              >
+                                {Array.from({ length: 24 }, (_, hour) => (
+                                  <option key={hour} value={String(hour).padStart(2, "0")}>
+                                    {String(hour).padStart(2, "0")} h
+                                  </option>
+                                ))}
+                              </select>
+
+                              <select
+                                aria-label="Minutes"
+                                className="h-11 min-w-0 rounded-md border-2 border-border/60 bg-background px-3 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={!field.value}
+                                value={
+                                  field.value && !Number.isNaN(new Date(field.value).getTime())
+                                    ? String(new Date(field.value).getMinutes()).padStart(2, "0")
+                                    : "00"
+                                }
+                                onChange={(event) => {
+                                  if (!field.value) return;
+                                  const date = new Date(field.value);
+                                  if (Number.isNaN(date.getTime())) return;
+                                  date.setMinutes(Number(event.target.value), 0, 0);
+                                  const pad = (value: number) => String(value).padStart(2, "0");
+                                  field.onChange(
+                                    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+                                  );
+                                }}
+                              >
+                                {[0, 15, 30, 45].map((minute) => (
+                                  <option key={minute} value={String(minute).padStart(2, "0")}>
+                                    {String(minute).padStart(2, "0")} min
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -208,7 +208,7 @@ privacySettingsSchema.methods.updatePrivacy = function (
   Object.assign(this, privacyData);
   this.version += 1;
   this.updatedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IPrivacySettings>;
 };
 
 privacySettingsSchema.methods.giveGDPRConsent = function (
@@ -217,23 +217,23 @@ privacySettingsSchema.methods.giveGDPRConsent = function (
   this.gdprCompliance.consentGiven = true;
   this.gdprCompliance.consentDate = new Date();
   this.gdprCompliance.consentVersion = version;
-  return this.save();
+  return this.save() as Promise<IPrivacySettings>;
 };
 
 privacySettingsSchema.methods.revokeGDPRConsent = function () {
   this.gdprCompliance.consentGiven = false;
-  this.gdprCompliance.consentDate = undefined;
-  return this.save();
+  this.gdprCompliance.consentDate = null as any;
+  return this.save() as Promise<IPrivacySettings>;
 };
 
 privacySettingsSchema.methods.requestDataPortability = function () {
   this.gdprCompliance.dataPortabilityRequested = true;
-  return this.save();
+  return this.save() as Promise<IPrivacySettings>;
 };
 
 privacySettingsSchema.methods.requestRightToBeForgotten = function () {
   this.gdprCompliance.rightToBeForgotten = true;
-  return this.save();
+  return this.save() as Promise<IPrivacySettings>;
 };
 
 // Static Methods

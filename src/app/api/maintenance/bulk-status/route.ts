@@ -16,6 +16,7 @@ import {
   isValidObjectId,
 } from "@/lib/api-utils";
 import { z } from "zod";
+import { maintenanceListScope } from "@/lib/maintenance-access";
 
 // Validation schema for bulk status update request
 const bulkStatusSchema = z.object({
@@ -49,10 +50,10 @@ export const POST = withPermissionAndDB([
       }
 
       // Find all requests to be updated
-      const baseQuery: any = {
+      const baseQuery: any = await maintenanceListScope(user, {
         _id: { $in: requestIds },
         deletedAt: null,
-      };
+      });
 
       // Role-based access control
       // Single company architecture - Managers can update all maintenance requests
@@ -64,6 +65,10 @@ export const POST = withPermissionAndDB([
           "No valid requests found or insufficient permissions",
           404
         );
+      }
+
+      if (requests.length !== requestIds.length) {
+        return createErrorResponse("Some requests are outside your scope or do not exist", 403);
       }
 
       // Prepare update data
@@ -99,7 +104,7 @@ export const POST = withPermissionAndDB([
       const affectedProperties = new Set<string>();
       for (const request of requests) {
         if (request.propertyId && request.unitId) {
-          affectedProperties.add(request.propertyId.toString());
+          affectedProperties.add(String(request.propertyId));
         }
       }
 
@@ -137,7 +142,7 @@ export const POST = withPermissionAndDB([
     } catch (error) {
       if (error instanceof z.ZodError) {
         return createErrorResponse(
-          `Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
+          `Validation error: ${error.issues.map((e) => e.message).join(", ")}`,
           400
         );
       }

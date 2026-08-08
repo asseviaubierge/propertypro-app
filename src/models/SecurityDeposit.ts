@@ -123,7 +123,7 @@ SecurityDepositSchema.methods.markCollected = function (
   this.status = SecurityDepositStatus.COLLECTED;
   this.collectedDate = new Date();
   if (paymentId) this.collectedPaymentId = paymentId;
-  return this.save();
+  return this.save() as Promise<ISecurityDeposit>;
 };
 
 // Method: add deduction
@@ -144,7 +144,7 @@ SecurityDepositSchema.methods.addDeduction = function (deduction: {
   }
 
   this.deductions.push({ ...deduction, createdAt: new Date() });
-  return this.save();
+  return this.save() as Promise<ISecurityDeposit>;
 };
 
 // Method: process refund
@@ -175,7 +175,7 @@ SecurityDepositSchema.methods.processRefund = function (
   if (notes) this.refundNotes = notes;
   if (refundPaymentId) this.refundPaymentId = refundPaymentId;
 
-  return this.save();
+  return this.save() as Promise<ISecurityDeposit>;
 };
 
 const SecurityDeposit: Model<ISecurityDeposit> =

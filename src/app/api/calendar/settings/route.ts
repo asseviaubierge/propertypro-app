@@ -85,11 +85,14 @@ export const GET = withPermissionAndDB("profile_management")(async (
 ) => {
   try {
     // Get or create settings for user
-    const settings = await CalendarSettings.getOrCreateForUser(user.id);
+    let settings = await CalendarSettings.findOne({ userId: user.id });
+    if (!settings) {
+      settings = await CalendarSettings.create({ userId: user.id });
+    }
 
     return createSuccessResponse(
       settings,
-      "Calendar settings retrieved successfully",
+      "Paramètres du calendrier récupérés avec succès",
     );
   } catch (error) {
     return handleApiError(error);
@@ -106,7 +109,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -142,7 +145,7 @@ export const PUT = withPermissionAndDB("profile_management")(async (
 
     return createSuccessResponse(
       settings,
-      "Calendar settings updated successfully",
+      "Paramètres du calendrier mis à jour avec succès",
     );
   } catch (error) {
     return handleApiError(error);
@@ -159,7 +162,7 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     const { path, value } = body;
@@ -169,14 +172,20 @@ export const PATCH = withPermissionAndDB("profile_management")(async (
     }
 
     // Get or create settings for user
-    const settings = await CalendarSettings.getOrCreateForUser(user.id);
+    let settings = await CalendarSettings.findOne({ userId: user.id });
+    if (!settings) {
+      settings = await CalendarSettings.create({ userId: user.id });
+    }
 
     // Update specific setting
-    await settings.updateSetting(path, value);
+    if (!settings) {
+      return createErrorResponse("Unable to create calendar settings", 500);
+    }
+    await (settings as any).updateSetting(path, value);
 
     return createSuccessResponse(
       settings,
-      "Calendar setting updated successfully",
+      "Paramètre du calendrier mis à jour avec succès",
     );
   } catch (error) {
     return handleApiError(error);
@@ -192,14 +201,20 @@ export const DELETE = withPermissionAndDB("profile_management")(async (
 ) => {
   try {
     // Get or create settings for user
-    const settings = await CalendarSettings.getOrCreateForUser(user.id);
+    let settings = await CalendarSettings.findOne({ userId: user.id });
+    if (!settings) {
+      settings = await CalendarSettings.create({ userId: user.id });
+    }
 
     // Reset to defaults
-    await settings.resetToDefaults();
+    if (!settings) {
+      return createErrorResponse("Unable to create calendar settings", 500);
+    }
+    await (settings as any).resetToDefaults();
 
     return createSuccessResponse(
       settings,
-      "Calendar settings reset to defaults",
+      "Paramètres du calendrier réinitialisés",
     );
   } catch (error) {
     return handleApiError(error);

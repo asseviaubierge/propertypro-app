@@ -1,37 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import connectDB from "@/lib/mongodb";
-import PushSubscription from "@/models/PushSubscription";
+import { NextRequest } from "next/server";
+import { PushSubscription } from "@/models";
+import { AuthenticatedAccessUser, createErrorResponse, createSuccessResponse, handleApiError, withPermissionAndDB } from "@/lib/api-utils";
 
-export const dynamic = "force-dynamic";
-
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  let body: any;
+export const POST = withPermissionAndDB("profile_management")(async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  const endpoint: string | undefined = body?.endpoint;
-  if (!endpoint) {
-    return NextResponse.json(
-      { error: "Missing endpoint" },
-      { status: 400 }
-    );
-  }
-
-  await connectDB();
-
-  await PushSubscription.deleteOne({
-    endpoint,
-    userId: session.user.id,
-  });
-
-  return NextResponse.json({ ok: true });
-}
+    const body = await request.json();
+    const endpoint = String(body?.endpoint || "");
+    if (!endpoint) return createErrorResponse("Point d’abonnement manquant", 400);
+    await PushSubscription.deleteOne({ endpoint, userId: user.id });
+    return createSuccessResponse({ endpoint }, "Notifications push désactivées");
+  } catch (error) { return handleApiError(error, "Impossible de désactiver les notifications push"); }
+});

@@ -67,7 +67,7 @@ async function loadAnnouncement(
 
   return {
     ...announcementObject,
-    id: document._id.toString(),
+    id: String(document._id),
     userReaction: userReaction ?? null,
     userHasViewed,
   };
@@ -241,26 +241,26 @@ export const PUT = withPermissionAndDB("company_settings")(
           if (typeof data.isSticky === "boolean") doc.isSticky = data.isSticky;
           if (typeof data.allowComments === "boolean")
             doc.allowComments = data.allowComments;
-          doc.updatedBy = user.id;
+          doc.updatedBy = user.id as any;
           await doc.save();
           break;
         }
         case "archive": {
           doc.status = "archived";
-          doc.updatedBy = user.id;
+          doc.updatedBy = user.id as any;
           await doc.save();
           break;
         }
         case "publish": {
           doc.status = "published";
           doc.publishedAt = new Date();
-          doc.updatedBy = user.id;
+          doc.updatedBy = user.id as any;
           await doc.save();
           break;
         }
         case "softDelete": {
           doc.deletedAt = new Date();
-          doc.updatedBy = user.id;
+          doc.updatedBy = user.id as any;
           await doc.save();
           break;
         }

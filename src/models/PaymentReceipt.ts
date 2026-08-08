@@ -177,7 +177,7 @@ PaymentReceiptSchema.pre("save", async function (next) {
 PaymentReceiptSchema.methods.markEmailSent = function () {
   this.emailSent = true;
   this.emailSentDate = new Date();
-  return this.save();
+  return this.save() as Promise<IPaymentReceipt>;
 };
 
 // Static Methods

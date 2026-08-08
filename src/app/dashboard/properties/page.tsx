@@ -166,7 +166,7 @@ function PropertyCard({
   const rentRange = getRentRange(property?.units, formatCurrency);
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 p-0 gap-0 rounded-lg">
+    <Card className="group overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 p-0 gap-0 rounded-lg">
       {/* Featured Image */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-t-lg m-0 p-0">
         {hasImage ? (
@@ -174,7 +174,7 @@ function PropertyCard({
             src={featuredImage!}
             alt={propertyName}
             fill
-            className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-300 m-0 p-0"
+            className="object-cover object-center w-full h-full  m-0 p-0"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={false}
           />
@@ -204,7 +204,7 @@ function PropertyCard({
         </div>
 
         {/* Overlay Actions */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className="flex space-x-2">
             <Button
               size="sm"
@@ -268,7 +268,7 @@ function PropertyCard({
 
         {/* Unit Information - Consistent for all properties */}
         <div className="mb-4 p-2.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-          <div className="flex items-center gap-1.5 mb-1.5">
+          <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
             <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
               {property?.isMultiUnit && totalUnits > 1 ? (
                 <>
@@ -279,7 +279,7 @@ function PropertyCard({
               )}
             </span>
             {/* Unit Status Badges - Single line with smaller text */}
-            <div className="flex items-center gap-1 text-[10px]">
+            <div className="flex flex-wrap items-center gap-1 text-[10px]">
               {property?.isMultiUnit ? (
                 <>
                   {unitStats.available > 0 && (
@@ -556,8 +556,22 @@ export default function PropertiesPage() {
       setError(null);
 
       const response = await propertyService.getProperties(filters);
-      setProperties(response.data);
-      setPagination(response.pagination);
+      const propertyList = Array.isArray(response)
+        ? response
+        : Array.isArray((response as any)?.data)
+          ? (response as any).data
+          : Array.isArray((response as any)?.properties)
+            ? (response as any).properties
+            : [];
+      setProperties(propertyList);
+      setPagination((response as any)?.pagination ?? {
+        page: 1,
+        limit: propertyList.length,
+        total: propertyList.length,
+        pages: 1,
+        hasNext: false,
+        hasPrev: false,
+      });
     } catch {
       const fallbackMessage = t("properties.error.fetchFailed");
       setError(fallbackMessage);
@@ -622,7 +636,7 @@ export default function PropertiesPage() {
   // DISABLED: Delete functionality temporarily disabled
   const handleDeleteClick = (property: PropertyResponse) => {
     if (isPropertyOccupied(property)) {
-      toast.error("Cannot delete occupied property");
+      toast.error("Impossible de supprimer un bien occupé");
       return;
     }
     setPropertyToDelete(property);
@@ -635,7 +649,7 @@ export default function PropertiesPage() {
 
     // Check if property is already deleted
     if (propertyToDelete.deletedAt) {
-      toast.error("This property has already been deleted");
+      toast.error("Ce bien a déjà été supprimé");
       setShowDeleteDialog(false);
       setPropertyToDelete(null);
       return;
@@ -646,13 +660,13 @@ export default function PropertiesPage() {
       await propertyService.deleteProperty(propertyToDelete._id);
 
       // Show success message
-      toast.success("Property deleted successfully");
+      toast.success("Bien supprimé avec succès");
 
       // Refresh the list
       await fetchProperties();
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to delete property";
+        err instanceof Error ? err.message : "Échec de la suppression du bien";
       toast.error(message);
     } finally {
       setDeleteLoading(null);
@@ -1373,7 +1387,7 @@ export default function PropertiesPage() {
           {loading ? (
             viewMode === "grid" ? (
               /* Grid Loading Skeleton */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <Card key={i} className="overflow-hidden p-0">
                     <div className="relative">
@@ -1472,7 +1486,7 @@ export default function PropertiesPage() {
           ) : viewMode === "grid" ? (
             /* Grid View */
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4">
                 {properties.map((property) => (
                   <PropertyCard
                     key={property._id}
@@ -1503,16 +1517,16 @@ export default function PropertiesPage() {
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
                   showingLabel={t("common.showing", {
-                    defaultValue: "Showing",
+                    defaultValue: "Affichage",
                   })}
                   previousLabel={t("common.previous", {
-                    defaultValue: "Previous",
+                    defaultValue: "Précédent",
                   })}
-                  nextLabel={t("common.next", { defaultValue: "Next" })}
+                  nextLabel={t("common.next", { defaultValue: "Suivant" })}
                   pageLabel={t("common.page", { defaultValue: "Page" })}
-                  ofLabel={t("common.of", { defaultValue: "of" })}
+                  ofLabel={t("common.of", { defaultValue: "sur" })}
                   itemsPerPageLabel={t("common.perPage", {
-                    defaultValue: "per page",
+                    defaultValue: "par page",
                   })}
                   disabled={loading || isSearching}
                 />
@@ -1552,16 +1566,16 @@ export default function PropertiesPage() {
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
                   showingLabel={t("common.showing", {
-                    defaultValue: "Showing",
+                    defaultValue: "Affichage",
                   })}
                   previousLabel={t("common.previous", {
-                    defaultValue: "Previous",
+                    defaultValue: "Précédent",
                   })}
-                  nextLabel={t("common.next", { defaultValue: "Next" })}
+                  nextLabel={t("common.next", { defaultValue: "Suivant" })}
                   pageLabel={t("common.page", { defaultValue: "Page" })}
-                  ofLabel={t("common.of", { defaultValue: "of" })}
+                  ofLabel={t("common.of", { defaultValue: "sur" })}
                   itemsPerPageLabel={t("common.perPage", {
-                    defaultValue: "per page",
+                    defaultValue: "par page",
                   })}
                   disabled={loading || isSearching}
                 />
@@ -1617,16 +1631,16 @@ export default function PropertiesPage() {
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
                   showingLabel={t("common.showing", {
-                    defaultValue: "Showing",
+                    defaultValue: "Affichage",
                   })}
                   previousLabel={t("common.previous", {
-                    defaultValue: "Previous",
+                    defaultValue: "Précédent",
                   })}
-                  nextLabel={t("common.next", { defaultValue: "Next" })}
+                  nextLabel={t("common.next", { defaultValue: "Suivant" })}
                   pageLabel={t("common.page", { defaultValue: "Page" })}
-                  ofLabel={t("common.of", { defaultValue: "of" })}
+                  ofLabel={t("common.of", { defaultValue: "sur" })}
                   itemsPerPageLabel={t("common.perPage", {
-                    defaultValue: "per page",
+                    defaultValue: "par page",
                   })}
                   disabled={loading || isSearching}
                 />

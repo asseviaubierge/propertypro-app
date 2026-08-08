@@ -12,6 +12,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import frLocale from "@fullcalendar/core/locales/fr";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -756,6 +757,7 @@ export default function CalendarView({
                 listPlugin,
               ]}
               initialView={defaultView}
+              locale={frLocale}
               headerToolbar={false} // We handle toolbar ourselves
               height={height}
               events={events}

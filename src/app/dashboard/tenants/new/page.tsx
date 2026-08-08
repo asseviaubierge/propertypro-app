@@ -136,7 +136,7 @@ const createTenantSchema = (t: (key: string) => string) =>
         .or(z.literal("")),
 
       // Additional Information
-      creditScore: z.number().min(1).max(7).optional(),
+      occupantCount: z.number().int().min(1).max(5).optional(),
 
       moveInDate: z
         .string()
@@ -218,7 +218,7 @@ export default function NewTenantPage() {
       emergencyContactEmail: "",
 
       // Additional Information
-      creditScore: undefined,
+      occupantCount: undefined,
       moveInDate: "",
       notes: "",
     },
@@ -432,7 +432,7 @@ export default function NewTenantPage() {
                 },
               ]
             : [],
-        creditScore: data.creditScore,
+        occupantCount: data.occupantCount,
         moveInDate: data.moveInDate || undefined,
         applicationNotes: data.notes || undefined,
         documents: uploadedDocumentUrls,
@@ -639,43 +639,16 @@ export default function NewTenantPage() {
                             <FormLabel className="text-sm font-semibold text-foreground">
                               {t("tenants.form.fields.dateOfBirth.label")}
                             </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant="outline"
-                                    className="h-11 w-full justify-start text-left font-normal border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                      format(field.value, "PPP")
-                                    ) : (
-                                      <span>
-                                        {t(
-                                          "tenants.form.fields.dateOfBirth.placeholder"
-                                        )}
-                                      </span>
-                                    )}
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-0"
-                                align="start"
-                              >
-                                <Calendar
-                                  mode="single"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={(date) =>
-                                    date > new Date() ||
-                                    date < new Date("1900-01-01")
-                                  }
-                                  initialFocus
-                                  captionLayout="dropdown"
-                                />
-                              </PopoverContent>
-                            </Popover>
+                            <FormControl>
+                              <FormDatePicker
+                                value={field.value ? new Date(field.value) : undefined}
+                                onChange={field.onChange}
+                                placeholder={t("tenants.form.fields.dateOfBirth.placeholder")}
+                                fromYear={1920}
+                                toYear={new Date().getFullYear()}
+                                disabled={(date) => date > new Date()}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -889,11 +862,12 @@ export default function NewTenantPage() {
                                   )}
                                   className="h-11 border-2 border-border/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 bg-background/50 transition-all duration-200"
                                   {...field}
+                                  value={field.value ?? ""}
                                   onChange={(e) =>
                                     field.onChange(
-                                      e.target.value
-                                        ? Number(e.target.value)
-                                        : undefined
+                                      e.target.value === ""
+                                        ? undefined
+                                        : Number(e.target.value)
                                     )
                                   }
                                 />
@@ -1104,7 +1078,7 @@ export default function NewTenantPage() {
                   <CardContent className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="creditScore"
+                      name="occupantCount"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm font-semibold text-muted-foreground">

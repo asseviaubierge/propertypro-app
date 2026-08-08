@@ -110,6 +110,28 @@ interface Tenant {
     notes?: string;
   }>;
   createdAt: string;
+  createdBy?: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    role?: string;
+    accountType?: "direct_owner" | "agency" | "e_immo" | string;
+    businessName?: string;
+    companyName?: string;
+  } | null;
+  managerId?: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    role?: string;
+    accountType?: "direct_owner" | "agency" | "e_immo" | string;
+    businessName?: string;
+    companyName?: string;
+  } | null;
   updatedAt: string;
 }
 
@@ -304,9 +326,9 @@ export default function TenantDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left side - Back button */}
         <Button
           size="sm"
@@ -319,8 +341,8 @@ export default function TenantDetailPage() {
         </Button>
 
         {/* Center - Tenant name and badges */}
-        <div className="flex-1 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
+        <div className="min-w-0 flex-1 text-center">
+          <h1 className="break-words text-2xl font-bold text-gray-900 sm:text-3xl">
             {tenant.firstName} {tenant.lastName}
           </h1>
           <div className="flex items-center justify-center space-x-2 mt-2">
@@ -338,7 +360,7 @@ export default function TenantDetailPage() {
         </div>
 
         {/* Right side - Action Buttons */}
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
           <Button
             size="sm"
             variant="outline"
@@ -396,7 +418,7 @@ export default function TenantDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Personal Information */}
-        <Card>
+        <Card className="min-w-0 overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
@@ -405,7 +427,7 @@ export default function TenantDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Avatar Section */}
-            <div className="flex items-center space-x-4 pb-4 border-b">
+            <div className="flex min-w-0 items-center gap-4 border-b pb-4">
               <Avatar className="h-20 w-20">
                 <AvatarImage
                   src={tenant.avatar || ""}
@@ -416,8 +438,8 @@ export default function TenantDetailPage() {
                   {tenant.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h3 className="text-lg font-semibold">
+              <div className="min-w-0">
+                <h3 className="break-words text-lg font-semibold">
                   {tenant.firstName} {tenant.lastName}
                 </h3>
                 <p className="text-sm text-muted-foreground">
@@ -427,7 +449,7 @@ export default function TenantDetailPage() {
             </div>
 
             {/* Personal Details */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   {t("tenants.details.personalInfo.firstName")}
@@ -444,18 +466,18 @@ export default function TenantDetailPage() {
                 <label className="text-sm font-medium text-muted-foreground">
                   {t("tenants.details.personalInfo.email")}
                 </label>
-                <p className="text-sm flex items-center gap-1">
-                  <Mail className="h-3 w-3" />
-                  {tenant.email}
+                <p className="flex min-w-0 items-start gap-1 text-sm">
+                  <Mail className="mt-0.5 h-3 w-3 shrink-0" />
+                  <span className="min-w-0 break-all">{tenant.email}</span>
                 </p>
               </div>
               <div>
                 <label className="text-sm font-medium text-muted-foreground">
                   {t("tenants.details.personalInfo.phone")}
                 </label>
-                <p className="text-sm flex items-center gap-1">
-                  <Phone className="h-3 w-3" />
-                  {tenant.phone}
+                <p className="flex min-w-0 items-start gap-1 text-sm">
+                  <Phone className="mt-0.5 h-3 w-3 shrink-0" />
+                  <span className="min-w-0 break-words">{tenant.phone}</span>
                 </p>
               </div>
               {tenant.dateOfBirth && (
@@ -495,6 +517,83 @@ export default function TenantDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Traceability / creator */}
+        {(tenant.managerId || tenant.createdBy) && (() => {
+          const creator = tenant.managerId || tenant.createdBy;
+          const creatorName =
+            creator?.businessName ||
+            creator?.companyName ||
+            `${creator?.firstName || ""} ${creator?.lastName || ""}`.trim() ||
+            "Gestionnaire non renseigné";
+          const accountTypeLabel =
+            creator?.accountType === "direct_owner"
+              ? "Propriétaire direct"
+              : creator?.accountType === "agency"
+                ? "Agence immobilière"
+                : creator?.accountType === "e_immo"
+                  ? "Gestion E-IMMO"
+                  : creator?.role === "admin"
+                    ? "Gestion E-IMMO"
+                    : "Type de compte non renseigné";
+
+          return (
+            <Card className="min-w-0 overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 shrink-0" />
+                  Traçabilité
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Type de compte
+                  </label>
+                  <p className="break-words text-sm font-semibold">{accountTypeLabel}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Enregistré par
+                  </label>
+                  <p className="break-words text-sm font-semibold">{creatorName}</p>
+                </div>
+                {creator?.role && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Rôle</label>
+                    <p className="text-sm capitalize">{creator.role.replace(/_/g, " ")}</p>
+                  </div>
+                )}
+                {creator?.email && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">E-mail</label>
+                    <p className="flex min-w-0 items-start gap-1 text-sm">
+                      <Mail className="mt-0.5 h-3 w-3 shrink-0" />
+                      <span className="min-w-0 break-all">{creator.email}</span>
+                    </p>
+                  </div>
+                )}
+                {creator?.phone && (
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Téléphone</label>
+                    <p className="flex min-w-0 items-start gap-1 text-sm">
+                      <Phone className="mt-0.5 h-3 w-3 shrink-0" />
+                      <span className="min-w-0 break-words">{creator.phone}</span>
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Date d’enregistrement
+                  </label>
+                  <p className="text-sm flex items-center gap-1">
+                    <Calendar className="h-3 w-3" /> {formatDate(tenant.createdAt)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* Employment Information */}
         {tenant.employmentInfo && (
           <Card>
@@ -505,7 +604,7 @@ export default function TenantDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
                     {t("tenants.details.employmentInfo.employer")}
@@ -550,7 +649,7 @@ export default function TenantDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {tenant.emergencyContacts.map((contact, index) => (
-                <div key={index} className="grid grid-cols-2 gap-4">
+                <div key={index} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
                       {t("tenants.details.emergencyContact.name")}
@@ -561,7 +660,7 @@ export default function TenantDetailPage() {
                     <label className="text-sm font-medium text-muted-foreground">
                       {t("tenants.details.emergencyContact.relationship")}
                     </label>
-                    <p className="text-sm capitalize">{contact.relationship}</p>
+                    <p className="break-words text-sm capitalize">{contact.relationship}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">
@@ -574,7 +673,7 @@ export default function TenantDetailPage() {
                       <label className="text-sm font-medium text-muted-foreground">
                         {t("tenants.details.emergencyContact.email")}
                       </label>
-                      <p className="text-sm">{contact.email}</p>
+                      <p className="break-all text-sm">{contact.email}</p>
                     </div>
                   )}
                 </div>
@@ -604,7 +703,7 @@ export default function TenantDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {tenant.moveInDate && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">

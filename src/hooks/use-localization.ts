@@ -76,8 +76,8 @@ export function useLocalization(): LocalizationContextType {
     const loadUserPreferences = async () => {
       try {
         // Try to load from localStorage first
-        const savedLocale = localStorage.getItem("PropertyPro-locale");
-        const savedCurrency = localStorage.getItem("PropertyPro-currency");
+        const savedLocale = localStorage.getItem("GestionEImmo-locale");
+        const savedCurrency = localStorage.getItem("GestionEImmo-currency");
 
         if (savedLocale) {
           localizationService.setLocale(savedLocale);
@@ -90,7 +90,7 @@ export function useLocalization(): LocalizationContextType {
         // Update exchange rates
         await localizationService.updateExchangeRates();
       } catch (error) {
-        console.error("Failed to load user preferences:", error);
+        console.warn("Impossible de charger les préférences locales :", error);
       }
     };
 
@@ -104,7 +104,7 @@ export function useLocalization(): LocalizationContextType {
       setLocale(localizationService.getLocale(localeCode));
 
       // Save to localStorage
-      localStorage.setItem("PropertyPro-locale", localeCode);
+      localStorage.setItem("GestionEImmo-locale", localeCode);
 
     },
     []
@@ -116,7 +116,7 @@ export function useLocalization(): LocalizationContextType {
     setCurrency(localizationService.getCurrency(currencyCode));
 
     // Save to localStorage
-    localStorage.setItem("PropertyPro-currency", currencyCode);
+    localStorage.setItem("GestionEImmo-currency", currencyCode);
   }, []);
 
   const formatCurrency = useCallback(
@@ -184,7 +184,6 @@ export function useLocalization(): LocalizationContextType {
     firstDayOfWeek: localizationService.getFirstDayOfWeek(),
     language,
     t,
-    firstDayOfWeek: localizationService.getFirstDayOfWeek(),
   };
 }
 

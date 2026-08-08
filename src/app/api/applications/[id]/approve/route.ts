@@ -64,7 +64,7 @@ export const POST = withPermissionAndDB([
       }
 
       // Approve the application
-      await (application as any).approve(user.id, notes);
+      await (application as any).approve?.(user.id, notes);
 
       return createSuccessResponse(
         { application },

@@ -22,7 +22,7 @@ import { z } from "zod";
 // ============================================================================
 
 const syncSchema = z.object({
-  calendarId: z.string().min(1, "Calendar ID is required"),
+  calendarId: z.string().min(1, "L’identifiant du calendrier est obligatoire"),
   direction: z.enum(["import", "export", "bidirectional"]),
   timeMin: z.string().optional(),
   timeMax: z.string().optional(),
@@ -38,7 +38,7 @@ export const POST = withPermissionAndDB("profile_management")(async (
   try {
     const { success, data: body, error } = await parseRequestBody(request);
     if (!success) {
-      return createErrorResponse(error ?? "Invalid request body", 400);
+      return createErrorResponse(error ?? "Requête invalide", 400);
     }
 
     // Validate request body
@@ -63,7 +63,7 @@ export const POST = withPermissionAndDB("profile_management")(async (
     // Get user's Google Calendar tokens
     const user = await User.findById(session.user.id);
     if (!user?.integrations?.googleCalendar?.accessToken) {
-      return createErrorResponse("Google Calendar not connected", 400);
+      return createErrorResponse("Google Agenda n’est pas connecté", 400);
     }
 
     // Set up Google Calendar service with user's tokens
@@ -116,10 +116,10 @@ export const POST = withPermissionAndDB("profile_management")(async (
         break;
 
       default:
-        return createErrorResponse("Invalid sync direction", 400);
+        return createErrorResponse("Sens de synchronisation invalide", 400);
     }
 
-    return createSuccessResponse(result, "Sync completed successfully");
+    return createSuccessResponse(result, "Synchronisation terminée avec succès");
     */
   } catch (error) {
     return handleApiError(error);
@@ -145,7 +145,7 @@ export const GET = withPermissionAndDB("profile_management")(async (
           lastSync: null,
           calendars: [],
         },
-        "Google Calendar not connected",
+        "Google Agenda n’est pas connecté",
       );
     }
 
@@ -199,9 +199,9 @@ export const GET = withPermissionAndDB("profile_management")(async (
             connected: false,
             lastSync: null,
             calendars: [],
-            error: "Token expired, please reconnect",
+            error: "Jeton expiré, veuillez vous reconnecter",
           },
-          "Google Calendar token expired"
+          "Le jeton Google Agenda a expiré"
         );
       }
 

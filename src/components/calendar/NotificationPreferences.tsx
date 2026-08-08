@@ -234,7 +234,7 @@ export function NotificationPreferences({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Enable Email Notifications</Label>
+              <Label>Activer les notifications par e-mail</Label>
               <p className="text-sm text-muted-foreground">
                 Master switch for all email notifications
               </p>
@@ -250,7 +250,7 @@ export function NotificationPreferences({
           {settings.email.enabled && (
             <div className="space-y-4 pl-6 border-l-2 border-muted">
               <div className="flex items-center justify-between">
-                <Label>Event Invitations</Label>
+                <Label>Invitations aux événements</Label>
                 <Switch
                   checked={settings.email.invitations}
                   onCheckedChange={(checked) =>
@@ -260,7 +260,7 @@ export function NotificationPreferences({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Event Reminders</Label>
+                <Label>Rappels d’événements</Label>
                 <Switch
                   checked={settings.email.reminders}
                   onCheckedChange={(checked) =>
@@ -270,7 +270,7 @@ export function NotificationPreferences({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Event Updates</Label>
+                <Label>Mises à jour d’événements</Label>
                 <Switch
                   checked={settings.email.updates}
                   onCheckedChange={(checked) =>
@@ -280,7 +280,7 @@ export function NotificationPreferences({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Event Cancellations</Label>
+                <Label>Annulations d’événements</Label>
                 <Switch
                   checked={settings.email.cancellations}
                   onCheckedChange={(checked) =>
@@ -293,7 +293,7 @@ export function NotificationPreferences({
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Daily Digest</Label>
+                  <Label>Résumé quotidien</Label>
                   <p className="text-sm text-muted-foreground">
                     Daily summary of upcoming events
                   </p>
@@ -308,7 +308,7 @@ export function NotificationPreferences({
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Weekly Digest</Label>
+                  <Label>Résumé hebdomadaire</Label>
                   <p className="text-sm text-muted-foreground">
                     Weekly summary of events and activities
                   </p>
@@ -339,7 +339,7 @@ export function NotificationPreferences({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Enable SMS Notifications</Label>
+              <Label>Activer les notifications par SMS</Label>
               <p className="text-sm text-muted-foreground">
                 Receive SMS for important calendar events
               </p>
@@ -355,7 +355,7 @@ export function NotificationPreferences({
           {settings.sms.enabled && (
             <div className="space-y-4 pl-6 border-l-2 border-muted">
               <div className="flex items-center justify-between">
-                <Label>Event Reminders</Label>
+                <Label>Rappels d’événements</Label>
                 <Switch
                   checked={settings.sms.reminders}
                   onCheckedChange={(checked) =>
@@ -365,7 +365,7 @@ export function NotificationPreferences({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label>Urgent Updates</Label>
+                <Label>Mises à jour urgentes</Label>
                 <Switch
                   checked={settings.sms.urgentUpdates}
                   onCheckedChange={(checked) =>
@@ -437,7 +437,7 @@ export function NotificationPreferences({
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Enable Quiet Hours</Label>
+              <Label>Activer les heures silencieuses</Label>
               <p className="text-sm text-muted-foreground">
                 Silence non-urgent notifications during specified hours
               </p>
@@ -453,7 +453,7 @@ export function NotificationPreferences({
           {settings.quietHours.enabled && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 border-l-2 border-muted">
               <div className="space-y-2">
-                <Label htmlFor="quietStart">Start Time</Label>
+                <Label htmlFor="quietStart">Heure de début</Label>
                 <input
                   id="quietStart"
                   type="time"
@@ -466,7 +466,7 @@ export function NotificationPreferences({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quietEnd">End Time</Label>
+                <Label htmlFor="quietEnd">Heure de fin</Label>
                 <input
                   id="quietEnd"
                   type="time"

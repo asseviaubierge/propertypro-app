@@ -1123,7 +1123,7 @@ export function UnifiedSettings({
                 Appearance
               </CardTitle>
               <CardDescription>
-                Customize how PropertyPro looks and feels
+                Personnalisez l’apparence de Gestion E-Immo
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1496,7 +1496,7 @@ export function UnifiedSettings({
                       <div className="space-y-2">
                         <Label>Company Name</Label>
                         <Input
-                          placeholder="PropertyPro"
+                          placeholder="Gestion E-Immo"
                           value={settings.system?.branding?.companyName ?? ""}
                           onChange={(e) =>
                             setSettings({

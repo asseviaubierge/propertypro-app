@@ -365,7 +365,7 @@ displaySettingsSchema.methods.updateDisplay = function (
   Object.assign(this, displayData);
   this.version += 1;
   this.updatedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IDisplaySettings>;
 };
 
 displaySettingsSchema.methods.getThemeConfig = function () {

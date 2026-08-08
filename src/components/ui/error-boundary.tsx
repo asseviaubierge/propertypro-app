@@ -109,7 +109,7 @@ class ErrorBoundary extends React.Component<
               className="border-red-300 text-red-700 hover:bg-red-100"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
+              Réessayer
             </Button>
           </CardContent>
         </Card>

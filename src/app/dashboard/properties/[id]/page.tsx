@@ -187,7 +187,7 @@ export default function PropertyDetailsPage() {
           setUnits([]);
         }
       } catch (err: any) {
-        console.error("Failed to fetch property details", err);
+        console.warn("Impossible de charger le détail du bien", err instanceof Error ? err.message : err);
         const errorMessage = t("properties.details.error.fetchFailed");
         toast.error(errorMessage);
         setError(errorMessage);
@@ -215,7 +215,7 @@ export default function PropertyDetailsPage() {
         );
       }
     } catch (err: any) {
-      console.error("Failed to refresh units", err);
+      console.warn("Impossible d’actualiser les logements", err instanceof Error ? err.message : err);
       toast.error(err.message || t("properties.details.units.refreshError"));
     } finally {
       setUnitsLoading(false);
@@ -233,10 +233,10 @@ export default function PropertyDetailsPage() {
   const handleDeleteUnit = async (unitId: string) => {
     try {
       await unitService.deleteUnit(propertyId, unitId);
-      toast.success("Unit deleted successfully");
+      toast.success("Logement supprimé avec succès");
       await refreshUnits(); // Refresh units list
     } catch (err: any) {
-      toast.error(err.message || "Failed to delete unit");
+      toast.error(err.message || "Échec de la suppression du logement");
       throw err; // Re-throw to let the component handle it
     }
   };
@@ -246,10 +246,10 @@ export default function PropertyDetailsPage() {
     try {
       setIsDeleting(true);
       await propertyService.deleteProperty(propertyId);
-      toast.success("Property deleted successfully");
+      toast.success("Bien supprimé avec succès");
       router.push("/dashboard/properties");
     } catch (err: any) {
-      toast.error(err.message || "Failed to delete property");
+      toast.error(err.message || "Échec de la suppression du bien");
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -266,9 +266,9 @@ export default function PropertyDetailsPage() {
   // Show loading skeleton while fetching data
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8 space-y-6">
+      <div className="container mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* Header Skeleton */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-4">
             <div className="animate-pulse h-10 w-32 bg-gray-200 dark:bg-gray-800 rounded-md" />
             <div className="space-y-2">
@@ -363,7 +363,7 @@ export default function PropertyDetailsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
+    <div className="container mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         {/* Left side - Back button */}
@@ -429,10 +429,10 @@ export default function PropertyDetailsPage() {
         className="space-y-6"
       >
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-2">
-          <TabsList className="grid w-full grid-cols-5 bg-transparent rounded-lg h-auto gap-2">
+          <TabsList className="flex w-full gap-1 overflow-x-auto bg-transparent rounded-lg h-auto pb-1">
             <TabsTrigger
               value="overview"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              className="shrink-0 flex items-center gap-1.5 py-2 px-2.5 text-xs sm:text-sm rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md"
             >
               <Building2 className="h-4 w-4 text-blue-600 data-[state=active]:text-white" />
               <span className="font-medium text-sm text-gray-700 dark:text-gray-300 data-[state=active]:text-white">
@@ -441,7 +441,7 @@ export default function PropertyDetailsPage() {
             </TabsTrigger>
             <TabsTrigger
               value="details"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              className="shrink-0 flex items-center gap-1.5 py-2 px-2.5 text-xs sm:text-sm rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-md"
             >
               <Eye className="h-4 w-4 text-blue-600 data-[state=active]:text-white" />
               <span className="font-medium text-sm text-gray-700 dark:text-gray-300 data-[state=active]:text-white">
@@ -450,7 +450,7 @@ export default function PropertyDetailsPage() {
             </TabsTrigger>
             <TabsTrigger
               value="units"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-700 data-[state=active]:to-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              className="shrink-0 flex items-center gap-1.5 py-2 px-2.5 text-xs sm:text-sm rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-700 data-[state=active]:to-blue-800 data-[state=active]:text-white data-[state=active]:shadow-md"
             >
               <Building2 className="h-4 w-4 text-blue-600 data-[state=active]:text-white" />
               <span className="font-medium text-sm text-gray-700 dark:text-gray-300 data-[state=active]:text-white">
@@ -459,7 +459,7 @@ export default function PropertyDetailsPage() {
             </TabsTrigger>
             <TabsTrigger
               value="images"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-blue-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              className="shrink-0 flex items-center gap-1.5 py-2 px-2.5 text-xs sm:text-sm rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-800 data-[state=active]:to-blue-900 data-[state=active]:text-white data-[state=active]:shadow-md"
             >
               <Camera className="h-4 w-4 text-blue-600 data-[state=active]:text-white" />
               <span className="font-medium text-sm text-gray-700 dark:text-gray-300 data-[state=active]:text-white">
@@ -468,7 +468,7 @@ export default function PropertyDetailsPage() {
             </TabsTrigger>
             <TabsTrigger
               value="amenities"
-              className="flex items-center gap-2 py-2 px-3 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-900 data-[state=active]:to-indigo-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+              className="shrink-0 flex items-center gap-1.5 py-2 px-2.5 text-xs sm:text-sm rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-900 data-[state=active]:to-indigo-900 data-[state=active]:text-white data-[state=active]:shadow-md"
             >
               <Star className="h-4 w-4 text-blue-600 data-[state=active]:text-white" />
               <span className="font-medium text-sm text-gray-700 dark:text-gray-300 data-[state=active]:text-white">
@@ -482,14 +482,14 @@ export default function PropertyDetailsPage() {
           {/* Enhanced Property Basic Information - Minimal Style */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Property Type */}
-            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-300">
+            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md">
               <CardContent className="">
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize break-words">
                       {property?.type
                         ? t(`properties.type.${property.type}`)
                         : t("properties.labels.unknown")}
@@ -503,14 +503,14 @@ export default function PropertyDetailsPage() {
             </Card>
 
             {/* Total Units (for multi-unit) or Bedrooms (for single unit) */}
-            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-300">
+            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md">
               <CardContent className="">
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <Bed className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                       {getTotalBedrooms(units) ||
                         t("properties.labels.unknown")}
                     </p>
@@ -523,14 +523,14 @@ export default function PropertyDetailsPage() {
             </Card>
 
             {/* Bathrooms */}
-            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-300">
+            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md">
               <CardContent className="">
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <Bath className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                       {getTotalBathrooms(units) ||
                         t("properties.labels.unknown")}
                     </p>
@@ -543,14 +543,14 @@ export default function PropertyDetailsPage() {
             </Card>
 
             {/* Square Footage */}
-            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-300">
+            <Card className="border border-gray-100 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-900 hover:shadow-md">
               <CardContent className="">
                 <div className="flex items-center space-x-4">
                   <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <Square className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                       {(() => {
                         const totalSqFt = getTotalSquareFootage(units);
                         return totalSqFt > 0
@@ -626,13 +626,13 @@ export default function PropertyDetailsPage() {
                               "properties.details.overview.occupancy.rateLabel"
                             )}
                           </h4>
-                          <span className="text-2xl font-bold text-blue-600">
+                          <span className="text-lg sm:text-2xl font-bold text-blue-600">
                             {occupancyRate}%
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                           <div
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full"
                             style={{ width: `${occupancyRate}%` }}
                           ></div>
                         </div>
@@ -648,7 +648,7 @@ export default function PropertyDetailsPage() {
 
                       {/* Unit Status Summary - Minimal Style */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                           <div className="text-3xl font-bold text-green-600 mb-2">
                             {unitStats.available}
                           </div>
@@ -657,7 +657,7 @@ export default function PropertyDetailsPage() {
                           </div>
                           <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-green-500 h-2 rounded-full"
                               style={{
                                 width: `${
                                   unitStats.total > 0
@@ -670,7 +670,7 @@ export default function PropertyDetailsPage() {
                           </div>
                         </div>
 
-                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                           <div className="text-3xl font-bold text-blue-600 mb-2">
                             {unitStats.occupied}
                           </div>
@@ -679,7 +679,7 @@ export default function PropertyDetailsPage() {
                           </div>
                           <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-blue-500 h-2 rounded-full"
                               style={{
                                 width: `${
                                   unitStats.total > 0
@@ -692,7 +692,7 @@ export default function PropertyDetailsPage() {
                           </div>
                         </div>
 
-                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                           <div className="text-3xl font-bold text-yellow-600 mb-2">
                             {unitStats.maintenance}
                           </div>
@@ -701,7 +701,7 @@ export default function PropertyDetailsPage() {
                           </div>
                           <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-yellow-500 h-2 rounded-full"
                               style={{
                                 width: `${
                                   unitStats.total > 0
@@ -715,7 +715,7 @@ export default function PropertyDetailsPage() {
                           </div>
                         </div>
 
-                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+                        <div className="text-center p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                           <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                             {unitStats.total}
                           </div>
@@ -723,7 +723,7 @@ export default function PropertyDetailsPage() {
                             {t("properties.details.specs.fields.totalUnits")}
                           </div>
                           <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div className="bg-gray-500 h-2 rounded-full w-full transition-all duration-500"></div>
+                            <div className="bg-gray-500 h-2 rounded-full w-full"></div>
                           </div>
                         </div>
                       </div>
@@ -873,7 +873,7 @@ export default function PropertyDetailsPage() {
                 <Building2 className="h-7 w-7 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                   {t("properties.details.specs.title")}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
@@ -884,7 +884,7 @@ export default function PropertyDetailsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Property Type Card */}
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900">
                     <Home className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -901,7 +901,7 @@ export default function PropertyDetailsPage() {
               </div>
 
               {/* Status Card */}
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900">
                     <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -943,7 +943,7 @@ export default function PropertyDetailsPage() {
               </div>
 
               {/* Total Units Card */}
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900">
                     <Building2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
@@ -959,7 +959,7 @@ export default function PropertyDetailsPage() {
               
               {/* Property Owner Card */}
 {property?.ownerId && (
-  <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+  <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm">
     <div className="flex items-center gap-3 mb-3">
       <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900">
         <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -992,7 +992,7 @@ export default function PropertyDetailsPage() {
 )}
 
               {/* Year Built Card */}
-              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300">
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900">
                     <Calendar className="h-4 w-4 text-amber-600 dark:text-amber-400" />
@@ -1009,7 +1009,7 @@ export default function PropertyDetailsPage() {
 
               {/* Description Card - Full Width */}
               {property?.description && (
-                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-300 md:col-span-2">
+                <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm md:col-span-2">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900">
                       <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
@@ -1034,7 +1034,7 @@ export default function PropertyDetailsPage() {
                   <Star className="h-7 w-7 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                     {t("properties.details.features.title")}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -1047,7 +1047,7 @@ export default function PropertyDetailsPage() {
                 {property.features.map((feature: string, index: number) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-200"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm"
                   >
                     <Star className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1067,7 +1067,7 @@ export default function PropertyDetailsPage() {
                   <Building2 className="h-7 w-7 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                     {t("properties.details.amenities.title")}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -1080,7 +1080,7 @@ export default function PropertyDetailsPage() {
                 {property.amenities.map((amenity: any, index: number) => (
                   <div
                     key={index}
-                    className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm transition-all duration-200"
+                    className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-sm"
                   >
                     <div className="flex-shrink-0 w-2.5 h-2.5 bg-blue-500 dark:bg-blue-400 rounded-full"></div>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">

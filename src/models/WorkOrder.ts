@@ -146,7 +146,7 @@ WorkOrderSchema.pre("save", function (next) {
 
   // Clear completed date if status is not completed
   if (this.status !== WorkOrderStatus.COMPLETED && this.completedDate) {
-    this.completedDate = undefined;
+    this.completedDate = null as any;
   }
 
   next();
@@ -174,18 +174,18 @@ WorkOrderSchema.statics.findByMaintenanceRequest = function (
 // Instance methods
 WorkOrderSchema.methods.softDelete = function () {
   this.deletedAt = new Date();
-  return this.save();
+  return this.save() as Promise<IWorkOrder>;
 };
 
 WorkOrderSchema.methods.restore = function () {
   this.deletedAt = null;
-  return this.save();
+  return this.save() as Promise<IWorkOrder>;
 };
 
 WorkOrderSchema.methods.markCompleted = function () {
   this.status = WorkOrderStatus.COMPLETED;
   this.completedDate = new Date();
-  return this.save();
+  return this.save() as Promise<IWorkOrder>;
 };
 
 WorkOrderSchema.methods.assignTo = function (userId: string) {
@@ -193,7 +193,7 @@ WorkOrderSchema.methods.assignTo = function (userId: string) {
   if (this.status === WorkOrderStatus.PENDING) {
     this.status = WorkOrderStatus.ASSIGNED;
   }
-  return this.save();
+  return this.save() as Promise<IWorkOrder>;
 };
 
 // Export the model

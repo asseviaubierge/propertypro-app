@@ -17,6 +17,7 @@ import {
   isValidObjectId,
 } from "@/lib/api-utils";
 import { resolveAccessProfile } from "@/lib/server-permissions";
+import { canAccessTenant } from "@/lib/tenant-scope";
 
 async function findTenantStatusUser(id: string) {
   const tenant = await User.findById(id)
@@ -63,12 +64,8 @@ export const GET = withAccessAndDB({
         return createErrorResponse("Tenant not found", 404);
       }
 
-      // Role-based authorization
-      if (user.isTenant && tenant._id.toString() !== user.id) {
-        return createErrorResponse(
-          "You can only view your own status information",
-          403
-        );
+      if (!(await canAccessTenant(user, tenant._id))) {
+        return createErrorResponse("Access denied", 403);
       }
 
       const statusInfo = {
@@ -143,12 +140,23 @@ export const POST = withPermissionAndDB("tenant_edit")(
         return createErrorResponse("Tenant not found", 404);
       }
 
+      if (!(await canAccessTenant(user, tenant._id))) {
+        return createErrorResponse("Access denied", 403);
+      }
+
+      // Normalize legacy values created by older forms.
+      const currentStatus = normalizeTenantStatus(tenant.tenantStatus);
+      if (tenant.tenantStatus !== currentStatus) {
+        tenant.tenantStatus = currentStatus;
+        await tenant.save();
+      }
+
       // Validate the status transition
-      const availableTransitions = getAvailableTransitions(tenant.tenantStatus);
+      const availableTransitions = getAvailableTransitions(currentStatus);
       if (!availableTransitions.includes(newStatus)) {
         return createErrorResponse(
           `Invalid status transition from ${
-            tenant.tenantStatus
+            currentStatus
           } to ${newStatus}. Available transitions: ${availableTransitions.join(
             ", "
           )}`,
@@ -157,7 +165,7 @@ export const POST = withPermissionAndDB("tenant_edit")(
       }
 
       // Change the status using the model method
-      await tenant.changeStatus(
+      await (tenant as any).changeStatus?.(
         newStatus,
         user.id,
         statusReason,
@@ -166,7 +174,7 @@ export const POST = withPermissionAndDB("tenant_edit")(
       );
 
       // Get updated tenant with populated fields
-      const updatedTenant = await User.findById(tenant._id)
+      const updatedTenant = await User.findById((tenant as any)._id)
         .populate("statusHistory.changedBy", "firstName lastName")
         .populate("currentLeaseId", "propertyId startDate endDate status");
 
@@ -197,7 +205,16 @@ export const POST = withPermissionAndDB("tenant_edit")(
 // Helper Functions
 // ============================================================================
 
+function normalizeTenantStatus(status?: string): string {
+  const normalized = String(status || "application_submitted").toLowerCase();
+  if (["submitted", "pending", "soumis"].includes(normalized)) {
+    return "application_submitted";
+  }
+  return normalized;
+}
+
 function getAvailableTransitions(currentStatus: string): string[] {
+  currentStatus = normalizeTenantStatus(currentStatus);
   const validTransitions = {
     application_submitted: ["under_review", "approved", "terminated"],
     under_review: ["approved", "terminated"],

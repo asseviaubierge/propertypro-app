@@ -117,7 +117,7 @@ export const POST = withAccessAndDB(APPLICATION_ACCESS)(
 
       const validation = validateSchema(applicationSchema, body);
       if (!validation.success) {
-        return createErrorResponse(validation.errors.join(", "), 400);
+        return createErrorResponse(validation.issues.map((i:any)=>i.message).join(", "), 400);
       }
 
       const applicationData = validation.data;

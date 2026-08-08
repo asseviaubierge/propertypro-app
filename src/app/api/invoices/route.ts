@@ -15,6 +15,8 @@ import {
   withPermissionAndDB,
 } from "@/lib/api-utils";
 import { computeEffectiveInvoiceStatus } from "@/lib/invoice/invoice-shared";
+import { buildInvoiceScopeQuery, canAccessInvoice } from "@/lib/invoice-access";
+import { canAccessProperty } from "@/lib/property-scope";
 import { Types } from "mongoose";
 
 // ============================================================================
@@ -33,24 +35,33 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
     const sortOrder = searchParams.get("sortOrder") || "desc";
     const search = (searchParams.get("search") || "").trim();
 
-    // Build filter query
-    const filter: any = {};
+    // Build a mandatory scope before applying optional filters.
+    let filter: any = await buildInvoiceScopeQuery(user, {
+      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+    });
 
     if (user.isTenant) {
       if (requestedTenantId && requestedTenantId !== user.id) {
-        return createErrorResponse("You can only view your own invoices", 403);
+        return createErrorResponse("Vous pouvez consulter uniquement vos propres factures", 403);
       }
-      filter.tenantId = new Types.ObjectId(user.id);
     } else if (requestedTenantId) {
       filter.tenantId = new Types.ObjectId(requestedTenantId);
     }
 
-    if (propertyId) filter.propertyId = new Types.ObjectId(propertyId);
+    if (propertyId) {
+      if (!Types.ObjectId.isValid(propertyId)) {
+        return createErrorResponse("Identifiant de propriété invalide", 400);
+      }
+      if (!user.isAdmin && !(await canAccessProperty(user, propertyId))) {
+        return createErrorResponse("Accès refusé à cette propriété", 403);
+      }
+      filter.propertyId = new Types.ObjectId(propertyId);
+    }
+
     if (leaseId) filter.leaseId = new Types.ObjectId(leaseId);
     if (status) {
       filter.status = status;
     } else {
-      // Exclude fully paid invoices by default so only actionable items appear
       filter.balanceRemaining = { $gt: 0 };
     }
 
@@ -117,6 +128,8 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
       invoices = aggResult[0]?.invoices || [];
       total = aggResult[0]?.total || 0;
     } else {
+      console.log("INVOICE FILTER:", filter);
+
       const [docs, count] = await Promise.all([
         Invoice.find(filter)
           .populate({
@@ -187,6 +200,8 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
       const propertyMap = new Map(
         propertyRows.map((property: any) => [property._id.toString(), property])
       );
+
+      console.log("INVOICE DOCS:", docs.length);
 
       invoices = docs.map((doc: any) => {
         const tenantId = doc.tenantId?.toString();
@@ -327,6 +342,10 @@ export const POST = withPermissionAndDB("financial_management")(
         matchingLease.terms?.paymentConfig?.lateFeeConfig?.gracePeriodDays || 5;
     }
 
+    if (!user.isAdmin && !user.isTenant && !(await canAccessProperty(user, resolvedPropertyId))) {
+      return createErrorResponse("Vous ne pouvez pas créer une facture pour cette propriété", 403);
+    }
+
     // Calculate totals
     const subtotal = lineItems.reduce(
       (sum: number, item: any) => sum + item.amount,
@@ -406,7 +425,7 @@ export const POST = withPermissionAndDB("financial_management")(
 // PATCH /api/invoices - Bulk update invoices
 // ============================================================================
 export const PATCH = withPermissionAndDB("financial_management")(
-  async (_user: AuthenticatedAccessUser, request: NextRequest) => {
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
     const body = await request.json();
     const { invoiceIds, updates } = body;
@@ -427,11 +446,11 @@ export const PATCH = withPermissionAndDB("financial_management")(
       return new Types.ObjectId(id);
     });
 
-    // Perform bulk update
-    const result = await Invoice.updateMany(
-      { _id: { $in: objectIds } },
-      { $set: updates }
-    );
+    const scopedBulkFilter = await buildInvoiceScopeQuery(user, {
+      _id: { $in: objectIds },
+      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+    });
+    const result = await Invoice.updateMany(scopedBulkFilter, { $set: updates });
 
     return createSuccessResponse(
       {
@@ -449,7 +468,7 @@ export const PATCH = withPermissionAndDB("financial_management")(
 // DELETE /api/invoices - Bulk soft delete invoices
 // ============================================================================
 export const DELETE = withPermissionAndDB("financial_management")(
-  async (_user: AuthenticatedAccessUser, request: NextRequest) => {
+  async (user: AuthenticatedAccessUser, request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const invoiceIds = searchParams.get("ids")?.split(",") || [];
@@ -467,8 +486,12 @@ export const DELETE = withPermissionAndDB("financial_management")(
     });
 
     // Check if any invoices have payments
-    const invoicesWithPayments = await Invoice.find({
+    const scopedDeleteFilter = await buildInvoiceScopeQuery(user, {
       _id: { $in: objectIds },
+      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+    });
+    const invoicesWithPayments = await Invoice.find({
+      ...scopedDeleteFilter,
       amountPaid: { $gt: 0 },
     });
 
@@ -481,7 +504,7 @@ export const DELETE = withPermissionAndDB("financial_management")(
 
     // Perform soft delete
     const result = await Invoice.updateMany(
-      { _id: { $in: objectIds } },
+      scopedDeleteFilter,
       { $set: { deletedAt: new Date(), status: InvoiceStatus.CANCELLED } }
     );
 

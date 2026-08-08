@@ -10,7 +10,7 @@ import {
 } from "@/lib/api-utils";
 import { getAdminDashboardData } from "@/lib/services/admin-dashboard.service";
 
-export const GET = withPermissionAndDB("system_settings")(async () => {
+export const GET = withPermissionAndDB("system_settings")(async (_user: any) => {
   try {
     const data = await getAdminDashboardData();
     return createSuccessResponse(data);

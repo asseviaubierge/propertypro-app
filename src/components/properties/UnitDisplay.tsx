@@ -117,7 +117,7 @@ export function EnhancedUnitDisplay({
       {/* Header with Search and Filters */}
       <Card className="border-blue-100 dark:border-gray-700 p-2">
         <CardHeader className="p-2 gap-0">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="flex items-center p-0">
               <Building className="h-5 w-5 mr-2 text-blue-600" />
               {t("properties.units.list.title")} (
@@ -131,7 +131,7 @@ export function EnhancedUnitDisplay({
             </CardTitle>
             <Button
               onClick={onAddUnit}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
             >
               <Building className="h-4 w-4 mr-2" />
               {t("properties.units.actions.addUnit")}
@@ -167,23 +167,23 @@ export function EnhancedUnitDisplay({
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
           {filteredUnits
             .filter((unit) => unit?.unitNumber)
             .map((unit) => (
               <Card
                 key={unit._id?.toString()}
-                className="border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-lg transition-all duration-200 cursor-pointer"
+                className="border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500 cursor-pointer overflow-hidden"
                 onClick={() => handleViewUnitDetails(unit)}
               >
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex min-w-0 items-start gap-2">
+                      <span className="text-xl shrink-0">
                         {getStatusIcon(unit.status)}
                       </span>
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                      <div className="min-w-0">
+                        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white break-words">
                           {t("properties.units.card.unitTitle", {
                             values: { unitNumber: unit.unitNumber },
                           })}
@@ -198,7 +198,7 @@ export function EnhancedUnitDisplay({
                         )}
                       </div>
                     </div>
-                    <Badge className={getStatusColor(unit.status)}>
+                    <Badge className={`${getStatusColor(unit.status)} shrink-0 text-[10px] sm:text-xs`}>
                       {t(`properties.status.${unit.status}`)}
                     </Badge>
                   </div>
@@ -206,12 +206,12 @@ export function EnhancedUnitDisplay({
 
                 <CardContent className="space-y-4">
                   {/* Unit Type */}
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="capitalize">
+                  <div className="flex flex-col gap-2 min-[380px]:flex-row min-[380px]:items-end min-[380px]:justify-between">
+                    <Badge variant="outline" className="w-fit max-w-full whitespace-normal text-left capitalize">
                       {t(`properties.unitType.${unit.unitType}`)}
                     </Badge>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    <div className="min-w-0 text-left min-[380px]:text-right">
+                      <div className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400 break-words">
                         {formatCurrency(unit.rentAmount)}
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -221,7 +221,7 @@ export function EnhancedUnitDisplay({
                   </div>
 
                   {/* Unit Details */}
-                  <div className="grid grid-cols-3 gap-3 py-3 border-t border-gray-100 dark:border-gray-800">
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-3 py-3 border-t border-gray-100 dark:border-gray-800">
                     <div className="text-center">
                       <div className="flex items-center justify-center mb-1">
                         <Bed className="h-4 w-4 text-blue-600 dark:text-blue-400" />

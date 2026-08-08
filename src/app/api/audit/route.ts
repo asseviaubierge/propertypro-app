@@ -178,7 +178,7 @@ export const POST = withPermissionAndDB("audit_logs")(
 );
 
 // GET /api/audit/stats - Get audit statistics
-export const stats = withPermissionAndDB("audit_logs")(async (user, request: NextRequest) => {
+export const stats = withPermissionAndDB("audit_logs")(async (_user: any, request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get("startDate")
@@ -300,7 +300,7 @@ export const stats = withPermissionAndDB("audit_logs")(async (user, request: Nex
 // GET /api/audit/user/{userId} - Get audit logs for specific user
 export const userLogs = withPermissionAndDB("audit_logs")(
   async (
-    user,
+    _user: any,
     request: NextRequest,
     { params }: { params: { userId: string } }
   ) => {
@@ -334,7 +334,7 @@ export const userLogs = withPermissionAndDB("audit_logs")(
 // GET /api/audit/resource/{resourceType}/{resourceId} - Get audit logs for specific resource
 export const resourceLogs = withPermissionAndDB("audit_logs")(
   async (
-    user,
+    _user: any,
     request: NextRequest,
     { params }: { params: { resourceType: string; resourceId: string } }
   ) => {
@@ -362,7 +362,7 @@ export const resourceLogs = withPermissionAndDB("audit_logs")(
 
 // GET /api/audit/security - Get security events
 export const securityEvents = withPermissionAndDB("audit_logs")(
-  async (user, request: NextRequest) => {
+  async (_user: any, request: NextRequest) => {
     try {
       const { searchParams } = new URL(request.url);
       const startDate = searchParams.get("startDate")
@@ -392,7 +392,7 @@ export const securityEvents = withPermissionAndDB("audit_logs")(
 
 // DELETE /api/audit/cleanup - Cleanup expired audit logs
 export const cleanup = withPermissionAndDB("audit_logs")(
-  async (user, request: NextRequest) => {
+  async (_user: any, request: NextRequest) => {
     try {
       const deletedCount = await auditService.cleanupExpiredLogs();
 

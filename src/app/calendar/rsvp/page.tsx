@@ -119,7 +119,7 @@ function RSVPContent() {
         loadRSVPDetails();
       }
     } else {
-      setError("Invalid invitation link");
+      setError("Invitation invalide link");
       setLoading(false);
     }
   }, [token, quickResponse]);
@@ -244,7 +244,7 @@ function RSVPContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading invitation...</p>
+          <p className="text-muted-foreground">Chargement de l’invitation…</p>
         </div>
       </div>
     );
@@ -257,7 +257,7 @@ function RSVPContent() {
           <CardContent className="pt-6">
             <div className="text-center">
               <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-lg font-semibold mb-2">Error</h2>
+              <h2 className="text-lg font-semibold mb-2">Erreur</h2>
               <p className="text-muted-foreground">{error}</p>
             </div>
           </CardContent>
@@ -273,7 +273,7 @@ function RSVPContent() {
           <CardContent className="pt-6">
             <div className="text-center mb-6">
               <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Response Recorded</h2>
+              <h2 className="text-xl font-semibold mb-2">Réponse enregistrée</h2>
               <p className="text-muted-foreground">
                 Thank you for responding to the invitation!
               </p>
@@ -387,7 +387,7 @@ function RSVPContent() {
             {/* Current Response */}
             {rsvpData.currentResponse && (
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">Current response:</span>
+                <span className="text-muted-foreground">Réponse actuelle :</span>
                 <div className="flex items-center gap-1">
                   {getResponseIcon(rsvpData.currentResponse)}
                   <Badge className={getResponseColor(rsvpData.currentResponse)}>
@@ -406,7 +406,7 @@ function RSVPContent() {
 
             {/* Response Options */}
             <div className="space-y-4">
-              <Label className="text-base font-medium">Your Response</Label>
+              <Label className="text-base font-medium">Votre réponse</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Button
                   variant={
@@ -416,7 +416,7 @@ function RSVPContent() {
                   className="flex items-center gap-2 h-auto py-3"
                 >
                   <CheckCircle className="h-4 w-4" />
-                  Accept
+                  Accepter
                 </Button>
                 <Button
                   variant={
@@ -436,7 +436,7 @@ function RSVPContent() {
                   className="flex items-center gap-2 h-auto py-3"
                 >
                   <XCircle className="h-4 w-4" />
-                  Decline
+                  Refuser
                 </Button>
               </div>
             </div>
@@ -449,7 +449,7 @@ function RSVPContent() {
               </Label>
               <Textarea
                 id="message"
-                placeholder="Add a note for the organizer..."
+                placeholder="Ajouter une note à l’organisateur…"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={3}
@@ -463,7 +463,7 @@ function RSVPContent() {
                 disabled={!selectedResponse || submitting}
                 className="min-w-32"
               >
-                {submitting ? "Submitting..." : "Submit Response"}
+                {submitting ? "Submitting..." : "Envoyer la réponse"}
               </Button>
             </div>
           </CardContent>
@@ -480,7 +480,7 @@ export default function RSVPPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading RSVP details...</p>
+            <p className="text-muted-foreground">Chargement des détails de la réponse…</p>
           </div>
         </div>
       }
