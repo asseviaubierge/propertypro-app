@@ -18,7 +18,7 @@ export interface SimpleLoadingProps {
 }
 
 export function SimpleLoading({
-  title = "Loading...",
+  title = "Chargement...",
   message = "Please wait while we fetch the data.",
   showCards = true,
   className,

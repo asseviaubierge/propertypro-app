@@ -48,32 +48,41 @@ export async function generateInvoicePdfBuffer(
     ? {
         ...(defaultCompanyInfo ?? {}),
         name:
-          owner.businessName?.trim() ||
           ownerFullName ||
+          owner.businessName?.trim() ||
           defaultCompanyInfo?.name ||
           "Propriétaire du bien",
-        legalName: ownerFullName || undefined,
-        address: ownerAddress || defaultCompanyInfo?.address || "",
-        phone: owner.phone || defaultCompanyInfo?.phone || "",
-        email: owner.email || defaultCompanyInfo?.email || "",
-        website: owner.website || defaultCompanyInfo?.website || "",
+        legalName: owner.businessName?.trim() || undefined,
+        address: ownerAddress || "Adresse non renseignée",
+        phone: owner.phone || "",
+        email: owner.email || "",
+        website: owner.website || "",
         logo: owner.businessLogo || defaultCompanyInfo?.logo,
-        accountType: owner.accountType,
+        accountType: owner.accountType || owner.role,
+        roleLabel:
+          owner.role === "manager" || owner.role === "property_manager"
+            ? "Gestionnaire"
+            : owner.role === "tenant"
+              ? "Locataire"
+              : owner.role === "admin" || owner.role === "super_admin"
+                ? "Gestion E-IMMO"
+                : undefined,
+        platformName: "E-IMMO",
         cip: owner.cip,
         ifu: owner.ifu,
         rccm: owner.rccm,
       }
     : defaultCompanyInfo;
 
-  let currencyCode: string | undefined = currencyCodeOverride;
-  try {
-    if (!currencyCode) {
-      const { default: SystemSettingsNew } = await import("@/models/SystemSettingsNew");
-      const systemSettings = await SystemSettingsNew.findOne().lean();
-      currencyCode = systemSettings?.payment?.currency || undefined;
-    }
-  } catch {
-    currencyCode = undefined;
+  // Gestion E-IMMO operates in Benin. Invoice documents are always rendered
+  // in CFA francs regardless of legacy invoice/system currency values.
+  const currencyCode = "XOF";
+
+  if ((invoice as any).unit && (invoice as any).propertyId && typeof (invoice as any).propertyId === "object") {
+    (invoice as any).propertyId = {
+      ...(invoice as any).propertyId,
+      unit: (invoice as any).unit.unitNumber || (invoice as any).unit.name || "",
+    };
   }
 
   const normalized = normalizeInvoiceForPrint(invoice, { companyInfo: companyInfo ?? undefined, currencyCode });

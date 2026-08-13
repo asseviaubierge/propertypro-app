@@ -166,7 +166,7 @@ export default function ExpenseDetailPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-2">
             <Wallet className="h-7 w-7" />
             {expense.expenseNumber}
           </h1>

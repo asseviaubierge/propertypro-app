@@ -652,5 +652,11 @@
   "leases.myLeases.toasts.downloadAgreement": "Téléchargement du contrat de location...",
   "leases.myLeases.toasts.viewInvoices": "Navigation vers les factures...",
   "leases.myLeases.toasts.contactManager": "Ouverture du formulaire de contact...",
-  "leases.myLeases.toasts.requestRenewal": "Ouverture du formulaire de demande de renouvellement..."
+  "leases.myLeases.toasts.requestRenewal": "Ouverture du formulaire de demande de renouvellement...",
+  "leases.invoices.empty.description": "Aucune facture ne correspond aux filtres actuels.",
+  "leases.invoices.stats.totalDescription": "Toutes les factures du portefeuille autorisé",
+  "leases.invoices.stats.paidDescription": "Factures payées avec succès",
+  "leases.invoices.stats.issuedDescription": "Émises et en attente de paiement",
+  "leases.invoices.stats.overdueDescription": "Factures nécessitant une attention",
+  "leases.invoices.stats.balanceDescription": "Solde impayé du portefeuille autorisé"
 }

@@ -17,6 +17,7 @@ import {
 } from "@/lib/api-utils";
 import { canAccessInvoice } from "@/lib/invoice-access";
 import { computeEffectiveInvoiceStatus } from "@/lib/invoice/invoice-shared";
+import { resolveInvoiceIssuer } from "@/lib/invoice/issuer-resolver";
 
 const INVOICE_READ_ACCESS = {
   roles: [UserRole.TENANT],
@@ -41,18 +42,33 @@ export const GET = withAccessAndDB(INVOICE_READ_ACCESS)(
         $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
       })
         .populate("tenantId", "firstName lastName email phone")
-        .populate("propertyId", "name address type ownerId managerId")
-        .populate("leaseId", "startDate endDate status propertyId")
+        .populate("propertyId", "name address type ownerId managerId units")
+        .populate("leaseId", "startDate endDate status propertyId unitId terms")
         .lean();
 
-      if (!invoice) return createErrorResponse("Invoice not found", 404);
+      if (!invoice) return createErrorResponse("Facture introuvable", 404);
       if (!(await canAccessInvoice(user, invoice))) {
-        return createErrorResponse("Access denied", 403);
+        return createErrorResponse("Accès refusé", 403);
       }
 
+      const issuer = await resolveInvoiceIssuer(invoice, user);
+
+      const property = (invoice as any)?.propertyId;
+      const unitId = (invoice as any)?.unitId || (invoice as any)?.leaseId?.unitId;
+      const units = Array.isArray(property?.units) ? property.units : [];
+      const unit = unitId
+        ? units.find((candidate: any) => String(candidate?._id) === String(unitId)) || null
+        : null;
+
       return createSuccessResponse(
-        { ...invoice, status: computeEffectiveInvoiceStatus(invoice, new Date()) },
-        "Invoice retrieved successfully"
+        {
+          ...invoice,
+          issuer,
+          unit,
+          platform: { name: "E-IMMO", displayName: "GESTION E-IMMO" },
+          status: computeEffectiveInvoiceStatus(invoice, new Date()),
+        },
+        "Facture récupérée avec succès"
       );
     } catch (error) {
       return handleApiError(error);

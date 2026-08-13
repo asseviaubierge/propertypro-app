@@ -632,13 +632,18 @@
 
 .dashboard-layout p,
 .dashboard-layout span,
-.dashboard-layout h1,
-.dashboard-layout h2,
-.dashboard-layout h3,
-.dashboard-layout h4,
 .dashboard-layout dd,
 .dashboard-layout dt {
   overflow-wrap: anywhere;
+}
+
+.dashboard-layout h1,
+.dashboard-layout h2,
+.dashboard-layout h3,
+.dashboard-layout h4 {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
 }
 
 @media (max-width: 767px) {
@@ -678,4 +683,102 @@
 .dashboard-layout .animate-in,
 .dashboard-layout .slide-in-from-bottom {
   animation: none !important;
+}
+
+/* ==========================================================================
+   GESTION E-IMMO — MOBILE STABLE
+   Règles limitées au téléphone. Le Desktop conserve le CSS historique.
+   ========================================================================== */
+@media (max-width: 767px) {
+  .mobile-navigation-overlay {
+    background: transparent !important;
+  }
+
+  .mobile-navigation-drawer,
+  .mobile-navigation-header,
+  .mobile-navigation-scroll,
+  .mobile-navigation-sidebar,
+  .mobile-navigation-sidebar > *,
+  .mobile-navigation-sidebar aside,
+  .mobile-navigation-sidebar nav {
+    background-color: #ffffff !important;
+  }
+
+  .mobile-navigation-drawer {
+    height: 100dvh;
+    border-right: 1px solid #e2e8f0;
+    border-radius: 0 18px 18px 0;
+    color: #0f172a;
+  }
+
+  .mobile-navigation-scroll {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .mobile-navigation-sidebar,
+  .mobile-navigation-sidebar > div,
+  .mobile-navigation-sidebar aside,
+  .mobile-navigation-sidebar nav {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .dashboard-layout main button,
+  .dashboard-layout main [role="button"],
+  .dashboard-layout main a {
+    max-width: 100%;
+  }
+
+  .dashboard-layout main button,
+  .dashboard-layout main [role="button"] {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .dashboard-layout main button > span,
+  .dashboard-layout main [role="button"] > span {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .dashboard-layout main .flex > *,
+  .dashboard-layout main .grid > * {
+    min-width: 0;
+  }
+
+  .dashboard-layout main [class*="gap-"][class*="flex"] {
+    max-width: 100%;
+  }
+}
+
+
+/* === E-IMMO MOBILE : BOUTONS SANS DÉBORDEMENT (CIBLÉ) === */
+@media (max-width: 767px) {
+  .dashboard-layout main button,
+  .dashboard-layout main a[role="button"] {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-layout main button span,
+  .dashboard-layout main a[role="button"] span {
+    min-width: 0;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    white-space: normal !important;
+  }
+
+  .dashboard-layout main button:not(:has(> svg:only-child)),
+  .dashboard-layout main a[role="button"] {
+    height: auto;
+    min-height: 2.125rem;
+    line-height: 1.15;
+  }
 }

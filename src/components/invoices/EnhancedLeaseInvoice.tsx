@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   Building2,
@@ -72,6 +73,7 @@ export function EnhancedLeaseInvoice({
   onInvoiceEmailed,
   onInvoiceSaved,
 }: EnhancedLeaseInvoiceProps) {
+  const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEmailing, setIsEmailing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -84,12 +86,32 @@ export function EnhancedLeaseInvoice({
     `Facture de location - ${lease.propertyId?.name || "Bien"}`
   );
   const [emailMessage, setEmailMessage] = useState(
-    `Dear ${
+    `Bonjour ${
       lease.tenantId?.userId?.firstName || "Locataire"
     },\n\nVeuillez trouver ci-joint votre facture de location pour ${
       lease.propertyId?.name || "le bien"
-    }.\n\nCordialement,\n${companyInfo?.name || "BienPro Management"}`
+    }.\n\nCordialement,\n${companyInfo?.name || "GESTION E-IMMO"}`
   );
+
+  const openStoredInvoiceIfAvailable = async (): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `/api/invoices?leaseId=${encodeURIComponent(String(lease._id))}&limit=1&includeSettled=true`,
+        { cache: "no-store" },
+      );
+      if (!response.ok) return false;
+
+      const payload = await response.json();
+      const rows = payload?.data?.invoices || payload?.data;
+      const invoice = Array.isArray(rows) ? rows[0] : null;
+      if (!invoice?._id) return false;
+
+      router.push(`/dashboard/accounting/invoices/${invoice._id}`);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   // Build a PrintableInvoice from lease data (keeps print and download identical)
   const buildPrintableFromLease = (): PrintableInvoice =>
@@ -104,6 +126,7 @@ export function EnhancedLeaseInvoice({
   const handleDownloadPDF = async () => {
     try {
       setIsGenerating(true);
+      if (await openStoredInvoiceIfAvailable()) return;
       const printable = buildPrintableFromLease();
       await downloadInvoiceAsPDFDirect(printable, companyInfo);
       toast.success("Facture téléchargée");
@@ -186,6 +209,7 @@ export function EnhancedLeaseInvoice({
 
   // Imprimer invoice using the same HTML design
   const handlePrint = async () => {
+    if (await openStoredInvoiceIfAvailable()) return;
     const printable = buildPrintableFromLease();
     await printInvoiceDirect(printable, companyInfo);
   };

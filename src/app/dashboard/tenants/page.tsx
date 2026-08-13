@@ -499,7 +499,7 @@ export default function TenantsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("tenants.header.title")}
           </h1>
           <p className="text-muted-foreground">
@@ -849,7 +849,7 @@ export default function TenantsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:gap-0">
             <AlertDialogCancel>
-              {t("common.cancel", { defaultValue: "Cancel" })}
+              {t("common.cancel", { defaultValue: "Annuler" })}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {

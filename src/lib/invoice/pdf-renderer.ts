@@ -23,11 +23,11 @@ import { formatCurrency } from "@/lib/utils/formatting";
 const PAGE = {
   WIDTH: 210,
   HEIGHT: 297,
-  MARGIN_LEFT: 20,
-  MARGIN_RIGHT: 20,
-  MARGIN_TOP: 20,
-  MARGIN_BOTTOM: 20,
-  CONTENT_WIDTH: 170, // WIDTH - MARGIN_LEFT - MARGIN_RIGHT
+  MARGIN_LEFT: 14,
+  MARGIN_RIGHT: 14,
+  MARGIN_TOP: 12,
+  MARGIN_BOTTOM: 12,
+  CONTENT_WIDTH: 182, // WIDTH - MARGIN_LEFT - MARGIN_RIGHT
 } as const;
 
 /** Color palette - Professional grayscale with accent */
@@ -82,7 +82,7 @@ function isApproximatelyZero(value: number): boolean {
 
 function formatDisplayCurrency(amount: number, currencyCode?: string): string {
   const normalized = isApproximatelyZero(amount) ? 0 : amount;
-  return formatCurrency(normalized, currencyCode);
+  return formatCurrency(normalized, "XOF", { maximumFractionDigits: 0 });
 }
 
 /** Set text color from RGB tuple */
@@ -111,11 +111,12 @@ function setDrawColor(
 
 /** Check if we need a new page and add one if necessary */
 function ensureSpace(ctx: RenderContext, requiredHeight: number): void {
-  const maxY = PAGE.HEIGHT - PAGE.MARGIN_BOTTOM;
+  // Invoice PDFs in Gestion E-IMMO are intentionally single-page documents.
+  // The renderer uses compact spacing; when space becomes tight, sections keep
+  // flowing on the same page instead of creating a second, inconsistent sheet.
+  const maxY = PAGE.HEIGHT - PAGE.MARGIN_BOTTOM - 8;
   if (ctx.y + requiredHeight > maxY) {
-    ctx.pdf.addPage();
-    ctx.pageNumber++;
-    ctx.y = PAGE.MARGIN_TOP;
+    ctx.y = Math.min(ctx.y, maxY - requiredHeight);
   }
 }
 
@@ -145,7 +146,7 @@ function renderSectionHeader(
     );
   }
 
-  ctx.y += 8;
+  ctx.y += 4;
   ctx.pdf.setFont(FONTS.FAMILY, "normal");
 }
 
@@ -228,6 +229,7 @@ export async function renderInvoicePdf(
   // PARTY SECTIONS (Invoice From / Invoice To)
   // ========================================================================
   renderPartySections(ctx, normalized);
+  renderInvoiceReferences(ctx, normalized);
 
   // ========================================================================
   // LINE ITEMS TABLE
@@ -263,7 +265,7 @@ async function renderHeader(
   const { pdf } = ctx;
   const company = normalized.companyInfo;
   const companyInitials = deriveCompanyInitials(company.name);
-  const logoSize = 22;
+  const logoSize = 16;
   const logoX = PAGE.MARGIN_LEFT;
   const logoY = PAGE.MARGIN_TOP;
 
@@ -399,7 +401,7 @@ async function renderHeader(
   pdf.text(`Date d'échéance: ${dueDate}`, rightX, dateY, { align: "right" });
 
   // Update context y position
-  ctx.y = Math.max(logoY + logoSize + 15, dateY + 10);
+  ctx.y = Math.max(logoY + logoSize + 8, dateY + 5);
 }
 
 /** Render Invoice From and Invoice To sections */
@@ -424,20 +426,19 @@ const accountTypeLabel =
     ? "Propriétaire direct"
     : company.accountType === "agency"
       ? "Agence immobilière"
-      : company.accountType === "e_immo"
-        ? "E-IMMO"
-        : "";
+      : company.accountType === "manager" || company.accountType === "property_manager"
+        ? "Gestionnaire"
+        : company.accountType === "e_immo" || company.accountType === "admin" || company.accountType === "super_admin"
+          ? "Gestion E-IMMO"
+          : String(company.roleLabel || "");
 
 const fromLines = [
   company.name,
-  company.legalName && company.legalName !== company.name ? company.legalName : "",
-  accountTypeLabel,
-  company.cip ? `CIP : ${company.cip}` : "",
-  company.ifu ? `IFU : ${company.ifu}` : "",
-  company.rccm ? `RCCM : ${company.rccm}` : "",
+  [company.legalName && company.legalName !== company.name ? company.legalName : "", accountTypeLabel].filter(Boolean).join(" • "),
+  "Plateforme : E-IMMO",
+  [company.cip ? `CIP : ${company.cip}` : "", company.ifu ? `IFU : ${company.ifu}` : "", company.rccm ? `RCCM : ${company.rccm}` : ""].filter(Boolean).join(" • "),
   company.address,
-  company.phone,
-  company.email,
+  [company.phone, company.email].filter(Boolean).join(" • "),
 ].filter(Boolean) as string[];
 
   // Build "Invoice To" lines
@@ -451,8 +452,8 @@ const fromLines = [
   toLines.push(tenantName);
 
   // Tenant contact
-  if (tenant.email) toLines.push(String(tenant.email));
-  if (tenant.phone) toLines.push(String(tenant.phone));
+  const tenantContact = [tenant.phone, tenant.email].filter(Boolean).join(" • ");
+  if (tenantContact) toLines.push(tenantContact);
 
   // Property info
   if (property.name) {
@@ -492,7 +493,48 @@ const fromLines = [
     75
   );
 
-  ctx.y = Math.max(fromEndY, toEndY) + 10;
+  ctx.y = Math.max(fromEndY, toEndY) + 5;
+}
+
+function renderInvoiceReferences(
+  ctx: RenderContext,
+  normalized: NormalizedInvoice
+): void {
+  const { pdf } = ctx;
+  const property = normalized.property || normalized.propertyId || {};
+  const lease = normalized.leaseId || {};
+  const parts: string[] = [];
+
+  if (property.name) parts.push(`Bien : ${String(property.name)}`);
+  if ((property as any).unit) parts.push(`Unité : ${String((property as any).unit)}`);
+  if ((property as any).type) parts.push(`Type : ${String((property as any).type)}`);
+
+  const startDate = (lease as any).startDate;
+  const endDate = (lease as any).endDate;
+  const format = (value: unknown) => {
+    if (!value) return "";
+    const date = new Date(value as any);
+    return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("fr-FR");
+  };
+  if (startDate || endDate) {
+    parts.push(`Bail : ${format(startDate)}${startDate && endDate ? " au " : ""}${format(endDate)}`);
+  }
+
+  if (!parts.length) return;
+
+  pdf.setFont(FONTS.FAMILY, "bold");
+  pdf.setFontSize(FONTS.SIZES.TINY);
+  setTextColor(pdf, COLORS.SECONDARY);
+  pdf.text("RÉFÉRENCES", PAGE.MARGIN_LEFT, ctx.y);
+  ctx.y += 4;
+
+  pdf.setFont(FONTS.FAMILY, "normal");
+  const lines = pdf.splitTextToSize(parts.join("   •   "), PAGE.CONTENT_WIDTH);
+  lines.slice(0, 2).forEach((line: string) => {
+    pdf.text(line, PAGE.MARGIN_LEFT, ctx.y);
+    ctx.y += 4;
+  });
+  ctx.y += 3;
 }
 
 /** Render the line items table */
@@ -507,8 +549,8 @@ function renderLineItemsTable(
 
   const tableX = PAGE.MARGIN_LEFT;
   const tableWidth = PAGE.CONTENT_WIDTH;
-  const headerHeight = 10;
-  const rowHeight = 9;
+  const headerHeight = 8;
+  const rowHeight = items.length > 8 ? 5.5 : 7;
 
   // Column positions (relative to tableX)
   const cols = {
@@ -528,17 +570,12 @@ function renderLineItemsTable(
   setFillColor(pdf, COLORS.HEADER_BG);
   pdf.rect(tableX, ctx.y, tableWidth, headerHeight, "F");
 
-  // Header border
-  setDrawColor(pdf, COLORS.BORDER);
-  pdf.setLineWidth(0.3);
-  pdf.rect(tableX, ctx.y, tableWidth, headerHeight);
-
   // Header text
   pdf.setFont(FONTS.FAMILY, "bold");
   pdf.setFontSize(FONTS.SIZES.SMALL);
   setTextColor(pdf, COLORS.PRIMARY);
 
-  const headerY = ctx.y + 7;
+  const headerY = ctx.y + 5.5;
   pdf.text("#", tableX + cols.num.x + 4, headerY);
   pdf.text("Description", tableX + cols.desc.x + 4, headerY);
   pdf.text("Qté", tableX + cols.qty.x + cols.qty.width / 2, headerY, {
@@ -557,7 +594,7 @@ function renderLineItemsTable(
   // TABLE ROWS
   // ========================================================================
   pdf.setFont(FONTS.FAMILY, "normal");
-  pdf.setFontSize(FONTS.SIZES.SMALL);
+  pdf.setFontSize(items.length > 8 ? FONTS.SIZES.TINY : FONTS.SIZES.SMALL);
 
   if (items.length === 0) {
     // Empty state
@@ -574,14 +611,14 @@ function renderLineItemsTable(
       const unit = Number(item.unitPrice ?? 0);
       const total = Number(item.total ?? item.amount ?? qty * unit);
 
-      const rowY = ctx.y + 6;
+      const rowY = ctx.y + (rowHeight > 6 ? 5 : 4);
       setTextColor(pdf, COLORS.PRIMARY);
 
       // Row number
       pdf.text(String(index + 1), tableX + cols.num.x + 4, rowY);
 
       // Description (with truncation if needed)
-      const description = String(item.description || "Item");
+      const description = String(item.description || "Article");
       const maxDescWidth = cols.desc.width - 8;
       const truncatedDesc =
         pdf.getTextWidth(description) > maxDescWidth
@@ -612,11 +649,7 @@ function renderLineItemsTable(
       );
       pdf.setFont(FONTS.FAMILY, "normal");
 
-      // Row separator line
       ctx.y += rowHeight;
-      setDrawColor(pdf, COLORS.BORDER);
-      pdf.setLineWidth(0.2);
-      pdf.line(tableX, ctx.y, tableX + tableWidth, ctx.y);
     });
   }
 
@@ -639,14 +672,14 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
     },
   } = normalized;
 
-  ensureSpace(ctx, 70);
+  ensureSpace(ctx, 45);
 
   // Totals box dimensions
   const boxWidth = 75;
   const boxX = PAGE.WIDTH - PAGE.MARGIN_RIGHT - boxWidth;
   const labelX = boxX + 5;
   const valueX = boxX + boxWidth - 5;
-  const lineHeight = 6;
+  const lineHeight = 5;
 
   // Start totals
   let y = ctx.y;
@@ -691,12 +724,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
     y += lineHeight;
   }
 
-  // Separator line before total
-  y += 2;
-  setDrawColor(pdf, COLORS.BORDER);
-  pdf.setLineWidth(0.5);
-  pdf.line(boxX, y, boxX + boxWidth, y);
-  y += 6;
+  y += 4;
 
   // Grand Total (highlighted)
   pdf.setFont(FONTS.FAMILY, "bold");
@@ -735,7 +763,7 @@ function renderTotals(ctx: RenderContext, normalized: NormalizedInvoice): void {
     y += lineHeight;
   }
 
-  ctx.y = y + 10;
+  ctx.y = y + 5;
 }
 
 /** Render notes section */
@@ -743,11 +771,9 @@ function renderNotes(ctx: RenderContext, normalized: NormalizedInvoice): void {
   const { pdf } = ctx;
   const company = normalized.companyInfo;
 
-  // Ensure we have space at the bottom
-  const notesMinY = PAGE.HEIGHT - PAGE.MARGIN_BOTTOM - 50;
-  if (ctx.y < notesMinY) {
-    ctx.y = notesMinY;
-  }
+  // Keep notes on the same A4 page. Place them after totals while reserving footer space.
+  const notesMinY = Math.min(Math.max(ctx.y + 2, 238), PAGE.HEIGHT - PAGE.MARGIN_BOTTOM - 34);
+  ctx.y = notesMinY;
 
   // Separator line
   setDrawColor(pdf, COLORS.BORDER);
@@ -768,7 +794,7 @@ function renderNotes(ctx: RenderContext, normalized: NormalizedInvoice): void {
 
   // Wrap notes text
   const notesText = normalized.notes || "Merci pour votre confiance!";
-  const wrappedNotes = pdf.splitTextToSize(notesText, 100);
+  const wrappedNotes = pdf.splitTextToSize(notesText, 100).slice(0, 3);
   wrappedNotes.forEach((line: string) => {
     pdf.text(line, PAGE.MARGIN_LEFT, ctx.y);
     ctx.y += 4;
@@ -805,7 +831,7 @@ function renderFooter(ctx: RenderContext, companyName?: string): void {
 
   // Left side - generated message
   pdf.text(
-    `Facture générée avec PropertyPro pour ${companyName || "le propriétaire"}`,
+    `Facture générée via E-IMMO pour ${companyName || "le compte émetteur"}`,
     PAGE.MARGIN_LEFT,
     footerY
   );

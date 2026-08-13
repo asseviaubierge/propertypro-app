@@ -15,6 +15,60 @@ export interface LeaseInvoiceLineItemInput
   type?: string;
 }
 
+
+
+function leaseIssuerCompanyInfo(
+  lease: LeaseResponse,
+  fallback?: Partial<InvoiceCompanyInfo>,
+): Partial<InvoiceCompanyInfo> | undefined {
+  const property: any = (lease as any)?.propertyId || {};
+  const issuer: any =
+    (property?.managerId && typeof property.managerId === "object" ? property.managerId : null) ||
+    (property?.ownerId && typeof property.ownerId === "object" ? property.ownerId : null);
+
+  if (!issuer) return fallback;
+
+  const fullName = `${issuer.firstName || ""} ${issuer.lastName || ""}`.trim();
+  const role = String(issuer.role || issuer.accountType || "").toLowerCase();
+  const isAgency = role === "agency";
+  const displayName = isAgency
+    ? issuer.businessName || fullName
+    : fullName || issuer.businessName;
+
+  const roleLabel =
+    ["manager", "property_manager"].includes(role)
+      ? "Gestionnaire"
+      : ["owner", "direct_owner"].includes(role)
+        ? "Propriétaire direct"
+        : role === "agency"
+          ? "Agence immobilière"
+          : ["admin", "super_admin", "e_immo"].includes(role)
+            ? "Gestion E-IMMO"
+            : "";
+
+  return {
+    ...(fallback || {}),
+    name: displayName || fallback?.name || "GESTION E-IMMO",
+    legalName:
+      issuer.businessName && issuer.businessName !== displayName
+        ? issuer.businessName
+        : fullName && fullName !== displayName
+          ? fullName
+          : undefined,
+    address: [issuer.address, issuer.city].filter(Boolean).join(", ") || fallback?.address || "",
+    phone: issuer.phone || fallback?.phone || "",
+    email: issuer.email || fallback?.email || "",
+    website: issuer.website || fallback?.website,
+    logo: issuer.businessLogo || fallback?.logo,
+    accountType: issuer.accountType || issuer.role,
+    roleLabel,
+    cip: issuer.cip,
+    ifu: issuer.ifu,
+    rccm: issuer.rccm,
+    platformName: "E-IMMO",
+  } as Partial<InvoiceCompanyInfo>;
+}
+
 export interface LeaseInvoiceBuildOptions {
   invoiceNumber?: string;
   issueDate?: Date;
@@ -35,7 +89,7 @@ function buildDefaultLineItems(
 
   if (lease.terms?.rentAmount) {
     items.push({
-      description: `Monthly Rent - ${lease.propertyId?.name || "Property"}`,
+      description: `Loyer mensuel - ${lease.propertyId?.name || "Bien"}`,
       quantity: 1,
       unitPrice: lease.terms.rentAmount,
       total: lease.terms.rentAmount,
@@ -46,7 +100,7 @@ function buildDefaultLineItems(
 
   if (lease.terms?.securityDeposit) {
     items.push({
-      description: "Security Deposit",
+      description: "Dépôt de garantie",
       quantity: 1,
       unitPrice: lease.terms.securityDeposit,
       total: lease.terms.securityDeposit,
@@ -57,7 +111,7 @@ function buildDefaultLineItems(
 
   if (lease.terms?.petDeposit) {
     items.push({
-      description: "Pet Deposit",
+      description: "Dépôt pour animal",
       quantity: 1,
       unitPrice: lease.terms.petDeposit,
       total: lease.terms.petDeposit,
@@ -143,6 +197,8 @@ export function buildPrintableInvoiceFromLease(
   const tenantInfo = (lease as any).tenantId || {};
   const propertyInfo = lease.propertyId || {};
 
+  const resolvedCompanyInfo = leaseIssuerCompanyInfo(lease, companyInfo);
+
   const rawInvoice = {
     invoiceNumber: generatedInvoiceNumber,
     issueDate: calculatedIssueDate,
@@ -154,15 +210,32 @@ export function buildPrintableInvoiceFromLease(
     amountPaid,
     balanceRemaining,
     notes: notes ?? DEFAULT_INVOICE_NOTES,
-    companyInfo,
+    companyInfo: resolvedCompanyInfo,
     tenantId: tenantInfo,
-    propertyId: propertyInfo,
-    leaseId: { _id: lease._id, propertyId: propertyInfo },
+    propertyId: {
+      ...propertyInfo,
+      unit:
+        (lease as any)?.unit?.unitNumber ||
+        (lease as any)?.unit?.name ||
+        ((lease as any)?.propertyId?.units || []).find(
+          (candidate: any) => String(candidate?._id) === String((lease as any)?.unitId)
+        )?.unitNumber ||
+        "",
+    },
+    leaseId: {
+      _id: lease._id,
+      propertyId: propertyInfo,
+      unitId: (lease as any).unitId,
+      startDate: lease.startDate,
+      endDate: lease.endDate,
+      status: lease.status,
+      terms: lease.terms,
+    },
     lineItems,
   };
 
   return normalizeInvoiceForPrint(rawInvoice, {
-    companyInfo,
+    companyInfo: resolvedCompanyInfo,
     defaultNotes: notes,
     fallbackStatus: status,
     ...overrides,

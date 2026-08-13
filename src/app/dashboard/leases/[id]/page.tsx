@@ -842,7 +842,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isDeleting ? "Deleting..." : "Delete Lease"}
+              {isDeleting ? "Suppression..." : "Delete Lease"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

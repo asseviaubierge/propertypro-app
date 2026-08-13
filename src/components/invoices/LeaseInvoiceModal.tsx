@@ -1,19 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { FileText, Receipt } from "lucide-react";
-import { LeaseInvoice } from "./LeaseInvoice";
+import { Receipt } from "lucide-react";
+import { resolveCanonicalInvoiceUrl } from "@/lib/invoice/navigation";
+import { showSimpleError } from "@/lib/toast-notifications";
 import { LeaseResponse } from "@/lib/services/lease.service";
-import { getCompanyInfo, CompanyInfo } from "@/lib/utils/company-info";
 
 export interface LeaseInvoiceModalProps {
   lease: LeaseResponse;
@@ -31,92 +25,61 @@ export interface LeaseInvoiceModalProps {
   dueDate?: Date;
 }
 
+/**
+ * Point d'entrée unique vers les factures liées à un bail.
+ *
+ * Tous les boutons liés à un bail résolvent directement l'identifiant de la
+ * facture enregistrée, puis ouvrent l'unique page canonique :
+ * /dashboard/accounting/invoices/[invoiceId].
+ * Aucun écran /dashboard/leases/[id]/invoice n'est affiché entre les deux.
+ */
 export function LeaseInvoiceModal({
   lease,
   trigger,
-  companyInfo: propCompanyInfo,
-  invoiceNumber,
-  issueDate,
-  dueDate,
 }: LeaseInvoiceModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(
-    propCompanyInfo || null
-  );
-  const [isLoadingCompanyInfo, setIsLoadingCompanyInfo] = useState(false);
-  const [hasFetched, setHasFetched] = useState(false);
+  const router = useRouter();
+  const { data: session } = useSession();
 
-  // Charger les informations de l’entreprise uniquement à la première ouverture
-  const fetchCompanyInfo = useCallback(async () => {
-    if (propCompanyInfo || hasFetched) return;
-
-    setIsLoadingCompanyInfo(true);
+  const openCanonicalInvoice = async () => {
     try {
-      const info = await getCompanyInfo();
-      if (info) {
-        setCompanyInfo(info);
-      }
+      const role = String((session?.user as any)?.role || "").toLowerCase();
+      const url = await resolveCanonicalInvoiceUrl(String(lease._id), {
+        tenant: role === "tenant" || role === "locataire",
+      });
+      router.push(url);
     } catch (error) {
-      console.error("Échec du chargement des informations de l’entreprise :", error);
-    } finally {
-      setIsLoadingCompanyInfo(false);
-      setHasFetched(true);
+      showSimpleError(
+        "Facture introuvable",
+        error instanceof Error ? error.message : "Impossible d’ouvrir la facture liée à ce bail",
+      );
     }
-  }, [propCompanyInfo, hasFetched]);
+  };
 
-  // Charger les informations à l’ouverture de la fenêtre
-  useEffect(() => {
-    if (isOpen && !propCompanyInfo && !hasFetched) {
-      fetchCompanyInfo();
-    }
-  }, [isOpen, propCompanyInfo, hasFetched, fetchCompanyInfo]);
+  if (trigger && React.isValidElement(trigger)) {
+    const element = trigger as React.ReactElement<any>;
+    return React.cloneElement(element, {
+      onClick: (event: React.MouseEvent) => {
+        element.props?.onClick?.(event);
+        if (!event.defaultPrevented) {
+          void openCanonicalInvoice();
+        }
+      },
+    });
+  }
 
-  const defaultTrigger = (
+  return (
     <Button
       variant="outline"
       size="sm"
       className="flex items-center gap-2 border-none! shadow-none! text-gray-600!"
+      onClick={() => void openCanonicalInvoice()}
     >
       <Receipt className="h-4 w-4" />
       Aperçu de la facture
     </Button>
   );
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className="w-full min-w-4/5! max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Facture de location
-          </DialogTitle>
-          <DialogDescription>
-            Facture professionnelle relative au contrat et aux conditions de location
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="mt-4">
-          {isLoadingCompanyInfo ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <LeaseInvoice
-              lease={lease}
-              companyInfo={companyInfo || undefined}
-              invoiceNumber={invoiceNumber}
-              issueDate={issueDate}
-              dueDate={dueDate}
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
 }
 
-// Composant d’action rapide pour les cartes/listes de locations
 export interface QuickInvoiceButtonProps {
   lease: LeaseResponse;
   variant?: "default" | "outline" | "ghost";
@@ -130,15 +93,33 @@ export function QuickInvoiceButton({
   size = "sm",
   className,
 }: QuickInvoiceButtonProps) {
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  const openInvoice = async () => {
+    try {
+      const role = String((session?.user as any)?.role || "").toLowerCase();
+      const url = await resolveCanonicalInvoiceUrl(String(lease._id), {
+        tenant: role === "tenant" || role === "locataire",
+      });
+      router.push(url);
+    } catch (error) {
+      showSimpleError(
+        "Facture introuvable",
+        error instanceof Error ? error.message : "Impossible d’ouvrir la facture liée à ce bail",
+      );
+    }
+  };
+
   return (
-    <LeaseInvoiceModal
-      lease={lease}
-      trigger={
-        <Button variant={variant} size={size} className={className}>
-          <Receipt className="h-4 w-4" />
-          {size !== "sm" && <span className="ml-2">Facture</span>}
-        </Button>
-      }
-    />
+    <Button
+      variant={variant}
+      size={size}
+      className={className}
+      onClick={() => void openInvoice()}
+    >
+      <Receipt className="h-4 w-4" />
+      {size !== "sm" && <span className="ml-2">Facture</span>}
+    </Button>
   );
 }

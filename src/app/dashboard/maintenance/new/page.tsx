@@ -162,7 +162,7 @@ export default function NewMaintenanceRequestPage() {
                   propertyName:
                     tenant.currentLeaseId?.propertyId?.name ||
                     t("maintenance.tenant.form.noLeases.title", {
-                      defaultValue: "No Active Leases",
+                      defaultValue: "Aucun bail actif",
                     }),
                   phone: tenant.phone || "",
                   tenantStatus: tenant.tenantStatus || "",
@@ -418,7 +418,7 @@ export default function NewMaintenanceRequestPage() {
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-orange-500" />
                 {t("maintenance.tenant.form.noLeases.title", {
-                  defaultValue: "No Active Leases",
+                  defaultValue: "Aucun bail actif",
                 })}
               </CardTitle>
               <CardDescription>

@@ -43,12 +43,12 @@ export function GlobalPagination({
   pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   showPageSizeSelector = true,
   showingText,
-  showingLabel = "Showing",
-  previousLabel = "Previous",
-  nextLabel = "Next",
+  showingLabel = "Affichage",
+  previousLabel = "Précédent",
+  nextLabel = "Suivant",
   pageLabel = "Page",
-  ofLabel = "of",
-  itemsPerPageLabel = "per page",
+  ofLabel = "sur",
+  itemsPerPageLabel = "par page",
   className,
   disabled = false,
 }: GlobalPaginationProps) {
@@ -115,12 +115,12 @@ export function GlobalPagination({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row items-center justify-between gap-4 px-2 py-3",
+        "flex flex-col items-stretch justify-between gap-3 px-1 py-3 sm:flex-row sm:items-center sm:px-2",
         className,
       )}
     >
       {/* Left side - Showing info and page size selector */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground sm:justify-start sm:text-sm">
         <span>
           {showingText ||
             `${showingLabel} ${startItem}-${endItem} ${ofLabel} ${totalItems}`}
@@ -150,7 +150,7 @@ export function GlobalPagination({
       </div>
 
       {/* Right side - Pagination controls (always visible) */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-1.5 sm:justify-end">
         {/* Previous button */}
         <Button
           variant="outline"
@@ -186,7 +186,7 @@ export function GlobalPagination({
         </div>
 
         {/* Mobile page indicator */}
-        <span className="sm:hidden text-sm text-muted-foreground">
+        <span className="sm:hidden whitespace-nowrap text-xs text-muted-foreground">
           {pageLabel} {currentPage} {ofLabel} {totalPages}
         </span>
 

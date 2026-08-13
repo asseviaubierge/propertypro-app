@@ -288,6 +288,26 @@ function ensureProperty(property: unknown): InvoicePropertyInfo {
   } as InvoicePropertyInfo;
 }
 
+
+
+function translateInvoiceDescription(value: string): string {
+  const normalized = value.trim().toLowerCase();
+  const exact: Record<string, string> = {
+    "security deposit": "Dépôt de garantie",
+    "monthly rent": "Loyer mensuel",
+    "monthly rent (prorated)": "Loyer mensuel (proratisé)",
+    "pet deposit": "Dépôt pour animal",
+    "late fee": "Frais de retard",
+    "maintenance": "Maintenance",
+  };
+  if (exact[normalized]) return exact[normalized];
+
+  const advance = value.match(/^Advance Rent Payment - Month\s+(\d+)$/i);
+  if (advance) return `Loyer payé d’avance — mois ${advance[1]}`;
+
+  return value;
+}
+
 function normalizeLineItems(items: unknown[]): InvoiceLineItemInfo[] {
   if (!Array.isArray(items) || items.length === 0) {
     return [];
@@ -323,12 +343,13 @@ function normalizeLineItems(items: unknown[]): InvoiceLineItemInfo[] {
       source.dueDate || source["due_date"] || source["due"] || undefined;
 
     return {
-      description:
+      description: translateInvoiceDescription(
         typeof source.description === "string"
           ? source.description
           : typeof source["name"] === "string"
           ? (source["name"] as string)
-          : "Article",
+          : "Article"
+      ),
       quantity,
       unitPrice,
       total,

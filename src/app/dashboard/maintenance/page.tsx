@@ -233,12 +233,12 @@ export default function MaintenancePage() {
             Consultez et suivez les demandes de maintenance de vos biens.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => void loadRequests()} disabled={loading}>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+          <Button className="min-w-0 px-2 text-xs sm:px-4 sm:text-sm" variant="outline" onClick={() => void loadRequests()} disabled={loading}>
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Actualiser
           </Button>
-          <Button asChild>
+          <Button asChild className="min-w-0 px-2 text-xs sm:px-4 sm:text-sm">
             <Link href="/dashboard/maintenance/new">
               <Plus className="mr-2 h-4 w-4" />
               Nouvelle demande

@@ -80,27 +80,27 @@ function getErrorMessage(type: string, error: Error) {
       };
     case "permission":
       return {
-        title: "Access Denied",
-        description: "You don't have permission to access this resource.",
-        suggestion: "Contact your administrator if you believe this is an error.",
+        title: "Accès refusé",
+        description: "Vous n’êtes pas autorisé à accéder à cette ressource.",
+        suggestion: "Contactez l’administrateur E-IMMO si vous pensez qu’il s’agit d’une erreur.",
       };
     case "database":
       return {
-        title: "Database Error",
-        description: "We're having trouble accessing the database. This is usually temporary.",
-        suggestion: "Please try again in a few moments. If the problem persists, contact support.",
+        title: "Erreur de base de données",
+        description: "Un problème empêche momentanément l’accès à la base de données.",
+        suggestion: "Réessayez dans quelques instants. Si le problème persiste, contactez E-IMMO.",
       };
     case "validation":
       return {
-        title: "Validation Error",
-        description: "The data provided is invalid or incomplete.",
-        suggestion: "Please check your input and try again.",
+        title: "Erreur de validation",
+        description: "Les informations fournies sont invalides ou incomplètes.",
+        suggestion: "Vérifiez les informations saisies puis réessayez.",
       };
     default:
       return {
-        title: "Something Went Wrong",
-        description: error.message || "An unexpected error occurred while processing your request.",
-        suggestion: "Try refreshing the page or going back to the previous page.",
+        title: "Une erreur est survenue",
+        description: error.message || "Une erreur inattendue est survenue pendant le traitement de votre demande.",
+        suggestion: "Actualisez la page ou revenez à la page précédente.",
       };
   }
 }
@@ -111,23 +111,6 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   const errorInfo = getErrorMessage(errorType, error);
   const ErrorIcon = getErrorIcon(errorType);
 
-  useEffect(() => {
-    // Log error to console in development
-    if (process.env.NODE_ENV === "development") {
-      console.error("Application Error:", {
-        message: error.message,
-        stack: error.stack,
-        digest: error.digest,
-        type: errorType,
-      });
-    }
-
-    // Log error to monitoring service in production
-    if (process.env.NODE_ENV === "production") {
-      // TODO: Send to error monitoring service (e.g., Sentry, LogRocket)
-      console.error("Error digest:", error.digest);
-    }
-  }, [error, errorType]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-muted/20">
@@ -163,7 +146,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             <Alert className="border-destructive/50 bg-destructive/5">
               <AlertCircle className="h-4 w-4 text-destructive" />
               <AlertDescription className="text-sm">
-                <strong>Suggestion:</strong> {errorInfo.suggestion}
+                <strong>Suggestion :</strong> {errorInfo.suggestion}
               </AlertDescription>
             </Alert>
 
@@ -171,12 +154,12 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             {process.env.NODE_ENV === "development" && (
               <details className="mt-4">
                 <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Technical Details (Development Mode)
+                  Détails techniques (mode développement)
                 </summary>
                 <div className="mt-3 p-4 bg-muted/50 rounded-lg border border-border">
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span className="font-semibold">Error Type:</span>{" "}
+                      <span className="font-semibold">Type d’erreur :</span>{" "}
                       <code className="px-2 py-1 bg-background rounded text-xs">
                         {errorType}
                       </code>
@@ -197,7 +180,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                     )}
                     {error.stack && (
                       <div className="mt-3">
-                        <span className="font-semibold">Stack Trace:</span>
+                        <span className="font-semibold">Trace technique :</span>
                         <pre className="mt-2 p-3 bg-background rounded text-xs overflow-auto max-h-48 border border-border">
                           {error.stack}
                         </pre>
@@ -212,10 +195,10 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             {process.env.NODE_ENV === "production" && error.digest && (
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">
-                  Error Reference: <code className="font-mono">{error.digest}</code>
+                  Référence de l’erreur : <code className="font-mono">{error.digest}</code>
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Please include this reference when contacting support.
+                  Indiquez cette référence lorsque vous contactez E-IMMO.
                 </p>
               </div>
             )}
@@ -246,14 +229,14 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                 className="gap-2"
               >
                 <Home className="size-4" />
-                Go Home
+                Accueil
               </Button>
             </div>
 
             {/* Help Section */}
             <div className="pt-6 border-t border-border/50 text-center">
               <p className="text-sm text-muted-foreground mb-3">
-                Need help? Here are some options:
+                Besoin d’aide ? Voici les options disponibles :
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Button
@@ -262,7 +245,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                   size="sm"
                   className="text-xs"
                 >
-                  <a href="/docs">View Documentation</a>
+                  <a href="/docs">Voir la documentation</a>
                 </Button>
                 <Button
                   asChild
@@ -270,7 +253,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                   size="sm"
                   className="text-xs"
                 >
-                  <a href="/dashboard">Go to Dashboard</a>
+                  <a href="/dashboard">Tableau de bord</a>
                 </Button>
                 <Button
                   asChild
@@ -278,7 +261,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
                   size="sm"
                   className="text-xs"
                 >
-                  <a href="mailto:support@propertypro.com">Contact Support</a>
+                  <a href="mailto:contact@e-immo.bj">Contacter E-IMMO</a>
                 </Button>
               </div>
             </div>

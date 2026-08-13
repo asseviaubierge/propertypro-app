@@ -149,7 +149,7 @@ export default function EditMaintenanceRequestPage() {
                   propertyName:
                     tenant.propertyId?.name ||
                     tenant.currentLeaseId?.propertyId?.name ||
-                    "No Property",
+                    "Aucune propriété",
                 }))
             : [];
           setTenants(mappedTenants);

@@ -383,7 +383,7 @@ export default function ApplicationDetailsPage() {
             <p className="text-muted-foreground">
               {application.reviewedBy
                 ? `${application.reviewedBy.firstName || ""} ${application.reviewedBy.lastName || ""}`.trim()
-                : "No reviewer"}
+                : "Aucun vérificateur"}
             </p>
           </CardContent>
         </Card>

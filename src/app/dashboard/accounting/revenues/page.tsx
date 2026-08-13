@@ -239,7 +239,7 @@ export default function RevenuesPage() {
     <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+        <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
           {t("nav.accounting.revenues", { defaultValue: "Revenus" })}
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base">

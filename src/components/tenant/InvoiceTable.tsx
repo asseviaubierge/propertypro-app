@@ -6,6 +6,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -89,6 +90,7 @@ export default function InvoiceTable({
   className,
 }: InvoiceTableProps) {
   const { t } = useLocalizationContext();
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(ITEMS_PER_PAGE);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -181,10 +183,16 @@ export default function InvoiceTable({
   };
 
   const handleAction = (action: string, invoice: Invoice) => {
-    if (action === "view-details") {
-      setSelectedInvoice(invoice);
-      setShowDetailsDialog(true);
-    } else if (onInvoiceAction) {
+    if (
+      action === "view-details" ||
+      action === "download-pdf" ||
+      action === "print"
+    ) {
+      router.push(`/dashboard/accounting/invoices/${invoice._id}`);
+      return;
+    }
+
+    if (onInvoiceAction) {
       onInvoiceAction(action, invoice);
     }
   };

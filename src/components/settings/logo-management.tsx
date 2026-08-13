@@ -567,7 +567,7 @@ export function LogoManagement({
                 variant="outline"
                 onClick={() => setShowAddForm(!showAddForm)}
               >
-                {showAddForm ? "Cancel" : "Add Setting"}
+                {showAddForm ? "Annuler" : "Add Setting"}
               </Button>
             </div>
           </CardHeader>

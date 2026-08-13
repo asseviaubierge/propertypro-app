@@ -19,7 +19,7 @@ export interface LoadingStateProps {
 }
 
 export function LoadingSpinner({
-  message = "Loading...",
+  message = "Chargement...",
   size = "md",
   variant = "spinner",
   className,
@@ -98,10 +98,10 @@ export interface LoadingCardProps {
 }
 
 export function LoadingCard({
-  title = "Loading",
+  title = "Chargement",
   message = "Please wait while we process your request...",
   onCancel,
-  cancelText = "Cancel",
+  cancelText = "Annuler",
   className,
 }: LoadingCardProps) {
   return (
@@ -264,7 +264,7 @@ export function LoadingButton({
   return (
     <Button disabled={loading || disabled} className={className} {...props}>
       {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-      {loading ? loadingText || "Loading..." : children}
+      {loading ? loadingText || "Chargement..." : children}
     </Button>
   );
 }

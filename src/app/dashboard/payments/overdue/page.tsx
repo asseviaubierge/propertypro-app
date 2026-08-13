@@ -437,7 +437,7 @@ export default function OverduePaymentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-2">
             <AlertTriangle className="h-8 w-8 text-red-600" />
             {t("payments.overdue.header.title")}
           </h1>
@@ -629,10 +629,10 @@ export default function OverduePaymentsPage() {
               emptyState={{
                 icon: <FileText className="h-12 w-12 text-muted-foreground" />,
                 title: t("payments.overdue.empty.title", {
-                  defaultValue: "No payments found",
+                  defaultValue: "Aucun paiement trouvé",
                 }),
                 description: t("payments.overdue.empty.description", {
-                  defaultValue: "No payments match your current filters.",
+                  defaultValue: "Aucun paiement ne correspond aux filtres actuels.",
                 }),
               }}
               striped

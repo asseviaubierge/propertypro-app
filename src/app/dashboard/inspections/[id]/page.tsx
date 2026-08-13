@@ -472,11 +472,11 @@ export default function InspectionDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold tracking-tight">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="min-w-0">
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
                 {t("inspections.labels.typeInspection", {
                   values: { type: getTypeLabel(inspection.type) },
                 })}
@@ -495,9 +495,9 @@ export default function InspectionDetailPage() {
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {isAdmin && (
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               {/* Status action buttons */}
               {inspection.status === "scheduled" && (
                 <Button
@@ -582,7 +582,7 @@ export default function InspectionDetailPage() {
               </DropdownMenu>
             </div>
           )}
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
+          <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("inspections.details.actions.back")}
           </Button>
@@ -614,8 +614,8 @@ export default function InspectionDetailPage() {
           {/* Inspection Items by Room */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                   <CardTitle>{t("inspections.details.sections.items")}</CardTitle>
                   <CardDescription>
                     {t("inspections.details.sections.itemsDescription", {
@@ -630,6 +630,7 @@ export default function InspectionDetailPage() {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="w-full whitespace-nowrap sm:w-auto"
                     onClick={() => setShowAddItemDialog(true)}
                   >
                     <Plus className="h-4 w-4 mr-1" />

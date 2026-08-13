@@ -285,7 +285,7 @@ export default function PaymentDetailsPage({
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2"></div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-2">
             <CreditCard className="h-8 w-8" />
             {t("payments.detail.header.title")}
           </h1>
@@ -583,7 +583,7 @@ export default function PaymentDetailsPage({
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

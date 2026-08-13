@@ -123,9 +123,10 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       setUsersError(null);
       const response = await fetch("/api/conversations/contacts?limit=100");
       if (!response.ok) {
-        const message = await response.text();
+        const errorPayload = await response.json().catch(() => null);
         throw new Error(
-          message || `Impossible de charger les participants (${response.status})`
+          errorPayload?.error ||
+            `Impossible de charger les participants (${response.status})`
         );
       }
 
@@ -171,9 +172,10 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       setPropertiesError(null);
       const response = await fetch("/api/conversations/properties");
       if (!response.ok) {
-        const message = await response.text();
+        const errorPayload = await response.json().catch(() => null);
         throw new Error(
-          message || `Impossible de charger les propriétés (${response.status})`
+          errorPayload?.error ||
+            `Impossible de charger les propriétés (${response.status})`
         );
       }
 
@@ -275,10 +277,11 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
 
       onOpenChange(false);
     } catch (error) {
+      const technicalMessage = error instanceof Error ? error.message : "";
       setSubmissionError(
-        error instanceof Error
-          ? error.message
-          : t("messages.newConversation.failedToCreate")
+        technicalMessage.includes("Maximum call stack")
+          ? "Impossible de créer la conversation pour le moment. Réessayez."
+          : technicalMessage || t("messages.newConversation.failedToCreate")
       );
     } finally {
       setLoading(false);
@@ -524,7 +527,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                       {user.firstName} {user.lastName}
                     </div>
                     <div className="text-sm text-gray-500">
-                      {user.email} • {user.role}
+                      {user.email} • {user.role === "tenant" ? "Locataire" : user.role === "manager" ? "Gestionnaire" : user.role === "admin" || user.role === "super_admin" ? "Super Admin" : user.role}
                     </div>
                   </div>
                   {isSelected && <Check className="h-5 w-5 text-blue-500" />}

@@ -78,65 +78,145 @@ export const POST = withPermissionAndDB("profile_management")(
   async (user, request: NextRequest, context?: { tenantProfile?: any }) => {
     const access = await resolveAccessProfile(user.role);
     const body = await request.json().catch(() => null);
+
     if (!body || !["individual", "group"].includes(body.type)) {
       return createErrorResponse("Type de conversation invalide", 400);
     }
 
-    const requested = Array.isArray(body.participants) ? body.participants.map(String) : [];
+    const requested = Array.isArray(body.participants)
+      ? body.participants.map(String).filter(Boolean)
+      : [];
     const participants = [...new Set([String(user.id), ...requested])];
+
     if (body.type === "individual" && participants.length !== 2) {
-      return createErrorResponse("Une conversation individuelle doit avoir exactement deux participants", 400);
+      return createErrorResponse(
+        "Une conversation individuelle doit avoir exactement deux participants",
+        400
+      );
     }
     if (body.type === "group" && participants.length < 2) {
       return createErrorResponse("Ajoutez au moins un participant", 400);
     }
-    if (!(await validateConversationParticipants({ ...access, id: String(user.id) }, participants))) {
-      return createErrorResponse("Un ou plusieurs participants sont hors de votre périmètre", 403);
+
+    if (
+      !(await validateConversationParticipants(
+        { ...access, id: String(user.id) },
+        participants
+      ))
+    ) {
+      return createErrorResponse(
+        "Vous ne pouvez communiquer qu’avec les contacts autorisés de votre espace E-IMMO.",
+        403
+      );
     }
 
+    const participantObjectIds = participants.map(
+      (participantId) => new Types.ObjectId(participantId)
+    );
+
+    // Sécurité supplémentaire : seuls Super Admin, Gestionnaires et Locataires
+    // peuvent participer à la messagerie E-IMMO.
+    const activeUsers = await User.find({
+      _id: { $in: participantObjectIds },
+      role: { $in: ["admin", "super_admin", "manager", "tenant"] },
+      isActive: true,
+      deletedAt: null,
+    })
+      .select("_id role")
+      .lean();
+
+    if (activeUsers.length !== participants.length) {
+      return createErrorResponse(
+        "Un participant n’est pas autorisé à utiliser cette conversation.",
+        400
+      );
+    }
+
+    let propertyObjectId: Types.ObjectId | undefined;
     if (body.propertyId) {
-      if (!Types.ObjectId.isValid(String(body.propertyId))) return createErrorResponse("Identifiant de bien invalide", 400);
+      if (!Types.ObjectId.isValid(String(body.propertyId))) {
+        return createErrorResponse("Identifiant de bien invalide", 400);
+      }
       if (!access.isAdmin) {
         const allowed = access.isTenant
-          ? Boolean(await Lease.exists({
-              tenantId: { $in: [String(user.id), context?.tenantProfile?._id].filter(Boolean) },
-              propertyId: body.propertyId,
-              deletedAt: null,
-            }))
-          : await canAccessProperty({ ...access, id: String(user.id) }, body.propertyId);
-        if (!allowed) return createErrorResponse("Accès refusé à ce bien", 403);
+          ? Boolean(
+              await Lease.exists({
+                tenantId: {
+                  $in: [String(user.id), context?.tenantProfile?._id].filter(Boolean),
+                },
+                propertyId: body.propertyId,
+                deletedAt: null,
+              })
+            )
+          : await canAccessProperty(
+              { ...access, id: String(user.id) },
+              body.propertyId
+            );
+        if (!allowed) {
+          return createErrorResponse("Accès refusé à ce bien", 403);
+        }
+      }
+      propertyObjectId = new Types.ObjectId(String(body.propertyId));
+    }
+
+    if (body.type === "individual") {
+      // Utilisation de la collection brute pour éviter les conversions récursives
+      // Mongoose observées lors de la création sur certaines données historiques.
+      const existing = await Conversation.collection.findOne({
+        type: "individual",
+        deletedAt: null,
+        "participants.userId": { $all: participantObjectIds },
+        participants: { $size: 2 },
+      } as any);
+
+      if (existing) {
+        return createSuccessResponse(
+          {
+            conversation: {
+              _id: String(existing._id),
+              id: String(existing._id),
+              type: existing.type,
+              name: existing.name,
+            },
+          },
+          "Conversation existante"
+        );
       }
     }
 
-    const activeUsers = await User.countDocuments({
-      _id: { $in: participants }, isActive: true, deletedAt: null,
-    });
-    if (activeUsers !== participants.length) return createErrorResponse("Participant introuvable ou inactif", 400);
-
-    if (body.type === "individual") {
-      const existing = await Conversation.findOne({
-        type: "individual",
-        deletedAt: null,
-        "participants.userId": { $all: participants },
-        participants: { $size: 2 },
-      }).populate("participants.userId", participantSelect);
-      if (existing) return createSuccessResponse({ conversation: existing }, "Conversation existante");
-    }
-
-    const conversation = await Conversation.create({
+    const now = new Date();
+    const creatorId = new Types.ObjectId(String(user.id));
+    const document = {
       type: body.type,
-      name: body.type === "group" ? String(body.name || "Nouvelle conversation").trim().slice(0, 100) : undefined,
-      description: body.description ? String(body.description).trim().slice(0, 500) : undefined,
-      propertyId: body.propertyId || undefined,
-      createdBy: user.id,
-      participants: participants.map((participantId) => ({
+      name:
+        body.type === "group"
+          ? String(body.name || "Nouvelle conversation").trim().slice(0, 100)
+          : undefined,
+      description: body.description
+        ? String(body.description).trim().slice(0, 500)
+        : undefined,
+      propertyId: propertyObjectId,
+      createdBy: creatorId,
+      participants: participantObjectIds.map((participantId) => ({
         userId: participantId,
-        role: participantId === String(user.id) ? "admin" : "member",
-        joinedAt: new Date(),
+        role:
+          participantId.toString() === creatorId.toString() ? "admin" : "member",
+        joinedAt: now,
         isActive: true,
-        permissions: participantId === String(user.id)
-          ? { canAddMembers: true, canRemoveMembers: true, canEditConversation: true, canDeleteMessages: true }
-          : { canAddMembers: false, canRemoveMembers: false, canEditConversation: false, canDeleteMessages: false },
+        permissions:
+          participantId.toString() === creatorId.toString()
+            ? {
+                canAddMembers: true,
+                canRemoveMembers: true,
+                canEditConversation: true,
+                canDeleteMessages: true,
+              }
+            : {
+                canAddMembers: false,
+                canRemoveMembers: false,
+                canEditConversation: false,
+                canDeleteMessages: false,
+              },
       })),
       settings: {
         allowFileSharing: true,
@@ -145,13 +225,34 @@ export const POST = withPermissionAndDB("profile_management")(
         autoDeleteMessages: false,
         requireApprovalForNewMembers: false,
       },
-      metadata: { totalMessages: 0, totalParticipants: participants.length, lastActivity: new Date() },
+      metadata: {
+        totalMessages: 0,
+        totalParticipants: participants.length,
+        lastActivity: now,
+      },
       isArchived: false,
       isPinned: false,
       tags: [],
-    });
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    await conversation.populate("participants.userId", participantSelect);
-    return createSuccessResponse({ conversation }, "Conversation créée");
+    const inserted = await Conversation.collection.insertOne(document as any);
+    const conversationId = String(inserted.insertedId);
+
+    // Réponse volontairement minimale et sérialisable. La liste est rechargée
+    // juste après par le client avec l'API GET normale.
+    return createSuccessResponse(
+      {
+        conversation: {
+          _id: conversationId,
+          id: conversationId,
+          type: body.type,
+          name: document.name,
+        },
+      },
+      "Conversation créée"
+    );
   }
 );

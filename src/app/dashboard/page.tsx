@@ -456,8 +456,8 @@ export default function DashboardPage() {
         loading: () => (
           <ResponsiveLayout>
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                   <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2" />
                   <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
                 </div>
@@ -561,10 +561,10 @@ export default function DashboardPage() {
     DashboardRevenueTrendRange,
     string
   > = {
-    "7d": "Daily financial performance (last 7 days)",
-    "30d": "Daily financial performance (last 30 days)",
+    "7d": "Performance financière quotidienne des 7 derniers jours",
+    "30d": "Performance financière quotidienne des 30 derniers jours",
     "12m": t("dashboard.charts.revenueExpenses.description"),
-    lastYear: `Monthly financial performance (${new Date().getFullYear() - 1})`,
+    lastYear: `Performance financière mensuelle (${new Date().getFullYear() - 1})`,
   };
   const revenueTrendDescription =
     revenueTrendDescriptionByRange[selectedTrendRange];
@@ -653,7 +653,7 @@ export default function DashboardPage() {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {getGreeting()}, {user?.firstName}!
           </h1>
           <p className="text-muted-foreground">
@@ -822,8 +822,8 @@ export default function DashboardPage() {
           {/* Revenue & Expenses Trends */}
           <Card className="hover-lift">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                   <CardTitle className="flex items-center gap-2">
                     <LineChart className="h-5 w-5 text-primary" />
                     {t("dashboard.charts.revenueExpenses.title")}
@@ -832,14 +832,14 @@ export default function DashboardPage() {
                     {revenueTrendDescription}
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="inline-flex items-center rounded-md border border-border bg-muted/30 p-1">
+                <div className="w-full sm:w-auto">
+                  <div className="grid w-full grid-cols-2 gap-1 rounded-md border border-border bg-muted/30 p-1 sm:inline-flex sm:w-auto">
                     {REVENUE_TREND_OPTIONS.map((option) => (
                       <button
                         key={option.value}
                         type="button"
                         onClick={() => setSelectedTrendRange(option.value)}
-                        className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                        className={`min-w-0 rounded px-2 py-1.5 text-center text-[10px] font-medium leading-tight sm:px-2.5 sm:py-1 sm:text-xs ${
                           selectedTrendRange === option.value
                             ? "bg-background text-foreground shadow-sm"
                             : "text-muted-foreground hover:text-foreground"
@@ -855,24 +855,28 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               {/* Legend */}
-              <div className="flex items-center gap-6 mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#10b981]"></div>
-                  <span className="text-sm text-muted-foreground">
-                    {t("dashboard.charts.revenueExpenses.legend.revenue")}
-                  </span>
-                  <span className="text-lg font-semibold">
+              <div className="grid grid-cols-2 gap-3 mb-4 sm:flex sm:items-center sm:gap-6">
+                <div className="min-w-0 rounded-lg bg-muted/30 p-2 sm:flex sm:items-center sm:gap-2 sm:bg-transparent sm:p-0">
+                  <div className="mb-1 flex min-w-0 items-center gap-1.5 sm:mb-0">
+                    <div className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#10b981]"></div>
+                    <span className="text-[10px] leading-tight text-muted-foreground sm:text-sm">
+                      {t("dashboard.charts.revenueExpenses.legend.revenue")}
+                    </span>
+                  </div>
+                  <div className="whitespace-nowrap text-sm font-bold text-foreground sm:text-lg">
                     {formatCurrency(chartRevenueValue)}
-                  </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
-                  <span className="text-sm text-muted-foreground">
-                    {t("dashboard.charts.revenueExpenses.legend.expenses")}
-                  </span>
-                  <span className="text-lg font-semibold">
+                <div className="min-w-0 rounded-lg bg-muted/30 p-2 sm:flex sm:items-center sm:gap-2 sm:bg-transparent sm:p-0">
+                  <div className="mb-1 flex min-w-0 items-center gap-1.5 sm:mb-0">
+                    <div className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#f59e0b]"></div>
+                    <span className="text-[10px] leading-tight text-muted-foreground sm:text-sm">
+                      {t("dashboard.charts.revenueExpenses.legend.expenses")}
+                    </span>
+                  </div>
+                  <div className="whitespace-nowrap text-sm font-bold text-foreground sm:text-lg">
                     {formatCurrency(chartExpenseValue)}
-                  </span>
+                  </div>
                 </div>
               </div>
 
@@ -986,14 +990,14 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
                 {/* Net Income */}
-                <div className="text-center p-4 rounded-lg bg-muted/50">
+                <div className="min-w-0 rounded-lg bg-muted/50 p-3 text-center sm:p-4">
                   <div className="text-xs text-muted-foreground mb-1">
                     {t("dashboard.financialSummary.netIncome")}
                   </div>
                   <div
-                    className={`text-xl font-bold ${
+                    className={`whitespace-nowrap text-base font-bold sm:text-xl ${
                       netIncome >= 0 ? "text-success" : "text-error"
                     }`}
                   >
@@ -1005,11 +1009,11 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Outstanding */}
-                <div className="text-center p-4 rounded-lg bg-muted/50">
+                <div className="min-w-0 rounded-lg bg-muted/50 p-3 text-center sm:p-4">
                   <div className="text-xs text-muted-foreground mb-1">
                     {t("dashboard.financialSummary.outstanding")}
                   </div>
-                  <div className="text-xl font-bold text-warning">
+                  <div className="whitespace-nowrap text-base font-bold text-warning sm:text-xl">
                     {formatCurrency(outstandingAmount)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
@@ -1023,12 +1027,12 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Month-over-Month */}
-                <div className="text-center p-4 rounded-lg bg-muted/50">
+                <div className="min-w-0 rounded-lg bg-muted/50 p-3 text-center sm:p-4">
                   <div className="text-xs text-muted-foreground mb-1">
                     {t("dashboard.financialSummary.monthOverMonth")}
                   </div>
                   <div
-                    className={`text-xl font-bold flex items-center justify-center gap-1 ${
+                    className={`flex items-center justify-center gap-1 whitespace-nowrap text-base font-bold sm:text-xl ${
                       revenueChangePercent >= 0 ? "text-success" : "text-error"
                     }`}
                   >
@@ -1107,7 +1111,7 @@ export default function DashboardPage() {
                       <div className="text-xs text-muted-foreground">
                         {t("dashboard.charts.propertyDistribution.total")}
                       </div>
-                      <div className="text-2xl font-bold">
+                      <div className="text-xl font-bold">
                         {overview?.totalProperties ?? 0}
                       </div>
                     </div>
@@ -1164,7 +1168,7 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <div className="text-center p-3 bg-warning/10 rounded-lg">
-                    <div className="text-lg font-bold text-warning">
+                    <div className="text-base font-bold text-warning">
                       {formatCurrency(payments?.pending ?? 0)}
                     </div>
                     <div className="text-xs text-muted-foreground">
@@ -1172,7 +1176,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   <div className="text-center p-3 bg-error/10 rounded-lg">
-                    <div className="text-lg font-bold text-error">
+                    <div className="text-base font-bold text-error">
                       {formatCurrency(payments?.overdue ?? 0)}
                     </div>
                     <div className="text-xs text-muted-foreground">

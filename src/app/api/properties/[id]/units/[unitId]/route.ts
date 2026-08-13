@@ -252,6 +252,18 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Suppression d'une unité réservée au Super Administrateur.
+    const deleteAccessProfile = await resolveAccessProfile(session.user.role);
+    if (deleteAccessProfile.systemRole !== UserRole.ADMIN) {
+      return NextResponse.json(
+        {
+          error:
+            "Suppression réservée au Super Administrateur afin de préserver l'historique et les preuves",
+        },
+        { status: 403 }
+      );
+    }
+
     await connectDB();
 
     // Await params before using its properties

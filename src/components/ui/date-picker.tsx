@@ -2,6 +2,13 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DatePickerProps {
   date?: Date;
@@ -36,9 +43,6 @@ export function DatePicker({
 }: DatePickerProps) {
   const currentYear = new Date().getFullYear();
   const firstYear = Math.max(1920, fromYear || 1920);
-  // Les formulaires de naissance restent limités à l'année courante par défaut,
-  // mais les formulaires métier (baux, échéances, etc.) peuvent explicitement
-  // autoriser des années futures avec `toYear`.
   const requestedLastYear = toYear ?? currentYear;
   const lastYear = Math.max(firstYear, requestedLastYear);
 
@@ -71,55 +75,64 @@ export function DatePicker({
     const safeDay = Math.min(nextDay, daysInMonth(nextYear, nextMonth));
     if (safeDay !== nextDay) setDay(safeDay);
 
-    // Midi local évite le décalage d'un jour lors de la conversion ISO.
     const selected = new Date(nextYear, nextMonth - 1, safeDay, 12, 0, 0, 0);
     if (disabled?.(selected)) return;
     onSelect?.(selected);
   };
 
-  const selectClass = cn(
-    "h-11 min-w-0 rounded-md border-2 border-border/60 bg-background px-3 text-sm",
-    "focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20",
-    "disabled:cursor-not-allowed disabled:opacity-50"
+  const triggerClass = cn(
+    "h-10 min-w-0 bg-white px-2 text-xs sm:h-11 sm:px-3 sm:text-sm",
+    "[&_[data-slot=select-value]]:truncate"
   );
+  const contentClass = "z-[100] max-h-[min(18rem,var(--radix-select-content-available-height))] bg-white";
 
   return (
-    <div id={id} className={cn("grid w-full grid-cols-3 gap-2", className)} aria-label={placeholder}>
-      <select
-        className={selectClass}
-        value={day || ""}
-        onChange={(event) => emitDate(Number(event.target.value), month, year)}
-        aria-label="Jour"
+    <div
+      id={id}
+      className={cn("grid w-full min-w-0 grid-cols-3 gap-2", className)}
+      aria-label={placeholder}
+    >
+      <Select
+        value={day ? String(day) : undefined}
+        onValueChange={(value) => emitDate(Number(value), month, year)}
       >
-        <option value="">Jour</option>
-        {Array.from({ length: maxDays }, (_, index) => index + 1).map((value) => (
-          <option key={value} value={value}>{value}</option>
-        ))}
-      </select>
+        <SelectTrigger className={triggerClass} aria-label="Jour">
+          <SelectValue placeholder="Jour" />
+        </SelectTrigger>
+        <SelectContent className={contentClass} position="popper" sideOffset={4}>
+          {Array.from({ length: maxDays }, (_, index) => index + 1).map((value) => (
+            <SelectItem key={value} value={String(value)}>{value}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select
-        className={selectClass}
-        value={month || ""}
-        onChange={(event) => emitDate(day, Number(event.target.value), year)}
-        aria-label="Mois"
+      <Select
+        value={month ? String(month) : undefined}
+        onValueChange={(value) => emitDate(day, Number(value), year)}
       >
-        <option value="">Mois</option>
-        {MONTHS.map((label, index) => (
-          <option key={label} value={index + 1}>{label}</option>
-        ))}
-      </select>
+        <SelectTrigger className={triggerClass} aria-label="Mois">
+          <SelectValue placeholder="Mois" />
+        </SelectTrigger>
+        <SelectContent className={contentClass} position="popper" sideOffset={4}>
+          {MONTHS.map((label, index) => (
+            <SelectItem key={label} value={String(index + 1)}>{label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select
-        className={selectClass}
-        value={year || ""}
-        onChange={(event) => emitDate(day, month, Number(event.target.value))}
-        aria-label="Année"
+      <Select
+        value={year ? String(year) : undefined}
+        onValueChange={(value) => emitDate(day, month, Number(value))}
       >
-        <option value="">Année</option>
-        {years.map((value) => (
-          <option key={value} value={value}>{value}</option>
-        ))}
-      </select>
+        <SelectTrigger className={triggerClass} aria-label="Année">
+          <SelectValue placeholder="Année" />
+        </SelectTrigger>
+        <SelectContent className={contentClass} position="popper" sideOffset={4}>
+          {years.map((value) => (
+            <SelectItem key={value} value={String(value)}>{value}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

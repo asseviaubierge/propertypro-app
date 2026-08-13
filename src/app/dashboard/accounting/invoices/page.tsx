@@ -266,6 +266,26 @@ export default function FacturesPage() {
 
         if (data?.success) {
           const allInv: Facture[] = data.data?.invoices || [];
+
+          // Source unique de vérité : les cartes et la liste utilisent le même
+          // périmètre d'accès renvoyé par /api/invoices. Ainsi, si le Manager
+          // voit 7 factures dans les compteurs, ces 7 factures existent bien
+          // dans son jeu de données et sont affichables dans la liste.
+          setStats({
+            total: allInv.length,
+            scheduled: allInv.filter((inv) => inv.status === "scheduled").length,
+            issued: allInv.filter((inv) => inv.status === "issued").length,
+            paid: allInv.filter((inv) => inv.status === "paid").length,
+            partial: allInv.filter((inv) => inv.status === "partial").length,
+            overdue: allInv.filter((inv) => inv.status === "overdue").length,
+            cancelled: allInv.filter((inv) => inv.status === "cancelled").length,
+            totalAmount: allInv.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0),
+            paidAmount: allInv.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0),
+            overdueAmount: allInv
+              .filter((inv) => inv.status === "overdue")
+              .reduce((sum, inv) => sum + (inv.balanceRemaining || 0), 0),
+          });
+
           const search = (activeFilters.search || "").toLowerCase().trim();
           const filtered = allInv.filter((inv) => {
             const matchesStatus =
@@ -371,11 +391,35 @@ export default function FacturesPage() {
 
         params.set("page", "1");
         params.set("limit", "1000");
+        // La page Factures doit afficher toutes les factures du périmètre du compte,
+        // y compris les factures déjà payées. Les compteurs sont calculés depuis
+        // exactement ce même jeu de données afin d'éviter toute incohérence.
+        params.set("includeSettled", "true");
         const response = await fetch(`/api/invoices?${params}`);
         const data = await response.json();
 
         if (data?.success) {
           const allInv: Facture[] = data.data?.invoices || [];
+
+          // Source unique de vérité : les cartes et la liste utilisent le même
+          // périmètre d'accès renvoyé par /api/invoices. Ainsi, si le Manager
+          // voit 7 factures dans les compteurs, ces 7 factures existent bien
+          // dans son jeu de données et sont affichables dans la liste.
+          setStats({
+            total: allInv.length,
+            scheduled: allInv.filter((inv) => inv.status === "scheduled").length,
+            issued: allInv.filter((inv) => inv.status === "issued").length,
+            paid: allInv.filter((inv) => inv.status === "paid").length,
+            partial: allInv.filter((inv) => inv.status === "partial").length,
+            overdue: allInv.filter((inv) => inv.status === "overdue").length,
+            cancelled: allInv.filter((inv) => inv.status === "cancelled").length,
+            totalAmount: allInv.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0),
+            paidAmount: allInv.reduce((sum, inv) => sum + (inv.amountPaid || 0), 0),
+            overdueAmount: allInv
+              .filter((inv) => inv.status === "overdue")
+              .reduce((sum, inv) => sum + (inv.balanceRemaining || 0), 0),
+          });
+
           const search = (activeFilters.search || "").toLowerCase().trim();
           const filtered = allInv.filter((inv) => {
             const matchesStatus =
@@ -454,32 +498,10 @@ export default function FacturesPage() {
   };
 
   const fetchStats = async () => {
-    try {
-      // Skip fetching stats for tenants - already fetched with invoices
-      if (isTenant) {
-        return;
-      }
-
-      const params = new URLSearchParams();
-      if (filters.propertyId)
-        params.append("propertyId", String(filters.propertyId));
-      if (filters.tenantId) params.append("tenantId", String(filters.tenantId));
-      if (filters.leaseId) params.append("leaseId", String(filters.leaseId));
-      const url = `/api/invoices/stats${
-        params.toString() ? `?${params.toString()}` : ""
-      }`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data?.success && data?.data) {
-        setStats((prev) => ({
-          ...prev,
-          ...(data?.data || {}),
-        }));
-      }
-    } catch (error) {
-      // Failed to fetch invoice stats
-    }
+    // Les statistiques de cette page sont volontairement calculées dans
+    // fetchInvoices() depuis le même jeu de factures que la liste.
+    // Ne pas réintroduire ici une seconde API de statistiques avec un scope différent.
+    return;
   };
 
   const handleSearch = (value: string) => {
@@ -1036,9 +1058,9 @@ export default function FacturesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {isTenant
               ? t("invoices.header.myTitle", {
                   defaultValue: "Mes factures",
@@ -1058,10 +1080,11 @@ export default function FacturesPage() {
                 })}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
+            className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
             onClick={() => {
               fetchFactures(filters, true);
               fetchStats();
@@ -1079,6 +1102,7 @@ export default function FacturesPage() {
               <Button
                 variant="outline"
                 size="sm"
+                className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
                 onClick={handleProcessLateFees}
               >
                 <AlertTriangle className="mr-2 h-4 w-4" />
@@ -1086,6 +1110,7 @@ export default function FacturesPage() {
               </Button>
               <Button
                 size="sm"
+                className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
                 onClick={() =>
                   router.push("/dashboard/accounting/invoices/new")
                 }
@@ -1168,7 +1193,7 @@ export default function FacturesPage() {
             title={t("leases.invoices.stats.issued")}
             value={stats.issued}
             description={t("leases.invoices.stats.issuedDescription", {
-              defaultValue: "Sent and awaiting payment",
+              defaultValue: "Émises et en attente de paiement",
             })}
             icon={Send}
             iconColor="info"

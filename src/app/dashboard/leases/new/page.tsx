@@ -13,9 +13,9 @@ export default function NewLeasePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("leases.new.header.title")}
           </h1>
           <p className="text-muted-foreground">
@@ -26,7 +26,7 @@ export default function NewLeasePage() {
           variant="outline"
           size="sm"
           onClick={() => router.back()}
-          className="flex items-center gap-2"
+          className="w-full justify-center gap-2 whitespace-nowrap sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("leases.new.header.backButton")}

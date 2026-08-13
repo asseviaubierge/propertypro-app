@@ -25,14 +25,9 @@ import {
   CreditCard,
   FileText,
 } from "lucide-react";
-import {
-  downloadInvoiceAsPDF,
-  generateInvoiceHTML,
-  resolveInvoiceLogo,
-  type PrintableInvoice,
-} from "@/lib/invoice-print";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { normalizeInvoiceForPrint } from "@/lib/invoice/invoice-shared";
+import { UnifiedInvoiceDocument } from "@/components/invoices/UnifiedInvoiceDocument";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import PaymentRecordDialog from "@/components/invoice/PaymentRecordDialog";
 import { showSimpleError, showSimpleSuccess } from "@/lib/toast-notifications";
@@ -75,7 +70,33 @@ interface Facture {
     _id: string;
     startDate: string;
     endDate: string;
+    status?: string;
+    unitId?: string;
     terms: { rentAmount: number };
+  } | null;
+  issuer?: {
+    _id?: string;
+    firstName?: string;
+    lastName?: string;
+    businessName?: string;
+    accountType?: string;
+    role?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    website?: string;
+    businessLogo?: string;
+    cip?: string;
+    ifu?: string;
+    rccm?: string;
+  } | null;
+  platform?: { name: string; displayName: string };
+  unit?: {
+    _id?: string;
+    unitNumber?: string;
+    unitType?: string;
+    floor?: number;
   } | null;
   issueDate: string;
   dueDate: string;
@@ -158,66 +179,14 @@ export default function InvoiceDetailsPage() {
   const invoiceId = params.id as string;
 
   const [invoice, setInvoice] = useState<Facture | null>(null);
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [collectOpen, setCollectOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const preparePrintableInvoice =
-  useCallback(async (): Promise<PrintableInvoice> => {
-    if (!invoice) throw new Error("Facture data not loaded");
-
-    const { getCompanyInfo } = await import("@/lib/utils/company-info");
-
-    const fallback = await getCompanyInfo();
-
-    const owner = (invoice.propertyId as any)?.ownerId;
-
-    const ownerCompany =
-      owner && typeof owner === "object"
-        ? {
-            name:
-              owner.businessName ||
-              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
-
-            address:
-              typeof invoice.propertyId?.address === "string"
-                ? invoice.propertyId.address
-                : invoice.propertyId?.address
-                  ? [
-                      invoice.propertyId.address.street,
-                      invoice.propertyId.address.city,
-                      invoice.propertyId.address.state,
-                      invoice.propertyId.address.zipCode,
-                    ]
-                      .filter(Boolean)
-                      .join(", ")
-                  : "",
-
-            phone: owner.phone || "",
-            email: owner.email || "",
-            logo: owner.businessLogo || "",
-            cip: owner.cip || "",
-            ifu: owner.ifu || "",
-            rccm: owner.rccm || "",
-          }
-        : undefined;
-
-    const normalized = normalizeInvoiceForPrint(invoice, {
-      companyInfo: ownerCompany ?? fallback ?? undefined,
-    });
-
-    return (await resolveInvoiceLogo(normalized)) as PrintableInvoice;
-  }, [invoice]);
-
   useEffect(() => {
     if (!invoiceId) return;
     fetchFactureDetails();
-    (async () => {
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      setCompanyInfo(await getCompanyInfo());
-    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId]);
 
@@ -301,31 +270,27 @@ export default function InvoiceDetailsPage() {
     if (!invoice) return;
     setActionLoading("print");
     try {
-      const printable = await preparePrintableInvoice();
-      const previewWindow = window.open("", "_blank", "width=900,height=700");
-      if (!previewWindow) throw new Error("Unable to open preview window");
-      const htmlContent = generateInvoiceHTML(printable);
-      previewWindow.document.open();
-      previewWindow.document.write(`<!DOCTYPE html>
-<html lang="${document.documentElement.lang || "en"}">
-  <head>
-    <meta charset="utf-8" />
-    <title>Facture ${printable.invoiceNumber}</title>
-    <style>
-      * { box-sizing: border-box; }
-      body { font-family: Arial, sans-serif; color: #111827; margin: 24px; background-color: #f9fafb; }
-    </style>
-  </head>
-  <body>${htmlContent}</body>
-</html>`);
-      previewWindow.document.close();
-      previewWindow.focus();
-      previewWindow.print();
-    } catch (error) {
-      console.error(error);
+      const response = await fetch(`/api/invoices/${invoice._id}/pdf`, {
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Impossible de préparer la facture");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const previewWindow = window.open(url, "_blank");
+      if (!previewWindow) {
+        URL.revokeObjectURL(url);
+        throw new Error("Impossible d’ouvrir l’aperçu");
+      }
+
+      previewWindow.onload = () => {
+        previewWindow.print();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+      };
+    } catch {
       showSimpleError(
-        "Échec de l'aperçu",
-        t("leases.invoices.details.toasts.previewError"),
+        "Échec de l'impression",
+        "Impossible de préparer la facture pour l’impression.",
       );
     } finally {
       setActionLoading(null);
@@ -336,18 +301,24 @@ export default function InvoiceDetailsPage() {
     if (!invoice) return;
     setActionLoading("download");
     try {
-      const printable = await preparePrintableInvoice();
-      await downloadInvoiceAsPDF(printable);
-      showSimpleSuccess(
-        "Téléchargement terminé",
-        t("leases.invoices.details.toasts.downloadSuccess"),
-      );
-    } catch (error) {
-      console.error(error);
-      showSimpleError(
-        "Échec du téléchargement",
-        t("leases.invoices.details.toasts.downloadError"),
-      );
+      const response = await fetch(`/api/invoices/${invoice._id}/pdf`, {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("Impossible de générer le PDF");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `facture-${invoice.invoiceNumber}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      showSimpleSuccess("Téléchargement terminé", "La facture PDF a été téléchargée.");
+    } catch {
+      showSimpleError("Échec du téléchargement", "Impossible de télécharger la facture PDF.");
     } finally {
       setActionLoading(null);
     }
@@ -399,10 +370,10 @@ export default function InvoiceDetailsPage() {
       });
       const data = await res.json();
       if (res.ok && data?.success) {
-        showSimpleSuccess("Facture Supprimerd", "");
+        showSimpleSuccess("Facture supprimée", "");
         router.push("/dashboard/accounting/invoices");
       } else {
-        throw new Error(data?.error || "Supprimer failed");
+        throw new Error(data?.error || "Échec de la suppression");
       }
     } catch {
       showSimpleError("Échec de la suppression", "Impossible de supprimer la facture.");
@@ -459,6 +430,56 @@ export default function InvoiceDetailsPage() {
     invoice.lineItems?.[0]?.description || invoice.propertyId?.name || "";
   const tenantPhone = invoice.tenantId?.phone || "";
   const tenantEmail = invoice.tenantId?.email || "";
+  const statusLabel: Record<string, string> = {
+    scheduled: "Planifiée",
+    issued: "Émise",
+    paid: "Payée",
+    partial: "Partiellement payée",
+    overdue: "En retard",
+    cancelled: "Annulée",
+    draft: "Brouillon",
+  };
+  const issuer = invoice.issuer;
+  const issuerName = issuer
+    ? `${issuer.firstName ?? ""} ${issuer.lastName ?? ""}`.trim() || issuer.businessName || ""
+    : "";
+  const issuerRoleRaw = (issuer?.role || issuer?.accountType || "").toLowerCase();
+  const issuerRole =
+    issuerRoleRaw === "manager" || issuerRoleRaw === "property_manager"
+      ? "Gestionnaire"
+      : issuerRoleRaw === "owner" || issuerRoleRaw === "direct_owner"
+        ? "Propriétaire direct"
+        : issuerRoleRaw === "agency"
+          ? "Agence immobilière"
+          : issuerRoleRaw === "admin" || issuerRoleRaw === "super_admin" || issuerRoleRaw === "e_immo"
+            ? "Gestion E-IMMO"
+            : issuerRoleRaw;
+
+  const displayInvoice = normalizeInvoiceForPrint(invoice, {
+    companyInfo: issuer
+      ? {
+          name: issuerName || "GESTION E-IMMO",
+          legalName:
+            issuer.businessName && issuer.businessName !== issuerName
+              ? issuer.businessName
+              : undefined,
+          address: [issuer.address, issuer.city].filter(Boolean).join(", "),
+          phone: issuer.phone || "",
+          email: issuer.email || "",
+          website: issuer.website || "",
+          logo: issuer.businessLogo || "",
+          accountType: issuer.accountType || issuer.role || "",
+          roleLabel: issuerRole,
+          cip: issuer.cip || "",
+          ifu: issuer.ifu || "",
+          rccm: issuer.rccm || "",
+          platformName: "E-IMMO",
+        } as any
+      : undefined,
+  });
+  if (invoice.unit?.unitNumber) {
+    (displayInvoice.property as any).unit = invoice.unit.unitNumber;
+  }
 
   return (
     <div className="mx-auto w-full max-w-4xl p-6 space-y-4">
@@ -473,7 +494,7 @@ export default function InvoiceDetailsPage() {
               variant="outline"
               className={`capitalize ${statusPillClasses(invoice.status)}`}
             >
-              {invoice.status || "unknown"}
+              {statusLabel[(invoice.status || "").toLowerCase()] || invoice.status || "Inconnu"}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -509,7 +530,7 @@ export default function InvoiceDetailsPage() {
           disabled={actionLoading === "download"}
         >
           <Download className="mr-2 h-4 w-4" />
-          Download
+          Télécharger
         </Button>
         <Button
           variant="outline"
@@ -543,7 +564,7 @@ export default function InvoiceDetailsPage() {
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Supprimer invoice?</AlertDialogTitle>
+              <AlertDialogTitle>Supprimer la facture ?</AlertDialogTitle>
               <AlertDialogDescription>
                 Cette action supprimera définitivement la facture {invoice.invoiceNumber}.
                 Cette action est irréversible.
@@ -576,7 +597,7 @@ export default function InvoiceDetailsPage() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-xs text-muted-foreground">Facture Total</p>
+          <p className="text-xs text-muted-foreground">Total de la facture</p>
           <p className="mt-1 text-2xl font-semibold">
             {formatCurrency(invoice.totalAmount ?? 0)}
           </p>
@@ -597,181 +618,9 @@ export default function InvoiceDetailsPage() {
         </div>
       </div>
 
-      {/* Facture document */}
-      <div className="rounded-lg border bg-card p-6 sm:p-8">
-        <div className="flex items-start justify-between">
-          <h2 className="text-2xl font-semibold">Facture</h2>
-          {companyInfo?.logo ? (
-            <div className="relative h-10 w-10 overflow-hidden rounded-md">
-              <Image
-                src={companyInfo.logo}
-                alt={companyInfo.name}
-                fill
-                sizes="40px"
-                className="object-contain"
-              />
-            </div>
-          ) : null}
-        </div>
-
-        <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 text-sm">
-          <dt className="font-medium">Facture number</dt>
-          <dd className="text-muted-foreground">{invoice.invoiceNumber}</dd>
-
-          <dt className="font-medium">Date d’émission</dt>
-          <dd className="text-muted-foreground">
-            {formatSafeDate(invoice.issueDate, formatDate)}
-          </dd>
-
-          <dt className="font-medium">Date d’échéance</dt>
-          <dd className="text-muted-foreground">
-            {formatSafeDate(invoice.dueDate, formatDate)}
-          </dd>
-
-          <dt className="font-medium">Statut</dt>
-          <dd>
-            <Badge
-              variant="outline"
-              className={`capitalize ${statusPillClasses(invoice.status)}`}
-            >
-              {invoice.status || "unknown"}
-            </Badge>
-          </dd>
-        </dl>
-
-        <div className="mt-6 h-px bg-border" />
-
-        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Facturé par
-            </p>
-            <div className="mt-2 space-y-0.5 text-sm">
-              <p className="font-semibold">
-                {(invoice.propertyId as any)?.ownerId?.businessName ||
-                 `${(invoice.propertyId as any)?.ownerId?.firstName ?? ""} ${(invoice.propertyId as any)?.ownerId?.lastName ?? ""}`.trim() ||
-                 "—"}
-              </p>
-              <p className="text-muted-foreground">
-                {formatAddress(invoice.propertyId?.address)}
-              </p>
-              {(invoice.propertyId as any)?.ownerId?.phone ? (
-                <p className="text-muted-foreground">
-                  {(invoice.propertyId as any).ownerId.phone}
-                </p>
-              ) : null}
-              {(invoice.propertyId as any)?.ownerId?.email ? (
-                <p className="text-muted-foreground">
-                  {(invoice.propertyId as any).ownerId.email}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Facturé à
-            </p>
-            <div className="mt-2 space-y-0.5 text-sm">
-              <p className="font-semibold">{tenantName}</p>
-              {tenantPhone ? (
-                <p className="text-muted-foreground">{tenantPhone}</p>
-              ) : null}
-              {tenantEmail ? (
-                <p className="text-muted-foreground">{tenantEmail}</p>
-              ) : null}
-              {invoice.propertyId ? (
-                <p className="text-muted-foreground">
-                  {invoice.propertyId?.name || "—"}
-                  {invoice.propertyId?.address
-                    ? ` — ${formatAddress(invoice.propertyId?.address)}`
-                    : ""}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <h3 className="text-sm font-semibold">Facture details</h3>
-          <div className="mt-3 overflow-x-auto rounded-md border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left">
-                  <th className="px-3 py-2 font-medium text-muted-foreground">
-                    #
-                  </th>
-                  <th className="px-3 py-2 font-medium text-muted-foreground">
-                    Description
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">
-                    Qté
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">
-                    Prix unitaire
-                  </th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.lineItems?.length ? (
-                  invoice.lineItems.map((item, idx) => {
-                    const qty = item.quantity ?? 1;
-                    const unitPrice = item.unitPrice ?? item.amount;
-                    return (
-                      <tr
-                        key={`${item?.description || "line-item"}-${idx}`}
-                        className="border-b last:border-b-0"
-                      >
-                        <td className="px-3 py-2 text-muted-foreground">
-                          {idx + 1}
-                        </td>
-                        <td className="px-3 py-2">{item?.description || "—"}</td>
-                        <td className="px-3 py-2 text-right">{qty}</td>
-                        <td className="px-3 py-2 text-right">
-                          {formatCurrency(unitPrice)}
-                        </td>
-                        <td className="px-3 py-2 text-right font-medium">
-                          {formatCurrency(item?.amount ?? 0)}
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-3 py-6 text-center text-muted-foreground"
-                    >
-                      Aucune ligne de facture
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4 flex justify-end">
-            <dl className="w-full max-w-xs space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Sous-total</dt>
-                <dd>{formatCurrency(invoice.subtotal ?? 0)}</dd>
-              </div>
-              {invoice.taxAmount ? (
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Taxe</dt>
-                  <dd>{formatCurrency(invoice.taxAmount)}</dd>
-                </div>
-              ) : null}
-              <div className="flex justify-between border-t pt-2 text-base font-semibold">
-                <dt>Total</dt>
-                <dd>{formatCurrency(invoice.totalAmount ?? 0)}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
+      {/* Document de facture unifié : même contenu pour écran, impression et PDF */}
+      <div className="bg-white px-2 py-6 sm:px-6">
+        <UnifiedInvoiceDocument invoice={displayInvoice} />
       </div>
 
       <PaymentRecordDialog

@@ -159,7 +159,7 @@ export default function LeaseManagementInvoicesPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               Invoice Management
             </h1>
             <p className="text-muted-foreground">

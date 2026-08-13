@@ -74,7 +74,7 @@ export function GlobalSearch({
   size = "md",
   showClearButton = true,
   minCharacters = 0,
-  ariaLabel = "Search",
+  ariaLabel = "Rechercher",
   onClear,
 }: GlobalSearchProps) {
   // Pass initialValue as externalValue to sync when parent resets the search

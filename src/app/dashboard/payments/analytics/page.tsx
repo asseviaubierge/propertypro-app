@@ -181,7 +181,7 @@ export default function PaymentAnalyticsPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-2">
             <BarChart3 className="h-8 w-8" />
             Payment Analytics
           </h1>

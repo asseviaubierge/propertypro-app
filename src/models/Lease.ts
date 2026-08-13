@@ -700,6 +700,13 @@ LeaseSchema.pre("save", async function (next) {
   next();
 });
 
+// Memorize the lease status transition for E-IMMO contract synchronization.
+LeaseSchema.pre("save", function (next) {
+  (this as any).$locals = (this as any).$locals || {};
+  (this as any).$locals.eimmoStatusChanged = this.isModified("status");
+  next();
+});
+
 // Post-save middleware to update unit status and handle payment cascades
 LeaseSchema.post("save", async function () {
   try {
@@ -731,6 +738,73 @@ LeaseSchema.post("save", async function () {
 
     // Save the property with updated unit information
     await property.save();
+
+    // E-IMMO contract portfolio event logging.
+    // Non bloquant : un problème de journalisation ne doit jamais casser le bail.
+    if ((this as any).$locals?.eimmoStatusChanged) {
+      try {
+        const { default: SubscriptionContract } = await import("./SubscriptionContract");
+        const { default: ContractPortfolioEvent } = await import("./ContractPortfolioEvent");
+
+        const accountIds = [
+          property.ownerId ? String(property.ownerId) : null,
+          property.managerId ? String(property.managerId) : null,
+        ].filter(Boolean);
+
+        const contracts = accountIds.length
+          ? await SubscriptionContract.find({
+              accountId: { $in: accountIds },
+              status: "active",
+              "mandateRules.leaseSyncEnabled": { $ne: false },
+            }).select("_id accountId mandateRules")
+          : [];
+
+        const eventTypeMap: Record<string, string> = {
+          active: "lease_activated",
+          terminated: "lease_terminated",
+          expired: "lease_expired",
+          renewed: "lease_renewed",
+        };
+
+        const eventType = eventTypeMap[String(this.status)];
+        if (eventType) {
+          const label =
+            eventType === "lease_activated"
+              ? "Bail activé"
+              : eventType === "lease_terminated"
+                ? "Bail résilié"
+                : eventType === "lease_expired"
+                  ? "Bail arrivé à expiration"
+                  : "Bail renouvelé";
+
+          for (const contract of contracts) {
+            const notify =
+              eventType === "lease_activated"
+                ? contract.mandateRules?.notifyOnLeaseActivation !== false
+                : eventType === "lease_terminated"
+                  ? contract.mandateRules?.notifyOnLeaseTermination !== false
+                  : eventType === "lease_expired"
+                    ? contract.mandateRules?.notifyOnLeaseExpiration !== false
+                    : true;
+
+            if (!notify) continue;
+
+            await ContractPortfolioEvent.create({
+              contractId: contract._id,
+              accountId: contract.accountId,
+              leaseId: this._id,
+              propertyId: this.propertyId,
+              tenantId: this.tenantId,
+              type: eventType,
+              message: `${label} — vérifier l'occupation, les paiements, la caution et la situation de l'unité.`,
+              occurredAt: new Date(),
+            });
+          }
+        }
+      } catch (contractSyncError) {
+        console.warn("Synchronisation contrat E-IMMO non bloquante :", contractSyncError);
+      }
+    }
 
     // Handle payment cascades for lease status changes
     if (this.isModified("status")) {

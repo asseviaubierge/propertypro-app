@@ -63,7 +63,7 @@ const createTicketFormSchema = (isTenantView: boolean) =>
     unitId: z.string().optional(),
     tenantId: isTenantView
       ? z.string().optional()
-      : z.string().min(1, "No tenant found for selected property/unit"),
+      : z.string().min(1, "Aucun locataire trouvé pour la propriété/unité sélectionnée"),
     attachments: z.array(z.string()).optional(),
   });
 

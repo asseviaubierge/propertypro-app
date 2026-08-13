@@ -63,10 +63,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  const user = session?.user;
+  const normalizedRole = String(user?.role || "").toLowerCase();
+  const isSuperAdmin = normalizedRole === "admin" || normalizedRole === "super_admin";
+  const isTenant = user?.role === "TENANT" || user?.role === "locataire";
+
   // Fermeture automatique instantanée de la modale dès que le chemin change (navigation fluide)
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     document.documentElement.classList.add("dashboard-layout");
@@ -76,6 +95,66 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       document.body.classList.remove("dashboard-layout");
     };
   }, []);
+
+  // Conservation des preuves E-IMMO :
+  // les actions de suppression ne sont visibles que par le Super Administrateur.
+  // Le contrôle serveur DELETE reste obligatoire en seconde barrière de sécurité.
+  useEffect(() => {
+    if (status !== "authenticated" || isSuperAdmin) return;
+
+    const hideDeleteActions = (rootNode: ParentNode = document) => {
+      const candidates = rootNode.querySelectorAll<HTMLElement>(
+        'button, [role="menuitem"], a, [data-radix-collection-item]'
+      );
+
+      candidates.forEach((element) => {
+        const text = (element.textContent || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .trim();
+
+        const ariaLabel = (element.getAttribute("aria-label") || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+
+        const hasTrashIcon = Boolean(
+          element.querySelector(
+            'svg.lucide-trash, svg.lucide-trash-2, [data-lucide="trash"], [data-lucide="trash-2"]'
+          )
+        );
+
+        const isDeleteAction =
+          hasTrashIcon ||
+          /\b(supprimer|suppression|delete|deleting|deleted)\b/.test(text) ||
+          /\b(supprimer|suppression|delete)\b/.test(ariaLabel);
+
+        if (isDeleteAction && !element.dataset.eimmoDeleteHidden) {
+          element.dataset.eimmoDeleteHidden = "true";
+          element.dataset.eimmoPreviousDisplay = element.style.display || "";
+          element.style.setProperty("display", "none", "important");
+        }
+      });
+    };
+
+    hideDeleteActions();
+
+    const observer = new MutationObserver(() => hideDeleteActions());
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      document
+        .querySelectorAll<HTMLElement>('[data-eimmo-delete-hidden="true"]')
+        .forEach((element) => {
+          element.style.display = element.dataset.eimmoPreviousDisplay || "";
+          delete element.dataset.eimmoDeleteHidden;
+          delete element.dataset.eimmoPreviousDisplay;
+        });
+    };
+  }, [status, isSuperAdmin]);
+
 
   if (status === "loading") {
     return (
@@ -88,9 +167,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   if (status === "unauthenticated") {
     redirect("/auth/signin");
   }
-
-  const user = session?.user;
-  const isTenant = user?.role === "TENANT" || user?.role === "locataire";
 
   // Bottom Navigation : Gestionnaire / Propriétaire (Réparation)
   const mobileNavItems = [
@@ -123,28 +199,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="flex h-screen w-screen bg-background relative overflow-hidden">
       {/* MODAL DU BOUTON MENU */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden items-end">
-          <div 
-            className="fixed inset-0 bg-black/60" 
+        <div className="mobile-navigation-layer fixed inset-0 z-[80] md:hidden">
+          <button
+            type="button"
+            className="mobile-navigation-overlay absolute inset-0"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="Fermer le menu de navigation"
           />
-          <div className="relative w-full max-h-[85vh] bg-background rounded-t-2xl shadow-2xl flex flex-col z-50 overflow-hidden border-t border-border/40">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border/20 bg-muted/35">
-              <span className="font-semibold text-sm tracking-wide text-muted-foreground uppercase">
-                Menu de navigation
-              </span>
+          <aside
+            className="mobile-navigation-drawer absolute inset-y-0 left-0 flex w-[90vw] max-w-[340px] flex-col overflow-hidden bg-white shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu principal"
+          >
+            <div className="mobile-navigation-header flex shrink-0 items-center justify-between border-b px-5 py-4">
+              <div className="min-w-0">
+                <div className="text-[17px] font-extrabold tracking-tight text-slate-950">
+                  GESTION E-IMMO
+                </div>
+                <div className="mt-0.5 text-[11px] font-medium text-slate-600">
+                  Plateforme de gestion immobilière
+                </div>
+              </div>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="h-8 w-8 rounded-full"
+                className="h-10 w-10 shrink-0 rounded-full bg-white"
                 aria-label="Fermer le menu"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </Button>
             </div>
 
-            <div className="overflow-y-auto flex-1 p-4">
+            <div className="mobile-navigation-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white px-3 py-3">
               {isTenant ? (
                 <div className="space-y-1.5">
                   {tenantMenuItems.map((item) => {
@@ -169,13 +257,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   })}
                 </div>
               ) : (
-                <Sidebar 
-                  isCollapsed={false} 
-                  onNavigate={() => setIsMobileMenuOpen(false)} 
-                />
+                <div className="mobile-navigation-sidebar w-full bg-white">
+                  <Sidebar
+                    isCollapsed={false}
+                    hideHeader
+                    onNavigate={() => setIsMobileMenuOpen(false)}
+                  />
+                </div>
               )}
             </div>
-          </div>
+          </aside>
         </div>
       )}
 
@@ -195,7 +286,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               className="hidden md:inline-flex h-10 w-10 rounded-lg border border-border/50 bg-transparent hover:bg-transparent"
               onClick={() => setIsSidebarCollapsed((prev) => !prev)}
               aria-label={
-                isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+                isSidebarCollapsed ? "Déployer le menu latéral" : "Réduire le menu latéral"
               }
             >
               {isSidebarCollapsed ? (
@@ -266,7 +357,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Bottom Navigation moderne et tactile */}
-      <nav className="fixed bottom-0 left-0 right-0 h-[70px] bg-background/95 backdrop-blur-md border-t border-border/20 z-40 md:hidden flex items-center justify-around px-2 shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 h-[70px] bg-background border-t border-border/20 z-40 md:hidden flex items-center justify-around px-2 shadow-lg">
         {(isTenant ? tenantMobileNavItems : mobileNavItems).map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;

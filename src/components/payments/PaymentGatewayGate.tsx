@@ -40,7 +40,7 @@ export function PaymentGatewayGate({
         <AlertTitle>Online payments unavailable</AlertTitle>
         <AlertDescription>
           {isAdmin
-            ? "No payment gateway is configured yet. Add your credentials in Settings → Payments to start accepting online payments."
+            ? "Aucune passerelle de paiement n’est encore configurée. Ajoutez vos identifiants dans Paramètres → Paiements pour accepter les paiements en ligne."
             : "Online card payments aren’t available right now. Please contact your property manager to arrange payment."}
         </AlertDescription>
       </Alert>

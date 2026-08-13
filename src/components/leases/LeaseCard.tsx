@@ -264,12 +264,15 @@ export function LeaseCard({
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href={`/dashboard/leases/${lease._id}/invoice`}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Voir la facture
-                      </Link>
-                    </DropdownMenuItem>
+                    <LeaseInvoiceModal
+                      lease={lease}
+                      trigger={
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Voir la facture
+                        </DropdownMenuItem>
+                      }
+                    />
                     <DropdownMenuItem asChild>
                       <LeaseInvoiceModal
                         lease={lease}
@@ -449,12 +452,15 @@ export function LeaseCard({
                 Voir détails
               </Link>
             </Button>
-            <Button variant="outline" size="sm" className="w-full h-8 text-xs" asChild>
-              <Link href={`/dashboard/leases/${lease._id}/invoice`}>
-                <FileText className="mr-1.5 h-3.5 w-3.5" />
-                Facture
-              </Link>
-            </Button>
+            <LeaseInvoiceModal
+              lease={lease}
+              trigger={
+                <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                  <FileText className="mr-1.5 h-3.5 w-3.5" />
+                  Facture
+                </Button>
+              }
+            />
           </div>
           <LeaseInvoiceModal
             lease={lease}

@@ -329,5 +329,6 @@
   "tickets.form.noLeaseForProperty": "Aucun bail actif trouvé pour cette propriété/unité. Le locataire doit avoir un bail actif pour créer un ticket.",
   "tickets.form.attachments": "Pièces jointes",
   "tickets.form.attachmentsDesc": "Téléchargez des captures d'écran ou des documents liés à votre problème (facultatif, max 10)",
-  "nav.settings.security": "Sécurité"
+  "nav.settings.security": "Sécurité",
+  "nav.admin.subscriptions": "Abonnements & Mandats"
 }

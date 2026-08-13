@@ -82,20 +82,20 @@ export function AnalyticsCard({
 
   return (
     <Card
-      className={cn("hover:shadow-md transition-shadow py-4 gap-0", className)}
+      className={cn("min-w-0 gap-0 py-3 sm:py-4", className)}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      <CardHeader className="flex min-w-0 flex-row items-start justify-between gap-3 space-y-0 px-4 pb-2 sm:px-6">
+        <CardTitle className="min-w-0 break-words text-[13px] font-semibold leading-5 text-foreground sm:text-sm">{title}</CardTitle>
         {Icon && (
-          <div className={cn("p-2 rounded-lg", iconColorClasses[iconColor])}>
+          <div className={cn("shrink-0 rounded-lg p-2", iconColorClasses[iconColor])}>
             <Icon className="h-4 w-4" />
           </div>
         )}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+      <CardContent className="min-w-0 px-4 pb-3 sm:px-6 sm:pb-4">
+        <div className="whitespace-nowrap text-lg font-bold leading-tight text-foreground sm:text-xl">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="mt-1 break-words text-[11px] leading-4 text-muted-foreground sm:text-xs">{description}</p>
         )}
         {/* {trend && (
           <div className="flex items-center text-xs mt-2">
@@ -142,14 +142,14 @@ export function FinancialCard({
     >
       <span
         className={cn(
-          "font-semibold text-sm lg:text-base",
+          "font-semibold text-sm lg:text-sm",
           variantClasses.text
         )}
       >
         {label}
       </span>
       <span
-        className={cn("font-bold text-base lg:text-lg", variantClasses.text)}
+        className={cn("font-bold text-sm lg:text-base", variantClasses.text)}
       >
         {formatCurrencyValue(amount)}
       </span>
@@ -168,7 +168,7 @@ export function MetricCard({
   return (
     <Card className={cn("hover:shadow-md transition-shadow", className)}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-lg">
+        <CardTitle className="flex items-center gap-3 text-base">
           {Icon && (
             <div className={cn("p-2 rounded-lg", iconColorClasses[iconColor])}>
               <Icon className="h-5 w-5" />
@@ -178,7 +178,7 @@ export function MetricCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-xl font-bold">{value}</div>
         {subtitle && (
           <p className="text-xs text-muted-foreground">{subtitle}</p>
         )}
@@ -197,7 +197,7 @@ export function AnalyticsCardGrid({
   return (
     <div
       className={cn(
-        "grid grid-4 gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5",
+        "grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-5",
         className
       )}
     >

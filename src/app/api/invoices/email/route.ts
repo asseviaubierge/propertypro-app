@@ -19,6 +19,7 @@ import { generateInvoicePdfBuffer } from "@/lib/services/invoice-pdf.service";
 import { Invoice } from "@/models";
 import { getCompanyInfoServer } from "@/lib/utils/company-info";
 import { buildPrintableInvoiceFromLease } from "@/lib/invoice/invoice-builders";
+import { resolveInvoiceIssuer } from "@/lib/invoice/issuer-resolver";
 import { formatCurrency } from "@/lib/utils/formatting";
 
 // ============================================================================
@@ -79,7 +80,7 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
     if (invoiceId) {
       invoice = await Invoice.findById(invoiceId)
         .populate("tenantId", "firstName lastName email")
-        .populate("propertyId", "name address");
+        .populate("propertyId", "name address ownerId managerId units");
 
       if (!invoice) {
         return createErrorResponse("Invoice not found", 404);
@@ -88,7 +89,7 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
       invoice = await Invoice.findOne({ leaseId })
         .sort({ issueDate: -1 })
         .populate("tenantId", "firstName lastName email")
-        .populate("propertyId", "name address");
+        .populate("propertyId", "name address ownerId managerId units");
     }
 
     // Initialize email service
@@ -121,8 +122,14 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
     } catch {}
 
     if (invoice) {
+      const invoiceObject =
+        typeof (invoice as any).toObject === "function"
+          ? (invoice as any).toObject({ flattenMaps: true, virtuals: true })
+          : invoice;
+      (invoiceObject as any).issuer = await resolveInvoiceIssuer(invoiceObject, user);
+
       pdfBuffer = await generateInvoicePdfBuffer(
-        invoice as any,
+        invoiceObject as any,
         currencyCode
       );
       fileName = `${invoice.invoiceNumber || invoice._id}.pdf`;

@@ -27,6 +27,34 @@ export default function LeaseInvoicePage() {
     }
   }, [leaseId]);
 
+  useEffect(() => {
+    if (!leaseId || !session?.user) return;
+
+    const findStoredInvoice = async () => {
+      try {
+        const role = String((session.user as any).role || "").toLowerCase();
+        const isTenant = role === "tenant" || role === "locataire";
+        const endpoint = isTenant
+          ? `/api/tenant/invoices?leaseId=${encodeURIComponent(leaseId)}&limit=1`
+          : `/api/invoices?leaseId=${encodeURIComponent(leaseId)}&limit=1&includeSettled=true`;
+        const response = await fetch(endpoint, { cache: "no-store" });
+        if (!response.ok) return;
+        const payload = await response.json();
+        const rows = isTenant
+          ? payload?.data?.invoices
+          : payload?.data?.invoices || payload?.data;
+        const invoice = Array.isArray(rows) ? rows[0] : null;
+        if (invoice?._id) {
+          router.replace(`/dashboard/accounting/invoices/${invoice._id}`);
+        }
+      } catch {
+        // If no stored invoice can be resolved, keep the lease invoice preview.
+      }
+    };
+
+    void findStoredInvoice();
+  }, [leaseId, router, session?.user]);
+
   const fetchLease = async () => {
     try {
       setLoading(true);
@@ -35,9 +63,9 @@ export default function LeaseInvoicePage() {
       setLease(leaseData);
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch lease";
+        err instanceof Error ? err.message : "Échec du chargement du bail";
       setError(errorMessage);
-      showSimpleError("Load Error", errorMessage);
+      showSimpleError("Erreur de chargement", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -88,19 +116,41 @@ export default function LeaseInvoicePage() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            Retour
           </Button>
         </div>
 
         <ErrorAlert
-          title="Failed to Load Lease"
-          message={error || "Lease not found"}
+          title="Échec du chargement du bail"
+          message={error || "Bail introuvable"}
           onRetry={fetchLease}
           className="max-w-md mx-auto"
         />
       </div>
     );
   }
+
+  const propertyAccount: any =
+    (lease.propertyId as any)?.managerId ||
+    (lease.propertyId as any)?.ownerId ||
+    null;
+  const accountFullName = propertyAccount
+    ? `${propertyAccount.firstName || ""} ${propertyAccount.lastName || ""}`.trim()
+    : "";
+  const invoiceCompanyInfo = {
+    name:
+      accountFullName ||
+      propertyAccount?.businessName ||
+      "GESTION E-IMMO",
+    address:
+      [propertyAccount?.address, propertyAccount?.city].filter(Boolean).join(", ") ||
+      "Carré 58, Rue 9232, Ménotin, Cotonou, Bénin",
+    phone: propertyAccount?.phone || "+229 01 91 86 86 86",
+    email: propertyAccount?.email || "contact@e-immo.bj",
+    website: propertyAccount?.website || "gestion.e-immo.bj",
+    logo: propertyAccount?.businessLogo,
+    platformName: "E-IMMO",
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -113,13 +163,13 @@ export default function LeaseInvoicePage() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Lease
+            Retour au bail
           </Button>
 
           <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900">Lease Invoice</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Facture du bail</h1>
             <p className="text-muted-foreground">
-              Generate and manage lease documentation
+              Consulter et gérer la facture liée au bail
             </p>
           </div>
         </div>
@@ -128,21 +178,15 @@ export default function LeaseInvoicePage() {
       {/* Enhanced Invoice Component */}
       <EnhancedLeaseInvoice
         lease={lease}
-        companyInfo={{
-          name: "PropertyPro Management",
-          address: "123 Business Avenue, Suite 100, Business City, BC 12345",
-          phone: "+1 (555) 123-4567",
-          email: "info@PropertyPro.com",
-          website: "www.PropertyPro.com",
-        }}
+        companyInfo={invoiceCompanyInfo as any}
         onInvoiceGenerated={(fileName) => {
-          showSimpleSuccess("Invoice Generated", `Invoice generated: ${fileName}`);
+          showSimpleSuccess("Facture générée", `Facture générée : ${fileName}`);
         }}
         onInvoiceEmailed={(email) => {
-          showSimpleSuccess("Invoice Emailed", `Invoice emailed to: ${email}`);
+          showSimpleSuccess("Facture envoyée", `Facture envoyée à : ${email}`);
         }}
         onInvoiceSaved={(documentId) => {
-          showSimpleSuccess("Invoice Saved", `Invoice saved with ID: ${documentId}`);
+          showSimpleSuccess("Facture enregistrée", `Facture enregistrée : ${documentId}`);
         }}
         className="mb-8"
       />

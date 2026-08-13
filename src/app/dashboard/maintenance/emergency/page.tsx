@@ -817,7 +817,7 @@ export default function EmergencyMaintenancePage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-red-600">
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl text-red-600">
               Emergency Maintenance
             </h1>
             <p className="text-muted-foreground">
@@ -847,7 +847,7 @@ export default function EmergencyMaintenancePage() {
       {/* Enhanced Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-red-600 flex items-center gap-2">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl text-red-600 flex items-center gap-2">
             <Zap className="h-8 w-8" />
             {t("maintenance.emergency.list.header.title")}
             {criticalRequests.length > 0 && (

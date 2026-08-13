@@ -28,6 +28,7 @@ import {
   canAccessLease,
   isLeaseTenantUser,
 } from "@/lib/lease-access";
+import { canAccessProperty } from "@/lib/property-scope";
 
 // ============================================================================
 // GET /api/leases/[id] - Get a specific lease
@@ -51,7 +52,19 @@ export const GET = withAccessAndDB(LEASE_READ_ACCESS)(
         return createErrorResponse("Bail introuvable", 404);
       }
 
-      if (!(await canAccessLease(user, lease))) {
+      // Lecture ciblée du bail : le locataire accède à son propre bail, tandis
+      // qu'un Gestionnaire accède aux baux des biens qui lui appartiennent ou
+      // qui lui sont affectés. On ne dépend pas ici d'une permission secondaire
+      // qui pourrait masquer un bail pourtant visible dans la liste.
+      const leasePropertyId = lease.propertyId?.toString();
+      const tenantOwnsLease =
+        user.isTenant && lease.tenantId?.toString() === user.id;
+      const staffCanReadProperty =
+        !user.isTenant &&
+        !!leasePropertyId &&
+        (user.isAdmin || (await canAccessProperty(user, leasePropertyId)));
+
+      if (!tenantOwnsLease && !staffCanReadProperty) {
         return createErrorResponse("Accès refusé", 403);
       }
 

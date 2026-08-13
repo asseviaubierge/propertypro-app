@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { Invoice, User } from "@/models";
+import { Invoice } from "@/models";
 import { UserRole } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -14,6 +14,7 @@ import {
 } from "@/lib/api-utils";
 import { canAccessInvoice } from "@/lib/invoice-access";
 import { generateInvoicePdfBuffer } from "@/lib/services/invoice-pdf.service";
+import { resolveInvoiceIssuer } from "@/lib/invoice/issuer-resolver";
 
 const INVOICE_PDF_ACCESS = {
   roles: [UserRole.TENANT],
@@ -44,30 +45,27 @@ export const GET = withAccessAndDB(INVOICE_PDF_ACCESS)(
         .populate("tenantId", "firstName lastName email phone address city")
         .populate({
           path: "propertyId",
-          select: "name address type unit ownerId managerId",
+          select: "name address type unit ownerId managerId units",
           populate: {
             path: "ownerId",
             select:
               "firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm",
           },
         })
-        .populate("leaseId", "startDate endDate status propertyId")
+        .populate("leaseId", "startDate endDate status propertyId unitId terms")
         .lean();
 
       if (!invoice) return createErrorResponse("Invoice not found", 404);
 
-      const issuerId = (invoice as any)?.metadata?.createdByUserId;
-      const managerId = (invoice as any)?.propertyId?.managerId;
-      const issuer = issuerId
-        ? await User.findById(issuerId)
-            .select("firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm role")
-            .lean()
-        : managerId
-          ? await User.findById(managerId)
-              .select("firstName lastName email phone address city website businessName businessLogo accountType cip ifu rccm role")
-              .lean()
-          : null;
+      const issuer = await resolveInvoiceIssuer(invoice, user);
       (invoice as any).issuer = issuer;
+
+      const property = (invoice as any)?.propertyId;
+      const unitId = (invoice as any)?.unitId || (invoice as any)?.leaseId?.unitId;
+      const units = Array.isArray(property?.units) ? property.units : [];
+      (invoice as any).unit = unitId
+        ? units.find((candidate: any) => String(candidate?._id) === String(unitId)) || null
+        : null;
 
       if (!(await canAccessInvoice(user, invoice))) {
         return createErrorResponse("Access denied", 403);

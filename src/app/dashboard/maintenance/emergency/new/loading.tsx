@@ -6,7 +6,7 @@ export default function NewEmergencyRequestLoading() {
       <div className="flex items-center gap-4">
         <div className="h-9 w-20 bg-gray-200 rounded animate-pulse" />
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-red-600 flex items-center gap-2">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl text-red-600 flex items-center gap-2">
             <Zap className="h-8 w-8" />
             New Emergency Request
           </h1>

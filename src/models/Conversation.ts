@@ -712,8 +712,10 @@ ConversationSchema.statics.getUserConversations = function (
 
 // Query middleware to exclude soft deleted documents
 ConversationSchema.pre(/^find/, function () {
-  // @ts-ignore
-  this.find({ deletedAt: null });
+  const currentQuery = this.getQuery();
+  if (currentQuery.deletedAt === undefined) {
+    this.where({ deletedAt: null });
+  }
 });
 
 // Pre-save middleware

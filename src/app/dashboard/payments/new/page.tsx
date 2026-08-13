@@ -105,10 +105,10 @@ export default function NewPaymentPage() {
           setLeases(
             leasesData.data?.map((lease: any) => ({
               id: lease._id,
-              propertyName: lease.propertyId?.name || "Unknown Property",
+              propertyName: lease.propertyId?.name || "Propriété inconnue",
               tenantName: lease.tenantId?.firstName
                 ? `${lease.tenantId.firstName} ${lease.tenantId.lastName}`
-                : "Unknown Tenant",
+                : "Locataire inconnu",
             })) || []
           );
         }
@@ -189,16 +189,16 @@ export default function NewPaymentPage() {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Payment processed and recorded successfully!");
+        toast.success("Paiement traité et enregistré avec succès.");
         router.push("/dashboard/payments");
       } else {
-        throw new Error(result.error || "Failed to record payment");
+        throw new Error(result.error || "Impossible d’enregistrer le paiement.");
       }
     } catch (error) {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Payment was processed but failed to save record. Please contact support."
+          : "Le paiement a été traité, mais son enregistrement a échoué. Contactez l’assistance."
       );
     } finally {
       setIsLoading(false);
@@ -243,9 +243,9 @@ export default function NewPaymentPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-2">
             <CreditCard className="h-8 w-8" />
             {t("payments.new.header.title")}
           </h1>
@@ -253,9 +253,9 @@ export default function NewPaymentPage() {
             {t("payments.new.header.subtitle")}
           </p>
         </div>
-         <div className="flex items-center gap-2">
-            <Link href="/dashboard/payments">
-              <Button variant="outline" size="sm">
+         <div className="w-full sm:w-auto">
+            <Link href="/dashboard/payments" className="block w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full whitespace-nowrap sm:w-auto">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t("payments.new.header.backButton")}
               </Button>

@@ -260,11 +260,28 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   }, [settings.compact]);
 
   // High-contrast mode
+  // Mobile E-IMMO: contraste élevé activé par défaut pour une lecture nette.
+  // Sur Desktop, le réglage utilisateur continue de décider.
   useEffect(() => {
-    document.documentElement.classList.toggle(
-      "high-contrast",
-      !!settings.contrast,
-    );
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+
+    const applyContrast = () => {
+      document.documentElement.classList.toggle(
+        "high-contrast",
+        mobileQuery.matches || !!settings.contrast,
+      );
+      document.documentElement.classList.toggle(
+        "mobile-high-contrast",
+        mobileQuery.matches,
+      );
+    };
+
+    applyContrast();
+    mobileQuery.addEventListener?.("change", applyContrast);
+
+    return () => {
+      mobileQuery.removeEventListener?.("change", applyContrast);
+    };
   }, [settings.contrast]);
 
   // Text direction: manual RTL toggle or a right-to-left language

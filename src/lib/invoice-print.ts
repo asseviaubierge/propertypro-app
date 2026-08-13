@@ -32,23 +32,44 @@ function isApproximatelyZero(value: number): boolean {
 function formatCurrency(amount: number = 0): string {
   const safeAmount = Number.isFinite(amount) ? amount : 0;
   const normalizedAmount = isApproximatelyZero(safeAmount) ? 0 : safeAmount;
+  const activeCurrencyCode = localizationService.getCurrentCurrency() || "XOF";
   try {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("fr-FR", {
       style: "currency",
-      currency: "USD",
+      currency: activeCurrencyCode,
+      maximumFractionDigits: activeCurrencyCode === "XOF" ? 0 : 2,
     }).format(normalizedAmount);
   } catch {
-    const activeCurrencyCode = localizationService.getCurrentCurrency();
     const currency = localizationService.getCurrency(activeCurrencyCode);
-    const decimals = currency?.decimals ?? 2;
+    const decimals = currency?.decimals ?? 0;
     const formattedAmount = normalizedAmount.toFixed(decimals);
-
-    if (currency?.symbolPosition === "after") {
-      return `${formattedAmount} ${currency.symbol}`;
-    }
-
-    return `${currency?.symbol ?? "$"}${formattedAmount}`;
+    return currency?.symbolPosition === "after"
+      ? `${formattedAmount} ${currency.symbol}`
+      : `${currency?.symbol ?? "FCFA"}${formattedAmount}`;
   }
+}
+
+function formatInvoiceType(type?: string): string {
+  const key = String(type || "").toLowerCase();
+  const labels: Record<string, string> = {
+    rent: "Loyer",
+    security_deposit: "Dépôt de garantie",
+    pet_deposit: "Dépôt animal",
+    late_fee: "Frais de retard",
+    maintenance: "Maintenance",
+    utility: "Charges",
+    other: "Autre",
+  };
+  return labels[key] || String(type || "").replace(/_/g, " ");
+}
+
+function formatAccountType(company: InvoiceCompanyInfo): string {
+  const key = String(company.accountType || company.roleLabel || "").toLowerCase();
+  if (["manager", "property_manager"].includes(key)) return "Gestionnaire";
+  if (["owner", "direct_owner"].includes(key)) return "Propriétaire direct";
+  if (key === "agency") return "Agence immobilière";
+  if (["admin", "super_admin", "e_immo", "gestion e-immo"].includes(key)) return "Gestion E-IMMO";
+  return String(company.roleLabel || company.accountType || "");
 }
 
 function formatAddress(address?: PrintableInvoiceAddress | string): string {
@@ -150,7 +171,7 @@ export function generateInvoiceHTML(
   const property =
     normalized.property ||
     normalized.leaseId?.propertyId ||
-    ({ name: "Property" } as InvoicePropertyInfo);
+    ({ name: "Bien" } as InvoicePropertyInfo);
 
   const {
     totals: {
@@ -172,7 +193,7 @@ export function generateInvoiceHTML(
   const safeLogoUrl = rawLogo.replace(/"/g, "%22");
   const safeCompanyAlt = (company.name || "Company").replace(/"/g, "&quot;");
   const logoContainerStyle = hasLogo
-    ? "width:40px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; overflow:hidden; background-color:#ffffff; border:1px solid #e5e7eb;"
+    ? "width:40px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; overflow:hidden; background-color:#ffffff;"
     : "width:40px; height:40px; background-color:#10b981; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; overflow:hidden;";
   const logoMarkup = hasLogo
     ? `<img src="${safeLogoUrl}" alt="${safeCompanyAlt}" style="width:100%; height:100%; object-fit:contain;" crossorigin="anonymous" />`
@@ -191,29 +212,27 @@ export function generateInvoiceHTML(
             const totalLine = item.total ?? item.amount ?? qty * unit;
             return `
         <tr>
-          <td style=\"padding:12px 16px; font-size:13px; color:#111827; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;\">${
+          <td style=\"padding:12px 16px; font-size:13px; color:#111827; \">${
             idx + 1
           }</td>
-          <td style=\"padding:12px 16px; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;\">
+          <td style=\"padding:12px 16px; \">
             <div style=\"font-size:13px; font-weight:600; color:#111827; margin-bottom:2px;\">${
               item.description
             }</div>
-            <div style=\"font-size:12px; color:#6b7280;\">${(
-              item.type || ""
-            ).replace("_", " ")}</div>
+            <div style=\"font-size:12px; color:#6b7280;\">${formatInvoiceType(item.type)}</div>
           </td>
-          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;\">${qty}</td>
-          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;\">${formatCurrency(
+          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; \">${qty}</td>
+          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; \">${formatCurrency(
             Number(unit)
           )}</td>
-          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; border-bottom:1px solid #e5e7eb;\">${formatCurrency(
+          <td style=\"padding:12px 16px; text-align:right; font-size:13px; color:#111827; \">${formatCurrency(
             Number(totalLine)
           )}</td>
         </tr>`;
           })
           .join("\n")
       : `<tr>
-          <td colspan=\"5\" style=\"padding:16px; text-align:center; font-size:13px; color:#6b7280; border-bottom:1px solid #e5e7eb;\">No line items available</td>
+          <td colspan=\"5\" style=\"padding:16px; text-align:center; font-size:13px; color:#6b7280; \">Aucune ligne de facture</td>
         </tr>`;
 
   return `
@@ -228,7 +247,11 @@ export function generateInvoiceHTML(
           }</h1>
           <div style=\"color:#6b7280; font-size:13px; line-height:1.4; margin-bottom:16px;\">
             <p style=\"margin:1px 0;\">${company.address}</p>
-            <p style=\"margin:1px 0;\">${company.phone}</p>
+            ${company.phone ? `<p style="margin:1px 0;">${company.phone}</p>` : ""}
+            ${company.email ? `<p style="margin:1px 0;">${company.email}</p>` : ""}
+            ${company.cip ? `<p style="margin:1px 0;">CIP : ${company.cip}</p>` : ""}
+            ${company.ifu ? `<p style="margin:1px 0;">IFU : ${company.ifu}</p>` : ""}
+            ${company.rccm ? `<p style="margin:1px 0;">RCCM : ${company.rccm}</p>` : ""}
             <p style=\"margin:1px 0;\">${company.email}</p>
             ${
               company.website
@@ -246,12 +269,12 @@ export function generateInvoiceHTML(
             normalized.invoiceNumber
           }</p>
           <div style=\"font-size:13px; color:#6b7280; text-align:right;\">
-            <p style=\"margin:2px 0; font-weight:500;\">Issue Date: ${issue.toLocaleDateString(
-              "en-US",
+            <p style=\"margin:2px 0; font-weight:500;\">Date d’émission : ${issue.toLocaleDateString(
+              "fr-FR",
               { year: "numeric", month: "long", day: "numeric" }
             )}</p>
-            <p style=\"margin:2px 0; font-weight:500;\">Due Date: ${due.toLocaleDateString(
-              "en-US",
+            <p style=\"margin:2px 0; font-weight:500;\">Date d’échéance : ${due.toLocaleDateString(
+              "fr-FR",
               { year: "numeric", month: "long", day: "numeric" }
             )}</p>
           </div>
@@ -261,22 +284,32 @@ export function generateInvoiceHTML(
       <!-- Invoice From/To -->
       <div style=\"display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-bottom:32px;\">
         <div>
-          <h3 style=\"font-weight:600; color:#111827; margin-bottom:8px; font-size:14px; margin:0 0 8px 0;\">Invoice from</h3>
+          <h3 style=\"font-weight:600; color:#111827; margin-bottom:8px; font-size:14px; margin:0 0 8px 0;\">Facturé par</h3>
           <div style=\"color:#374151; font-size:13px; line-height:1.4;\">
             <p style=\"font-weight:600; margin:1px 0; color:#111827;\">${
               company.name
             }</p>
+            ${company.legalName && company.legalName !== company.name ? `<p style="margin:1px 0;">${company.legalName}</p>` : ""}
+            ${formatAccountType(company) ? `<p style="margin:1px 0;">${formatAccountType(company)}</p>` : ""}
+            <p style=\"margin:1px 0; font-weight:600; color:#dc2626;\">Plateforme : E-IMMO</p>
             <p style=\"margin:1px 0;\">${company.address}</p>
-            <p style=\"margin:1px 0;\">${company.phone}</p>
+            ${company.phone ? `<p style="margin:1px 0;">${company.phone}</p>` : ""}
+            ${company.email ? `<p style="margin:1px 0;">${company.email}</p>` : ""}
+            ${company.cip ? `<p style="margin:1px 0;">CIP : ${company.cip}</p>` : ""}
+            ${company.ifu ? `<p style="margin:1px 0;">IFU : ${company.ifu}</p>` : ""}
+            ${company.rccm ? `<p style="margin:1px 0;">RCCM : ${company.rccm}</p>` : ""}
           </div>
         </div>
         <div>
-          <h3 style=\"font-weight:600; color:#111827; margin-bottom:8px; font-size:14px; margin:0 0 8px 0;\">Invoice to</h3>
+          <h3 style=\"font-weight:600; color:#111827; margin-bottom:8px; font-size:14px; margin:0 0 8px 0;\">Facturé à</h3>
           <div style=\"color:#374151; font-size:13px; line-height:1.4;\">
             <p style=\"font-weight:600; margin:1px 0; color:#111827;\">${
               tenantName || "N/A"
             }</p>
             <p style=\"margin:1px 0;\">${formatAddress(property?.address)}</p>
+            ${normalized.tenantId?.phone ? `<p style="margin:1px 0;">${normalized.tenantId.phone}</p>` : ""}
+            ${property?.name ? `<p style="margin:5px 0 1px 0; font-weight:600;">${property.name}</p>` : ""}
+            ${(property as any)?.unit ? `<p style="margin:1px 0;">Unité : ${(property as any).unit}</p>` : ""}
             ${
               normalized.tenantId?.email
                 ? `<p style="margin:1px 0;">${normalized.tenantId.email}</p>`
@@ -288,13 +321,13 @@ export function generateInvoiceHTML(
 
       <!-- Items -->
       <div style=\"margin-bottom:32px;\">
-        <table style=\"width:100%; border-collapse:collapse; border:1px solid #e5e7eb;\">
+        <table style=\"width:100%; border-collapse:collapse; \">
           <thead>
             <tr>
-              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:left; border-right:1px solid #e5e7eb;\">#</th>
-              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:left; border-right:1px solid #e5e7eb;\">Description</th>
-              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:right; border-right:1px solid #e5e7eb;\">Qty</th>
-              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:right; border-right:1px solid #e5e7eb;\">Unit price</th>
+              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:left; \">#</th>
+              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:left; \">Description</th>
+              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:right; \">Qté</th>
+              <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:right; \">Prix unitaire</th>
               <th style=\"padding:12px 16px; background:#f9fafb; font-weight:600; color:#111827; font-size:13px; text-align:right;\">Total</th>
             </tr>
           </thead>
@@ -309,17 +342,17 @@ export function generateInvoiceHTML(
         <div style=\"width:280px;\">
           <div style=\"display:flex; flex-direction:column; gap:6px;\">
             <div style=\"display:flex; justify-content:space-between; font-size:13px; padding-bottom:4px;\">
-              <span style=\"color:#6b7280;\">Subtotal</span>
+              <span style=\"color:#6b7280;\">Sous-total</span>
               <span style=\"color:#111827;\">${formatCurrency(subtotal)}</span>
             </div>
             <div style=\"display:flex; justify-content:space-between; font-size:13px; padding-bottom:4px;\">
-              <span style=\"color:#6b7280;\">Shipping</span>
+              <span style=\"color:#6b7280;\">Frais</span>
               <span style=\"color:#111827;\">${formatCurrency(
                 shippingAmount
               )}</span>
             </div>
             <div style=\"display:flex; justify-content:space-between; font-size:13px; padding-bottom:4px;\">
-              <span style=\"color:#6b7280;\">Discount</span>
+              <span style=\"color:#6b7280;\">Remise</span>
               <span style=\"color:#111827;\">${formatCurrency(
                 discountAmount === 0 ? 0 : -Math.abs(discountAmount)
               )}</span>
@@ -327,7 +360,7 @@ export function generateInvoiceHTML(
             ${
               adjustmentsAmount !== 0
                 ? `<div style="display:flex; justify-content:space-between; font-size:13px; padding-bottom:4px;">
-                    <span style="color:#6b7280;">Adjustments</span>
+                    <span style="color:#6b7280;">Ajustements</span>
                     <span style="color:#111827;">${formatCurrency(
                       adjustmentsAmount
                     )}</span>
@@ -338,7 +371,7 @@ export function generateInvoiceHTML(
               <span style=\"color:#6b7280;\">Taxes</span>
               <span style=\"color:#111827;\">${formatCurrency(taxAmount)}</span>
             </div>
-            <div style=\"border-top:1px solid #e5e7eb; padding-top:12px; margin-top:4px;\">
+            <div style=\"padding-top:12px; margin-top:4px;\">
               <div style=\"display:flex; justify-content:space-between;\">
                 <span style=\"font-size:16px; font-weight:700; color:#111827;\">Total</span>
                 <span style=\"font-size:16px; font-weight:700; color:#111827;\">${formatCurrency(
@@ -347,13 +380,13 @@ export function generateInvoiceHTML(
               </div>
             </div>
             <div style=\"display:flex; justify-content:space-between; font-size:13px; padding-top:8px;\">
-              <span style=\"color:#6b7280;\">Amount Paid</span>
+              <span style=\"color:#6b7280;\">Montant payé</span>
               <span style=\"color:#111827;\">${formatCurrency(
                 amountPaid
               )}</span>
             </div>
             <div style=\"display:flex; justify-content:space-between; font-size:13px; padding-top:4px;\">
-              <span style=\"color:#6b7280;\">Balance Due</span>
+              <span style=\"color:#6b7280;\">Solde dû</span>
               <span style=\"color:#111827;\">${formatCurrency(
                 balanceDue
               )}</span>
@@ -363,7 +396,7 @@ export function generateInvoiceHTML(
       </div>
 
       <!-- Notes -->
-      <div style=\"border-top:1px solid #e5e7eb; padding-top:24px; display:flex; justify-content:space-between; align-items:flex-start;\">
+      <div style=\"padding-top:24px; display:flex; justify-content:space-between; align-items:flex-start;\">
         <div>
           <h3 style=\"font-weight:600; color:#111827; margin-bottom:6px; font-size:14px; margin:0 0 6px 0;\">NOTES</h3>
           <p style=\"font-size:13px; color:#6b7280; max-width:320px; line-height:1.4; margin:0;\">${
@@ -371,7 +404,7 @@ export function generateInvoiceHTML(
           }</p>
         </div>
         <div style=\"text-align:right;\">
-          <h3 style=\"font-weight:600; color:#111827; margin-bottom:6px; font-size:14px; margin:0 0 6px 0;\">Have a question?</h3>
+          <h3 style=\"font-weight:600; color:#111827; margin-bottom:6px; font-size:14px; margin:0 0 6px 0;\">Une question ?</h3>
           <p style=\"font-size:13px; color:#6b7280; margin:0;\">${
             company.email
           }</p>
@@ -385,11 +418,11 @@ export async function buildPrintableDocument(
   const normalized = await resolveInvoiceLogo(invoice);
   const body = generateInvoiceHTML(normalized);
   return `<!DOCTYPE html>
-  <html lang="en">
+  <html lang="fr">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Invoice ${normalized.invoiceNumber}</title>
+      <title>Facture ${normalized.invoiceNumber}</title>
       <style>
         * { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; color: #111827; margin: 24px; }
@@ -430,7 +463,7 @@ export function printInvoice(invoice: PrintableInvoice | unknown): void {
   if (!w) return;
   w.document.open();
   w.document.write(
-    `<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Preparing invoice…</title></head><body style="font-family:Arial,sans-serif;color:#6b7280;padding:24px;">Preparing invoice…</body></html>`
+    `<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Préparation de la facture…</title></head><body style="font-family:Arial,sans-serif;color:#6b7280;padding:24px;">Préparation de la facture…</body></html>`
   );
   w.document.close();
 

@@ -54,7 +54,7 @@ export function SearchableSelect({
   groups,
   placeholder = "Select...",
   searchPlaceholder = "Search...",
-  emptyMessage = "No results found.",
+  emptyMessage = "Aucun résultat trouvé.",
   className,
   triggerClassName,
   contentClassName,

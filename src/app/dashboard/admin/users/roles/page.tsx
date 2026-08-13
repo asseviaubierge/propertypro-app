@@ -946,7 +946,7 @@ export default function RoleManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("admin.roles.title")}
           </h1>
           <p className="text-muted-foreground">{t("admin.roles.subtitle")}</p>

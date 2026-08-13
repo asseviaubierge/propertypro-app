@@ -53,7 +53,7 @@ export async function generateLeaseInvoicePDF(
       watermark,
     } = options;
     const baseNotes = includeTerms
-      ? `${DEFAULT_INVOICE_NOTES}\n\n• Payment is due on or before the due date specified above.\n• Late fees may apply for payments received after the due date.\n• Please include invoice number with your payment.\n• Contact us immediately if you have any questions about this invoice.`
+      ? `${DEFAULT_INVOICE_NOTES}\n\n• Le paiement doit être effectué au plus tard à la date d’échéance indiquée.\n• Des frais de retard peuvent s’appliquer après la date d’échéance.\n• Merci d’indiquer le numéro de facture lors du paiement.\n• Contactez-nous pour toute question relative à cette facture.`
       : DEFAULT_INVOICE_NOTES;
 
     const normalized = buildPrintableInvoiceFromLease(lease, {

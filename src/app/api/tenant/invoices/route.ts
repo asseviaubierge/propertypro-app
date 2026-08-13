@@ -24,6 +24,7 @@ export const GET = withPermissionAndDB("payment_history", {
       const page = parseInt(searchParams.get("page") || "1");
       const limit = parseInt(searchParams.get("limit") || "12");
       const status = searchParams.get("status");
+      const leaseId = searchParams.get("leaseId");
       const sortBy = searchParams.get("sortBy") || "dueDate";
       const sortOrder = searchParams.get("sortOrder") || "desc";
 
@@ -34,6 +35,9 @@ export const GET = withPermissionAndDB("payment_history", {
 
       if (status && status !== "all") {
         query.status = status;
+      }
+      if (leaseId) {
+        query.leaseId = leaseId;
       }
 
       const skip = (page - 1) * limit;

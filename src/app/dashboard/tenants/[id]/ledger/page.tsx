@@ -185,7 +185,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Tenant Ledger</h1>
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Tenant Ledger</h1>
             <p className="text-muted-foreground">
               Loading tenant information...
             </p>
@@ -200,7 +200,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               Tenant Not Found
             </h1>
             <p className="text-muted-foreground">
@@ -226,7 +226,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tenant Ledger</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Tenant Ledger</h1>
           <p className="text-muted-foreground">
             Financial history for {tenant.firstName} {tenant.lastName}
           </p>

@@ -6,8 +6,10 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest } from "next/server";
-import { Invoice, Property } from "@/models";
+import { Invoice } from "@/models";
 import { InvoiceStatus } from "@/types";
+import { buildInvoiceScopeQuery } from "@/lib/invoice-access";
+import { canAccessProperty } from "@/lib/property-scope";
 import {
   AuthenticatedAccessUser,
   createSuccessResponse,
@@ -28,33 +30,27 @@ export const GET = withPermissionAndDB("financial_reports")(async (user: Authent
     const tenantId = searchParams.get("tenantId");
     const leaseId = searchParams.get("leaseId");
 
-    // Build base query
-    let baseQuery: any = {};
+    // Même périmètre obligatoire que GET /api/invoices.
+    // Super Admin = global ; Manager = uniquement ses propriétés ; Tenant = ses factures.
+    let baseQuery: any = await buildInvoiceScopeQuery(user, {
+      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+    });
 
-    // Apply role-based filtering
-    // Single company architecture - Managers can view invoice stats for all properties
-    if (user.isTenant) {
-      baseQuery.tenantId = user.id;
-
-      if (tenantId && tenantId !== user.id) {
-        return createErrorResponse(
-          "You can only view your own invoice statistics",
-          403
-        );
-      }
+    if (user.isTenant && tenantId && tenantId !== user.id) {
+      return createErrorResponse(
+        "Vous pouvez consulter uniquement vos propres statistiques de factures",
+        403
+      );
     }
 
-    // Apply additional filters
     if (propertyId) {
+      if (!user.isAdmin && !(await canAccessProperty(user, propertyId))) {
+        return createErrorResponse("Accès refusé à cette propriété", 403);
+      }
       baseQuery.propertyId = propertyId;
     }
-    if (tenantId) {
-      // Non-tenant roles may inspect other tenants; tenants already validated above
-      baseQuery.tenantId = tenantId;
-    }
-    if (leaseId) {
-      baseQuery.leaseId = leaseId;
-    }
+    if (tenantId) baseQuery.tenantId = tenantId;
+    if (leaseId) baseQuery.leaseId = leaseId;
 
     // Apply timeframe filter
     if (timeframe !== "all") {
@@ -147,7 +143,7 @@ export const GET = withPermissionAndDB("financial_reports")(async (user: Authent
 
     return createSuccessResponse(
       stats,
-      "Invoice statistics retrieved successfully"
+      "Statistiques des factures récupérées avec succès"
     );
   } catch (error) {
     return handleApiError(error);

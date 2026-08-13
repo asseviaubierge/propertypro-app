@@ -256,7 +256,7 @@ export default function PaymentReceiptPage({
               </Button>
             </Link>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("payments.receipt.header.title")}
           </h1>
           <p className="text-muted-foreground">

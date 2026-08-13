@@ -101,7 +101,7 @@ export default function EditLeasePage({ params }: EditLeasePageProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit Lease</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Edit Lease</h1>
           <p className="text-muted-foreground">
             {lease.propertyId?.name
               ? `Update the lease agreement for ${lease.propertyId.name}`

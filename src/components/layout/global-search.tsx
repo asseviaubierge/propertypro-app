@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -28,102 +29,103 @@ interface SearchGroup {
 
 const searchGroups: SearchGroup[] = [
   {
-    heading: "Overview",
+    heading: "Aperçu",
     items: [
-      { label: "Dashboard", href: "/dashboard", badge: "Overview" },
-      { label: "Calendar", href: "/dashboard/calendar", badge: "Overview" },
+      { label: "Tableau de bord", href: "/dashboard", badge: "Aperçu" },
+      { label: "Calendrier", href: "/dashboard/calendar", badge: "Aperçu" },
     ],
   },
   {
-    heading: "Management",
+    heading: "Gestion",
     items: [
-      { label: "Properties", href: "/dashboard/properties", badge: "Overview" },
-      { label: "Units", href: "/dashboard/properties/units", badge: "List" },
-      { label: "Tenants", href: "/dashboard/tenants", badge: "Overview" },
+      { label: "Propriétés", href: "/dashboard/properties", badge: "Aperçu" },
+      { label: "Unités", href: "/dashboard/properties/units", badge: "Liste" },
+      { label: "Locataires", href: "/dashboard/tenants", badge: "Aperçu" },
       {
-        label: "Applications",
+        label: "Demandes",
         href: "/dashboard/tenants/applications",
-        badge: "List",
+        badge: "Liste",
       },
-      { label: "Leases", href: "/dashboard/leases", badge: "Overview" },
+      { label: "Baux", href: "/dashboard/leases", badge: "Aperçu" },
       {
         label: "Maintenance",
         href: "/dashboard/maintenance",
-        badge: "Overview",
+        badge: "Aperçu",
       },
       {
         label: "Inspections",
         href: "/dashboard/inspections",
-        badge: "Overview",
+        badge: "Aperçu",
       },
     ],
   },
   {
-    heading: "Financials",
+    heading: "Finances",
     items: [
+      { label: "Paiements", href: "/dashboard/payments", badge: "Paiements" },
       {
         label: "Transactions",
         href: "/dashboard/accounting/transactions",
-        badge: "List",
+        badge: "Liste",
       },
       {
-        label: "Invoices",
+        label: "Factures",
         href: "/dashboard/accounting/invoices",
-        badge: "List",
+        badge: "Liste",
       },
       {
-        label: "Revenues",
+        label: "Revenus",
         href: "/dashboard/accounting/revenues",
-        badge: "Report",
+        badge: "Rapport",
       },
       {
-        label: "Expenses",
+        label: "Dépenses",
         href: "/dashboard/accounting/expenses",
-        badge: "Report",
+        badge: "Rapport",
       },
       {
-        label: "Reports",
+        label: "Rapports",
         href: "/dashboard/accounting/reports",
-        badge: "Report",
+        badge: "Rapport",
       },
     ],
   },
   {
     heading: "Communication",
     items: [
-      { label: "Messages", href: "/dashboard/messages", badge: "Inbox" },
+      { label: "Messages", href: "/dashboard/messages", badge: "Messagerie" },
       {
         label: "Notifications",
         href: "/dashboard/notifications",
-        badge: "Inbox",
+        badge: "Messagerie",
       },
       {
-        label: "Announcements",
+        label: "Annonces",
         href: "/dashboard/announcements",
-        badge: "Inbox",
+        badge: "Messagerie",
       },
-      { label: "Tickets", href: "/dashboard/tickets", badge: "Inbox" },
+      { label: "Tickets", href: "/dashboard/tickets", badge: "Messagerie" },
     ],
   },
   {
     heading: "Administration",
     items: [
-      { label: "Admin", href: "/dashboard/admin", badge: "Overview" },
-      { label: "Users", href: "/dashboard/admin/users", badge: "List" },
+      { label: "Admin", href: "/dashboard/admin", badge: "Aperçu" },
+      { label: "Utilisateurs", href: "/dashboard/admin/users", badge: "Liste" },
       {
-        label: "Roles & Permissions",
+        label: "Rôles et permissions",
         href: "/dashboard/admin/users/roles",
-        badge: "Settings",
+        badge: "Paramètres",
       },
       {
-        label: "Profile",
+        label: "Profil",
         href: "/dashboard/settings/profile",
-        badge: "Settings",
+        badge: "Paramètres",
       },
       {
-        label: "Appearance",
+        label: "Apparence",
         href: "/dashboard/settings/appearance",
-        badge: "Settings",
+        badge: "Paramètres",
       },
     ],
   },
@@ -136,6 +138,30 @@ interface GlobalSearchProps {
 export function GlobalSearch({ className }: GlobalSearchProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
+  const normalizedRole = String(session?.user?.role || "").toLowerCase();
+  const isAdmin = normalizedRole === "admin" || normalizedRole === "super_admin";
+  const isTenant = normalizedRole === "tenant" || normalizedRole === "locataire";
+
+  const tenantAllowedHrefs = new Set([
+    "/dashboard",
+    "/dashboard/calendar",
+    "/dashboard/leases",
+    "/dashboard/payments",
+    "/dashboard/maintenance",
+    "/dashboard/messages",
+    "/dashboard/settings/profile",
+  ]);
+
+  const visibleGroups = searchGroups
+    .filter((group) => group.heading !== "Administration" || isAdmin)
+    .map((group) => ({
+      ...group,
+      items: isTenant
+        ? group.items.filter((item) => tenantAllowedHrefs.has(item.href))
+        : group.items,
+    }))
+    .filter((group) => group.items.length > 0);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -162,20 +188,20 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
           "inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-muted/80 pl-3 pr-1.5 text-foreground shadow-sm transition-colors hover:bg-accent/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 dark:border-border/70 dark:bg-muted/70 dark:hover:bg-accent/70",
           className
         )}
-        aria-label="Open search"
+        aria-label="Ouvrir la recherche"
       >
         <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <kbd className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground shadow-sm dark:bg-background/80">
+        <kbd className="hidden md:inline-flex items-center gap-1 rounded-full border border-border/50 bg-background px-2.5 py-1 text-xs font-medium text-foreground shadow-sm">
           <span>⌘</span>
           <span>K</span>
         </kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search..." />
+        <CommandInput placeholder="Rechercher..." />
         <CommandList className="max-h-[420px]">
-          <CommandEmpty>No results found.</CommandEmpty>
-          {searchGroups.map((group, idx) => (
+          <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
+          {visibleGroups.map((group, idx) => (
             <div key={group.heading}>
               {idx > 0 && <CommandSeparator />}
               <CommandGroup heading={group.heading}>
@@ -190,9 +216,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                       <span className="text-sm font-semibold text-foreground truncate">
                         {item.label}
                       </span>
-                      <span className="text-xs text-muted-foreground truncate">
-                        {item.href}
-                      </span>
+
                     </div>
                     {item.badge && (
                       <span className="shrink-0 inline-flex items-center rounded-md border border-border bg-background px-2 py-0.5 text-[11px] font-medium text-foreground">

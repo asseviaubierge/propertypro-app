@@ -157,11 +157,11 @@ export default function PaymentsPage() {
           setTotalPayments(result.pagination.total || 0);
         }
       } else {
-        throw new Error("Failed to fetch payments");
+        throw new Error("Impossible de charger les paiements");
       }
     } catch (error) {
       showSimpleError(
-        "Load Error",
+        "Erreur de chargement",
         error instanceof Error ? error.message : t("payments.toasts.loadError")
       );
     } finally {
@@ -531,27 +531,27 @@ export default function PaymentsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-payments-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+      <div className="mobile-page-header flex min-w-0 flex-col gap-2 rounded-2xl bg-background px-1 py-1 sm:flex-row sm:items-start sm:justify-between sm:rounded-none sm:bg-transparent sm:p-0">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-3xl">
             {t("payments.header.title")}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="max-w-2xl text-xs leading-4 text-muted-foreground sm:text-base sm:leading-normal">
             {t("payments.header.subtitle")}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
           <Link href="/dashboard/payments/analytics">
-            <Button variant="outline" size="sm">
-              <BarChart3 className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="w-full justify-center px-2 text-xs sm:w-auto sm:px-3 sm:text-sm">
+              <BarChart3 className="mr-1.5 h-4 w-4 shrink-0 sm:mr-2" />
               {t("payments.header.analytics")}
             </Button>
           </Link>
           <Link href="/dashboard/payments/new">
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
+            <Button size="sm" className="w-full justify-center px-2 text-xs sm:w-auto sm:px-3 sm:text-sm">
+              <Plus className="mr-1.5 h-4 w-4 shrink-0 sm:mr-2" />
               {t("payments.header.addPayment")}
             </Button>
           </Link>
@@ -595,19 +595,19 @@ export default function PaymentsPage() {
 
       {/* Payments Display */}
       {!isLoading && viewMode === "card" ? (
-        <Card className="gap-2">
+        <Card className="mobile-app-section gap-2">
           <CardHeader>
             {/* Main Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-2">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-4 mb-2">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg border border-green-100 dark:border-green-800">
                   <CreditCard className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <div className="min-w-0">
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg">
                     {t("payments.table.title")} ({totalPayments})
                   </h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs leading-4 text-gray-600 dark:text-gray-300 sm:text-sm">
                     {t("payments.table.description")}
                   </p>
                 </div>
@@ -635,7 +635,7 @@ export default function PaymentsPage() {
             </div>
 
             {/* Integrated Filters Bar - Single Row */}
-            <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
+            <div className="mobile-filter-panel flex flex-col gap-2 rounded-xl border border-gray-200/70 bg-gray-50/70 p-2.5 dark:border-gray-700/60 dark:bg-gray-800/50 sm:p-4 lg:flex-row lg:items-center lg:gap-4">
               {/* Search */}
               <GlobalSearch
                 placeholder={t("payments.filters.searchPlaceholder")}
@@ -649,9 +649,9 @@ export default function PaymentsPage() {
               />
 
               {/* Filters */}
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue
                       placeholder={t("payments.filters.allStatuses")}
                     />
@@ -679,7 +679,7 @@ export default function PaymentsPage() {
                 </Select>
 
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue placeholder={t("payments.filters.allTypes")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -717,7 +717,7 @@ export default function PaymentsPage() {
                   value={paymentMethodFilter}
                   onValueChange={setPaymentMethodFilter}
                 >
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue
                       placeholder={t("payments.filters.allMethods")}
                     />
@@ -770,7 +770,7 @@ export default function PaymentsPage() {
                     className="h-10 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                   >
                     <XCircle className="h-4 w-4 mr-2" />
-                    {t("payments.filters.clearAll") || "Clear All"}
+                    {t("payments.filters.clearAll") || "Effacer les filtres"}
                   </Button>
                 )}
               </div>
@@ -782,19 +782,19 @@ export default function PaymentsPage() {
                 <CreditCard className="h-12 w-12 text-muted-foreground" />
                 <h3 className="text-lg font-semibold">
                   {t("payments.empty.title", {
-                    defaultValue: "No payments found",
+                    defaultValue: "Aucun paiement trouvé",
                   })}
                 </h3>
                 <p className="text-muted-foreground mb-2">
                   {t("payments.empty.descriptionStart", {
-                    defaultValue: "No payments have been created yet.",
+                    defaultValue: "Aucun paiement n’a encore été créé.",
                   })}
                 </p>
                 <Link href="/dashboard/payments/new">
                   <Button variant="outline" size="sm">
                     <Plus className="mr-2 h-4 w-4" />
                     {t("payments.header.addPayment", {
-                      defaultValue: "Add Payment",
+                      defaultValue: "Ajouter un paiement",
                     })}
                   </Button>
                 </Link>
@@ -1026,7 +1026,7 @@ export default function PaymentsPage() {
               {/* Filters */}
               <div className="flex flex-wrap items-center gap-3">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue
                       placeholder={t("payments.filters.allStatuses")}
                     />
@@ -1054,7 +1054,7 @@ export default function PaymentsPage() {
                 </Select>
 
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue placeholder={t("payments.filters.allTypes")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -1092,7 +1092,7 @@ export default function PaymentsPage() {
                   value={paymentMethodFilter}
                   onValueChange={setPaymentMethodFilter}
                 >
-                  <SelectTrigger className="h-10 w-[130px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                  <SelectTrigger className="h-10 w-full min-w-0 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[130px]">
                     <SelectValue
                       placeholder={t("payments.filters.allMethods")}
                     />
@@ -1145,7 +1145,7 @@ export default function PaymentsPage() {
                     className="h-10 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                   >
                     <XCircle className="h-4 w-4 mr-2" />
-                    {t("payments.filters.clearAll") || "Clear All"}
+                    {t("payments.filters.clearAll") || "Effacer les filtres"}
                   </Button>
                 )}
               </div>
@@ -1162,7 +1162,7 @@ export default function PaymentsPage() {
                   <CreditCard className="h-12 w-12 text-muted-foreground" />
                 ),
                 title: t("payments.empty.title", {
-                  defaultValue: "No payments found",
+                  defaultValue: "Aucun paiement trouvé",
                 }),
                 description:
                   searchTerm ||
@@ -1170,17 +1170,17 @@ export default function PaymentsPage() {
                   typeFilter !== "all" ||
                   paymentMethodFilter !== "all"
                     ? t("payments.empty.description", {
-                        defaultValue: "No payments match your current filters.",
+                        defaultValue: "Aucun paiement ne correspond aux filtres actuels.",
                       })
                     : t("payments.empty.descriptionStart", {
-                        defaultValue: "No payments have been created yet.",
+                        defaultValue: "Aucun paiement n’a encore été créé.",
                       }),
                 action: (
                   <Link href="/dashboard/payments/new">
                     <Button variant="outline" size="sm">
                       <Plus className="mr-2 h-4 w-4" />
                       {t("payments.header.addPayment", {
-                        defaultValue: "Add Payment",
+                        defaultValue: "Ajouter un paiement",
                       })}
                     </Button>
                   </Link>
@@ -1233,7 +1233,7 @@ export default function PaymentsPage() {
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

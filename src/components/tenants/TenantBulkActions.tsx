@@ -283,7 +283,7 @@ export default function TenantBulkActions({
               disabled={isLoading}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isLoading ? "Deleting..." : "Delete"}
+              {isLoading ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

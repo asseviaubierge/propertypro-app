@@ -29,6 +29,7 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
     const propertyId = searchParams.get("propertyId");
     const leaseId = searchParams.get("leaseId");
     const status = searchParams.get("status");
+    const includeSettled = searchParams.get("includeSettled") === "true";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
     const sortBy = searchParams.get("sortBy") || "dueDate";
@@ -61,7 +62,7 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
     if (leaseId) filter.leaseId = new Types.ObjectId(leaseId);
     if (status) {
       filter.status = status;
-    } else {
+    } else if (!includeSettled) {
       filter.balanceRemaining = { $gt: 0 };
     }
 
@@ -128,7 +129,6 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
       invoices = aggResult[0]?.invoices || [];
       total = aggResult[0]?.total || 0;
     } else {
-      console.log("INVOICE FILTER:", filter);
 
       const [docs, count] = await Promise.all([
         Invoice.find(filter)
@@ -201,7 +201,6 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
         propertyRows.map((property: any) => [property._id.toString(), property])
       );
 
-      console.log("INVOICE DOCS:", docs.length);
 
       invoices = docs.map((doc: any) => {
         const tenantId = doc.tenantId?.toString();

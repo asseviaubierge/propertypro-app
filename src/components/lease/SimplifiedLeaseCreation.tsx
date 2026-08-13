@@ -871,7 +871,7 @@ Nom et signature                    Nom et signature                    Intermé
                   )}
                   emptyMessage={t(
                     "leases.new.form.sections.propertyTenant.messages.noPropertiesFound",
-                    { defaultValue: "No property found." }
+                    { defaultValue: "Aucune propriété trouvée." }
                   )}
                   disabled={loadingProperties}
                 />
@@ -954,7 +954,7 @@ Nom et signature                    Nom et signature                    Intermé
                 )}
                 emptyMessage={t(
                   "leases.new.form.sections.propertyTenant.messages.noTenantFound",
-                  { defaultValue: "No tenant found." }
+                  { defaultValue: "Aucun locataire trouvé." }
                 )}
               />
               {fieldErrors.tenantId && (

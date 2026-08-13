@@ -513,7 +513,7 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("nav.accounting.transactions", { defaultValue: "Transactions" })}
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base">

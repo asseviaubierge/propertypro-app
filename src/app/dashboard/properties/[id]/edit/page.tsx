@@ -126,7 +126,7 @@ export default function EditPropertyPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl flex items-center gap-3">
             <Building2 className="h-8 w-8" />
             Modifier la propriété
           </h1>

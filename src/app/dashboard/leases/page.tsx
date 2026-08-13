@@ -657,14 +657,15 @@ export default function LeasesPage() {
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                router.push(`/dashboard/leases/${lease._id}/invoice`)
+            <LeaseInvoiceModal
+              lease={lease}
+              trigger={
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  {t("leases.actions.viewInvoice")}
+                </DropdownMenuItem>
               }
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              {t("leases.actions.viewInvoice")}
-            </DropdownMenuItem>
+            />
             <LeaseInvoiceModal
               lease={lease}
               trigger={
@@ -880,7 +881,7 @@ export default function LeasesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("leases.header.title")}
           </h1>
           <p className="text-muted-foreground">{t("leases.header.subtitle")}</p>

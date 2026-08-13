@@ -37,7 +37,7 @@ export function ConfirmationDialog({
   title,
   description,
   confirmText = "Confirm",
-  cancelText = "Cancel",
+  cancelText = "Annuler",
   variant = "default",
   onConfirm,
   loading = false,
@@ -107,7 +107,7 @@ export function DeleteConfirmationDialog({
     <ConfirmationDialog
       title={`Delete ${itemType}`}
       description={`Are you sure you want to delete "${itemName}"? This action cannot be undone.`}
-      confirmText="Delete"
+      confirmText="Supprimer"
       variant="destructive"
       onConfirm={onConfirm}
       loading={loading}

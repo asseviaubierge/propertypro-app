@@ -856,7 +856,7 @@ export default function AnnouncementsPage({
       {!embedded && (
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               {t("announcements.header.title")}
             </h1>
             <p className="text-muted-foreground">

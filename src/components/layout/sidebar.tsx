@@ -421,6 +421,13 @@ const navigationSections: NavSection[] = [
             roles: [UserRole.ADMIN],
             requiredPermissions: ["role_management"],
           },
+          {
+            title: "nav.admin.subscriptions",
+            href: "/dashboard/admin/subscriptions",
+            icon: CreditCard,
+            roles: [UserRole.ADMIN],
+            requiredPermissions: ["system_settings"],
+          },
         ],
       },
       {
@@ -473,9 +480,11 @@ const navigationSections: NavSection[] = [
 interface SidebarProps {
   className?: string;
   isCollapsed?: boolean;
+  hideHeader?: boolean;
+  onNavigate?: () => void;
 }
 
-export function Sidebar({ className, isCollapsed = false }: SidebarProps) {
+export function Sidebar({ className, isCollapsed = false, hideHeader = false, onNavigate }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -814,7 +823,9 @@ export function Sidebar({ className, isCollapsed = false }: SidebarProps) {
             if (hasChildren) {
               e.preventDefault();
               toggleExpanded(item.href);
+              return;
             }
+            onNavigate?.();
           }}
           className={cn(
             "relative group flex items-center text-sm font-medium transition-all duration-200 rounded-lg",
@@ -974,54 +985,56 @@ export function Sidebar({ className, isCollapsed = false }: SidebarProps) {
       )}
     >
       {/* Header */}
-      <div
-        className={cn(
-          "flex h-16 items-center flex-shrink-0 border-b border-gray-200 dark:border-gray-800 gap-2",
-          isCollapsed ? "px-2 justify-center" : "px-4",
-        )}
-      >
-        <Link
-          href="/dashboard"
+      {!hideHeader && (
+        <div
           className={cn(
-            "flex items-center hover:opacity-80 transition-opacity duration-150",
-            isCollapsed ? "justify-center gap-0" : "flex-1 gap-3",
+            "flex h-16 items-center flex-shrink-0 border-b border-gray-200 dark:border-gray-800 gap-2",
+            isCollapsed ? "px-2 justify-center" : "px-4",
           )}
         >
-          <div className="flex items-center justify-center">
-            {isCollapsed ? (
-              <Image
-                src={currentIconUrl}
-                loading="lazy"
-                alt={companyName}
-                width={32}
-                height={32}
-                className="h-8 w-8 object-contain"
-              />
-            ) : showLogoImage ? (
-              <Image
-                src={currentLogoUrl}
-                loading="lazy"
-                alt={companyName}
-                width={140}
-                height={36}
-                onError={() => setLogoError(true)}
-                className="h-8 w-auto max-w-[140px] object-contain"
-              />
-            ) : (
-              <span
-                className={cn(
-                  "truncate text-lg font-bold tracking-tight",
-                  navColor === "apparent"
-                    ? "text-white"
-                    : "text-gray-900 dark:text-white",
-                )}
-              >
-                {companyName}
-              </span>
+          <Link
+            href="/dashboard"
+            className={cn(
+              "flex items-center hover:opacity-80 transition-opacity duration-150",
+              isCollapsed ? "justify-center gap-0" : "flex-1 gap-3",
             )}
-          </div>
-        </Link>
-      </div>
+          >
+            <div className="flex items-center justify-center">
+              {isCollapsed ? (
+                <Image
+                  src={currentIconUrl}
+                  loading="lazy"
+                  alt={companyName}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                />
+              ) : showLogoImage ? (
+                <Image
+                  src={currentLogoUrl}
+                  loading="lazy"
+                  alt={companyName}
+                  width={140}
+                  height={36}
+                  onError={() => setLogoError(true)}
+                  className="h-8 w-auto max-w-[140px] object-contain"
+                />
+              ) : (
+                <span
+                  className={cn(
+                    "truncate text-lg font-bold tracking-tight",
+                    navColor === "apparent"
+                      ? "text-white"
+                      : "text-gray-900 dark:text-white",
+                  )}
+                >
+                  {companyName}
+                </span>
+              )}
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav

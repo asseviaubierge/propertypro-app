@@ -888,7 +888,7 @@ export default function LeaseInvoicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {isTenant
               ? t("leases.invoices.header.myTitle")
               : t("leases.invoices.header.title")}
@@ -1248,12 +1248,12 @@ export default function LeaseInvoicesPage() {
                   <FileText className="h-12 w-12 text-muted-foreground" />
                   <h3 className="text-lg font-semibold">
                     {t("leases.invoices.empty.noInvoices", {
-                      defaultValue: "No invoices found",
+                      defaultValue: "Aucune facture trouvée",
                     })}
                   </h3>
                   <p className="text-muted-foreground mb-2">
                     {t("leases.invoices.empty.description", {
-                      defaultValue: "No invoices match your current filters.",
+                      defaultValue: "Aucune facture ne correspond aux filtres actuels.",
                     })}
                   </p>
                   {!isTenant &&
@@ -1537,10 +1537,10 @@ export default function LeaseInvoicesPage() {
               emptyState={{
                 icon: <FileText className="h-12 w-12 text-muted-foreground" />,
                 title: t("leases.invoices.empty.noInvoices", {
-                  defaultValue: "No invoices found",
+                  defaultValue: "Aucune facture trouvée",
                 }),
                 description: t("leases.invoices.empty.description", {
-                  defaultValue: "No invoices match your current filters.",
+                  defaultValue: "Aucune facture ne correspond aux filtres actuels.",
                 }),
               }}
               striped

@@ -42,12 +42,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { InvoiceStatus } from "@/types";
-import {
-  printInvoice,
-  downloadInvoiceAsPDF,
-  type PrintableInvoice,
-} from "@/lib/invoice-print";
-import { normalizeInvoiceForPrint } from "@/lib/invoice/invoice-shared";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
 interface Invoice {
@@ -206,31 +200,16 @@ export default function TenantInvoiceHistory({
     );
   };
 
-  const handleViewInvoice = (invoiceId: string) => {
-    window.open(`/dashboard/leases/invoices/${invoiceId}`, "_blank");
+  const openCanonicalInvoice = (invoiceId: string) => {
+    window.location.assign(`/dashboard/accounting/invoices/${invoiceId}`);
   };
 
-  const handleDownloadInvoice = async (invoice: Invoice) => {
-    try {
-      // Fetch company info from display settings
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const companyInfo = await getCompanyInfo();
+  const handleViewInvoice = (invoiceId: string) => {
+    openCanonicalInvoice(invoiceId);
+  };
 
-      const printable = normalizeInvoiceForPrint(invoice, {
-        companyInfo: companyInfo || undefined,
-      }) as PrintableInvoice;
-      await downloadInvoiceAsPDF(printable);
-      toast.success(t("tenants.details.invoiceHistory.toasts.downloadSuccess"));
-    } catch (error) {
-      toast.error(
-        t("tenants.details.invoiceHistory.toasts.downloadFailedTitle"),
-        {
-          description: t(
-            "tenants.details.invoiceHistory.toasts.downloadFailedDescription"
-          ),
-        }
-      );
-    }
+  const handleDownloadInvoice = (invoice: Invoice) => {
+    openCanonicalInvoice(invoice._id);
   };
 
   const handleEmailInvoice = async (invoiceId: string) => {
@@ -264,23 +243,8 @@ export default function TenantInvoiceHistory({
     }
   };
 
-  const handlePrintInvoice = async (invoice: Invoice) => {
-    try {
-      // Fetch company info from display settings
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const companyInfo = await getCompanyInfo();
-
-      const printable = normalizeInvoiceForPrint(invoice, {
-        companyInfo: companyInfo || undefined,
-      }) as PrintableInvoice;
-      printInvoice(printable);
-    } catch (error) {
-      toast.error(t("tenants.details.invoiceHistory.toasts.printFailedTitle"), {
-        description: t(
-          "tenants.details.invoiceHistory.toasts.printFailedDescription"
-        ),
-      });
-    }
+  const handlePrintInvoice = (invoice: Invoice) => {
+    openCanonicalInvoice(invoice._id);
   };
 
   if (loading) {

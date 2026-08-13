@@ -9,27 +9,31 @@ import { User } from "@/models";
 import { resolveAccessProfile } from "@/lib/server-permissions";
 import { getAllowedMessagingUserIds } from "@/lib/messaging-access";
 
+const ALLOWED_ROLES = ["admin", "super_admin", "manager", "tenant"];
+
 export const GET = withPermissionAndDB("profile_management")(
   async (user, request: NextRequest) => {
     try {
       const access = await resolveAccessProfile(user.role);
       const params = new URL(request.url).searchParams;
       const search = params.get("search")?.trim() ?? "";
-      const limit = Math.min(Math.max(Number.parseInt(params.get("limit") ?? "50", 10) || 50, 1), 200);
-      const allowedIds = await getAllowedMessagingUserIds({ ...access, id: String(user.id) });
+      const limit = Math.min(
+        Math.max(Number.parseInt(params.get("limit") ?? "50", 10) || 50, 1),
+        200
+      );
+
+      const currentUserId = String(user.id);
+      const allowedIds = (await getAllowedMessagingUserIds({
+        ...access,
+        id: currentUserId,
+      })).filter((id) => id !== currentUserId && Types.ObjectId.isValid(id));
 
       const filter: Record<string, any> = {
-        _id: { $ne: user.id },
+        _id: { $in: allowedIds.map((id) => new Types.ObjectId(id)) },
+        role: { $in: ALLOWED_ROLES },
         isActive: true,
         deletedAt: null,
       };
-
-      if (allowedIds !== null) {
-        const ids = allowedIds
-          .filter((value) => Types.ObjectId.isValid(value) && value !== String(user.id))
-          .map((value) => new Types.ObjectId(value));
-        filter._id = { $in: ids };
-      }
 
       if (search) {
         filter.$or = [
@@ -42,7 +46,7 @@ export const GET = withPermissionAndDB("profile_management")(
 
       const users = await User.find(filter)
         .select("firstName lastName email phone role avatar isActive")
-        .sort({ firstName: 1, lastName: 1 })
+        .sort({ role: 1, firstName: 1, lastName: 1 })
         .limit(limit)
         .lean();
 
@@ -59,8 +63,11 @@ export const GET = withPermissionAndDB("profile_management")(
 
       return createSuccessResponse({ users: formatted, total: formatted.length });
     } catch (error) {
-      console.error("Chargement des contacts de messagerie:", error);
-      return createErrorResponse("Impossible de charger les contacts", 500);
+      console.error("Messaging contacts error:", error);
+      return createErrorResponse(
+        "Impossible de charger les contacts autorisés. Réessayez dans quelques instants.",
+        500
+      );
     }
   }
 );

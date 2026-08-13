@@ -403,11 +403,11 @@ export function MaintenanceRequestForm({
                 })
               : unitId
               ? t("maintenance.form.toasts.noTenantsFoundForUnit", {
-                  defaultValue: "No active tenant found for the selected unit.",
+                  defaultValue: "Aucun locataire actif trouvé pour l’unité sélectionnée.",
                 })
               : t("maintenance.form.toasts.noTenantsFoundForProperty", {
                   defaultValue:
-                    "No active tenants found for the selected property.",
+                    "Aucun locataire actif trouvé pour la propriété sélectionnée.",
                 }),
             {
               id: `maintenance-no-tenants-${requestKey}`,
@@ -641,7 +641,7 @@ export function MaintenanceRequestForm({
                           emptyMessage={t(
                             "maintenance.form.category.emptyMessage",
                             {
-                              defaultValue: "No category found.",
+                              defaultValue: "Aucune catégorie trouvée.",
                             }
                           )}
                           triggerClassName="h-11 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
@@ -777,7 +777,7 @@ export function MaintenanceRequestForm({
                             emptyMessage={t(
                               "maintenance.form.property.emptyMessage",
                               {
-                                defaultValue: "No property found.",
+                                defaultValue: "Aucune propriété trouvée.",
                               }
                             )}
                             triggerClassName="h-11 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
@@ -813,7 +813,7 @@ export function MaintenanceRequestForm({
                               emptyMessage={t(
                                 "maintenance.form.unit.emptyMessage",
                                 {
-                                  defaultValue: "No unit found.",
+                                  defaultValue: "Aucune unité trouvée.",
                                 }
                               )}
                             />
@@ -852,7 +852,7 @@ export function MaintenanceRequestForm({
                                     "maintenance.form.tenant.noTenantsForUnit",
                                     {
                                       defaultValue:
-                                        "No tenants found for the selected unit",
+                                        "Aucun locataire trouvé pour l’unité sélectionnée",
                                     }
                                   )
                                 : watchedPropertyId

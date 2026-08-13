@@ -346,6 +346,16 @@ export function withAccessAndDB(requirement: AccessRequirement) {
           return createErrorResponse("Account is deactivated", 403);
         }
 
+        // Conservation des preuves E-IMMO : toute suppression HTTP est réservée
+        // au rôle système Super Administrateur. Les permissions Manager, même
+        // personnalisées, ne peuvent pas contourner cette règle globale.
+        if (request.method === "DELETE" && user.systemRole !== UserRole.ADMIN) {
+          return createErrorResponse(
+            "Action non autorisée. Vous n’êtes pas autorisé à effectuer cette suppression. Seul le Super Administrateur peut supprimer définitivement un élément afin de préserver l’historique et les preuves.",
+            403
+          );
+        }
+
         if (!hasAccess(user, requirement)) {
           return createErrorResponse("Insufficient permissions", 403);
         }

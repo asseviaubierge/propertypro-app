@@ -258,7 +258,7 @@ export function EmergencyStatusManagement({
 
     if (canTransitionTo(MaintenanceStatus.CANCELLED)) {
       actions.push({
-        label: "Cancel",
+        label: "Annuler",
         icon: XCircle,
         variant: "outline" as const,
         onClick: () => handleStatusChange(MaintenanceStatus.CANCELLED),

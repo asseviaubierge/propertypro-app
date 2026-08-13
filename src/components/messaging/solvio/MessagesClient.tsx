@@ -196,9 +196,11 @@ export function MessagesClient({ userId }: MessagesClientProps) {
         body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const errorText = await res.text();
+        const errorPayload = await res.json().catch(() => null);
         throw new Error(
-          errorText || `Failed to create conversation (${res.status})`
+          errorPayload?.error ||
+            errorPayload?.message ||
+            `Impossible de créer la conversation (${res.status})`
         );
       }
       const payload = await res.json();
@@ -210,7 +212,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
       const createdId = created?._id || created?.id || null;
       toast.success(
         t("messages.toasts.conversationCreated", {
-          defaultValue: "Conversation created successfully!",
+          defaultValue: "Conversation créée avec succès.",
         })
       );
       setShowNewDialog(false);
@@ -223,7 +225,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
         error instanceof Error
           ? error.message
           : t("messages.toasts.conversationError", {
-              defaultValue: "Failed to create conversation",
+              defaultValue: "Impossible de créer la conversation",
             })
       );
       throw error;

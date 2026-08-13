@@ -1156,7 +1156,7 @@ export default function PropertyDetailsPage() {
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {isDeleting ? "Deleting..." : "Delete Property"}
+              {isDeleting ? "Suppression..." : "Delete Property"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

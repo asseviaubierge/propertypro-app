@@ -371,36 +371,17 @@ export default function TenantPayRentPage() {
     return normalizedInvoice as PrintableInvoice;
   };
 
-  const handleDownloadInvoice = async (payment: TenantPayment) => {
-    try {
-      const printable = buildPrintableInvoice(payment);
-      if (!printable) {
-        throw new Error(t("payments.payRent.toasts.invoiceNotAvailable"));
-      }
-
-      // Fetch company info from display settings
-      const { getCompanyInfo } = await import("@/lib/utils/company-info");
-      const companyInfo = await getCompanyInfo();
-
-      // Normalize with company info
-      const normalizedPrintable = normalizeInvoiceForPrint(printable, {
-        companyInfo: companyInfo || undefined,
-      }) as PrintableInvoice;
-
-      await downloadInvoiceAsPDF(normalizedPrintable);
-      toast.success(t("payments.payRent.toasts.invoiceDownloaded"));
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : t("payments.payRent.toasts.downloadFailed")
-      );
+  const handleDownloadInvoice = (payment: TenantPayment) => {
+    if (payment.invoiceId?._id) {
+      router.push(`/dashboard/accounting/invoices/${payment.invoiceId._id}`);
+    } else {
+      toast.error(t("payments.payRent.toasts.invoiceNotAvailable"));
     }
   };
 
   const handleViewInvoice = (payment: TenantPayment) => {
     if (payment.invoiceId?._id) {
-      router.push(`/dashboard/leases/invoices/${payment.invoiceId._id}`);
+      router.push(`/dashboard/accounting/invoices/${payment.invoiceId._id}`);
     } else {
       toast.error(t("payments.payRent.toasts.invoiceNotAvailable"));
     }
@@ -463,7 +444,7 @@ export default function TenantPayRentPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               {t("payments.payRent.header.title")}
             </h1>
             <p className="text-muted-foreground">

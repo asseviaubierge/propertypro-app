@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/form";
 import {
   CreditCard,
-  DollarSign,
   Calendar,
   User,
   Building2,
@@ -193,13 +192,13 @@ function PaymentFormInner({
 
   const handleStripePayment = async () => {
     if (!stripe || !elements || !stripeClientSecret) {
-      toast.error("Payment system not ready");
+      toast.error("Le système de paiement n’est pas prêt.");
       return;
     }
 
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) {
-      toast.error("Card information not found");
+      toast.error("Informations de carte introuvables.");
       return;
     }
 
@@ -213,19 +212,18 @@ function PaymentFormInner({
       });
 
       if (error) {
-        toast.error(error.message || "Payment failed");
-        setCardError(error.message || "Payment failed");
+        toast.error(error.message || "Le paiement a échoué");
+        setCardError(error.message || "Le paiement a échoué");
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        toast.success("Payment processed successfully!");
+        toast.success("Paiement traité avec succès.");
         if (onStripePaymentSuccess) {
           onStripePaymentSuccess(paymentIntent.id, form.getValues());
         }
       } else {
-        toast.error("Payment was not successful");
+        toast.error("Le paiement n’a pas abouti.");
       }
     } catch (err) {
-      console.error("Stripe payment error:", err);
-      toast.error("An unexpected error occurred");
+      toast.error("Une erreur inattendue est survenue.");
     } finally {
       setProcessingStripe(false);
     }
@@ -304,7 +302,7 @@ function PaymentFormInner({
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-xl font-bold leading-tight md:text-3xl">
           {initialData
             ? t("payments.new.form.headerTitleEdit")
             : t("payments.new.form.headerTitle")}
@@ -399,14 +397,14 @@ function PaymentFormInner({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-muted-foreground md:text-xs">FCFA</span>
                           <Input
                             type="number"
                             step="0.01"
                             placeholder={t(
                               "payments.new.form.paymentDetails.amountPlaceholder"
                             )}
-                            className="pl-10"
+                            className="pl-12 md:pl-14"
                             {...field}
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value) || 0)
@@ -737,7 +735,7 @@ function PaymentFormInner({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Unit
+                        Unité
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -745,7 +743,7 @@ function PaymentFormInner({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select unit" />
+                            <SelectValue placeholder="Sélectionner une unité" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -753,7 +751,7 @@ function PaymentFormInner({
                             <SelectItem key={unit._id} value={unit._id}>
                               <div>
                                 <div className="font-medium">
-                                  Unit {unit.unitNumber}
+                                  Unité {unit.unitNumber}
                                   {unit.type && (
                                     <span className="ml-2 text-xs text-muted-foreground">
                                       ({unit.type})
@@ -762,7 +760,7 @@ function PaymentFormInner({
                                 </div>
                                 {unit.rentAmount && (
                                   <div className="text-sm text-muted-foreground">
-                                    ${unit.rentAmount.toLocaleString()}/month
+                                    {unit.rentAmount.toLocaleString("fr-FR")} FCFA/mois
                                   </div>
                                 )}
                               </div>
@@ -771,7 +769,7 @@ function PaymentFormInner({
                         </SelectContent>
                       </Select>
                       <FormDescription>
-                        Select the specific unit for this payment
+                        Sélectionnez l’unité concernée par ce paiement
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

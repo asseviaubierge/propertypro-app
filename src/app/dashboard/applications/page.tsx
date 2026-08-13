@@ -208,7 +208,7 @@ export default function ApplicationsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Applications</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Applications</h1>
         </div>
         <div className="animate-pulse space-y-4">
           <div className="h-32 bg-gray-200 rounded"></div>
@@ -223,7 +223,7 @@ export default function ApplicationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Applications</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Applications</h1>
           <p className="text-muted-foreground">
             Review and manage tenant applications
           </p>
