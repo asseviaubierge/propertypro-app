@@ -879,24 +879,16 @@ export const LOCALES: Record<string, Locale> = {
 
 export class LocalizationService {
   private static instance: LocalizationService;
-  private currentLocale: string = "en-US";
+  private currentLocale: string = "fr-FR";
   private currentCurrency: string = "XOF";
   private exchangeRates: Map<string, ExchangeRate> = new Map();
 
   private translations: Record<string, Record<string, string>> = translations;
 
   private constructor() {
-    // Initialize with browser locale if available
+    // L'application est volontairement proposée intégralement en français.
     if (typeof window !== "undefined") {
-      this.currentLocale = navigator.language || "en-US";
-      if (!LOCALES[this.currentLocale]) {
-        // Fallback to language code only
-        const langCode = this.currentLocale.split("-")[0];
-        const fallbackLocale = Object.keys(LOCALES).find((locale) =>
-          locale.startsWith(langCode)
-        );
-        this.currentLocale = fallbackLocale || "en-US";
-      }
+      this.currentLocale = "fr-FR";
       const savedCurrency = (() => {
         try {
           return localStorage.getItem("PropertyPro-currency") || undefined;
@@ -937,7 +929,7 @@ export class LocalizationService {
   }
 
   public getAllLocales(): Locale[] {
-    return Object.values(LOCALES);
+    return [LOCALES["fr-FR"]];
   }
 
   public getAllCurrencies(): Currency[] {
@@ -946,9 +938,7 @@ export class LocalizationService {
 
   // Setters
   public setLocale(localeCode: string): void {
-    if (LOCALES[localeCode]) {
-      this.currentLocale = localeCode;
-    }
+    this.currentLocale = "fr-FR";
   }
 
   public setCurrency(currencyCode: string): void {

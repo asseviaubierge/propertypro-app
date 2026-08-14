@@ -47,7 +47,7 @@ export const POST = withPermissionAndDB([
       // Verify lease exists and user has access
       const lease = await Lease.findById(leaseId);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       const body = await request.json();
@@ -208,7 +208,7 @@ export const GET = withAccessAndDB(PAYMENT_SYNC_READ_ACCESS)(
         .populate("propertyId", "name address");
 
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       // Get all payments for this lease

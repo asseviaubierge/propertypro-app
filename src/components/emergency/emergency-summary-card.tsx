@@ -131,9 +131,9 @@ export function EmergencySummaryCard({
   };
 
   const getStatusText = () => {
-    if (stats.criticalCount > 0) return "Critical";
-    if (stats.overdueEmergencies > 0) return "Overdue";
-    if (stats.activeEmergencies > 0) return "Active";
+    if (stats.criticalCount > 0) return "Critique";
+    if (stats.overdueEmergencies > 0) return "En retard";
+    if (stats.activeEmergencies > 0) return "Actif";
     return "All Clear";
   };
 
@@ -141,15 +141,15 @@ export function EmergencySummaryCard({
     if (stats.criticalCount > 0) {
       return (
         <Badge variant="destructive" className="animate-pulse">
-          Critical
+          Critique
         </Badge>
       );
     }
     if (stats.overdueEmergencies > 0) {
-      return <Badge variant="destructive">Overdue</Badge>;
+      return <Badge variant="destructive">En retard</Badge>;
     }
     if (stats.activeEmergencies > 0) {
-      return <Badge variant="secondary">Active</Badge>;
+      return <Badge variant="secondary">Actif</Badge>;
     }
     return (
       <Badge variant="default" className="bg-green-100 text-green-800">
@@ -173,7 +173,7 @@ export function EmergencySummaryCard({
         {/* Key Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Active</p>
+            <p className="text-xs text-muted-foreground">Actif</p>
             <p
               className={`text-lg font-bold ${
                 stats.activeEmergencies > 0 ? "text-red-600" : "text-green-600"
@@ -183,7 +183,7 @@ export function EmergencySummaryCard({
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Overdue</p>
+            <p className="text-xs text-muted-foreground">En retard</p>
             <p
               className={`text-lg font-bold ${
                 stats.overdueEmergencies > 0
@@ -195,7 +195,7 @@ export function EmergencySummaryCard({
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Critical</p>
+            <p className="text-xs text-muted-foreground">Critique</p>
             <p
               className={`text-lg font-bold ${
                 stats.criticalCount > 0 ? "text-red-700" : "text-green-600"
@@ -205,7 +205,7 @@ export function EmergencySummaryCard({
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Avg Response</p>
+            <p className="text-xs text-muted-foreground">Réponse moyenne</p>
             <p
               className={`text-lg font-bold ${
                 stats.avgResponseTime <= 2
@@ -249,7 +249,7 @@ export function EmergencySummaryCard({
                 {getStatusText()}
               </span>
             </div>
-            <span className="text-xs text-muted-foreground">Last 7 days</span>
+            <span className="text-xs text-muted-foreground">7 derniers jours</span>
           </div>
           {stats.criticalCount > 0 && (
             <p className="text-xs text-red-600 mt-1">

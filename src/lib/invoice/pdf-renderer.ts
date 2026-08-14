@@ -287,10 +287,8 @@ async function renderHeader(
         );
         logoRendered = true;
       }
-    } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("Failed to render company logo in PDF:", error);
-      }
+    } catch {
+      // Le logo est facultatif : poursuivre avec les initiales de l'émetteur.
     }
   }
 

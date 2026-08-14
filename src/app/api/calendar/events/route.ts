@@ -25,11 +25,13 @@ import type {
 import {
   calendarService,
   CreateEventParams,
+  EventQueryParams,
 } from "@/lib/services/calendar.service";
 import { calendarEmailService } from "@/lib/services/calendar-email.service";
 // import { googleCalendarService } from "@/lib/services/google-calendar.service";
 import { User } from "@/models";
 import { z } from "zod";
+import { buildCalendarScope } from "@/lib/calendar-scope";
 
 // ============================================================================
 // VALIDATION SCHEMAS
@@ -173,6 +175,7 @@ const CALENDAR_READ_ACCESS: AccessRequirement = {
 export const GET = withAccessAndDB(CALENDAR_READ_ACCESS)(async (
   user: AuthenticatedAccessUser,
   request: NextRequest,
+  context?: { tenantProfile?: { _id?: unknown } | null },
 ) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -189,21 +192,16 @@ export const GET = withAccessAndDB(CALENDAR_READ_ACCESS)(async (
       );
     }
 
-    const params = validation.data;
+    const params: EventQueryParams = validation.data;
 
-    // For tenants, only show events they're involved in
-    if (user.isTenant) {
-      params.attendeeId = user.id.toString();
-    }
-
-    // For property managers and owners, filter by their properties
-    if (user.isManager && !user.isAdmin) {
-      // TODO: Add property filtering based on user's assigned properties
-    }
+    params.scopeQuery = await buildCalendarScope(
+      user,
+      context?.tenantProfile,
+    );
 
     const result = await calendarService.getEvents(params);
 
-    return createSuccessResponse(result, "Events retrieved successfully");
+    return createSuccessResponse(result, "Événements récupérés");
   } catch (error) {
     return handleApiError(error);
   }

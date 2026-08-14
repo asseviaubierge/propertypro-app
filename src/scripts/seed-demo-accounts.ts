@@ -28,7 +28,7 @@ const DEMO_ACCOUNTS = [
   {
     email: "manager@propertypro.com",
     password: "Manager123$",
-    firstName: "Property",
+    firstName: "Bien",
     lastName: "Manager",
     role: "manager",
     phone: "+1234567891",
@@ -39,7 +39,7 @@ const DEMO_ACCOUNTS = [
     email: "tenant@propertypro.com",
     password: "Tenant123$",
     firstName: "Demo",
-    lastName: "Tenant",
+    lastName: "Locataire",
     role: "tenant",
     phone: "+1234567892",
     isActive: true,
@@ -57,7 +57,7 @@ const DEMO_ACCOUNTS = [
     },
     emergencyContacts: [
       {
-        name: "Emergency Contact",
+        name: "Contact d’urgence",
         relationship: "Family",
         phone: "+1234567893",
         email: "emergency@example.com",

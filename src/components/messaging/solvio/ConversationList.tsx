@@ -211,7 +211,7 @@ export function ConversationList({
                         {lastContent}
                       </>
                     ) : (
-                      <span className="italic">No messages yet</span>
+                      <span className="italic">Aucun message pour le moment</span>
                     )}
                   </p>
                   {conversation.lastActivityAt && (

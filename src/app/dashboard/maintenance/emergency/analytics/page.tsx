@@ -49,15 +49,15 @@ export default function EmergencyAnalyticsPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            Overview
+            Vue d’ensemble
           </TabsTrigger>
           <TabsTrigger value="performance" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            Performance
+            Rendement
           </TabsTrigger>
           <TabsTrigger value="trends" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
-            Trends
+            Évolutions
           </TabsTrigger>
           <TabsTrigger value="alerts" className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
@@ -137,7 +137,7 @@ export default function EmergencyAnalyticsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Performance Metrics by Category</CardTitle>
+              <CardTitle>Indicateurs de rendement par catégorie</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -209,7 +209,7 @@ export default function EmergencyAnalyticsPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Trends</CardTitle>
+                <CardTitle>Évolutions mensuelles</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -245,7 +245,7 @@ export default function EmergencyAnalyticsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Peak Hours Analysis</CardTitle>
+                <CardTitle>Analyse des heures de pointe</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -318,7 +318,7 @@ export default function EmergencyAnalyticsPage() {
 
             <Card className="border-yellow-200 bg-yellow-50">
               <CardHeader>
-                <CardTitle className="text-yellow-700">Unassigned</CardTitle>
+                <CardTitle className="text-yellow-700">Non attribué</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600 mb-2">2</div>

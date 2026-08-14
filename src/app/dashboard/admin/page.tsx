@@ -741,7 +741,7 @@ export default function UserListPage() {
                 onSearch={handleSearch}
                 isLoading={isSearching}
                 className="flex-1"
-                ariaLabel="Search users"
+                ariaLabel="Rechercher des utilisateurs"
               />
 
               <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -812,7 +812,7 @@ export default function UserListPage() {
                   className="h-10 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  {t("admin.usersPage.selection.clearSelection") || "Clear"}
+                  {t("admin.usersPage.selection.clearSelection") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -1063,15 +1063,15 @@ export default function UserListPage() {
               onPageChange={setCurrentPage}
               onPageSizeChange={setItemsPerPage}
               pageSizeOptions={paginationPageSizeOptions}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
               previousLabel={t("common.previous", {
-                defaultValue: "Previous",
+                defaultValue: "Précédent",
               })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={isLoading || isSearching}
             />

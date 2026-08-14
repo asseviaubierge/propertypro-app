@@ -418,24 +418,24 @@ export function EventList({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <Card>
+    <div className={`min-w-0 space-y-3 sm:space-y-6 ${className ?? ""}`}>
+      <Card className="min-w-0 gap-3">
         {/* Header and Filters */}
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold">{t("calendar.list.title")}</h2>
-              <p className="text-muted-foreground">
+        <CardHeader className="min-w-0 px-3 sm:px-6">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <h2 className="text-lg font-bold sm:text-2xl">{t("calendar.list.title")}</h2>
+              <p className="text-xs leading-4 text-muted-foreground sm:text-sm">
                 {t("calendar.list.subtitle")}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button onClick={loadEvents} variant="outline" size="sm">
+            <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+              <Button className="w-full whitespace-nowrap sm:w-auto" onClick={loadEvents} variant="outline" size="sm">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 {t("calendar.actions.refresh")}
               </Button>
               {onEventCreate && (
-                <Button onClick={onEventCreate} size="sm">
+                <Button className="w-full whitespace-nowrap sm:w-auto" onClick={onEventCreate} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   {t("calendar.header.newEvent")}
                 </Button>
@@ -444,8 +444,8 @@ export function EventList({
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-[200px]">
+          <div className="grid min-w-0 grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+            <div className="col-span-2 min-w-0 flex-1 sm:min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -468,7 +468,7 @@ export function EventList({
                 }))
               }
             >
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder={t("calendar.filters.type")} />
               </SelectTrigger>
               <SelectContent>
@@ -492,7 +492,7 @@ export function EventList({
                 }))
               }
             >
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <SelectValue placeholder={t("calendar.filters.status")} />
               </SelectTrigger>
               <SelectContent>
@@ -513,7 +513,7 @@ export function EventList({
                 setFilters((prev) => ({ ...prev, dateRange: value as any }))
               }
             >
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="col-span-2 w-full sm:w-[150px]">
                 <SelectValue placeholder={t("calendar.filters.dateRange")} />
               </SelectTrigger>
               <SelectContent>
@@ -535,7 +535,7 @@ export function EventList({
         </CardHeader>
 
         {/* Events List */}
-        <CardContent className="space-y-4">
+        <CardContent className="min-w-0 space-y-3 px-3 sm:space-y-4 sm:px-6">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <RefreshCw className="h-6 w-6 animate-spin mr-2" />
@@ -558,16 +558,16 @@ export function EventList({
               {filteredEvents.map((event) => (
                 <Card
                   key={event._id.toString()}
-                  className="hover:shadow-md transition-shadow"
+                  className="min-w-0 gap-3 hover:shadow-md transition-shadow"
                 >
-                  <CardContent>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 space-y-3">
+                  <CardContent className="min-w-0 px-3 sm:px-6">
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1 space-y-3">
                         {/* Event Header */}
                         <div className="flex items-start gap-3">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-lg">
+                            <div className="flex min-w-0 flex-wrap items-center gap-2 mb-1">
+                              <h3 className="min-w-0 break-words font-semibold text-base sm:text-lg">
                                 {event.title}
                               </h3>
                               <Badge
@@ -597,7 +597,7 @@ export function EventList({
                         </div>
 
                         {/* Event Details */}
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:text-sm">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
                             <span>

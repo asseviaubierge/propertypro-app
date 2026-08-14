@@ -220,7 +220,7 @@ export default function EmailSettingsPage() {
               ) : (
                 <HardDrive className="h-4 w-4 text-muted-foreground" />
               )}
-              <span className="text-sm font-medium">Active source:</span>
+              <span className="text-sm font-medium">Source active :</span>
               <Badge
                 variant={active.source === "database" ? "default" : "secondary"}
               >
@@ -283,7 +283,7 @@ export default function EmailSettingsPage() {
             <>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="smtpHost">SMTP Host</Label>
+                  <Label htmlFor="smtpHost">Serveur SMTP</Label>
                   <Input
                     id="smtpHost"
                     placeholder="smtp.gmail.com"
@@ -324,7 +324,7 @@ export default function EmailSettingsPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="smtpUser">SMTP Username</Label>
+                  <Label htmlFor="smtpUser">Nom d’utilisateur SMTP</Label>
                   <Input
                     id="smtpUser"
                     autoComplete="off"
@@ -372,16 +372,16 @@ export default function EmailSettingsPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="fromName">From Name</Label>
+                  <Label htmlFor="fromName">Nom de l’expéditeur</Label>
                   <Input
                     id="fromName"
-                    placeholder="PropertyPro"
+                    placeholder="GESTION E-IMMO"
                     value={form.fromName}
                     onChange={(e) => setField("fromName", e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="fromEmail">From Email</Label>
+                  <Label htmlFor="fromEmail">E-mail de l’expéditeur</Label>
                   <Input
                     id="fromEmail"
                     type="email"
@@ -393,7 +393,7 @@ export default function EmailSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="adminEmail">Admin / Reply-To Email</Label>
+                <Label htmlFor="adminEmail">E-mail administrateur / réponse</Label>
                 <Input
                   id="adminEmail"
                   type="email"

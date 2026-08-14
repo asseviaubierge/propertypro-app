@@ -490,7 +490,7 @@ export function LeaseForm({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading form data...</p>
+          <p className="text-muted-foreground">Chargement du formulaire…</p>
         </div>
       </div>
     );
@@ -504,7 +504,7 @@ export function LeaseForm({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Basic Information
+              Informations générales
             </CardTitle>
             <CardDescription>
               Select the property and tenant for this lease
@@ -517,14 +517,14 @@ export function LeaseForm({
                 name="propertyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Property</FormLabel>
+                    <FormLabel>Bien</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a property" />
+                          <SelectValue placeholder="Sélectionner un bien" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -551,7 +551,7 @@ export function LeaseForm({
                 name="unitId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Unit</FormLabel>
+                    <FormLabel>Logement</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -603,11 +603,11 @@ export function LeaseForm({
                                   unit.garden ||
                                   unit.parking?.included) && (
                                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    {unit.balcony && <span>Balcony</span>}
-                                    {unit.patio && <span>Patio</span>}
-                                    {unit.garden && <span>Garden</span>}
+                                    {unit.balcony && <span>Balcon</span>}
+                                    {unit.patio && <span>Terrasse</span>}
+                                    {unit.garden && <span>Jardin</span>}
                                     {unit.parking?.included && (
-                                      <span>Parking</span>
+                                      <span>Stationnement</span>
                                     )}
                                   </div>
                                 )}
@@ -633,14 +633,14 @@ export function LeaseForm({
                 name="tenantId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tenant</FormLabel>
+                    <FormLabel>Locataire</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a tenant" />
+                          <SelectValue placeholder="Sélectionner un locataire" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -679,25 +679,25 @@ export function LeaseForm({
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <span className="text-blue-600 font-medium">Unit:</span>
+                    <span className="text-blue-600 font-medium">Logement :</span>
                     <p className="text-blue-800">
                       {selectedUnit.unitNumber} ({selectedUnit.unitType})
                     </p>
                   </div>
                   <div>
-                    <span className="text-blue-600 font-medium">Size:</span>
+                    <span className="text-blue-600 font-medium">Taille :</span>
                     <p className="text-blue-800">
                       {selectedUnit.bedrooms}BR/{selectedUnit.bathrooms}BA
                     </p>
                   </div>
                   <div>
-                    <span className="text-blue-600 font-medium">Area:</span>
+                    <span className="text-blue-600 font-medium">Surface :</span>
                     <p className="text-blue-800">
                       {selectedUnit.squareFootage} sq ft
                     </p>
                   </div>
                   <div>
-                    <span className="text-blue-600 font-medium">Rent:</span>
+                    <span className="text-blue-600 font-medium">Loyer :</span>
                     <p className="text-blue-800 font-medium">
                       ${selectedUnit.rentAmount}/month
                     </p>
@@ -713,17 +713,17 @@ export function LeaseForm({
                       <div className="flex flex-wrap gap-2 mt-1">
                         {selectedUnit.balcony && (
                           <Badge variant="secondary" className="text-xs">
-                            Balcony
+                            Balcon
                           </Badge>
                         )}
                         {selectedUnit.patio && (
                           <Badge variant="secondary" className="text-xs">
-                            Patio
+                            Terrasse
                           </Badge>
                         )}
                         {selectedUnit.garden && (
                           <Badge variant="secondary" className="text-xs">
-                            Garden
+                            Jardin
                           </Badge>
                         )}
                         {selectedUnit.parking?.included && (
@@ -745,7 +745,7 @@ export function LeaseForm({
                 name="startDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Date</FormLabel>
+                    <FormLabel>Date de début</FormLabel>
                     <FormControl>
                       <FormDatePicker
                         value={field.value ? new Date(field.value) : undefined}
@@ -760,7 +760,7 @@ export function LeaseForm({
                             field.onChange("");
                           }
                         }}
-                        placeholder="Select lease start date"
+                        placeholder="Sélectionner la date de début du bail"
                       />
                     </FormControl>
                     <FormMessage />
@@ -773,7 +773,7 @@ export function LeaseForm({
                 name="endDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Date</FormLabel>
+                    <FormLabel>Date de fin</FormLabel>
                     <FormControl>
                       <FormDatePicker
                         value={field.value ? new Date(field.value) : undefined}
@@ -788,7 +788,7 @@ export function LeaseForm({
                             field.onChange("");
                           }
                         }}
-                        placeholder="Select lease end date"
+                        placeholder="Sélectionner la date de fin du bail"
                         disabled={(date) => {
                           const startDate = form.watch("startDate");
                           return startDate
@@ -807,21 +807,21 @@ export function LeaseForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Statut</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder="Sélectionner un statut" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="draft">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                            Draft
+                            Brouillon
                           </div>
                         </SelectItem>
                         <SelectItem value="pending">
@@ -833,7 +833,7 @@ export function LeaseForm({
                         <SelectItem value="active">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                            Active
+                            Actif
                           </div>
                         </SelectItem>
                         <SelectItem value="expired">
@@ -876,7 +876,7 @@ export function LeaseForm({
                 name="terms.rentAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monthly Rent</FormLabel>
+                    <FormLabel>Loyer mensuel</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -898,7 +898,7 @@ export function LeaseForm({
                 name="terms.securityDeposit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Security Deposit</FormLabel>
+                    <FormLabel>Garantie</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -920,7 +920,7 @@ export function LeaseForm({
                 name="terms.lateFee"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Late Fee</FormLabel>
+                    <FormLabel>Frais de retard</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -942,7 +942,7 @@ export function LeaseForm({
                 name="terms.petDeposit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pet Deposit (Optional)</FormLabel>
+                    <FormLabel>Dépôt pour animaux (facultatif)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -976,14 +976,14 @@ export function LeaseForm({
           <CardContent className="space-y-6">
             {/* Payment Schedule Settings */}
             <div className="space-y-4">
-              <h4 className="text-sm font-medium">Payment Schedule</h4>
+              <h4 className="text-sm font-medium">Échéancier de paiement</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="terms.paymentConfig.rentDueDay"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rent Due Day</FormLabel>
+                      <FormLabel>Jour d’échéance du loyer</FormLabel>
                       <Select
                         onValueChange={(value) =>
                           field.onChange(parseInt(value))
@@ -992,7 +992,7 @@ export function LeaseForm({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select day" />
+                            <SelectValue placeholder="Sélectionner le jour" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -1025,7 +1025,7 @@ export function LeaseForm({
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>Auto-create Payments</FormLabel>
+                        <FormLabel>Créer automatiquement les paiements</FormLabel>
                         <FormDescription>
                           Automatically generate recurring rent payments
                         </FormDescription>
@@ -1046,7 +1046,7 @@ export function LeaseForm({
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>Auto-Generate Invoices</FormLabel>
+                        <FormLabel>Générer automatiquement les factures</FormLabel>
                         <FormDescription>
                           Automatically generate invoices when payments are
                           created
@@ -1068,7 +1068,7 @@ export function LeaseForm({
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>Auto-Email Invoices</FormLabel>
+                        <FormLabel>Envoyer automatiquement les factures par e-mail</FormLabel>
                         <FormDescription>
                           Automatically email invoices to tenants when generated
                         </FormDescription>
@@ -1089,7 +1089,7 @@ export function LeaseForm({
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>Enable Proration</FormLabel>
+                        <FormLabel>Activer le calcul au prorata</FormLabel>
                         <FormDescription>
                           Prorate first and last month rent
                         </FormDescription>
@@ -1104,7 +1104,7 @@ export function LeaseForm({
                 name="terms.paymentConfig.advancePaymentMonths"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Advance Payment Months</FormLabel>
+                    <FormLabel>Mois payés d’avance</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -1131,7 +1131,7 @@ export function LeaseForm({
             {/* Late Fee Configuration */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-medium">Late Fee Configuration</h4>
+                <h4 className="text-sm font-medium">Configuration des frais de retard</h4>
                 <FormField
                   control={form.control}
                   name="terms.paymentConfig.lateFeeConfig.enabled"
@@ -1158,7 +1158,7 @@ export function LeaseForm({
                     name="terms.paymentConfig.lateFeeConfig.gracePeriodDays"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Grace Period (Days)</FormLabel>
+                        <FormLabel>Délai de grâce (jours)</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -1183,20 +1183,20 @@ export function LeaseForm({
                     name="terms.paymentConfig.lateFeeConfig.feeType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fee Type</FormLabel>
+                        <FormLabel>Type de frais</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select fee type" />
+                              <SelectValue placeholder="Sélectionner le type de frais" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="fixed">Fixed Amount</SelectItem>
+                            <SelectItem value="fixed">Montant fixe</SelectItem>
                             <SelectItem value="percentage">
-                              Percentage
+                              Pourcentage
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -1248,7 +1248,7 @@ export function LeaseForm({
                       name="terms.paymentConfig.lateFeeConfig.maxFeeAmount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Maximum Fee Amount</FormLabel>
+                          <FormLabel>Montant maximal des frais</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -1282,7 +1282,7 @@ export function LeaseForm({
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>Compound Daily</FormLabel>
+                          <FormLabel>Cumul quotidien</FormLabel>
                           <FormDescription>
                             Apply late fee for each day overdue
                           </FormDescription>
@@ -1298,7 +1298,7 @@ export function LeaseForm({
 
             {/* Payment Methods */}
             <div className="space-y-4">
-              <h4 className="text-sm font-medium">Accepted Payment Methods</h4>
+              <h4 className="text-sm font-medium">Modes de paiement acceptés</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {Object.values(PaymentMethod).map((method) => (
                   <div key={method} className="flex items-center space-x-2">
@@ -1405,7 +1405,7 @@ export function LeaseForm({
             {/* Custom Utility */}
             <div className="flex gap-2">
               <Input
-                placeholder="Add custom utility"
+                placeholder="Ajouter un service personnalisé"
                 value={customUtility}
                 onChange={(e) => setCustomUtility(e.target.value)}
                 onKeyPress={(e) =>
@@ -1451,7 +1451,7 @@ export function LeaseForm({
         {/* Restrictions */}
         <Card>
           <CardHeader>
-            <CardTitle>Lease Restrictions</CardTitle>
+            <CardTitle>Restrictions du bail</CardTitle>
             <CardDescription>
               Add any restrictions or rules for the lease
             </CardDescription>
@@ -1480,7 +1480,7 @@ export function LeaseForm({
             {/* Custom Restriction */}
             <div className="flex gap-2">
               <Input
-                placeholder="Add custom restriction"
+                placeholder="Ajouter une restriction personnalisée"
                 value={customRestriction}
                 onChange={(e) => setCustomRestriction(e.target.value)}
                 onKeyPress={(e) =>
@@ -1527,8 +1527,8 @@ export function LeaseForm({
         {/* Renewal Options */}
         <Card>
           <CardHeader>
-            <CardTitle>Renewal Options</CardTitle>
-            <CardDescription>Configure lease renewal options</CardDescription>
+            <CardTitle>Options de renouvellement</CardTitle>
+            <CardDescription>Configurer les options de renouvellement du bail</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -1543,7 +1543,7 @@ export function LeaseForm({
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Allow lease renewal</FormLabel>
+                    <FormLabel>Autoriser le renouvellement du bail</FormLabel>
                     <FormDescription>
                       Enable automatic renewal options for this lease
                     </FormDescription>
@@ -1558,7 +1558,7 @@ export function LeaseForm({
                 name="renewalOptions.terms"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Renewal Terms</FormLabel>
+                    <FormLabel>Conditions de renouvellement</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Describe the renewal terms and conditions..."
@@ -1591,7 +1591,7 @@ export function LeaseForm({
             {/* Existing Documents */}
             {form.watch("documents") && form.watch("documents")!.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium">Existing Documents</h4>
+                <h4 className="text-sm font-medium">Documents existants</h4>
                 <div className="grid grid-cols-1 gap-2">
                   {form.watch("documents")!.map((url, index) => (
                     <div
@@ -1621,7 +1621,7 @@ export function LeaseForm({
 
             {/* File Upload */}
             <div className="space-y-2">
-              <h4 className="text-sm font-medium">Upload New Documents</h4>
+              <h4 className="text-sm font-medium">Téléverser de nouveaux documents</h4>
               <FileUpload
                 onFilesSelected={handleFileUpload}
                 onFileRemove={handleFileRemove}
@@ -1669,7 +1669,7 @@ export function LeaseForm({
         {/* Notes */}
         <Card>
           <CardHeader>
-            <CardTitle>Additional Notes</CardTitle>
+            <CardTitle>Notes complémentaires</CardTitle>
             <CardDescription>
               Add any additional notes or comments about this lease
             </CardDescription>
@@ -1682,7 +1682,7 @@ export function LeaseForm({
                 <FormItem>
                   <FormControl>
                     <Textarea
-                      placeholder="Add any additional notes..."
+                      placeholder="Ajouter des notes complémentaires…"
                       {...field}
                     />
                   </FormControl>
@@ -1706,7 +1706,7 @@ export function LeaseForm({
         {/* Form Actions */}
         <div className="flex items-center justify-end gap-4">
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
+            Annuler
           </Button>
           <Button type="submit" disabled={isLoading || isUploading}>
             {isLoading || isUploading

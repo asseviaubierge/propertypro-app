@@ -72,7 +72,7 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
       : null;
 
     if (leaseId && !lease) {
-      return createErrorResponse("Lease not found", 404);
+      return createErrorResponse("Bail introuvable", 404);
     }
 
     let invoice = null;
@@ -157,13 +157,13 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
           invoice.tenantId.lastName || ""
         }`.trim() ||
         invoice.tenantId.email ||
-        "Tenant"
+        "Locataire"
       : lease?.tenantId
       ? `${lease.tenantId.firstName} ${lease.tenantId.lastName}`
-      : "Tenant";
+      : "Locataire";
 
     const propertyName =
-      invoice?.propertyId?.name || lease?.propertyId?.name || "Property";
+      invoice?.propertyId?.name || lease?.propertyId?.name || "Bien";
 
     // currencyCode already resolved above
 

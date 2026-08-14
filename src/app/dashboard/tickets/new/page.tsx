@@ -290,7 +290,7 @@ export default function NewTicketPage() {
       }
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to create ticket";
+        error instanceof Error ? error.message : "Impossible de créer le ticket";
       toast.error(errorMessage);
     } finally {
       setLoading(false);

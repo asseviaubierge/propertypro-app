@@ -8,9 +8,7 @@ import { toast } from "sonner";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreditCard, ArrowLeft } from "lucide-react";
@@ -43,8 +41,14 @@ interface Property {
 
 interface Lease {
   id: string;
+  tenantId: string;
+  propertyId: string;
+  unitId?: string;
   propertyName: string;
   tenantName: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
 }
 
 interface PaymentData {
@@ -95,7 +99,7 @@ export default function EditPaymentPage({
         const paymentRes = await fetch(`/api/payments/${resolvedParams.id}`);
         if (!paymentRes.ok) {
           const err = await paymentRes.json().catch(() => null);
-          throw new Error(err?.error || "Failed to fetch payment data");
+          throw new Error(err?.error || "Impossible de charger le paiement");
         }
         const paymentData = await paymentRes.json();
         const payment = paymentData.data;
@@ -119,7 +123,7 @@ export default function EditPaymentPage({
           [
             fetch("/api/tenants"),
             fetch("/api/properties"),
-            fetch("/api/leases"),
+            fetch("/api/leases?limit=100"),
           ]
         );
 
@@ -132,7 +136,7 @@ export default function EditPaymentPage({
           setTenants(
             tenantsData.data?.map((tenant: any) => ({
               id: tenant?._id,
-              name: `${tenant?.firstName ?? "Unknown"} ${
+              name: `${tenant?.firstName ?? "Inconnu"} ${
                 tenant?.lastName ?? ""
               }`.trim(),
               email: tenant?.email ?? "",
@@ -149,7 +153,7 @@ export default function EditPaymentPage({
           setProperties(
             propertiesData.data?.map((property: any) => ({
               id: property?._id,
-              name: property?.name ?? "Unknown Property",
+              name: property?.name ?? "Propriété",
               address:
                 property?.address?.street ||
                 property?.address?.city ||
@@ -163,7 +167,7 @@ export default function EditPaymentPage({
                         ? ", " + property.address.state
                         : ""
                     }`
-                  : "Address not available",
+                  : "Adresse non renseignée",
               isMultiUnit: property?.isMultiUnit,
               units: property?.units?.map((unit: any) => ({
                 _id: unit._id,
@@ -185,15 +189,21 @@ export default function EditPaymentPage({
           setLeases(
             leasesData.data?.map((lease: any) => ({
               id: lease?._id,
-              propertyName: lease?.propertyId?.name ?? "Unknown Property",
-              tenantName: `${lease?.tenantId?.firstName ?? "Unknown"} ${
+              tenantId: lease?.tenantId?._id ?? lease?.tenantId ?? "",
+              propertyId: lease?.propertyId?._id ?? lease?.propertyId ?? "",
+              unitId: lease?.unitId?._id ?? lease?.unitId ?? undefined,
+              propertyName: lease?.propertyId?.name ?? "Propriété",
+              tenantName: `${lease?.tenantId?.firstName ?? "Inconnu"} ${
                 lease?.tenantId?.lastName ?? ""
               }`.trim(),
+              startDate: lease?.startDate,
+              endDate: lease?.endDate,
+              status: lease?.status,
             })) || []
           );
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Échec du chargement des données :", error);
         toast.error(t("payments.edit.toasts.loadFailed"));
       } finally {
         setIsDataLoading(false);
@@ -231,10 +241,10 @@ export default function EditPaymentPage({
         toast.success(t("payments.edit.toasts.updateSuccess"));
         router.push(`/dashboard/payments/${payment._id}`);
       } else {
-        throw new Error(result.error || "Failed to update payment");
+        throw new Error(result.error || "Impossible de mettre à jour le paiement");
       }
     } catch (error) {
-      console.error("Error updating payment:", error);
+      console.error("Échec de la mise à jour du paiement :", error);
       toast.error(
         error instanceof Error
           ? error.message

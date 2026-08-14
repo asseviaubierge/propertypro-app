@@ -88,7 +88,7 @@ function ConfirmEmailChangeInner() {
               <Mail className="h-6 w-6 text-primary" />
             )}
           </div>
-          <CardTitle>Confirm Email Change</CardTitle>
+          <CardTitle>Confirmer le changement d’adresse e-mail</CardTitle>
           <CardDescription>
             {status === "validating" && "Validating your confirmation link…"}
             {status === "ready" &&

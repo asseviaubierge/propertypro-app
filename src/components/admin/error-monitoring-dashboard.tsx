@@ -111,7 +111,7 @@ export function ErrorMonitoringDashboard() {
         <CardContent className="flex items-center justify-center py-12">
           <div className="flex items-center gap-2 text-muted-foreground">
             <RefreshCw className="size-4 animate-spin" />
-            Loading error statistics...
+            Chargement des statistiques d’erreurs…
           </div>
         </CardContent>
       </Card>
@@ -140,7 +140,7 @@ export function ErrorMonitoringDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Error Monitoring</h2>
+          <h2 className="text-2xl font-bold">Surveillance des erreurs</h2>
           <p className="text-muted-foreground">
             Real-time application error tracking and analysis
           </p>
@@ -149,7 +149,7 @@ export function ErrorMonitoringDashboard() {
           <RefreshCw
             className={`size-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
           />
-          Refresh
+          Actualiser
         </Button>
       </div>
 
@@ -157,18 +157,18 @@ export function ErrorMonitoringDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Errors</CardTitle>
+            <CardTitle className="text-sm font-medium">Total des erreurs</CardTitle>
             <Activity className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalErrors ?? 0}</div>
-            <p className="text-xs text-muted-foreground">Last 24 hours</p>
+            <p className="text-xs text-muted-foreground">Dernières 24 heures</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical</CardTitle>
+            <CardTitle className="text-sm font-medium">Critique</CardTitle>
             <AlertCircle className="size-4 text-destructive" />
           </CardHeader>
           <CardContent>
@@ -183,7 +183,7 @@ export function ErrorMonitoringDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">High Priority</CardTitle>
+            <CardTitle className="text-sm font-medium">Priorité élevée</CardTitle>
             <AlertTriangle className="size-4 text-orange-500" />
           </CardHeader>
           <CardContent>
@@ -198,14 +198,14 @@ export function ErrorMonitoringDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Priority</CardTitle>
+            <CardTitle className="text-sm font-medium">Priorité faible</CardTitle>
             <Info className="size-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-500">
               {(stats?.bySeverity?.medium ?? 0) + (stats?.bySeverity?.low ?? 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Monitor and track</p>
+            <p className="text-xs text-muted-foreground">Surveiller et suivre</p>
           </CardContent>
         </Card>
       </div>
@@ -213,7 +213,7 @@ export function ErrorMonitoringDashboard() {
       {/* Error by Category */}
       <Card>
         <CardHeader>
-          <CardTitle>Errors by Category</CardTitle>
+          <CardTitle>Erreurs par catégorie</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -246,19 +246,19 @@ export function ErrorMonitoringDashboard() {
       {/* Recent Errors */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Errors</CardTitle>
+          <CardTitle>Erreurs récentes</CardTitle>
         </CardHeader>
         <CardContent>
           {recentErrors.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Time</TableHead>
+                  <TableHead>Heure</TableHead>
                   <TableHead>Message</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Severity</TableHead>
-                  <TableHead>Path</TableHead>
-                  <TableHead>User</TableHead>
+                  <TableHead>Catégorie</TableHead>
+                  <TableHead>Gravité</TableHead>
+                  <TableHead>Chemin</TableHead>
+                  <TableHead>Utilisateur</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -293,7 +293,7 @@ export function ErrorMonitoringDashboard() {
           ) : (
             <div className="text-center py-12 text-muted-foreground">
               <Info className="size-12 mx-auto mb-4 opacity-50" />
-              <p>No recent errors</p>
+              <p>Aucune erreur récente</p>
             </div>
           )}
         </CardContent>

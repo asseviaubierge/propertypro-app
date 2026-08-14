@@ -83,7 +83,13 @@ function detectFormat(
 export async function fetchLogoAsDataUrl(
   logo?: string
 ): Promise<{ dataUrl?: string; format?: SupportedLogoFormat }> {
-  const source = typeof logo === "string" ? logo.trim() : "";
+  const rawSource = typeof logo === "string" ? logo.trim() : "";
+  // D'anciennes valeurs R2 contiennent parfois un retour à la ligne entre le
+  // domaine et le chemin. Un espace n'est jamais valide dans une URL d'image :
+  // le retirer évite l'erreur jsPDF « Error loading image ».
+  const source = /^https?:\/\//i.test(rawSource)
+    ? rawSource.replace(/\s+/g, "")
+    : rawSource;
   if (!source) {
     return {};
   }
@@ -108,10 +114,8 @@ export async function fetchLogoAsDataUrl(
     const resolvedMime = mime && mime.startsWith("image/") ? mime : "image/png";
     const dataUrl = `data:${resolvedMime};base64,${base64}`;
     return { dataUrl, format: detectFormat(resolvedMime, dataUrl) };
-  } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("Failed to load company logo", error);
-    }
+  } catch {
+    // Le logo est facultatif : le moteur PDF affichera les initiales.
     return {};
   }
 }

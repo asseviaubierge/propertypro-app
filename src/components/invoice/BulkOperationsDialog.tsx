@@ -123,7 +123,7 @@ export default function BulkOperationsDialog({
           break;
         case "add_late_fees":
           requestData.data.amount = data.lateFeeAmount;
-          requestData.data.reason = data.notes || "Late payment fee";
+          requestData.data.reason = data.notes || "Frais de retard";
           break;
         case "send_reminders":
           requestData.data.type = data.reminderType;
@@ -199,7 +199,7 @@ export default function BulkOperationsDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Bulk Operations</DialogTitle>
+          <DialogTitle>Opérations groupées</DialogTitle>
           <DialogDescription>
             Perform operations on {selectedInvoices.length} selected invoice(s)
           </DialogDescription>
@@ -213,14 +213,14 @@ export default function BulkOperationsDialog({
                 name="operation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Operation</FormLabel>
+                    <FormLabel>Opération</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select operation" />
+                          <SelectValue placeholder="Sélectionner une opération" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -289,26 +289,26 @@ export default function BulkOperationsDialog({
                   name="paymentMethod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Method</FormLabel>
+                      <FormLabel>Mode de paiement</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select payment method" />
+                            <SelectValue placeholder="Sélectionner un mode de paiement" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="check">Check</SelectItem>
+                          <SelectItem value="cash">Espèces</SelectItem>
+                          <SelectItem value="check">Chèque</SelectItem>
                           <SelectItem value="bank_transfer">
                             Bank Transfer
                           </SelectItem>
                           <SelectItem value="credit_card">
-                            Credit Card
+                            Carte de crédit
                           </SelectItem>
-                          <SelectItem value="manual">Manual Entry</SelectItem>
+                          <SelectItem value="manual">Saisie manuelle</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -323,23 +323,23 @@ export default function BulkOperationsDialog({
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Status</FormLabel>
+                      <FormLabel>Nouveau statut</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
+                            <SelectValue placeholder="Sélectionner un statut" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                          <SelectItem value="issued">Issued</SelectItem>
-                          <SelectItem value="partial">Partial</SelectItem>
-                          <SelectItem value="paid">Paid</SelectItem>
-                          <SelectItem value="overdue">Overdue</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectItem value="scheduled">Planifiée</SelectItem>
+                          <SelectItem value="issued">Émise</SelectItem>
+                          <SelectItem value="partial">Partielle</SelectItem>
+                          <SelectItem value="paid">Payée</SelectItem>
+                          <SelectItem value="overdue">En retard</SelectItem>
+                          <SelectItem value="cancelled">Annulée</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -355,7 +355,7 @@ export default function BulkOperationsDialog({
                     name="lateFeeAmount"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Late Fee Amount</FormLabel>
+                        <FormLabel>Montant des frais de retard</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -377,9 +377,9 @@ export default function BulkOperationsDialog({
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reason</FormLabel>
+                        <FormLabel>Motif</FormLabel>
                         <FormControl>
-                          <Input placeholder="Late payment fee" {...field} />
+                          <Input placeholder="Frais de retard" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -394,22 +394,22 @@ export default function BulkOperationsDialog({
                   name="reminderType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reminder Type</FormLabel>
+                      <FormLabel>Type de rappel</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select reminder type" />
+                            <SelectValue placeholder="Sélectionner un type de rappel" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="reminder">
-                            Payment Reminder
+                            Rappel de paiement
                           </SelectItem>
                           <SelectItem value="overdue">
-                            Overdue Notice
+                            Avis de retard
                           </SelectItem>
                           <SelectItem value="final_notice">
                             Final Notice
@@ -428,7 +428,7 @@ export default function BulkOperationsDialog({
                     <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium text-red-900">
-                        Warning
+                        Avertissement
                       </p>
                       <p className="text-xs text-red-700">
                         This will soft delete the selected invoices. Invoices
@@ -446,7 +446,7 @@ export default function BulkOperationsDialog({
                   onClick={handleClose}
                   disabled={submitting}
                 >
-                  Cancel
+                  Annuler
                 </Button>
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Processing..." : "Execute Operation"}
@@ -458,7 +458,7 @@ export default function BulkOperationsDialog({
           // Results display
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="text-lg font-semibold">Operation Complete</h3>
+              <h3 className="text-lg font-semibold">Opération terminée</h3>
               <p className="text-sm text-gray-600">
                 Processed {result.totalProcessed} invoice(s)
               </p>
@@ -481,7 +481,7 @@ export default function BulkOperationsDialog({
                 <div className="flex items-center gap-2 mb-2">
                   <XCircle className="h-4 w-4 text-red-600" />
                   <span className="text-sm font-medium text-red-900">
-                    Failed
+                    Échoué
                   </span>
                 </div>
                 <p className="text-lg font-bold text-red-600">
@@ -507,7 +507,7 @@ export default function BulkOperationsDialog({
             )}
 
             <DialogFooter>
-              <Button onClick={handleClose}>Close</Button>
+              <Button onClick={handleClose}>Fermer</Button>
             </DialogFooter>
           </div>
         )}

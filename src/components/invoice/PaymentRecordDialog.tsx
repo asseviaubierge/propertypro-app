@@ -239,7 +239,7 @@ export default function PaymentRecordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-160 max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="shrink-0">
-          <DialogTitle>Collect Payment</DialogTitle>
+          <DialogTitle>Encaisser un paiement</DialogTitle>
           <DialogDescription>
             Record a payment for invoice {invoice.invoiceNumber} from{" "}
             {tenantName}
@@ -256,7 +256,7 @@ export default function PaymentRecordDialog({
               {gateways.stripe && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-muted/40 p-4">
                   <div>
-                    <p className="text-sm font-medium">Collect via Stripe</p>
+                    <p className="text-sm font-medium">Encaisser avec Stripe</p>
                     <p className="text-xs text-muted-foreground">
                       Opens Stripe Checkout for {formatCurrency(stripeAmount)} —
                       status updates automatically
@@ -276,7 +276,7 @@ export default function PaymentRecordDialog({
               {gateways.paypal && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-muted/40 p-4">
                   <div>
-                    <p className="text-sm font-medium">Collect via PayPal</p>
+                    <p className="text-sm font-medium">Encaisser avec PayPal</p>
                     <p className="text-xs text-muted-foreground">
                       Opens PayPal for {formatCurrency(stripeAmount)} — status
                       updates automatically
@@ -296,7 +296,7 @@ export default function PaymentRecordDialog({
               {gateways.razorpay && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-muted/40 p-4">
                   <div>
-                    <p className="text-sm font-medium">Collect via Razorpay</p>
+                    <p className="text-sm font-medium">Encaisser avec Razorpay</p>
                     <p className="text-xs text-muted-foreground">
                       Opens Razorpay for {formatCurrency(stripeAmount)} — status
                       updates automatically
@@ -318,7 +318,7 @@ export default function PaymentRecordDialog({
               {gateways.paystack && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border bg-muted/40 p-4">
                   <div>
-                    <p className="text-sm font-medium">Collect via Paystack</p>
+                    <p className="text-sm font-medium">Encaisser avec Paystack</p>
                     <p className="text-xs text-muted-foreground">
                       Opens Paystack for {formatCurrency(stripeAmount)} — status
                       updates automatically
@@ -361,13 +361,13 @@ export default function PaymentRecordDialog({
           {/* Summary cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="rounded-lg border p-3">
-              <p className="text-xs text-muted-foreground">Invoice total</p>
+              <p className="text-xs text-muted-foreground">Total de la facture</p>
               <p className="mt-1 text-lg font-semibold">
                 {formatCurrency(invoice.totalAmount)}
               </p>
             </div>
             <div className="rounded-lg border p-3">
-              <p className="text-xs text-muted-foreground">Already paid</p>
+              <p className="text-xs text-muted-foreground">Déjà payé</p>
               <p className="mt-1 text-lg font-semibold text-emerald-600">
                 {formatCurrency(invoice.amountPaid)}
               </p>
@@ -394,7 +394,7 @@ export default function PaymentRecordDialog({
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount</FormLabel>
+                      <FormLabel>Montant</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -418,27 +418,27 @@ export default function PaymentRecordDialog({
                   name="paymentMethod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Method</FormLabel>
+                      <FormLabel>Mode</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select method" />
+                            <SelectValue placeholder="Sélectionner un mode" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="check">Check</SelectItem>
+                          <SelectItem value="cash">Espèces</SelectItem>
+                          <SelectItem value="check">Chèque</SelectItem>
                           <SelectItem value="bank_transfer">
                             Bank Transfer
                           </SelectItem>
                           <SelectItem value="credit_card">
-                            Credit Card
+                            Carte de crédit
                           </SelectItem>
-                          <SelectItem value="debit_card">Debit Card</SelectItem>
-                          <SelectItem value="manual">Manual Entry</SelectItem>
+                          <SelectItem value="debit_card">Carte de débit</SelectItem>
+                          <SelectItem value="manual">Saisie manuelle</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -451,7 +451,7 @@ export default function PaymentRecordDialog({
                   name="paidDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Collected at</FormLabel>
+                      <FormLabel>Date d’encaissement</FormLabel>
                       <FormControl>
                         <Input type="datetime-local" {...field} />
                       </FormControl>
@@ -467,9 +467,9 @@ export default function PaymentRecordDialog({
                   name="transactionId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reference</FormLabel>
+                      <FormLabel>Référence</FormLabel>
                       <FormControl>
-                        <Input placeholder="Receipt / txn ID" {...field} />
+                        <Input placeholder="Reçu / identifiant de transaction" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -481,10 +481,10 @@ export default function PaymentRecordDialog({
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Notes (optional)</FormLabel>
+                      <FormLabel>Notes (facultatives)</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Collection notes"
+                          placeholder="Notes d’encaissement"
                           className="min-h-10"
                           {...field}
                         />
@@ -505,7 +505,7 @@ export default function PaymentRecordDialog({
             onClick={() => onOpenChange(false)}
             disabled={submitting || stripeLoading}
           >
-            Cancel
+            Annuler
           </Button>
           <Button
             type="submit"

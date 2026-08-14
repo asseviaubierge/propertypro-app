@@ -196,7 +196,7 @@ export default function AnnouncementDetailPage({
       const payload = await res.json();
 
       if (!res.ok) {
-        throw new Error(payload?.error || "Failed to load announcement");
+        throw new Error(payload?.error || "Impossible de charger l’annonce");
       }
 
       const data = payload?.data?.announcement ?? payload?.announcement;
@@ -277,7 +277,7 @@ export default function AnnouncementDetailPage({
         });
       }
 
-      if (!response.ok) throw new Error("Failed to update reaction");
+      if (!response.ok) throw new Error("Impossible de modifier la réaction");
 
       const payload = await response.json();
       const data = payload?.data?.announcement ?? payload?.announcement;
@@ -319,7 +319,7 @@ export default function AnnouncementDetailPage({
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to update");
+      if (!response.ok) throw new Error("Impossible de modifier l’annonce");
 
       toast.success(t("announcements.toasts.updated"));
       setIsEditing(false);
@@ -339,7 +339,7 @@ export default function AnnouncementDetailPage({
         body: JSON.stringify({ action: "archive" }),
       });
 
-      if (!response.ok) throw new Error("Failed to archive");
+      if (!response.ok) throw new Error("Impossible d’archiver l’annonce");
 
       toast.success(t("announcements.toasts.archived"));
       await fetchAnnouncement();
@@ -357,7 +357,7 @@ export default function AnnouncementDetailPage({
         body: JSON.stringify({ action: "softDelete" }),
       });
 
-      if (!response.ok) throw new Error("Failed to delete");
+      if (!response.ok) throw new Error("Impossible de supprimer l’annonce");
 
       toast.success(t("announcements.toasts.deleted"));
       router.push("/dashboard/announcements");

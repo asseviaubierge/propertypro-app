@@ -305,7 +305,7 @@ function DataTable<T>({
                   <Checkbox
                     checked={isAllSelected}
                     onCheckedChange={selection.onSelectAll}
-                    aria-label={selection.selectAllLabel || "Select all"}
+                    aria-label={selection.selectAllLabel || "Tout sélectionner"}
                   />
                 </TableHead>
               )}
@@ -353,7 +353,7 @@ function DataTable<T>({
               disabled={pagination.currentPage <= 1}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
-              {pagination.previousLabel || "Previous"}
+              {pagination.previousLabel || "Précédent"}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {pagination.currentPage} / {pagination.totalPages}
@@ -366,7 +366,7 @@ function DataTable<T>({
               }
               disabled={pagination.currentPage >= pagination.totalPages}
             >
-              {pagination.nextLabel || "Next"}
+              {pagination.nextLabel || "Suivant"}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>

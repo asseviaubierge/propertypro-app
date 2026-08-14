@@ -127,7 +127,7 @@ function getStatusBadgeClass(status?: string) {
 }
 
 function formatStatusLabel(status?: string) {
-  if (!status) return "Unknown";
+  if (!status) return "Inconnu";
   return status
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -260,7 +260,7 @@ export default function ApplicationDetailsPage() {
     return (
       <div className="rounded-lg border bg-card p-12 text-center">
         <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-        <h3 className="mb-2 text-lg font-semibold">Application not found</h3>
+        <h3 className="mb-2 text-lg font-semibold">Candidature introuvable</h3>
         <p className="mb-4 text-muted-foreground">
           The requested application is unavailable.
         </p>
@@ -339,7 +339,7 @@ export default function ApplicationDetailsPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Submitted</CardTitle>
+            <CardTitle className="text-sm font-medium">Soumise</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 text-sm">
@@ -369,7 +369,7 @@ export default function ApplicationDetailsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Reviewed</CardTitle>
+            <CardTitle className="text-sm font-medium">Examinée</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1 text-sm">
             <div className="flex items-center gap-2">
@@ -394,23 +394,23 @@ export default function ApplicationDetailsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Applicant
+              Candidat
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <p className="text-muted-foreground">Name</p>
+              <p className="text-muted-foreground">Nom</p>
               <p className="font-medium">{applicantName}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Email</p>
+              <p className="text-muted-foreground">E-mail</p>
               <p className="font-medium flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 {applicantEmail}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">Phone</p>
+              <p className="text-muted-foreground">Téléphone</p>
               <p className="font-medium flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
                 {applicantPhone}
@@ -423,18 +423,18 @@ export default function ApplicationDetailsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              Property
+              Bien
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <p className="text-muted-foreground">Name</p>
+              <p className="text-muted-foreground">Nom</p>
               <p className="font-medium">
                 {application.propertyId?.name || "Not available"}
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground">Address</p>
+              <p className="text-muted-foreground">Adresse</p>
               <p className="font-medium flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <span>{formatAddress(application.propertyId?.address)}</span>
@@ -442,13 +442,13 @@ export default function ApplicationDetailsPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-muted-foreground">Rent</p>
+                <p className="text-muted-foreground">Loyer</p>
                 <p className="font-medium">
                   {formatCurrency(application.propertyId?.rentAmount || 0)}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Security Deposit</p>
+                <p className="text-muted-foreground">Garantie</p>
                 <p className="font-medium">
                   {formatCurrency(application.propertyId?.securityDeposit || 0)}
                 </p>
@@ -476,19 +476,19 @@ export default function ApplicationDetailsPage() {
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2 text-sm">
           <div>
-            <p className="text-muted-foreground">Employer</p>
+            <p className="text-muted-foreground">Employeur</p>
             <p className="font-medium">
               {application.employmentInfo?.employer || "Not provided"}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground">Position</p>
+            <p className="text-muted-foreground">Poste</p>
             <p className="font-medium">
               {application.employmentInfo?.position || "Not provided"}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground">Income</p>
+            <p className="text-muted-foreground">Revenu</p>
             <p className="font-medium">
               {application.employmentInfo?.income
                 ? formatCurrency(application.employmentInfo.income)
@@ -496,7 +496,7 @@ export default function ApplicationDetailsPage() {
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground">Start Date</p>
+            <p className="text-muted-foreground">Date de début</p>
             <p className="font-medium">
               {application.employmentInfo?.startDate
                 ? formatDate(application.employmentInfo.startDate)
@@ -508,7 +508,7 @@ export default function ApplicationDetailsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Emergency Contacts</CardTitle>
+          <CardTitle>Contacts d’urgence</CardTitle>
         </CardHeader>
         <CardContent>
           {!application.emergencyContacts?.length ? (
@@ -521,7 +521,7 @@ export default function ApplicationDetailsPage() {
                 <div key={`${contact.name || "contact"}-${index}`}>
                   <div className="grid gap-2 md:grid-cols-2 text-sm">
                     <p>
-                      <span className="text-muted-foreground">Name: </span>
+                      <span className="text-muted-foreground">Nom : </span>
                       <span className="font-medium">
                         {contact.name || "Not provided"}
                       </span>
@@ -535,13 +535,13 @@ export default function ApplicationDetailsPage() {
                       </span>
                     </p>
                     <p>
-                      <span className="text-muted-foreground">Phone: </span>
+                      <span className="text-muted-foreground">Téléphone : </span>
                       <span className="font-medium">
                         {contact.phone || "Not provided"}
                       </span>
                     </p>
                     <p>
-                      <span className="text-muted-foreground">Email: </span>
+                      <span className="text-muted-foreground">E-mail : </span>
                       <span className="font-medium">
                         {contact.email || "Not provided"}
                       </span>
@@ -583,7 +583,7 @@ export default function ApplicationDetailsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={doc.verified ? "default" : "outline"}>
-                      {doc.verified ? "Verified" : "Pending"}
+                      {doc.verified ? "Verified" : "En attente"}
                     </Badge>
                     {doc.fileUrl && (
                       <Button variant="outline" size="sm" asChild>
@@ -607,12 +607,12 @@ export default function ApplicationDetailsPage() {
         application.reviewNotes) && (
         <Card>
           <CardHeader>
-            <CardTitle>Additional Notes</CardTitle>
+            <CardTitle>Notes complémentaires</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {application.additionalInfo?.pets && (
               <p>
-                <span className="text-muted-foreground">Pets: </span>
+                <span className="text-muted-foreground">Animaux : </span>
                 <span className="font-medium">
                   {application.additionalInfo.pets}
                 </span>
@@ -620,7 +620,7 @@ export default function ApplicationDetailsPage() {
             )}
             {application.additionalInfo?.vehicles && (
               <p>
-                <span className="text-muted-foreground">Vehicles: </span>
+                <span className="text-muted-foreground">Véhicules : </span>
                 <span className="font-medium">
                   {application.additionalInfo.vehicles}
                 </span>
@@ -638,7 +638,7 @@ export default function ApplicationDetailsPage() {
             )}
             {application.additionalInfo?.additionalNotes && (
               <p>
-                <span className="text-muted-foreground">Applicant notes: </span>
+                <span className="text-muted-foreground">Notes du candidat : </span>
                 <span className="font-medium">
                   {application.additionalInfo.additionalNotes}
                 </span>
@@ -646,7 +646,7 @@ export default function ApplicationDetailsPage() {
             )}
             {application.reviewNotes && (
               <p>
-                <span className="text-muted-foreground">Review notes: </span>
+                <span className="text-muted-foreground">Notes d’examen : </span>
                 <span className="font-medium">{application.reviewNotes}</span>
               </p>
             )}

@@ -626,7 +626,7 @@ export default function EventForm({
                                 Webex
                               </SelectItem>
                               <SelectItem value={OnlinePlatform.OTHER}>
-                                Other
+                                Autre
                               </SelectItem>
                             </SelectContent>
                           </Select>

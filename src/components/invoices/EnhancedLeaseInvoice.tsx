@@ -272,7 +272,7 @@ export function EnhancedLeaseInvoice({
                   className="flex items-center gap-2"
                 >
                   <Mail className="h-4 w-4" />
-                  Email
+                  E-mail
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">

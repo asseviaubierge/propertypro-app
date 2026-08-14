@@ -299,7 +299,7 @@ if (owner?.email) {
     pdf.setTextColor(...grayColor);
     pdf.setFont("helvetica", "bold");
     pdf.text("Description", 20, y + 6.5);
-    pdf.text("Amount", 188, y + 6.5, { align: "right" });
+    pdf.text("Montant", 188, y + 6.5, { align: "right" });
     pdf.setFont("helvetica", "normal");
 
     // Table content with proper spacing

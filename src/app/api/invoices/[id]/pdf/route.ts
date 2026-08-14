@@ -35,7 +35,7 @@ export const GET = withAccessAndDB(INVOICE_PDF_ACCESS)(
     try {
       const { id } = await params;
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid invoice ID", 400);
+        return createErrorResponse("Identifiant de facture invalide", 400);
       }
 
       const invoice = await Invoice.findOne({
@@ -55,7 +55,7 @@ export const GET = withAccessAndDB(INVOICE_PDF_ACCESS)(
         .populate("leaseId", "startDate endDate status propertyId unitId terms")
         .lean();
 
-      if (!invoice) return createErrorResponse("Invoice not found", 404);
+      if (!invoice) return createErrorResponse("Facture introuvable", 404);
 
       const issuer = await resolveInvoiceIssuer(invoice, user);
       (invoice as any).issuer = issuer;
@@ -68,7 +68,7 @@ export const GET = withAccessAndDB(INVOICE_PDF_ACCESS)(
         : null;
 
       if (!(await canAccessInvoice(user, invoice))) {
-        return createErrorResponse("Access denied", 403);
+        return createErrorResponse("Accès refusé", 403);
       }
 
       const pdfBuffer = await generateInvoicePdfBuffer(invoice as any);

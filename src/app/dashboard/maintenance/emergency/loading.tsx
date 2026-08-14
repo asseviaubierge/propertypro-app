@@ -41,11 +41,11 @@ export default function EmergencyMaintenanceLoading() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         {[
           { border: "border-red-200", title: "Total Emergencies" },
-          { border: "border-orange-200", title: "Active" },
-          { border: "border-red-200", title: "Critical" },
-          { border: "border-yellow-200", title: "Unassigned" },
+          { border: "border-orange-200", title: "Actif" },
+          { border: "border-red-200", title: "Critique" },
+          { border: "border-yellow-200", title: "Non attribué" },
           { border: "border-green-200", title: "Completed" },
-          { border: "border-blue-200", title: "Avg Response" },
+          { border: "border-blue-200", title: "Réponse moyenne" },
         ].map((card, i) => (
           <Card
             key={i}
@@ -109,10 +109,10 @@ export default function EmergencyMaintenanceLoading() {
                 </TableHead>
                 <TableHead className="w-16">#</TableHead>
                 <TableHead>Request</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Property</TableHead>
-                <TableHead>Tenant</TableHead>
-                <TableHead>Assigned To</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Bien</TableHead>
+                <TableHead>Locataire</TableHead>
+                <TableHead>Attribuée à</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Elapsed</TableHead>
                 <TableHead className="text-right">Actions</TableHead>

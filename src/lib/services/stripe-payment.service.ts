@@ -388,7 +388,7 @@ class StripePaymentService {
     if (paymentMethod.us_bank_account) {
       formatted.bankAccount = {
         last4: paymentMethod.us_bank_account.last4,
-        bankName: paymentMethod.us_bank_account.bank_name || "Unknown",
+        bankName: paymentMethod.us_bank_account.bank_name || "Inconnu",
         accountType: paymentMethod.us_bank_account.account_type || "checking",
       };
     }

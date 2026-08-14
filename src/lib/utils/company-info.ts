@@ -90,7 +90,7 @@ async function fetchCompanyInfo(): Promise<CompanyInfo | null> {
       email: profileSettings?.email || "",
       website: profileSettings?.website || "",
       logo:
-        displaySettings.branding.favicon || displaySettings.branding.logoLight,
+        displaySettings.branding.logoLight || displaySettings.branding.favicon,
     };
 
     // Update cache
@@ -157,7 +157,7 @@ export async function getCompanyInfoServer(): Promise<CompanyInfo | null> {
       email: profileSettings?.email || "",
       website: profileSettings?.website || "",
       logo:
-        displaySettings.branding.favicon || displaySettings.branding.logoLight,
+        displaySettings.branding.logoLight || displaySettings.branding.favicon,
     };
   } catch (error) {
     console.error("Error fetching company info (server):", error);

@@ -318,7 +318,7 @@ export function canBeAssignedMaintenance(role?: string | null): boolean {
 export function formatRoleLabel(role?: string | null): string {
   const normalizedRole = normalizeRoleName(role);
   if (!normalizedRole) {
-    return "Unknown";
+    return "Inconnu";
   }
 
   return normalizedRole.replace(/_/g, " ").replace(/\b\w/g, (char) =>

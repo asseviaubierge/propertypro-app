@@ -453,7 +453,7 @@ export function GoogleCalendarSync({
 
         <div className="flex justify-end">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            Fermer
           </Button>
         </div>
       </DialogContent>

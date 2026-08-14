@@ -129,27 +129,27 @@ const getStatusInfo = (status?: TenantStatus, t?: (key: string) => string) => {
       icon: Clock,
     },
     under_review: {
-      label: t ? t("tenants.status.underReview") : "Under Review",
+      label: t ? t("tenants.status.underReview") : "En cours d’examen",
       color: "outline" as const,
       icon: Clock,
     },
     approved: {
-      label: t ? t("tenants.status.approved") : "Approved",
+      label: t ? t("tenants.status.approved") : "Approuvée",
       color: "default" as const,
       icon: CheckCircle,
     },
     active: {
-      label: t ? t("tenants.status.active") : "Active",
+      label: t ? t("tenants.status.active") : "Actif",
       color: "default" as const,
       icon: UserCheck,
     },
     inactive: {
-      label: t ? t("tenants.status.inactive") : "Inactive",
+      label: t ? t("tenants.status.inactive") : "Inactif",
       color: "secondary" as const,
       icon: UserX,
     },
     moved_out: {
-      label: t ? t("tenants.status.movedOut") : "Moved Out",
+      label: t ? t("tenants.status.movedOut") : "Partis",
       color: "secondary" as const,
       icon: UserX,
     },

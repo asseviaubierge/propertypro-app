@@ -94,9 +94,9 @@ export default function ErrorMonitoringPage() {
     <div className="space-y-8 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Error Monitoring</h1>
+        <h1 className="text-3xl font-bold mb-2">Surveillance des erreurs</h1>
         <p className="text-muted-foreground">
-          Monitor and track application errors in real-time
+          Surveillez et suivez les erreurs de l’application en temps réel
         </p>
       </div>
 
@@ -106,13 +106,13 @@ export default function ErrorMonitoringPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-orange-800">
               <Bug className="size-5" />
-              Error Testing Tools
-              <Badge variant="outline" className="ml-2">Development Only</Badge>
+              Outils de test des erreurs
+              <Badge variant="outline" className="ml-2">Développement uniquement</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-orange-700 mb-4">
-              Use these buttons to test different error scenarios and see how they appear in the monitoring dashboard.
+              Utilisez ces boutons pour tester différents scénarios et vérifier leur affichage dans le tableau de surveillance.
             </p>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               <Button
@@ -121,7 +121,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-blue-300 hover:bg-blue-50"
               >
                 <Wifi className="size-4" />
-                Network Error
+                Erreur réseau
               </Button>
               <Button
                 onClick={triggerAuthError}
@@ -129,7 +129,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-purple-300 hover:bg-purple-50"
               >
                 <Shield className="size-4" />
-                Auth Error
+                Erreur d’authentification
               </Button>
               <Button
                 onClick={triggerDatabaseError}
@@ -137,7 +137,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-red-300 hover:bg-red-50"
               >
                 <Database className="size-4" />
-                Database Error
+                Erreur de base de données
               </Button>
               <Button
                 onClick={triggerValidationError}
@@ -145,7 +145,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-yellow-300 hover:bg-yellow-50"
               >
                 <FileWarning className="size-4" />
-                Validation Error
+                Erreur de validation
               </Button>
               <Button
                 onClick={triggerCriticalError}
@@ -153,7 +153,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-red-500 hover:bg-red-50"
               >
                 <AlertCircle className="size-4" />
-                Critical Error
+                Erreur critique
               </Button>
               <Button
                 onClick={triggerComponentError}
@@ -161,7 +161,7 @@ export default function ErrorMonitoringPage() {
                 className="gap-2 border-orange-300 hover:bg-orange-50"
               >
                 <Bug className="size-4" />
-                Component Error
+                Erreur de composant
               </Button>
             </div>
           </CardContent>
@@ -174,74 +174,74 @@ export default function ErrorMonitoringPage() {
       {/* Error Handling Guide */}
       <Card>
         <CardHeader>
-          <CardTitle>Error Handling Guide</CardTitle>
+          <CardTitle>Guide de gestion des erreurs</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">Error Severity Levels</h3>
+            <h3 className="font-semibold mb-2">Niveaux de gravité des erreurs</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <Badge variant="destructive">Critical</Badge>
+                <Badge variant="destructive">Critique</Badge>
                 <span className="text-muted-foreground">
-                  Requires immediate attention - system is down or severely impacted
+                  Intervention immédiate requise : le système est indisponible ou fortement perturbé
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="destructive">High</Badge>
+                <Badge variant="destructive">Élevée</Badge>
                 <span className="text-muted-foreground">
-                  Should be addressed soon - major functionality affected
+                  À traiter rapidement : une fonction importante est touchée
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="default">Medium</Badge>
+                <Badge variant="default">Moyenne</Badge>
                 <span className="text-muted-foreground">
-                  Should be monitored - minor functionality affected
+                  À surveiller : une fonction secondaire est touchée
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary">Low</Badge>
+                <Badge variant="secondary">Faible</Badge>
                 <span className="text-muted-foreground">
-                  Informational - no immediate action required
+                  Information : aucune action immédiate requise
                 </span>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Error Categories</h3>
+            <h3 className="font-semibold mb-2">Catégories d’erreurs</h3>
             <div className="grid gap-2 md:grid-cols-2 text-sm">
               <div className="flex items-center gap-2">
                 <Shield className="size-4 text-muted-foreground" />
-                <span><strong>Authentication:</strong> Login, session errors</span>
+                <span><strong>Authentification :</strong> erreurs de connexion ou de session</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield className="size-4 text-muted-foreground" />
-                <span><strong>Authorization:</strong> Permission errors</span>
+                <span><strong>Autorisation :</strong> erreurs de droits d’accès</span>
               </div>
               <div className="flex items-center gap-2">
                 <Wifi className="size-4 text-muted-foreground" />
-                <span><strong>Network:</strong> Connection, timeout errors</span>
+                <span><strong>Réseau :</strong> erreurs de connexion ou de délai dépassé</span>
               </div>
               <div className="flex items-center gap-2">
                 <Database className="size-4 text-muted-foreground" />
-                <span><strong>Database:</strong> Query, connection errors</span>
+                <span><strong>Base de données :</strong> erreurs de requête ou de connexion</span>
               </div>
               <div className="flex items-center gap-2">
                 <FileWarning className="size-4 text-muted-foreground" />
-                <span><strong>Validation:</strong> Form, data validation</span>
+                <span><strong>Validation :</strong> erreurs de formulaire ou de données</span>
               </div>
               <div className="flex items-center gap-2">
                 <Bug className="size-4 text-muted-foreground" />
-                <span><strong>UI:</strong> Component rendering errors</span>
+                <span><strong>Interface :</strong> erreurs d’affichage des composants</span>
               </div>
             </div>
           </div>
 
           <div className="pt-4 border-t">
             <p className="text-sm text-muted-foreground">
-              For more information, see the{" "}
+              Pour plus d’informations, consultez la{" "}
               <a href="/docs/error-handling" className="text-primary hover:underline">
-                Error Handling Documentation
+                documentation sur la gestion des erreurs
               </a>
             </p>
           </div>
@@ -250,4 +250,3 @@ export default function ErrorMonitoringPage() {
     </div>
   );
 }
-

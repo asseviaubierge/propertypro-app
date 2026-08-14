@@ -285,7 +285,7 @@ export default function TenantFilters({
                         {filters.applicationDateFrom ? (
                           format(filters.applicationDateFrom, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>Choisir une date</span>
                         )}
                       </Button>
                     </PopoverTrigger>
@@ -316,7 +316,7 @@ export default function TenantFilters({
                         {filters.applicationDateTo ? (
                           format(filters.applicationDateTo, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>Choisir une date</span>
                         )}
                       </Button>
                     </PopoverTrigger>
@@ -351,12 +351,12 @@ export default function TenantFilters({
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Any status" />
+                      <SelectValue placeholder="Tous les statuts" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ANY_STATUS">Any Status</SelectItem>
-                      <SelectItem value="true">Employed</SelectItem>
-                      <SelectItem value="false">Unemployed</SelectItem>
+                      <SelectItem value="ANY_STATUS">Tous les statuts</SelectItem>
+                      <SelectItem value="true">Employé</SelectItem>
+                      <SelectItem value="false">Sans emploi</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

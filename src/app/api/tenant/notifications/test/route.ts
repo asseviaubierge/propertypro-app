@@ -35,13 +35,13 @@ export const POST = withPermissionAndDB("profile_management")(
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
       const emailData = {
         to: emailAddress,
-        subject: "PropertyPro - Test Notification",
+        subject: "GESTION E-IMMO - Notification de test",
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
-            <h2 style="color: #333; margin-bottom: 20px;">Test Notification</h2>
+            <h2 style="color: #333; margin-bottom: 20px;">Notification de test</h2>
             <p style="color: #666; line-height: 1.6;">
-              Hello ${fullName || "Tenant"},
+              Hello ${fullName || "Locataire"},
             </p>
             <p style="color: #666; line-height: 1.6;">
               This is a test email to verify that your notification settings are working correctly.
@@ -58,15 +58,15 @@ export const POST = withPermissionAndDB("profile_management")(
             </p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
             <p style="color: #999; font-size: 12px; text-align: center;">
-              This is an automated message from PropertyPro. Please do not reply to this email.
+              Ceci est un message automatique de GESTION E-IMMO. Merci de ne pas répondre à cet e-mail.
             </p>
           </div>
         </div>
       `,
         text: `
-        Test Notification
+        Notification de test
         
-        Hello ${fullName || "Tenant"},
+        Hello ${fullName || "Locataire"},
         
         This is a test email to verify that your notification settings are working correctly.
         You should receive payment reminders, confirmations, and other important notifications
@@ -76,7 +76,7 @@ export const POST = withPermissionAndDB("profile_management")(
         
         If you have any questions or need assistance, please contact your property manager.
         
-        This is an automated message from PropertyPro. Please do not reply to this email.
+        Ceci est un message automatique de GESTION E-IMMO. Merci de ne pas répondre à cet e-mail.
       `,
       };
 

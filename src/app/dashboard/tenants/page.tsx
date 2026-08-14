@@ -358,7 +358,7 @@ export default function TenantsPage() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Ouvrir le menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -586,7 +586,7 @@ export default function TenantsPage() {
                 onSearch={handleSearch}
                 isLoading={isSearching}
                 className="flex-1"
-                ariaLabel="Search tenants"
+                ariaLabel="Rechercher des locataires"
               />
 
               <Select
@@ -639,7 +639,7 @@ export default function TenantsPage() {
                   className="h-10 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  {t("tenants.filters.clear") || "Clear"}
+                  {t("tenants.filters.clear") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -777,13 +777,13 @@ export default function TenantsPage() {
               pageSize={itemsPerPage}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={isLoading || isSearching}
             />
@@ -842,7 +842,7 @@ export default function TenantsPage() {
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-600" />
               {t("tenants.delete.blockedTitle", {
-                defaultValue: "Cannot Delete Tenant",
+                defaultValue: "Impossible de supprimer le locataire",
               })}
             </AlertDialogTitle>
             <AlertDialogDescription>{deleteBlockedMessage}</AlertDialogDescription>
@@ -859,7 +859,7 @@ export default function TenantsPage() {
               }}
             >
               {t("tenants.actions.viewDetails", {
-                defaultValue: "View Details",
+                defaultValue: "Voir les détails",
               })}
             </AlertDialogAction>
           </AlertDialogFooter>

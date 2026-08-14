@@ -119,7 +119,7 @@ export const POST = withPermissionAndDB("system_settings")(
                 unitPrice: lease.terms?.rentAmount || 1200,
               },
               {
-                description: "Late Fee",
+                description: "Frais de retard",
                 amount: 50,
                 type: InvoiceType.LATE_FEE,
                 quantity: 1,

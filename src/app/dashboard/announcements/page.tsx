@@ -454,7 +454,7 @@ export default function AnnouncementsPage({
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Failed to create announcement");
+        throw new Error(errorText || "Impossible de créer l’annonce");
       }
 
       toast.success(t("announcements.toasts.created"));
@@ -487,7 +487,7 @@ export default function AnnouncementsPage({
         body: JSON.stringify({ action: "softDelete" }),
       });
 
-      if (!response.ok) throw new Error("Failed to delete");
+      if (!response.ok) throw new Error("Échec de la suppression");
       return true;
     } catch {
       return false;
@@ -503,7 +503,7 @@ export default function AnnouncementsPage({
           body: JSON.stringify({ action: "archive" }),
         });
 
-        if (!response.ok) throw new Error("Failed to archive");
+        if (!response.ok) throw new Error("Échec de l’archivage");
         toast.success(t("announcements.toasts.archived"));
         await fetchAnnouncements();
         refreshAnnouncementCounts();
@@ -610,13 +610,13 @@ export default function AnnouncementsPage({
 
   const dateRangeLabel = useMemo(() => {
     if (selectedDateRange?.from && selectedDateRange?.to) {
-      return `${format(selectedDateRange.from, "MMM dd, yyyy")} - ${format(
+      return `${format(selectedDateRange.from, "dd/MM/yyyy")} - ${format(
         selectedDateRange.to,
-        "MMM dd, yyyy",
+        "dd/MM/yyyy",
       )}`;
     }
     if (selectedDateRange?.from) {
-      return format(selectedDateRange.from, "MMM dd, yyyy");
+      return format(selectedDateRange.from, "dd/MM/yyyy");
     }
     return t("announcements.filter.dateRange");
   }, [selectedDateRange, t]);
@@ -652,7 +652,7 @@ export default function AnnouncementsPage({
             </div>
           </div>
         ),
-        className: "min-w-[280px]",
+        className: "min-w-[120px] sm:min-w-[280px]",
       },
       {
         id: "status",
@@ -668,6 +668,7 @@ export default function AnnouncementsPage({
           </div>
         ),
         width: "w-[150px]",
+        visibility: "sm",
       },
       {
         id: "priority",
@@ -678,6 +679,7 @@ export default function AnnouncementsPage({
           </Badge>
         ),
         width: "w-[120px]",
+        visibility: "md",
       },
       {
         id: "audience",
@@ -813,7 +815,8 @@ export default function AnnouncementsPage({
             </DropdownMenu>
           </div>
         ),
-        width: "w-[80px]",
+        className: "w-12",
+        width: "w-12",
         align: "right",
       },
     ],
@@ -832,7 +835,7 @@ export default function AnnouncementsPage({
   }, [embedded]);
 
   const actionButtons = (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
       <Button
         variant="outline"
         size="sm"
@@ -852,10 +855,10 @@ export default function AnnouncementsPage({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-announcements-page min-w-0 space-y-3 sm:space-y-6">
       {!embedded && (
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
+        <div className="mobile-page-header flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
             <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               {t("announcements.header.title")}
             </h1>
@@ -869,7 +872,7 @@ export default function AnnouncementsPage({
       {embedded && portalTarget && createPortal(actionButtons, portalTarget)}
 
       {/* Stats Cards */}
-      <AnalyticsCardGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <AnalyticsCardGrid className="grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         <AnalyticsCard
           title={t("announcements.stats.total.title")}
           value={stats.total}
@@ -932,8 +935,8 @@ export default function AnnouncementsPage({
           )}
 
           {/* Filters */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
-            <div className="relative flex-1 min-w-0">
+          <div className="grid grid-cols-2 gap-2 rounded-lg border border-gray-200/60 bg-gray-50/50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50 lg:flex lg:items-center lg:gap-4 lg:p-4">
+            <div className="relative col-span-2 min-w-0 lg:flex-1">
               <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <Input
                 value={searchInput}
@@ -943,8 +946,8 @@ export default function AnnouncementsPage({
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex flex-wrap gap-2">
+            <div className="col-span-2">
+              <div className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
                 {viewOptions.map((option) => (
                   <Button
                     key={option.value}
@@ -952,7 +955,7 @@ export default function AnnouncementsPage({
                     variant={
                       currentView === option.value ? "default" : "outline"
                     }
-                    className="h-10"
+                    className="h-10 px-1 text-[10px] sm:px-3 sm:text-xs"
                     onClick={() =>
                       updateParams({
                         view: option.value === "all" ? null : option.value,
@@ -966,7 +969,7 @@ export default function AnnouncementsPage({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="col-span-2 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-3">
               <Select
                 value={currentType}
                 onValueChange={(value) =>
@@ -976,7 +979,7 @@ export default function AnnouncementsPage({
                   })
                 }
               >
-                <SelectTrigger className="h-10 w-42.5 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-42.5">
                   <SelectValue
                     placeholder={t("announcements.filter.type.all")}
                   />
@@ -999,7 +1002,7 @@ export default function AnnouncementsPage({
                   })
                 }
               >
-                <SelectTrigger className="h-10 w-36 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-36">
                   <SelectValue
                     placeholder={t("announcements.filter.priority.all")}
                   />
@@ -1017,7 +1020,7 @@ export default function AnnouncementsPage({
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-10 w-70 justify-start border-gray-200 bg-white text-left font-normal dark:border-gray-700 dark:bg-gray-800"
+                    className="col-span-2 h-10 w-full justify-start border-gray-200 bg-white px-2 text-left text-[10px] font-normal dark:border-gray-700 dark:bg-gray-800 sm:text-xs lg:w-70"
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRangeLabel}
@@ -1047,7 +1050,7 @@ export default function AnnouncementsPage({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-10 px-3 text-gray-500 hover:text-gray-700"
+                  className="col-span-2 h-10 w-full px-3 text-gray-500 hover:text-gray-700 lg:col-span-1 lg:w-auto"
                   onClick={() =>
                     updateParams({
                       view: null,
@@ -1071,6 +1074,7 @@ export default function AnnouncementsPage({
           <DataTable<AnnouncementItem>
             columns={columns}
             data={announcements}
+            tableClassName="table-fixed sm:table-auto"
             loading={isLoading}
             getRowKey={(item) => item.id}
             onRowClick={(item) =>

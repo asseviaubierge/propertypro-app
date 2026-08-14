@@ -168,7 +168,7 @@ export default function PaymentConfirmation({
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading payment details...</p>
+          <p>Chargement des détails du paiement…</p>
         </CardContent>
       </Card>
     );
@@ -178,7 +178,7 @@ export default function PaymentConfirmation({
     return (
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">Payment details not found</p>
+          <p className="text-muted-foreground">Détails du paiement introuvables</p>
         </CardContent>
       </Card>
     );
@@ -215,13 +215,13 @@ export default function PaymentConfirmation({
           {/* Transaction Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Amount Paid</p>
+              <p className="text-sm text-muted-foreground">Montant payé</p>
               <p className="text-2xl font-bold text-green-600">
                 {formatCurrency(paymentDetails.amount, paymentDetails.currency)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Payment Date</p>
+              <p className="text-sm text-muted-foreground">Date du paiement</p>
               <p className="font-medium">{formatDate(paymentDetails.paidAt)}</p>
             </div>
           </div>
@@ -236,13 +236,13 @@ export default function PaymentConfirmation({
             </h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-muted-foreground">Invoice Number</p>
+                <p className="text-muted-foreground">Numéro de facture</p>
                 <p className="font-medium">
                   {paymentDetails.invoice.invoiceNumber}
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Due Date</p>
+                <p className="text-muted-foreground">Date d’échéance</p>
                 <p className="font-medium">
                   {new Date(
                     paymentDetails.invoice.dueDate
@@ -276,10 +276,10 @@ export default function PaymentConfirmation({
           <div className="space-y-4">
             <h3 className="font-semibold flex items-center gap-2">
               <CreditCard className="h-4 w-4" />
-              Payment Method
+              Mode de paiement
             </h3>
             <div className="flex items-center gap-2">
-              <Badge variant="outline">Credit Card</Badge>
+              <Badge variant="outline">Carte de crédit</Badge>
               {paymentDetails.transactionId && (
                 <span className="text-sm text-muted-foreground">
                   Transaction ID: {paymentDetails.transactionId}
@@ -342,7 +342,7 @@ export default function PaymentConfirmation({
             )}
             {onClose && (
               <Button variant="secondary" onClick={onClose} className="flex-1">
-                Close
+                Fermer
               </Button>
             )}
           </div>

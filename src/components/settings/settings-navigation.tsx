@@ -52,105 +52,105 @@ export default function SettingsNavigation({
   const navigationItems: NavigationItem[] = [
     {
       id: "profile",
-      title: "Profile Settings",
-      description: "Manage your personal information and account details",
+      title: "Profil",
+      description: "Gérez vos informations personnelles",
       href: "/dashboard/settings/profile",
       icon: User,
       sections: [
-        { id: "basic", title: "Basic Information", href: "/dashboard/settings/profile#basic" },
-        { id: "emergency", title: "Emergency Contact", href: "/dashboard/settings/profile#emergency" },
-        { id: "social", title: "Social Links", href: "/dashboard/settings/profile#social" },
-        { id: "account", title: "Account Information", href: "/dashboard/settings/profile#account" },
+        { id: "basic", title: "Informations générales", href: "/dashboard/settings/profile#basic" },
+        { id: "emergency", title: "Contact d’urgence", href: "/dashboard/settings/profile#emergency" },
+        { id: "social", title: "Réseaux sociaux", href: "/dashboard/settings/profile#social" },
+        { id: "account", title: "Informations du compte", href: "/dashboard/settings/profile#account" },
       ],
     },
     {
       id: "notifications",
-      title: "Notification Settings",
-      description: "Configure how and when you receive notifications",
+      title: "Paramètres des notifications",
+      description: "Configurez la réception des notifications",
       href: "/dashboard/settings/notifications",
       icon: Bell,
       sections: [
-        { id: "email", title: "Email Notifications", href: "/dashboard/settings/notifications#email" },
-        { id: "sms", title: "SMS Notifications", href: "/dashboard/settings/notifications#sms" },
-        { id: "push", title: "Push Notifications", href: "/dashboard/settings/notifications#push" },
-        { id: "in-app", title: "In-App Notifications", href: "/dashboard/settings/notifications#in-app" },
+        { id: "email", title: "Notifications par e-mail", href: "/dashboard/settings/notifications#email" },
+        { id: "sms", title: "Notifications par SMS", href: "/dashboard/settings/notifications#sms" },
+        { id: "push", title: "Notifications instantanées", href: "/dashboard/settings/notifications#push" },
+        { id: "in-app", title: "Notifications internes", href: "/dashboard/settings/notifications#in-app" },
       ],
     },
     {
       id: "security",
-      title: "Security Settings",
-      description: "Protect your account with security features",
+      title: "Sécurité",
+      description: "Protégez votre compte",
       href: "/dashboard/settings/security",
       icon: Shield,
       badge: "Important",
       sections: [
-        { id: "password", title: "Password & Authentication", href: "/dashboard/settings/security#password" },
-        { id: "2fa", title: "Two-Factor Authentication", href: "/dashboard/settings/security#2fa" },
-        { id: "devices", title: "Device Management", href: "/dashboard/settings/security#devices" },
-        { id: "audit", title: "Security Audit", href: "/dashboard/settings/security#audit" },
+        { id: "password", title: "Mot de passe", href: "/dashboard/settings/security#password" },
+        { id: "2fa", title: "Double authentification", href: "/dashboard/settings/security#2fa" },
+        { id: "devices", title: "Appareils connectés", href: "/dashboard/settings/security#devices" },
+        { id: "audit", title: "Contrôle de sécurité", href: "/dashboard/settings/security#audit" },
       ],
     },
     {
       id: "display",
-      title: "Display Settings",
-      description: "Customize the appearance and layout",
+      title: "Affichage",
+      description: "Personnalisez l’apparence",
       href: "/dashboard/settings/appearance",
       icon: Palette,
       sections: [
-        { id: "theme", title: "Theme & Appearance", href: "/dashboard/settings/appearance#theme" },
-        { id: "language", title: "Language & Region", href: "/dashboard/settings/appearance#language" },
-        { id: "layout", title: "Layout & Typography", href: "/dashboard/settings/appearance#layout" },
-        { id: "colors", title: "Color Scheme", href: "/dashboard/settings/appearance#colors" },
+        { id: "theme", title: "Thème et apparence", href: "/dashboard/settings/appearance#theme" },
+        { id: "language", title: "Langue et région", href: "/dashboard/settings/appearance#language" },
+        { id: "layout", title: "Mise en page", href: "/dashboard/settings/appearance#layout" },
+        { id: "colors", title: "Palette de couleurs", href: "/dashboard/settings/appearance#colors" },
       ],
     },
     {
       id: "privacy",
-      title: "Privacy Settings",
-      description: "Control your privacy and data sharing preferences",
+      title: "Confidentialité",
+      description: "Contrôlez vos données et leur partage",
       href: "/dashboard/settings/privacy",
       icon: Eye,
       sections: [
-        { id: "profile", title: "Profile Visibility", href: "/dashboard/settings/privacy#profile" },
-        { id: "data", title: "Data & Analytics", href: "/dashboard/settings/privacy#data" },
-        { id: "cookies", title: "Cookie Preferences", href: "/dashboard/settings/privacy#cookies" },
-        { id: "rights", title: "Data Rights", href: "/dashboard/settings/privacy#rights" },
+        { id: "profile", title: "Visibilité du profil", href: "/dashboard/settings/privacy#profile" },
+        { id: "data", title: "Données et analyses", href: "/dashboard/settings/privacy#data" },
+        { id: "cookies", title: "Préférences des cookies", href: "/dashboard/settings/privacy#cookies" },
+        { id: "rights", title: "Droits sur les données", href: "/dashboard/settings/privacy#rights" },
       ],
     },
     {
       id: "system",
-      title: "System Settings",
-      description: "Configure system-wide settings and integrations",
+      title: "Système",
+      description: "Configuration générale et intégrations",
       href: "/dashboard/settings/system",
       icon: Database,
       adminOnly: true,
       badge: "Admin",
       sections: [
-        { id: "branding", title: "Branding & Logo", href: "/dashboard/settings/system#branding" },
-        { id: "email", title: "Email Configuration", href: "/dashboard/settings/system#email" },
-        { id: "payment", title: "Payment Settings", href: "/dashboard/settings/system#payment" },
-        { id: "maintenance", title: "Maintenance Mode", href: "/dashboard/settings/system#maintenance" },
+        { id: "branding", title: "Identité et logo", href: "/dashboard/settings/system#branding" },
+        { id: "email", title: "Configuration des e-mails", href: "/dashboard/settings/system#email" },
+        { id: "payment", title: "Paramètres des paiements", href: "/dashboard/settings/system#payment" },
+        { id: "maintenance", title: "Mode maintenance", href: "/dashboard/settings/system#maintenance" },
       ],
     },
     {
       id: "import-export",
-      title: "Import/Export",
-      description: "Backup and restore your settings",
+      title: "Importation et exportation",
+      description: "Sauvegardez et restaurez vos paramètres",
       href: "/dashboard/settings/import-export",
       icon: FileText,
       sections: [
-        { id: "export", title: "Export Settings", href: "/dashboard/settings/import-export#export" },
-        { id: "import", title: "Import Settings", href: "/dashboard/settings/import-export#import" },
+        { id: "export", title: "Exporter les paramètres", href: "/dashboard/settings/import-export#export" },
+        { id: "import", title: "Importer les paramètres", href: "/dashboard/settings/import-export#import" },
       ],
     },
     {
       id: "history",
-      title: "Settings History",
-      description: "View audit logs and change history",
+      title: "Historique",
+      description: "Consultez les modifications",
       href: "/dashboard/settings/history",
       icon: History,
       sections: [
-        { id: "recent", title: "Recent Changes", href: "/dashboard/settings/history#recent" },
-        { id: "audit", title: "Audit Logs", href: "/dashboard/settings/history#audit" },
+        { id: "recent", title: "Modifications récentes", href: "/dashboard/settings/history#recent" },
+        { id: "audit", title: "Journal de contrôle", href: "/dashboard/settings/history#audit" },
       ],
     },
   ];
@@ -188,7 +188,7 @@ export default function SettingsNavigation({
           onClick={() => handleNavigation("/dashboard/settings?search=true")}
         >
           <Search className="h-4 w-4 mr-2" />
-          Search settings...
+          Rechercher dans les paramètres…
         </Button>
       </div>
 
@@ -265,7 +265,7 @@ export default function SettingsNavigation({
       {/* Quick Actions */}
       <div className="space-y-1">
         <p className="text-sm font-medium text-muted-foreground px-3 py-2">
-          Quick Actions
+          Actions rapides
         </p>
         <Button
           variant="ghost"

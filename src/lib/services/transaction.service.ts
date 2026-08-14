@@ -45,15 +45,15 @@ export interface TransactionListResult {
 function getPaymentDescription(payment: any): string {
   const typeLabels: Record<string, string> = {
     [PaymentType.RENT]: "Rent Payment",
-    [PaymentType.SECURITY_DEPOSIT]: "Security Deposit",
-    [PaymentType.LATE_FEE]: "Late Fee",
+    [PaymentType.SECURITY_DEPOSIT]: "Dépôt de garantie",
+    [PaymentType.LATE_FEE]: "Frais de retard",
     [PaymentType.PET_DEPOSIT]: "Pet Deposit",
     [PaymentType.UTILITY]: "Utility Payment",
     [PaymentType.MAINTENANCE]: "Maintenance Payment",
     [PaymentType.INVOICE]: "Invoice Payment",
     [PaymentType.OTHER]: "Other Payment",
   };
-  return typeLabels[payment.type] || "Payment";
+  return typeLabels[payment.type] || "Paiement";
 }
 
 export class TransactionService {
@@ -207,7 +207,7 @@ export class TransactionService {
               : { $ifNull: ["$paidDate", { $ifNull: ["$dueDate", "$createdAt"] }] },
             _txType: "income",
             _txCategory: { $ifNull: ["$type", "rent"] },
-            _txDescription: { $ifNull: ["$type", "Payment"] },
+            _txDescription: { $ifNull: ["$type", "Paiement"] },
             _txReference: {
               $ifNull: [
                 "$stripePaymentIntentId",

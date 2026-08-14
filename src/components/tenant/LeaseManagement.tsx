@@ -317,7 +317,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
             Gestion des baux
           </h1>
           <p className="text-muted-foreground">
-            Gérez vos baux, factures et documents
+            Baux et documents
           </p>
         </div>
 
@@ -432,7 +432,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les statuts</SelectItem>
@@ -454,7 +454,7 @@ export default function LeaseManagement({ className }: LeaseManagementProps) {
                 <SelectItem value="startDate">Date de début</SelectItem>
                 <SelectItem value="endDate">Date de fin</SelectItem>
                 <SelectItem value="rent">Montant du loyer</SelectItem>
-                <SelectItem value="status">Status</SelectItem>
+                <SelectItem value="status">Statut</SelectItem>
               </SelectContent>
             </Select>
             <Button

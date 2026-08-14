@@ -34,11 +34,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   }, [error]);
 
   return (
-    <html lang="en">
+    <html lang="fr">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Critical Error - PropertyPro</title>
+        <title>Erreur critique - GESTION E-IMMO</title>
         <style>{`
           * {
             margin: 0;
@@ -255,35 +255,35 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <div className="icon-container">
               <AlertTriangle className="icon" />
             </div>
-            <h1>Critical Application Error</h1>
-            <p>We encountered a critical error that prevented the application from loading</p>
+            <h1>Erreur critique de l’application</h1>
+            <p>Une erreur critique a empêché le chargement de l’application</p>
           </div>
 
           <div className="content">
             <div className="alert">
               <div className="alert-title">Que s’est-il passé ?</div>
               <div className="alert-description">
-                A critical error occurred in the application's core system. This is usually
-                caused by a configuration issue, network problem, or temporary server error.
+                Une erreur critique est survenue dans le système principal. Elle est généralement
+                liée à la configuration, au réseau ou à une indisponibilité temporaire du serveur.
               </div>
             </div>
 
             {process.env.NODE_ENV === "development" && (
               <div className="error-details">
                 <details>
-                  <summary>Technical Details (Development Mode)</summary>
+                  <summary>Détails techniques (mode développement)</summary>
                   <div className="error-code">
-                    <div><strong>Error Message:</strong></div>
+                    <div><strong>Message d’erreur :</strong></div>
                     <div>{error.message}</div>
                     {error.digest && (
                       <>
-                        <div style={{ marginTop: '0.5rem' }}><strong>Error Digest:</strong></div>
+                        <div style={{ marginTop: '0.5rem' }}><strong>Référence de l’erreur :</strong></div>
                         <div>{error.digest}</div>
                       </>
                     )}
                     {error.stack && (
                       <>
-                        <div style={{ marginTop: '0.5rem' }}><strong>Stack Trace:</strong></div>
+                        <div style={{ marginTop: '0.5rem' }}><strong>Trace technique :</strong></div>
                         <div>{error.stack}</div>
                       </>
                     )}
@@ -294,9 +294,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
             {process.env.NODE_ENV === "production" && error.digest && (
               <div className="error-ref">
-                <p>Error Reference: <code>{error.digest}</code></p>
+                <p>Référence de l’erreur : <code>{error.digest}</code></p>
                 <p style={{ marginTop: '0.25rem' }}>
-                  Please include this reference when contacting support.
+                  Indiquez cette référence lorsque vous contactez l’assistance.
                 </p>
               </div>
             )}
@@ -308,21 +308,21 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               </button>
               <a href="/" className="btn btn-secondary">
                 <Home style={{ width: '1rem', height: '1rem' }} />
-                Go to Homepage
+                Retour à l’accueil
               </a>
             </div>
 
             <div className="footer">
-              <div className="footer-title">Need immediate assistance?</div>
+              <div className="footer-title">Besoin d’une assistance immédiate ?</div>
               <div className="footer-links">
-                <a href="mailto:support@propertypro.com" className="footer-link">
-                  Contact Support
+                <a href="mailto:support@e-immo.bj" className="footer-link">
+                  Contacter l’assistance
                 </a>
                 <a href="/docs" className="footer-link">
                   Documentation
                 </a>
-                <a href="https://status.propertypro.com" className="footer-link" target="_blank" rel="noopener noreferrer">
-                  System Status
+                <a href="/" className="footer-link">
+                  État du système
                 </a>
               </div>
             </div>
@@ -332,4 +332,3 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
     </html>
   );
 }
-

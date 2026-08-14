@@ -128,7 +128,7 @@ export default function PropertyManagementDashboard() {
       maintenanceRequests: 3,
       lastInspection: new Date("2024-01-15"),
       status: "active",
-      amenities: ["Pool", "Gym", "Parking", "Laundry"],
+      amenities: ["Pool", "Gym", "Stationnement", "Laundry"],
       manager: "John Smith",
     },
     {
@@ -144,7 +144,7 @@ export default function PropertyManagementDashboard() {
       maintenanceRequests: 1,
       lastInspection: new Date("2024-01-20"),
       status: "active",
-      amenities: ["Garage", "Garden", "Parking"],
+      amenities: ["Garage", "Jardin", "Stationnement"],
       manager: "Sarah Johnson",
     },
   ]);
@@ -170,7 +170,7 @@ export default function PropertyManagementDashboard() {
         leaseEnd: new Date("2024-05-31"),
       },
       lastMaintenance: new Date("2024-01-10"),
-      amenities: ["AC", "Dishwasher", "Balcony"],
+      amenities: ["AC", "Dishwasher", "Balcon"],
     },
     {
       id: "unit_2",
@@ -237,22 +237,22 @@ export default function PropertyManagementDashboard() {
   ) => {
     const configs = {
       property: {
-        active: { label: "Active", variant: "default" },
+        active: { label: "Actif", variant: "default" },
         maintenance: { label: "Maintenance", variant: "secondary" },
         renovation: { label: "Renovation", variant: "secondary" },
-        inactive: { label: "Inactive", variant: "outline" },
+        inactive: { label: "Inactif", variant: "outline" },
       },
       unit: {
         occupied: { label: "Occupied", variant: "default" },
         vacant: { label: "Vacant", variant: "secondary" },
         maintenance: { label: "Maintenance", variant: "secondary" },
-        notice: { label: "Notice Given", variant: "default" },
+        notice: { label: "Préavis donné", variant: "default" },
       },
       maintenance: {
         open: { label: "Open", variant: "destructive" },
         in_progress: { label: "In Progress", variant: "default" },
         completed: { label: "Completed", variant: "default" },
-        cancelled: { label: "Cancelled", variant: "outline" },
+        cancelled: { label: "Annulée", variant: "outline" },
       },
     };
 
@@ -264,9 +264,9 @@ export default function PropertyManagementDashboard() {
 
   const getPriorityBadge = (priority: MaintenanceRequest["priority"]) => {
     const priorityConfig = {
-      low: { label: "Low", variant: "outline" },
-      medium: { label: "Medium", variant: "secondary" },
-      high: { label: "High", variant: "default" },
+      low: { label: "Faible", variant: "outline" },
+      medium: { label: "Moyenne", variant: "secondary" },
+      high: { label: "Élevée", variant: "default" },
       urgent: { label: "Urgent", variant: "destructive" },
     };
 
@@ -329,12 +329,12 @@ export default function PropertyManagementDashboard() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Property
+                Ajouter le bien
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Add New Property</DialogTitle>
+                <DialogTitle>Ajouter un bien</DialogTitle>
                 <DialogDescription>
                   Add a new property to your portfolio
                 </DialogDescription>
@@ -343,18 +343,18 @@ export default function PropertyManagementDashboard() {
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="property-name">Property Name</Label>
+                    <Label htmlFor="property-name">Nom du bien</Label>
                     <Input
                       id="property-name"
-                      placeholder="Enter property name"
+                      placeholder="Saisir le nom du bien"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="property-type">Property Type</Label>
+                    <Label htmlFor="property-type">Type de bien</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder="Sélectionner un type" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="apartment">
@@ -371,30 +371,30 @@ export default function PropertyManagementDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input id="address" placeholder="Property address" />
+                  <Label htmlFor="address">Adresse</Label>
+                  <Input id="address" placeholder="Adresse du bien" />
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <Label htmlFor="total-units">Total Units</Label>
+                    <Label htmlFor="total-units">Total des logements</Label>
                     <Input id="total-units" type="number" placeholder="0" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="average-rent">Average Rent</Label>
+                    <Label htmlFor="average-rent">Loyer moyen</Label>
                     <Input id="average-rent" type="number" placeholder="0" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="manager">Property Manager</Label>
-                    <Input id="manager" placeholder="Manager name" />
+                    <Label htmlFor="manager">Gestionnaire du bien</Label>
+                    <Input id="manager" placeholder="Nom du gestionnaire" />
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Add Property</Button>
+                  <Button variant="outline">Annuler</Button>
+                  <Button>Ajouter le bien</Button>
                 </div>
               </div>
             </DialogContent>
@@ -439,7 +439,7 @@ export default function PropertyManagementDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Occupancy Rate
+              Taux d’occupation
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -494,7 +494,7 @@ export default function PropertyManagementDashboard() {
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search properties..."
+                      placeholder="Rechercher des biens…"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-8"
@@ -504,14 +504,14 @@ export default function PropertyManagementDashboard() {
 
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    <SelectItem value="active">Actif</SelectItem>
                     <SelectItem value="maintenance">Maintenance</SelectItem>
                     <SelectItem value="renovation">Renovation</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="inactive">Inactif</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -553,7 +553,7 @@ export default function PropertyManagementDashboard() {
                         </div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground">Occupancy</div>
+                        <div className="text-muted-foreground">Occupation</div>
                         <div className="font-medium">
                           {(property.occupancyRate * 100).toFixed(1)}%
                         </div>
@@ -577,7 +577,7 @@ export default function PropertyManagementDashboard() {
                     {/* Occupancy Progress */}
                     <div>
                       <div className="flex justify-between text-sm mb-1">
-                        <span>Occupancy Rate</span>
+                        <span>Taux d’occupation</span>
                         <span>
                           {(property.occupancyRate * 100).toFixed(1)}%
                         </span>
@@ -623,7 +623,7 @@ export default function PropertyManagementDashboard() {
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" className="flex-1">
                         <Eye className="h-4 w-4 mr-2" />
-                        View Details
+                        Voir les détails
                       </Button>
                       <Button size="sm" variant="outline">
                         <Edit className="h-4 w-4" />
@@ -795,7 +795,7 @@ export default function PropertyManagementDashboard() {
         <TabsContent value="inspections" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Property Inspections</CardTitle>
+              <CardTitle>Inspections du bien</CardTitle>
               <CardDescription>
                 Schedule and track property inspections
               </CardDescription>
@@ -821,13 +821,13 @@ export default function PropertyManagementDashboard() {
                       <CardContent>
                         <div className="space-y-2">
                           <div className="flex justify-between">
-                            <span>Last Inspection:</span>
+                            <span>Dernière inspection :</span>
                             <span>
                               {property.lastInspection.toLocaleDateString()}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span>Next Due:</span>
+                            <span>Prochaine échéance :</span>
                             <span className="text-orange-600">
                               {new Date(
                                 property.lastInspection.getTime() +

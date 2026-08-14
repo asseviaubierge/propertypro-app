@@ -360,13 +360,13 @@ export class TenantLedgerService {
     const headers = [
       "Date",
       "Type",
-      "Category",
+      "Catégorie",
       "Description",
-      "Reference",
+      "Référence",
       "Debit Amount",
       "Credit Amount",
       "Running Balance",
-      "Status",
+      "Statut",
     ];
 
     const rows = ledger.entries.map((entry) => [

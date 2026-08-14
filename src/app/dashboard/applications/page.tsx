@@ -208,7 +208,7 @@ export default function ApplicationsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Applications</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Candidatures</h1>
         </div>
         <div className="animate-pulse space-y-4">
           <div className="h-32 bg-gray-200 rounded"></div>
@@ -223,7 +223,7 @@ export default function ApplicationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Applications</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Candidatures</h1>
           <p className="text-muted-foreground">
             Review and manage tenant applications
           </p>
@@ -262,7 +262,7 @@ export default function ApplicationsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
+            <CardTitle className="text-sm font-medium">Approuvée</CardTitle>
             <Check className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -273,7 +273,7 @@ export default function ApplicationsPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Ce mois-ci</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -296,32 +296,32 @@ export default function ApplicationsPage() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filter Applications</CardTitle>
+          <CardTitle>Filtrer les candidatures</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Global Search Component with 300ms debounce */}
             <GlobalSearch
-              placeholder="Search by applicant name or email..."
+              placeholder="Rechercher par nom ou adresse e-mail…"
               initialValue={searchTerm}
               debounceDelay={300}
               onSearch={handleSearch}
               isLoading={isSearching}
               className="flex-1"
-              ariaLabel="Search applications"
+              ariaLabel="Rechercher des candidatures"
             />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filtrer par statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="submitted">Submitted</SelectItem>
-                <SelectItem value="under_review">Under Review</SelectItem>
-                <SelectItem value="screening_in_progress">Screening</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="draft">Brouillon</SelectItem>
+                <SelectItem value="submitted">Soumise</SelectItem>
+                <SelectItem value="under_review">En cours d’examen</SelectItem>
+                <SelectItem value="screening_in_progress">Vérification en cours</SelectItem>
+                <SelectItem value="approved">Approuvée</SelectItem>
+                <SelectItem value="rejected">Rejetée</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -347,12 +347,12 @@ export default function ApplicationsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Applicant</TableHead>
-                <TableHead>Property</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Rent</TableHead>
-                <TableHead>Fee Status</TableHead>
-                <TableHead>Submitted</TableHead>
+                <TableHead>Candidat</TableHead>
+                <TableHead>Bien</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Loyer</TableHead>
+                <TableHead>État des frais</TableHead>
+                <TableHead>Soumise</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -415,7 +415,7 @@ export default function ApplicationsPage() {
                             href={`/dashboard/applications/${application._id}`}
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                            Voir les détails
                           </Link>
                         </DropdownMenuItem>
                         {[

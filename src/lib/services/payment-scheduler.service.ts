@@ -217,7 +217,7 @@ class PaymentSchedulerService {
       })
       .populate("propertyId");
     if (!lease) {
-      throw new Error("Lease not found");
+      throw new Error("Bail introuvable");
     }
 
     const paymentConfig = lease.terms.paymentConfig;

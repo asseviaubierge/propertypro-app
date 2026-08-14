@@ -185,28 +185,28 @@ export default function PaymentManagementDashboard() {
   const getStatusBadge = (status: PaymentStatus["status"]) => {
     const statusConfig = {
       pending: {
-        label: "Pending",
+        label: "En attente",
         variant: "secondary",
         color: "bg-yellow-500",
       },
       paid: {
-        label: "Paid",
+        label: "Payée",
         variant: "default",
         color: "bg-green-500",
       },
       partial: {
-        label: "Partial",
+        label: "Partielle",
         variant: "default",
         color: "bg-blue-500",
       },
       overdue: {
-        label: "Overdue",
+        label: "En retard",
         variant: "secondary",
         color: "bg-yellow-600",
       },
-      cancelled: { label: "Cancelled", variant: "secondary", color: "bg-gray-500" },
+      cancelled: { label: "Annulée", variant: "secondary", color: "bg-gray-500" },
       refunded: { label: "Refunded", variant: "secondary", color: "bg-purple-500" },
-      failed: { label: "Failed", variant: "destructive", color: "bg-red-500" },
+      failed: { label: "Échoué", variant: "destructive", color: "bg-red-500" },
     };
 
     const config = statusConfig[status];
@@ -237,7 +237,7 @@ export default function PaymentManagementDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">
-            Payment Management
+            Gestion des paiements
           </h2>
           <p className="text-muted-foreground">
             Monitor collections, track overdue payments, and manage tenant
@@ -269,7 +269,7 @@ export default function PaymentManagementDashboard() {
             </Button>
             <Button>
               <CreditCard className="h-4 w-4 mr-2" />
-              Process Payment
+              Traiter le paiement
             </Button>
           </div>
         </div>
@@ -340,7 +340,7 @@ export default function PaymentManagementDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Collection Rate
+              Taux d’encaissement
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -357,10 +357,10 @@ export default function PaymentManagementDashboard() {
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="aging">Aging Report</TabsTrigger>
-          <TabsTrigger value="payments">Payment Status</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="overview">Vue d’ensemble</TabsTrigger>
+          <TabsTrigger value="aging">Rapport d’ancienneté</TabsTrigger>
+          <TabsTrigger value="payments">État des paiements</TabsTrigger>
+          <TabsTrigger value="analytics">Analyses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -368,7 +368,7 @@ export default function PaymentManagementDashboard() {
             {/* Collection Progress */}
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Collection Progress</CardTitle>
+                <CardTitle>Progression des encaissements mensuels</CardTitle>
                 <CardDescription>
                   Current month performance vs target
                 </CardDescription>
@@ -376,19 +376,19 @@ export default function PaymentManagementDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span>Collected</span>
+                    <span>Encaissé</span>
                     <span className="font-bold text-green-600">
                       {formatCurrency(metrics.currentMonthCollected)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Outstanding</span>
+                    <span>Impayé</span>
                     <span className="font-bold text-orange-600">
                       {formatCurrency(metrics.outstandingThisMonth)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Target</span>
+                    <span>Objectif</span>
                     <span className="font-bold">
                       {formatCurrency(metrics.currentMonthTarget)}
                     </span>
@@ -405,7 +405,7 @@ export default function PaymentManagementDashboard() {
             {/* Payment Status Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Payment Status Summary</CardTitle>
+                <CardTitle>Résumé de l’état des paiements</CardTitle>
                 <CardDescription>
                   Current payment statuses across portfolio
                 </CardDescription>
@@ -418,35 +418,35 @@ export default function PaymentManagementDashboard() {
                       count: paymentStatuses.filter(
                         (p) => p.status === "pending"
                       ).length,
-                      label: "Pending",
+                      label: "En attente",
                     },
                     {
                       status: "paid",
                       count: paymentStatuses.filter(
                         (p) => p.status === "paid"
                       ).length,
-                      label: "Paid",
+                      label: "Payée",
                     },
                     {
                       status: "partial",
                       count: paymentStatuses.filter(
                         (p) => p.status === "partial"
                       ).length,
-                      label: "Partial",
+                      label: "Partielle",
                     },
                     {
                       status: "overdue",
                       count: paymentStatuses.filter(
                         (p) => p.status === "overdue"
                       ).length,
-                      label: "Overdue",
+                      label: "En retard",
                     },
                     {
                       status: "failed",
                       count: paymentStatuses.filter(
                         (p) => p.status === "failed"
                       ).length,
-                      label: "Failed",
+                      label: "Échoué",
                     },
                   ].map((item) => (
                     <div
@@ -468,7 +468,7 @@ export default function PaymentManagementDashboard() {
           {/* Recent Activity */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Payment Activity</CardTitle>
+              <CardTitle>Activité de paiement récente</CardTitle>
               <CardDescription>
                 Latest payment transactions and status changes
               </CardDescription>
@@ -550,8 +550,8 @@ export default function PaymentManagementDashboard() {
             {/* Aging Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Aging Report</CardTitle>
-                <CardDescription>Outstanding balances by age</CardDescription>
+                <CardTitle>Rapport d’ancienneté</CardTitle>
+                <CardDescription>Soldes impayés par ancienneté</CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -583,8 +583,8 @@ export default function PaymentManagementDashboard() {
             {/* Aging Details */}
             <Card>
               <CardHeader>
-                <CardTitle>Aging Breakdown</CardTitle>
-                <CardDescription>Detailed aging analysis</CardDescription>
+                <CardTitle>Détail par ancienneté</CardTitle>
+                <CardDescription>Analyse détaillée de l’ancienneté</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -658,7 +658,7 @@ export default function PaymentManagementDashboard() {
                             <Button size="sm" variant="outline">
                               Contact
                             </Button>
-                            <Button size="sm">Process Payment</Button>
+                            <Button size="sm">Traiter le paiement</Button>
                           </div>
                         </div>
                       </AlertDescription>
@@ -672,7 +672,7 @@ export default function PaymentManagementDashboard() {
         <TabsContent value="payments" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Status Overview</CardTitle>
+              <CardTitle>Vue d’ensemble des paiements</CardTitle>
               <CardDescription>
                 All current payment statuses and actions
               </CardDescription>
@@ -734,7 +734,7 @@ export default function PaymentManagementDashboard() {
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Collection Trends</CardTitle>
+                <CardTitle>Évolution des encaissements</CardTitle>
                 <CardDescription>
                   Monthly collection performance
                 </CardDescription>
@@ -755,8 +755,8 @@ export default function PaymentManagementDashboard() {
                     <Tooltip
                       formatter={(value) => formatCurrency(value as number)}
                     />
-                    <Bar dataKey="collected" fill="#22c55e" name="Collected" />
-                    <Bar dataKey="target" fill="#e5e7eb" name="Target" />
+                    <Bar dataKey="collected" fill="#22c55e" name="Encaissé" />
+                    <Bar dataKey="target" fill="#e5e7eb" name="Objectif" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -764,13 +764,13 @@ export default function PaymentManagementDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Key Performance Indicators</CardTitle>
-                <CardDescription>Portfolio performance metrics</CardDescription>
+                <CardTitle>Indicateurs clés de rendement</CardTitle>
+                <CardDescription>Indicateurs de rendement du portefeuille</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span>Collection Rate</span>
+                    <span>Taux d’encaissement</span>
                     <div className="text-right">
                       <div className="font-bold text-green-600">
                         {formatPercentage(metrics.collectionRate)}
@@ -781,7 +781,7 @@ export default function PaymentManagementDashboard() {
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Average Days to Payment</span>
+                    <span>Délai moyen de paiement</span>
                     <div className="text-right">
                       <div className="font-bold">
                         {metrics.averageDaysToPayment} days
@@ -792,7 +792,7 @@ export default function PaymentManagementDashboard() {
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Late Payment Rate</span>
+                    <span>Taux de retard</span>
                     <div className="text-right">
                       <div className="font-bold text-orange-600">12%</div>
                       <div className="text-xs text-muted-foreground">
@@ -801,7 +801,7 @@ export default function PaymentManagementDashboard() {
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>Auto-pay Adoption</span>
+                    <span>Adoption du paiement automatique</span>
                     <div className="text-right">
                       <div className="font-bold text-blue-600">68%</div>
                       <div className="text-xs text-muted-foreground">

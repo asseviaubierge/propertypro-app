@@ -534,19 +534,19 @@ export default function UnitDetailsPage() {
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Unit
+                    Supprimer le logement
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Unit</AlertDialogTitle>
+                    <AlertDialogTitle>Supprimer le logement</AlertDialogTitle>
                     <AlertDialogDescription>
                       Are you sure you want to delete Unit {unit.unitNumber}?
                       This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDeleteUnit}
                       className="bg-red-600 hover:bg-red-700"
@@ -1402,7 +1402,7 @@ export default function UnitDetailsPage() {
                               {doc.fileName}
                             </p>
                             <p className="text-xs text-muted-foreground uppercase">
-                              {doc.fileType.split("/")[1] || "File"} •{" "}
+                              {doc.fileType.split("/")[1] || "Fichier"} •{" "}
                               {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
                             </p>
                           </div>

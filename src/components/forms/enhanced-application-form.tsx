@@ -131,7 +131,7 @@ const STEPS = [
   { id: 3, title: "Contacts", icon: Users },
   { id: 4, title: "History", icon: Home },
   { id: 5, title: "Documents", icon: FileText },
-  { id: 6, title: "Payment", icon: CreditCard },
+  { id: 6, title: "Paiement", icon: CreditCard },
   { id: 7, title: "Review", icon: Check },
 ];
 
@@ -340,7 +340,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>Prénom</FormLabel>
                         <FormControl>
                           <Input placeholder="John" {...field} />
                         </FormControl>
@@ -353,7 +353,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>Nom</FormLabel>
                         <FormControl>
                           <Input placeholder="Doe" {...field} />
                         </FormControl>
@@ -369,7 +369,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel>Adresse e-mail</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
@@ -386,7 +386,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Numéro de téléphone</FormLabel>
                         <FormControl>
                           <Input placeholder="(555) 123-4567" {...field} />
                         </FormControl>
@@ -402,7 +402,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.dateOfBirth"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date of Birth</FormLabel>
+                        <FormLabel>Date de naissance</FormLabel>
                         <FormControl>
                           <FormDatePicker
                             value={
@@ -411,7 +411,7 @@ export function EnhancedApplicationForm({
                             onChange={(date) =>
                               field.onChange(date?.toISOString().split("T")[0])
                             }
-                            placeholder="Select date of birth"
+                            placeholder="Sélectionner la date de naissance"
                             disabled={(date) =>
                               date > new Date() || date < new Date("1900-01-01")
                             }
@@ -426,7 +426,7 @@ export function EnhancedApplicationForm({
                     name="personalInfo.ssn"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Social Security Number (Optional)</FormLabel>
+                        <FormLabel>Numéro d’identification sociale (facultatif)</FormLabel>
                         <FormControl>
                           <Input placeholder="XXX-XX-XXXX" {...field} />
                         </FormControl>
@@ -462,9 +462,9 @@ export function EnhancedApplicationForm({
                     name="employmentInfo.employer"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Employer Name</FormLabel>
+                        <FormLabel>Nom de l’employeur</FormLabel>
                         <FormControl>
-                          <Input placeholder="Company Name" {...field} />
+                          <Input placeholder="Nom de l’entreprise" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -475,7 +475,7 @@ export function EnhancedApplicationForm({
                     name="employmentInfo.position"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Job Title</FormLabel>
+                        <FormLabel>Intitulé du poste</FormLabel>
                         <FormControl>
                           <Input placeholder="Software Engineer" {...field} />
                         </FormControl>
@@ -491,7 +491,7 @@ export function EnhancedApplicationForm({
                     name="employmentInfo.income"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Annual Income</FormLabel>
+                        <FormLabel>Revenu annuel</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -511,7 +511,7 @@ export function EnhancedApplicationForm({
                     name="employmentInfo.startDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Employment Start Date</FormLabel>
+                        <FormLabel>Date de début d’emploi</FormLabel>
                         <FormControl>
                           <FormDatePicker
                             value={
@@ -520,7 +520,7 @@ export function EnhancedApplicationForm({
                             onChange={(date) =>
                               field.onChange(date?.toISOString().split("T")[0])
                             }
-                            placeholder="Select employment start date"
+                            placeholder="Sélectionner la date de début d’emploi"
                             disabled={(date) => date > new Date()}
                           />
                         </FormControl>
@@ -535,7 +535,7 @@ export function EnhancedApplicationForm({
                   name="employmentInfo.employerContact"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employer Contact (Optional)</FormLabel>
+                      <FormLabel>Coordonnées de l’employeur (facultatif)</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="HR phone number or email"
@@ -564,7 +564,7 @@ export function EnhancedApplicationForm({
                   disabled={currentStep === 1}
                 >
                   <ChevronLeft className="mr-2 h-4 w-4" />
-                  Previous
+                  Précédent
                 </Button>
 
                 <div className="flex gap-2">
@@ -574,13 +574,13 @@ export function EnhancedApplicationForm({
                       variant="outline"
                       onClick={handleSaveDraft}
                     >
-                      Save Draft
+                      Enregistrer le brouillon
                     </Button>
                   )}
 
                   {currentStep < STEPS.length ? (
                     <Button type="button" onClick={nextStep}>
-                      Next
+                      Suivant
                       <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   ) : (

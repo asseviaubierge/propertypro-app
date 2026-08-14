@@ -71,7 +71,7 @@ export function EmergencyWorkflow({
         status: "completed",
         icon: AlertTriangle,
         timestamp: new Date(createdAt).toLocaleString(),
-        slaTarget: "Immediate",
+        slaTarget: "Immédiate",
       },
       {
         id: "notification",
@@ -387,7 +387,7 @@ export function EmergencyWorkflow({
                 {onEscalate && (
                   <Button variant="destructive" size="sm" onClick={onEscalate}>
                     <ArrowRight className="mr-2 h-4 w-4" />
-                    Escalate Emergency
+                    Faire remonter l’urgence
                   </Button>
                 )}
                 {onNotify && (
@@ -419,7 +419,7 @@ export function EmergencyWorkflow({
                 <div className={`text-lg font-bold ${getSLAColor()}`}>
                   {getTotalElapsedTime()}
                 </div>
-                <div className="text-xs text-gray-500">Time Elapsed</div>
+                <div className="text-xs text-gray-500">Temps écoulé</div>
               </div>
             </div>
           </div>

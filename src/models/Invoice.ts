@@ -363,7 +363,7 @@ InvoiceSchema.statics.createFromLease = async function (
   const lease = await Lease.findById(leaseId).populate("tenantId propertyId");
 
   if (!lease) {
-    throw new Error("Lease not found");
+    throw new Error("Bail introuvable");
   }
 
   const invoiceNumber = `INV-${new Date().getFullYear()}${String(
@@ -395,7 +395,7 @@ InvoiceSchema.statics.createFromLease = async function (
     ),
     lineItems: [
       {
-        description: "Monthly Rent",
+        description: "Loyer mensuel",
         amount: lease.terms.rentAmount,
         type: InvoiceType.RENT,
         quantity: 1,

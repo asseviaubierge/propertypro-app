@@ -7,21 +7,22 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest } from "next/server";
 import { Event } from "@/models";
-import mongoose from "mongoose";
 import {
+  AuthenticatedAccessUser,
   createSuccessResponse,
-  createErrorResponse,
   handleApiError,
   withPermissionAndDB,
 } from "@/lib/api-utils";
 import { EventType, EventStatus } from "@/types";
+import { buildCalendarScope } from "@/lib/calendar-scope";
 
 // ============================================================================
 // GET /api/calendar/stats - Get calendar statistics
 // ============================================================================
 export const GET = withPermissionAndDB("profile_management")(async (
-  user: any,
+  user: AuthenticatedAccessUser,
   request: NextRequest,
+  context?: { tenantProfile?: { _id?: unknown } | null },
 ) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -37,43 +38,40 @@ export const GET = withPermissionAndDB("profile_management")(async (
       dateFilter.$lte = new Date(endDate);
     }
 
-    // Base filters
-    const userObjectId = new mongoose.Types.ObjectId(user.id);
-    const userFilter = {
-      $or: [
-        { organizer: userObjectId },
-        { createdBy: userObjectId },
-        { "attendees.userId": userObjectId },
-      ],
-    };
+    const scopeFilter = await buildCalendarScope(
+      user,
+      context?.tenantProfile,
+    );
 
     const softDeleteFilter = {
       $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
     };
 
-    const baseQuery = {
+    const scopedQuery = (...extraFilters: Record<string, unknown>[]) => ({
       $and: [
-        userFilter,
         softDeleteFilter,
-        ...(Object.keys(dateFilter).length > 0
-          ? [{ startDate: dateFilter }]
-          : []),
+        ...(Object.keys(scopeFilter).length > 0 ? [scopeFilter] : []),
+        ...extraFilters,
       ],
-    };
+    });
+
+    const baseQuery = scopedQuery(
+      ...(Object.keys(dateFilter).length > 0
+        ? [{ startDate: dateFilter }]
+        : []),
+    );
 
     // Get total events count
     const totalEvents = await Event.countDocuments(baseQuery);
 
     // Get upcoming events (from now)
     const now = new Date();
-    const upcomingEvents = await Event.countDocuments({
-      $and: [
-        userFilter,
-        softDeleteFilter,
+    const upcomingEvents = await Event.countDocuments(
+      scopedQuery(
         { startDate: { $gte: now } },
         { status: { $nin: [EventStatus.CANCELLED, EventStatus.COMPLETED] } },
-      ],
-    });
+      ),
+    );
 
     // Get today's events
     const startOfDay = new Date(now);
@@ -81,28 +79,23 @@ export const GET = withPermissionAndDB("profile_management")(async (
     const endOfDay = new Date(now);
     endOfDay.setHours(23, 59, 59, 999);
 
-    const todayEvents = await Event.countDocuments({
-      $and: [
-        userFilter,
-        softDeleteFilter,
-        {
-          startDate: {
-            $gte: startOfDay,
-            $lte: endOfDay,
-          },
+    const todayEvents = await Event.countDocuments(
+      scopedQuery({
+        startDate: {
+          $gte: startOfDay,
+          $lte: endOfDay,
         },
-      ],
-    });
+      }),
+    );
 
     // Get pending RSVPs for events organized by the user
     // Count attendees with pending status in events organized by the user
     const pendingRSVPsAgg = await Event.aggregate([
       {
-        $match: {
-          organizer: new mongoose.Types.ObjectId(user.id),
-          startDate: { $gte: now }, // Only count future events
-          status: { $nin: [EventStatus.CANCELLED, EventStatus.COMPLETED] },
-        },
+        $match: scopedQuery(
+          { startDate: { $gte: now } },
+          { status: { $nin: [EventStatus.CANCELLED, EventStatus.COMPLETED] } },
+        ),
       },
       {
         $unwind: "$attendees",
@@ -160,13 +153,9 @@ export const GET = withPermissionAndDB("profile_management")(async (
 
     // Get recent activity (events created in last 30 days)
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const recentEvents = await Event.countDocuments({
-      $and: [
-        userFilter,
-        softDeleteFilter,
-        { createdAt: { $gte: thirtyDaysAgo } },
-      ],
-    });
+    const recentEvents = await Event.countDocuments(
+      scopedQuery({ createdAt: { $gte: thirtyDaysAgo } }),
+    );
 
     // Get completion rate
     const completedEvents = eventsByStatus[EventStatus.COMPLETED] ?? 0;
@@ -175,13 +164,9 @@ export const GET = withPermissionAndDB("profile_management")(async (
 
     // Get average events per week (last 4 weeks)
     const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
-    const recentEventsCount = await Event.countDocuments({
-      $and: [
-        userFilter,
-        softDeleteFilter,
-        { startDate: { $gte: fourWeeksAgo } },
-      ],
-    });
+    const recentEventsCount = await Event.countDocuments(
+      scopedQuery({ startDate: { $gte: fourWeeksAgo } }),
+    );
     const avgEventsPerWeek = recentEventsCount / 4;
 
     // Get busiest day of week
@@ -199,13 +184,13 @@ export const GET = withPermissionAndDB("profile_management")(async (
 
     const busiestDay = dayOfWeekAgg.length > 0 ? dayOfWeekAgg[0]._id : null;
     const dayNames = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      "Dimanche",
+      "Lundi",
+      "Mardi",
+      "Mercredi",
+      "Jeudi",
+      "Vendredi",
+      "Samedi",
     ];
     const busiestDayName = busiestDay ? dayNames[busiestDay - 1] : null;
 
@@ -213,13 +198,7 @@ export const GET = withPermissionAndDB("profile_management")(async (
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
     const monthlyTrend = await Event.aggregate([
       {
-        $match: {
-          $and: [
-            userFilter,
-            softDeleteFilter,
-            { startDate: { $gte: sixMonthsAgo } },
-          ],
-        },
+        $match: scopedQuery({ startDate: { $gte: sixMonthsAgo } }),
       },
       {
         $group: {
@@ -251,9 +230,14 @@ export const GET = withPermissionAndDB("profile_management")(async (
         completedEvents,
         cancelledEvents: eventsByStatus[EventStatus.CANCELLED] ?? 0,
         responseRate:
-          pendingRSVPs > 0
-            ? Math.round(((totalEvents - pendingRSVPs) / totalEvents) * 100)
-            : 100,
+          totalEvents > 0 && pendingRSVPs > 0
+            ? Math.max(
+                0,
+                Math.round(((totalEvents - pendingRSVPs) / totalEvents) * 100),
+              )
+            : totalEvents > 0
+              ? 100
+              : 0,
       },
     };
 

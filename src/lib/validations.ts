@@ -194,13 +194,13 @@ export const amenitySchema = z.object({
     "Living",
     "Bedroom",
     "Outdoor",
-    "Parking",
-    "Security",
-    "Utilities",
+    "Stationnement",
+    "Sécurité",
+    "Services publics",
     "Recreation",
     "Laundry",
     "Climate",
-    "Other",
+    "Autre",
   ]),
 });
 
@@ -723,10 +723,10 @@ export const maintenanceRequestSchema = z.object({
     "Landscaping",
     "Cleaning",
     "Pest Control",
-    "Security",
+    "Sécurité",
     "General Repair",
     "Emergency",
-    "Other",
+    "Autre",
   ]),
   images: z
     .array(z.string().url("Invalid image URL"))
@@ -1082,7 +1082,7 @@ export const creditReportSchema = z.object({
     .min(300, "Credit score too low")
     .max(850, "Credit score too high"),
   reportDate: z.date().default(() => new Date()),
-  provider: z.enum(["TransUnion", "Experian", "Equifax", "Other"]),
+  provider: z.enum(["TransUnion", "Experian", "Equifax", "Autre"]),
   reportId: z.string().min(1, "Report ID is required"),
   details: z.any().optional(),
 });

@@ -192,7 +192,7 @@ export function PaymentCard({ payment, onDelete }: PaymentCardProps) {
               <DropdownMenuItem asChild>
                 <Link href={`/dashboard/payments/${payment._id}`}>
                   <Eye className="mr-2 h-4 w-4" />
-                  View Details
+                  Voir les détails
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -274,14 +274,14 @@ export function PaymentCard({ payment, onDelete }: PaymentCardProps) {
 
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-muted-foreground">Due:</span>
+          <span className="text-muted-foreground">Échéance :</span>
           <span>{formatDate(payment.dueDate)}</span>
         </div>
 
         {payment.paidDate && (
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className="h-4 w-4 text-green-600" />
-            <span className="text-muted-foreground">Paid:</span>
+            <span className="text-muted-foreground">Payé :</span>
             <span>{formatDate(payment.paidDate)}</span>
           </div>
         )}
@@ -289,7 +289,7 @@ export function PaymentCard({ payment, onDelete }: PaymentCardProps) {
         {daysOverdue > 0 && (
           <div className="flex items-center gap-2 text-sm">
             <XCircle className="h-4 w-4 text-red-600" />
-            <span className="text-muted-foreground">Overdue:</span>
+            <span className="text-muted-foreground">Retard :</span>
             <span className="text-red-600 font-medium">{daysOverdue} days</span>
           </div>
         )}
@@ -297,7 +297,7 @@ export function PaymentCard({ payment, onDelete }: PaymentCardProps) {
         {payment.paymentMethod && (
           <div className="flex items-center gap-2 text-sm">
             <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Method:</span>
+            <span className="text-muted-foreground">Mode :</span>
             <span className="capitalize">
               {payment.paymentMethod.replace("_", " ")}
             </span>

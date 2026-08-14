@@ -286,7 +286,7 @@ export const POST = withPermissionAndDB("financial_management")(
         "tenantId propertyId"
       );
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       resolvedTenantId = lease.tenantId._id;

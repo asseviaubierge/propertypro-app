@@ -196,7 +196,7 @@ export default function ActiveLeasesPage() {
         }));
       } catch (error) {
         console.error("Error fetching active leases:", error);
-        showSimpleError("Load Error", t("leases.active.toasts.fetchError"));
+        showSimpleError("Erreur de chargement", t("leases.active.toasts.fetchError"));
         setLeases([]);
         setStats((prev) => ({
           ...prev,
@@ -597,7 +597,7 @@ export default function ActiveLeasesPage() {
               onSearch={handleSearch}
               isLoading={isSearching}
               className="flex-1 min-w-0"
-              ariaLabel="Search active leases"
+              ariaLabel="Rechercher des baux actifs"
             />
 
             {/* Filter Controls */}
@@ -619,7 +619,7 @@ export default function ActiveLeasesPage() {
                   </SelectItem>
                   <SelectItem value="endDate-desc">
                     {t("leases.sort.endDateLatest", {
-                      defaultValue: "End Date (Latest)",
+                      defaultValue: "Date de fin (la plus récente)",
                     })}
                   </SelectItem>
                   <SelectItem value="startDate-desc">
@@ -650,7 +650,7 @@ export default function ActiveLeasesPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("leases.filters.clear") || "Clear"}
+                  {t("leases.filters.clear") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -764,13 +764,13 @@ export default function ActiveLeasesPage() {
               pageSize={filters.limit ?? 12}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

@@ -191,7 +191,7 @@ function formatErrorLog(error: ErrorLog): string {
   ];
 
   if (error.context.userId) {
-    parts.push(`(User: ${error.context.userId})`);
+    parts.push(`(Utilisateur : ${error.context.userId})`);
   }
 
   if (error.context.path) {
@@ -241,7 +241,7 @@ function generateErrorAlertEmail(errors: ErrorLog[]): string {
       <h3 style="margin: 0 0 10px 0; color: #c00;">${error.message}</h3>
       <p><strong>Category:</strong> ${error.category}</p>
       <p><strong>Severity:</strong> ${error.severity}</p>
-      <p><strong>User:</strong> ${error.context.userEmail || "Anonymous"}</p>
+      <p><strong>Utilisateur :</strong> ${error.context.userEmail || "Anonyme"}</p>
       <p><strong>Path:</strong> ${error.context.path || "N/A"}</p>
       <p><strong>Time:</strong> ${error.context.timestamp}</p>
       ${
@@ -259,18 +259,18 @@ function generateErrorAlertEmail(errors: ErrorLog[]): string {
     <html>
       <head>
         <meta charset="utf-8">
-        <title>Critical Error Alert</title>
+        <title>Alerte d’erreur critique</title>
       </head>
       <body style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
         <div style="max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px;">
-          <h1 style="color: #c00; margin-bottom: 20px;">🚨 Critical Error Alert</h1>
+          <h1 style="color: #c00; margin-bottom: 20px;">🚨 Alerte d’erreur critique</h1>
           <p style="margin-bottom: 20px;">
-            ${errors.length} critical error(s) detected in PropertyPro application.
+            ${errors.length} erreur(s) critique(s) détectée(s) dans GESTION E-IMMO.
           </p>
           ${errorList}
           <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
           <p style="color: #666; font-size: 12px;">
-            This is an automated alert from PropertyPro Error Monitoring System.
+            Ceci est une alerte automatique du système de surveillance GESTION E-IMMO.
           </p>
         </div>
       </body>

@@ -351,7 +351,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 min-h-0 scrollbar-thin bg-linear-to-br from-background via-background to-muted/25">
+        <main
+          data-dashboard-page={pathname === "/dashboard" ? "home" : "module"}
+          className="flex-1 overflow-y-auto p-4 md:p-6 pb-24 md:pb-6 min-h-0 scrollbar-thin bg-linear-to-br from-background via-background to-muted/25"
+        >
           <div className="min-w-0">{children}</div>
         </main>
       </div>

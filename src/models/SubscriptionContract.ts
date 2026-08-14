@@ -78,6 +78,73 @@ const MandateRulesSchema = new Schema(
   { _id: false }
 );
 
+
+const SafeguardsSchema = new Schema(
+  {
+    manualPaymentRegister: { type: Boolean, default: true },
+    manualOwnerPayoutRegister: { type: Boolean, default: true },
+    independentEvidenceArchive: { type: Boolean, default: true },
+    independentBackups: { type: Boolean, default: true },
+    backupFrequency: { type: String, trim: true, default: "Quotidienne + sauvegardes périodiques" },
+    outageReconciliation: { type: Boolean, default: true },
+    immutableAuditTrail: { type: Boolean, default: true },
+    incidentNotification: { type: Boolean, default: true },
+    financialInstructionVerification: { type: Boolean, default: true },
+    employeeFraudControls: { type: Boolean, default: true },
+    professionalLiabilityInsurance: { type: Boolean, default: false },
+    propertyInsuranceRequired: { type: Boolean, default: true },
+    tenantLiabilityInsuranceRecommended: { type: Boolean, default: true },
+    cyberInsurance: { type: Boolean, default: false },
+    thirdPartyFundsProtection: { type: Boolean, default: false },
+    guaranteeReserveRequired: { type: Boolean, default: true },
+    guaranteeReserveAmount: { type: Number, min: 0, default: 0 },
+    forceMajeureNotes: { type: String, trim: true, default: "" },
+  },
+  { _id: false }
+);
+
+const OnboardingChecklistSchema = new Schema(
+  {
+    ownerIdentityVerified: { type: Boolean, default: false },
+    ownershipDocumentsVerified: { type: Boolean, default: false },
+    existingOccupantsDeclared: { type: Boolean, default: false },
+    existingLeasesCollected: { type: Boolean, default: false },
+    priorArrearsDeclared: { type: Boolean, default: false },
+    depositsAdvancesDeclared: { type: Boolean, default: false },
+    propertyConditionRecorded: { type: Boolean, default: false },
+    knownDisputesDeclared: { type: Boolean, default: false },
+    payoutCoordinatesVerified: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
+
+const OffboardingChecklistSchema = new Schema(
+  {
+    closureStatementRequired: { type: Boolean, default: true },
+    finalFinancialStatement: { type: Boolean, default: true },
+    depositsTransferred: { type: Boolean, default: true },
+    documentsDelivered: { type: Boolean, default: true },
+    activeLeasesTransferred: { type: Boolean, default: true },
+    openDisputesRecorded: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
+const ComplianceRulesSchema = new Schema(
+  {
+    identityVerification: { type: Boolean, default: true },
+    dataUseNoticeAccepted: { type: Boolean, default: true },
+    occupantContactUseRestricted: { type: Boolean, default: true },
+    accountSecurityAcknowledged: { type: Boolean, default: true },
+    collectionAuthorization: { type: Boolean, default: true },
+    legalProceedingsNeedApproval: { type: Boolean, default: true },
+    taxResponsibilityAcknowledged: { type: Boolean, default: true },
+    deathSuccessionProcedure: { type: Boolean, default: true },
+    propertySaleProcedure: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
 const SubscriptionContractSchema = new Schema(
   {
     accountId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
@@ -119,16 +186,38 @@ const SubscriptionContractSchema = new Schema(
     renewalMode: { type: String, enum: ["manual", "automatic"], default: "manual" },
     status: {
       type: String,
-      enum: ["draft", "active", "suspended", "expired", "cancelled"],
+      enum: ["draft", "pending_signature", "signed", "active", "suspended", "expired", "cancelled"],
       default: "draft",
       index: true,
     },
+
+    // Cycle de lecture et signature du document par le contractant.
+    signatureStatus: {
+      type: String,
+      enum: ["not_sent", "pending_signature", "signed", "rejected"],
+      default: "not_sent",
+      index: true,
+    },
+    sentAt: { type: Date, default: null },
+    lastDeliveryChannel: {
+      type: String,
+      enum: ["email", "whatsapp", "manual", null],
+      default: null,
+    },
+    viewedAt: { type: Date, default: null },
+    signedAt: { type: Date, default: null },
+    signatoryName: { type: String, trim: true, default: "" },
+    signatoryAcknowledgement: { type: Boolean, default: false },
 
     title: { type: String, trim: true, default: "Contrat E-IMMO" },
     contractBody: { type: String, trim: true, default: "" },
     conditions: { type: String, trim: true, default: "" },
     specialClauses: { type: String, trim: true, default: "" },
     mandateRules: { type: MandateRulesSchema, default: () => ({}) },
+    safeguards: { type: SafeguardsSchema, default: () => ({}) },
+    onboardingChecklist: { type: OnboardingChecklistSchema, default: () => ({}) },
+    offboardingChecklist: { type: OffboardingChecklistSchema, default: () => ({}) },
+    complianceRules: { type: ComplianceRulesSchema, default: () => ({}) },
 
     platformName: { type: String, default: "E-IMMO" },
     platformRepresentative: { type: String, trim: true, default: "GESTION E-IMMO" },

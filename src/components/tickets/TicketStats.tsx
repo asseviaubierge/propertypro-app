@@ -40,7 +40,7 @@ export default function TicketStats({ tickets }: TicketStatsProps) {
   }, [tickets]);
 
   return (
-    <AnalyticsCardGrid className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <AnalyticsCardGrid className="grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
       <AnalyticsCard
         title={t("tickets.stats.total")}
         value={stats.total}

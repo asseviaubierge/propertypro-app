@@ -521,7 +521,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="security-deposit">Dépôt de garantie</Label>
+                  <Label htmlFor="security-deposit">Garantie</Label>
                   <Input
                     id="security-deposit"
                     type="number"
@@ -884,19 +884,19 @@ export default function EnhancedLeaseCreation() {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Days in Month:</span>
+                      <span>Jours dans le mois :</span>
                       <span className="font-medium">
                         {proration.daysInMonth}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Days Occupied:</span>
+                      <span>Jours d’occupation :</span>
                       <span className="font-medium">
                         {proration.daysOccupied}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Daily Rate:</span>
+                      <span>Tarif journalier :</span>
                       <span className="font-medium">
                         {formatCurrency(proration.dailyRate)}
                       </span>
@@ -904,13 +904,13 @@ export default function EnhancedLeaseCreation() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span>Full Month Rent:</span>
+                      <span>Loyer mensuel complet :</span>
                       <span className="font-medium">
                         {formatCurrency(proration.fullMonthRent)}
                       </span>
                     </div>
                     <div className="flex justify-between text-lg font-bold">
-                      <span>Au prorata Amount:</span>
+                      <span>Montant au prorata :</span>
                       <span className="text-green-600">
                         {formatCurrency(proration.proratedAmount)}
                       </span>
@@ -994,8 +994,8 @@ export default function EnhancedLeaseCreation() {
                 <div>
                   <h4 className="font-semibold mb-2">Détails du bail</h4>
                   <div className="space-y-1 text-sm">
-                    <div>Tenant: {leaseData.tenantName}</div>
-                    <div>Property: {leaseData.propertyAddress}</div>
+                    <div>Locataire : {leaseData.tenantName}</div>
+                    <div>Bien : {leaseData.propertyAddress}</div>
                     <div>Unit: {leaseData.unitNumber}</div>
                     <div>
                       Term: {leaseData.leaseStartDate} to{" "}
@@ -1006,7 +1006,7 @@ export default function EnhancedLeaseCreation() {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2">Configuration des paiementsuration</h4>
+                  <h4 className="font-semibold mb-2">Configuration des paiements</h4>
                   <div className="space-y-1 text-sm">
                     <div>
                       Monthly Rent:{" "}

@@ -163,7 +163,7 @@ export function CalendarSettings({
         toast.error(data?.message || t("calendar.settingsModal.email.failed"));
       }
     } catch (error) {
-      console.error("Email test error:", error);
+      console.error("Erreur du test d’e-mail :", error);
       toast.error(t("calendar.settingsModal.email.failed"));
     } finally {
       setEmailTesting(false);
@@ -194,9 +194,9 @@ export function CalendarSettings({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="calendar-settings-dialog max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-none gap-3 overflow-y-auto p-3 sm:max-h-[90vh] sm:w-full sm:max-w-2xl sm:gap-4 sm:p-6">
+        <DialogHeader className="min-w-0 pr-7 text-left">
+          <DialogTitle className="flex min-w-0 items-center gap-2 text-base sm:text-lg">
             <Settings className="h-5 w-5" />
             {t("calendar.settingsModal.title")}
           </DialogTitle>
@@ -205,10 +205,10 @@ export function CalendarSettings({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-3 sm:space-y-6">
           {/* Display Settings */}
-          <Card>
-            <CardHeader>
+          <Card className="min-w-0 gap-3">
+            <CardHeader className="min-w-0 px-3 sm:px-6">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Eye className="h-4 w-4" />
                 {t("calendar.settingsModal.display.title")}
@@ -217,13 +217,13 @@ export function CalendarSettings({
                 {t("calendar.settingsModal.display.description")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
+            <CardContent className="min-w-0 space-y-4 px-3 sm:px-6">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0 space-y-0.5">
                   <Label htmlFor="weekends">
                     {t("calendar.settingsModal.display.showWeekends")}
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs leading-4 text-muted-foreground sm:text-sm">
                     {t("calendar.settingsModal.display.showWeekendsDesc")}
                   </p>
                 </div>
@@ -246,7 +246,7 @@ export function CalendarSettings({
                     updateSetting("firstDay", parseInt(value))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -267,7 +267,7 @@ export function CalendarSettings({
                   value={settings.timezone}
                   onValueChange={(value) => updateSetting("timezone", value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -283,8 +283,8 @@ export function CalendarSettings({
           </Card>
 
           {/* Time Settings */}
-          <Card>
-            <CardHeader>
+          <Card className="min-w-0 gap-3">
+            <CardHeader className="min-w-0 px-3 sm:px-6">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Clock className="h-4 w-4" />
                 {t("calendar.settingsModal.time.title")}
@@ -293,8 +293,8 @@ export function CalendarSettings({
                 {t("calendar.settingsModal.time.description")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="min-w-0 space-y-4 px-3 sm:px-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startTime">
                     {t("calendar.settingsModal.time.businessHoursStart")}
@@ -333,7 +333,7 @@ export function CalendarSettings({
                     updateSetting("slotDuration", value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -356,7 +356,7 @@ export function CalendarSettings({
                     updateSetting("snapDuration", value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -379,7 +379,7 @@ export function CalendarSettings({
                     updateSetting("defaultEventDuration", value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -395,8 +395,8 @@ export function CalendarSettings({
           </Card>
 
           {/* Email Service Test */}
-          <Card>
-            <CardHeader>
+          <Card className="min-w-0 gap-3">
+            <CardHeader className="min-w-0 px-3 sm:px-6">
               <CardTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5" />
                 {t("calendar.settingsModal.email.title")}
@@ -405,9 +405,9 @@ export function CalendarSettings({
                 {t("calendar.settingsModal.email.description")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
+            <CardContent className="min-w-0 space-y-4 px-3 sm:px-6">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
                   <p className="text-sm font-medium">
                     {t("calendar.settingsModal.email.status")}
                   </p>
@@ -420,6 +420,7 @@ export function CalendarSettings({
                   disabled={emailTesting}
                   variant="outline"
                   size="sm"
+                  className="w-full whitespace-nowrap sm:w-auto"
                 >
                   <Send className="h-4 w-4 mr-2" />
                   {emailTesting
@@ -433,18 +434,16 @@ export function CalendarSettings({
           <Separator />
 
           {/* Action Buttons */}
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={handleReset}>
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:justify-end">
+            <Button className="w-full whitespace-nowrap px-1 text-[11px] sm:w-auto sm:px-3 sm:text-sm" variant="outline" onClick={handleReset}>
               {t("calendar.settingsModal.resetToDefaults")}
             </Button>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                {t("calendar.settingsModal.cancel")}
-              </Button>
-              <Button onClick={handleSave}>
-                {t("calendar.settingsModal.save")}
-              </Button>
-            </div>
+            <Button className="w-full whitespace-nowrap px-1 text-[11px] sm:w-auto sm:px-3 sm:text-sm" variant="outline" onClick={() => onOpenChange(false)}>
+              {t("calendar.settingsModal.cancel")}
+            </Button>
+            <Button className="w-full whitespace-nowrap px-1 text-[11px] sm:w-auto sm:px-3 sm:text-sm" onClick={handleSave}>
+              {t("calendar.settingsModal.save")}
+            </Button>
           </div>
         </div>
       </DialogContent>

@@ -4,9 +4,23 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import ContractSafeguardsEditor from "@/components/subscriptions/ContractSafeguardsEditor";
+import { buildSubscriptionContractText } from "@/lib/subscriptions/contract-template";
 
 const unwrap = (j: any) => j?.data ?? j;
+
+const isLegacyContractBody = (body?: string) => {
+  if (!body) return true;
+  return !body.includes("ARTICLE 22 — VALIDATION AVANT ACCÈS");
+};
+
+const isLockedContract = (status?: string) =>
+  ["pending_signature", "signed", "active", "expired", "cancelled"].includes(
+    String(status || "")
+  );
 
 export default function EditSubscriptionContract() {
   const p = useParams<{ id: string }>();
@@ -14,6 +28,9 @@ export default function EditSubscriptionContract() {
   const [portfolio, setPortfolio] = useState<any>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
+  const [legacyDraftUpgraded, setLegacyDraftUpgraded] = useState(false);
+  const [sending, setSending] = useState<"email" | "whatsapp" | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetch(`/api/admin/subscriptions/contracts/${p.id}`, { cache: "no-store" })
@@ -33,13 +50,114 @@ export default function EditSubscriptionContract() {
       });
   }, [c?.accountId?._id]);
 
+  useEffect(() => {
+    if (!c || !portfolio || legacyDraftUpgraded) return;
+    if (c.status !== "draft" || !isLegacyContractBody(c.contractBody)) return;
+
+    const currentAccount = c.accountId || {};
+    const currentAccountName = currentAccount.businessName || `${currentAccount.firstName || ""} ${currentAccount.lastName || ""}`.trim() || currentAccount.email || "Contractant";
+    const dateLabel = (value: any) => value ? new Date(value).toLocaleDateString("fr-FR") : "sans date de fin définie";
+    const currentPeriodText = `${dateLabel(c.startDate)} au ${c.endDate ? dateLabel(c.endDate) : "terme non défini"}`;
+
+    setC((current: any) => ({
+      ...current,
+      contractBody: buildSubscriptionContractText({
+        form: current,
+        account: current.accountId || {},
+        accountName: currentAccountName,
+        portfolio,
+        periodText: currentPeriodText,
+      }),
+    }));
+    setLegacyDraftUpgraded(true);
+  }, [c, portfolio, legacyDraftUpgraded]);
+
   if (!c) return <div className="p-4 sm:p-8">Chargement du contrat...</div>;
 
   const account = c.accountId || {};
   const rules = c.mandateRules || {};
+  const safeguards = c.safeguards || {};
+  const onboardingChecklist = c.onboardingChecklist || {};
+  const offboardingChecklist = c.offboardingChecklist || {};
+  const complianceRules = c.complianceRules || {};
 
   const setRule = (key: string, value: any) =>
     setC({ ...c, mandateRules: { ...rules, [key]: value } });
+  const setSafeguard = (key: string, value: any) => setC({ ...c, safeguards: { ...safeguards, [key]: value } });
+  const setOnboarding = (key: string, value: any) => setC({ ...c, onboardingChecklist: { ...onboardingChecklist, [key]: value } });
+  const setOffboarding = (key: string, value: any) => setC({ ...c, offboardingChecklist: { ...offboardingChecklist, [key]: value } });
+  const setCompliance = (key: string, value: any) => setC({ ...c, complianceRules: { ...complianceRules, [key]: value } });
+
+  const accountName = account.businessName || `${account.firstName || ""} ${account.lastName || ""}`.trim() || account.email || "Contractant";
+  const dateLabel = (value: any) => value ? new Date(value).toLocaleDateString("fr-FR") : "sans date de fin définie";
+  const periodText = `${dateLabel(c.startDate)} au ${c.endDate ? dateLabel(c.endDate) : "terme non défini"}`;
+  const regenerateContract = () => {
+    if (isLockedContract(c.status)) {
+      toast({
+        title: "Contrat figé",
+        description:
+          "Ce contrat a déjà quitté le brouillon. Créez un avenant ou une nouvelle version pour le modifier.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setC({
+      ...c,
+      contractBody: buildSubscriptionContractText({
+        form: c,
+        account,
+        accountName,
+        portfolio,
+        periodText,
+      }),
+    });
+    setLegacyDraftUpgraded(true);
+  };
+
+  async function sendToContractor(channel: "email" | "whatsapp") {
+    setSending(channel);
+
+    try {
+      const r = await fetch(
+        `/api/admin/subscriptions/contracts/${p.id}/send`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ channel }),
+        }
+      );
+
+      const j = await r.json();
+      if (!r.ok) throw new Error(j?.error || "Envoi impossible");
+
+      const payload = unwrap(j);
+      const updatedContract = payload?.contract || payload;
+      setC(updatedContract);
+
+      if (channel === "whatsapp" && payload?.whatsappUrl) {
+        window.open(payload.whatsappUrl, "_blank", "noopener,noreferrer");
+      }
+
+      toast({
+        title:
+          channel === "whatsapp"
+            ? "WhatsApp prêt à envoyer"
+            : "Contrat envoyé",
+        description:
+          channel === "whatsapp"
+            ? "WhatsApp s'ouvre avec le message, le lien de lecture et le PDF. Vérifiez puis appuyez sur Envoyer."
+            : "Le contractant peut maintenant lire, imprimer et signer le document.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Envoi impossible",
+        description: error?.message || "Une erreur est survenue.",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(null);
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -51,9 +169,20 @@ export default function EditSubscriptionContract() {
     const j = await r.json();
     setSaving(false);
 
-    if (!r.ok) return alert(j?.error || "Modification impossible");
+    if (!r.ok) {
+      toast({
+        title: "Modification impossible",
+        description: j?.error || "Une erreur est survenue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setC(unwrap(j));
-    alert("Contrat mis à jour.");
+    toast({
+      title: "Contrat mis à jour",
+      description: "Les modifications ont été enregistrées.",
+    });
   }
 
   return (
@@ -64,6 +193,72 @@ export default function EditSubscriptionContract() {
       <p className="mt-1 break-words text-sm text-slate-600 sm:text-base">
         Entre E-IMMO et {account.businessName || `${account.firstName || ""} ${account.lastName || ""}`}
       </p>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Button type="button" variant="outline" onClick={regenerateContract} disabled={isLockedContract(c.status)}>{isLockedContract(c.status) ? "Contrat figé — avenant requis" : "Régénérer les 22 articles"}</Button>
+        <a href={`/api/admin/subscriptions/contracts/${p.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-medium text-white">Voir / imprimer le PDF</a>
+        <ConfirmationDialog
+          title="Envoyer le contrat par e-mail"
+          description="Le contractant recevra un lien sécurisé pour lire, imprimer et signer ce document."
+          confirmText="Envoyer par e-mail"
+          loading={sending === "email"}
+          disabled={!!sending || c.signatureStatus === "signed"}
+          onConfirm={() => sendToContractor("email")}
+        >
+          <Button
+            type="button"
+            disabled={!!sending || c.signatureStatus === "signed"}
+          >
+            {sending === "email" ? "Envoi…" : "Envoyer par e-mail"}
+          </Button>
+        </ConfirmationDialog>
+
+        <ConfirmationDialog
+          title="Partager le contrat par WhatsApp"
+          description={
+            account.whatsappVerificationStatus === "verified" && account.whatsappVerifiedAt
+              ? "WhatsApp s'ouvrira avec un message prérempli contenant le lien sécurisé du contrat et du PDF. Aucun service WhatsApp payant n'est utilisé."
+              : "Le numéro WhatsApp du contractant doit d'abord être vérifié par le Super Administrateur E-IMMO."
+          }
+          confirmText="Ouvrir WhatsApp"
+          loading={sending === "whatsapp"}
+          disabled={
+            !!sending ||
+            c.signatureStatus === "signed" ||
+            !(account.whatsappVerificationStatus === "verified" && account.whatsappVerifiedAt)
+          }
+          onConfirm={() => sendToContractor("whatsapp")}
+        >
+          <Button
+            type="button"
+            className="bg-emerald-600 hover:bg-emerald-700"
+            disabled={
+              !!sending ||
+              c.signatureStatus === "signed" ||
+              !(account.whatsappVerificationStatus === "verified" && account.whatsappVerifiedAt)
+            }
+          >
+            {sending === "whatsapp"
+              ? "Préparation…"
+              : "Envoyer par WhatsApp"}
+          </Button>
+        </ConfirmationDialog>
+      </div>
+
+      <div className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
+        <b>Signature du contractant :</b>{" "}
+        {c.signatureStatus === "signed"
+          ? `Signé${c.signedAt ? ` le ${new Date(c.signedAt).toLocaleDateString("fr-FR")}` : ""}${c.signatoryName ? ` par ${c.signatoryName}` : ""}.`
+          : c.signatureStatus === "pending_signature"
+            ? `En attente de signature${c.sentAt ? ` depuis le ${new Date(c.sentAt).toLocaleDateString("fr-FR")}` : ""}${c.lastDeliveryChannel ? ` — canal : ${c.lastDeliveryChannel === "whatsapp" ? "WhatsApp" : "e-mail"}` : ""}.`
+            : "Pas encore envoyé au contractant."}
+      </div>
+
+      {legacyDraftUpgraded && c.status === "draft" && (
+        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
+          Ancienne version détectée : le brouillon a été régénéré avec le modèle contractuel unique à 22 articles.
+          Vérifiez le texte puis cliquez sur « Enregistrer les modifications » pour conserver cette version.
+        </div>
+      )}
 
       {portfolio && (
         <section className="mt-5 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
@@ -180,6 +375,17 @@ export default function EditSubscriptionContract() {
             </div>
           )}
         </section>
+
+        <ContractSafeguardsEditor
+          safeguards={safeguards}
+          onboardingChecklist={onboardingChecklist}
+          offboardingChecklist={offboardingChecklist}
+          complianceRules={complianceRules}
+          onSafeguardsChange={setSafeguard}
+          onOnboardingChange={setOnboarding}
+          onOffboardingChange={setOffboarding}
+          onComplianceChange={setCompliance}
+        />
 
         <section className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
           <h2 className="text-lg font-bold sm:text-xl">Contrat modifiable</h2>

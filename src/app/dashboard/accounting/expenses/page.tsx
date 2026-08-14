@@ -458,14 +458,14 @@ export default function ExpensesPage() {
                 <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("expenses.filters.allStatut", {
-                      defaultValue: "All Statut",
+                      defaultValue: "Tous les statuts",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("expenses.filters.allStatut", {
-                      defaultValue: "All Statut",
+                      defaultValue: "Tous les statuts",
                     })}
                   </SelectItem>
                   {Object.values(ExpenseStatus).map((s) => (

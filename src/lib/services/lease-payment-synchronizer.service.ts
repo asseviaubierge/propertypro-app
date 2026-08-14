@@ -96,7 +96,7 @@ export class LeasePaymentSynchronizer {
             .findById(leaseId)
             .session(session);
           if (!lease) {
-            throw new Error("Lease not found");
+            throw new Error("Bail introuvable");
           }
 
           const payments = await mongoose
@@ -188,7 +188,7 @@ export class LeasePaymentSynchronizer {
         .session(options.session || null);
 
       if (!lease) {
-        result.errors.push("Lease not found");
+        result.errors.push("Bail introuvable");
         result.isValid = false;
         return result;
       }

@@ -359,7 +359,7 @@ async function createUsers(): Promise<Record<string, any>> {
       emergencyContacts: [
         {
           name: "Hana Kim",
-          relationship: "Spouse",
+          relationship: "Conjoint",
           phone: "+12065550117",
           email: "hana.kim@example.com",
         },
@@ -413,7 +413,7 @@ async function createRoles(admin: any) {
     },
     {
       name: UserRole.MANAGER,
-      label: "Property Manager",
+      label: "Gestionnaire du bien",
       description: "Operational access for property and tenant management.",
       permissions: [...SYSTEM_ROLE_PERMISSIONS[UserRole.MANAGER]],
       isSystem: true,
@@ -424,7 +424,7 @@ async function createRoles(admin: any) {
     },
     {
       name: UserRole.TENANT,
-      label: "Tenant",
+      label: "Locataire",
       description: "Tenant portal access for leases, payments, and requests.",
       permissions: [...SYSTEM_ROLE_PERMISSIONS[UserRole.TENANT]],
       isSystem: true,
@@ -461,8 +461,8 @@ async function createProperties(users: Record<string, any>) {
       ],
       amenities: [
         { name: "Rooftop Terrace", category: "Recreation" },
-        { name: "Secure Package Room", category: "Security" },
-        { name: "Bike Storage", category: "Parking" },
+        { name: "Secure Package Room", category: "Sécurité" },
+        { name: "Bike Storage", category: "Stationnement" },
       ],
       units: [
         {
@@ -594,7 +594,7 @@ async function createProperties(users: Record<string, any>) {
         "https://picsum.photos/seed/maple-court-property-2/1400/900",
       ],
       amenities: [
-        { name: "Attached Garage", category: "Parking" },
+        { name: "Attached Garage", category: "Stationnement" },
         { name: "Private Patio", category: "Outdoor" },
         { name: "Smart Thermostat", category: "Climate" },
       ],
@@ -673,7 +673,7 @@ async function createProperties(users: Record<string, any>) {
       amenities: [
         { name: "Coworking Lounge", category: "Living" },
         { name: "Fitness Studio", category: "Recreation" },
-        { name: "EV Charging", category: "Parking" },
+        { name: "EV Charging", category: "Stationnement" },
       ],
       units: [
         {
@@ -750,7 +750,7 @@ async function createProperties(users: Record<string, any>) {
       amenities: [
         { name: "Community Greenway", category: "Outdoor" },
         { name: "Pet Relief Area", category: "Outdoor" },
-        { name: "Covered Parking", category: "Parking" },
+        { name: "Covered Parking", category: "Stationnement" },
       ],
       units: [
         {
@@ -810,7 +810,7 @@ async function createProperties(users: Record<string, any>) {
       amenities: [
         { name: "Coworking Pods", category: "Living" },
         { name: "Fitness Room", category: "Recreation" },
-        { name: "Secure Entry", category: "Security" },
+        { name: "Secure Entry", category: "Sécurité" },
       ],
       units: [
         {
@@ -881,7 +881,7 @@ async function createProperties(users: Record<string, any>) {
       amenities: [
         { name: "Shared Courtyard", category: "Outdoor" },
         { name: "Resident Storage", category: "Living" },
-        { name: "Guest Parking", category: "Parking" },
+        { name: "Guest Parking", category: "Stationnement" },
       ],
       units: [
         {
@@ -939,8 +939,8 @@ async function createProperties(users: Record<string, any>) {
       ],
       amenities: [
         { name: "Resident Club Room", category: "Living" },
-        { name: "Secured Parking", category: "Parking" },
-        { name: "Parcel Lockers", category: "Security" },
+        { name: "Secured Parking", category: "Stationnement" },
+        { name: "Parcel Lockers", category: "Sécurité" },
       ],
       units: [
         {
@@ -996,9 +996,9 @@ async function createProperties(users: Record<string, any>) {
         "https://picsum.photos/seed/rivergate-flats-property-2/1400/900",
       ],
       amenities: [
-        { name: "Transit Shuttle Stop", category: "Other" },
+        { name: "Transit Shuttle Stop", category: "Autre" },
         { name: "Outdoor Lounge", category: "Recreation" },
-        { name: "Package Lockers", category: "Security" },
+        { name: "Package Lockers", category: "Sécurité" },
       ],
       units: [
         {
@@ -1137,7 +1137,7 @@ async function createTenantProfiles(
       emergencyContacts: [
         {
           name: "Hana Kim",
-          relationship: "Spouse",
+          relationship: "Conjoint",
           phone: "+12065550117",
           email: "hana.kim@example.com",
         },
@@ -1487,8 +1487,8 @@ async function createInvoiceAndPayment({
           amount,
           type:
             category === InvoiceType.SECURITY_DEPOSIT
-              ? "Security Deposit"
-              : "Rent",
+              ? "Dépôt de garantie"
+              : "Loyer",
           dueDate,
           paidDate: paidDate || new Date(),
         },

@@ -149,7 +149,7 @@ export class ReceiptGenerationService {
       tenantId: payment.tenantId._id.toString(),
       propertyId: payment.propertyId._id.toString(),
       amount: payment.amount,
-      paymentMethod: payment.paymentMethod || "Unknown",
+      paymentMethod: payment.paymentMethod || "Inconnu",
       paymentDate: payment.paidDate || payment.createdAt,
       description: payment.description || `Payment for ${payment.type}`,
       invoiceApplications,
@@ -240,7 +240,7 @@ export class ReceiptGenerationService {
       // Table header
       pdf.setFont("helvetica", "bold");
       pdf.text("Description", 20, 175);
-      pdf.text("Amount", 150, 175);
+      pdf.text("Montant", 150, 175);
 
       // Table content
       pdf.setFont("helvetica", "normal");

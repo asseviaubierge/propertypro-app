@@ -124,6 +124,18 @@ export default function CalendarSettingsPage() {
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTab, setActiveTab] = useState("display");
 
+  const eventColorLabels: Record<string, string> = {
+    LEASE_RENEWAL: t("calendar.settings.events.typeLeaseRenewal"),
+    PROPERTY_INSPECTION: t("calendar.settings.events.typePropertyInspection"),
+    MAINTENANCE_APPOINTMENT: t("calendar.settings.events.typeMaintenance"),
+    PROPERTY_SHOWING: t("calendar.settings.events.typePropertyShowing"),
+    TENANT_MEETING: t("calendar.settings.events.typeTenantMeeting"),
+    RENT_COLLECTION: t("calendar.settings.events.typeRentCollection"),
+    MOVE_IN: t("calendar.settings.events.typeMoveIn"),
+    MOVE_OUT: t("calendar.settings.events.typeMoveOut"),
+    GENERAL: t("calendar.settings.events.typeGeneral"),
+  };
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -136,7 +148,7 @@ export default function CalendarSettingsPage() {
         setSettings({ ...defaultSettings, ...(result?.data ?? {}) });
       }
     } catch (error) {
-      console.error("Failed to load settings:", error);
+      console.error("Impossible de charger les paramètres :", error);
       toast.error(t("calendar.settings.loadFailed"));
     } finally {
       setLoading(false);
@@ -177,7 +189,7 @@ export default function CalendarSettingsPage() {
         toast.error(result?.error || t("calendar.settings.saveFailed"));
       }
     } catch (error) {
-      console.error("Failed to save settings:", error);
+      console.error("Impossible d’enregistrer les paramètres :", error);
       toast.error(t("calendar.settings.saveFailed"));
     } finally {
       setSaving(false);
@@ -198,7 +210,7 @@ export default function CalendarSettingsPage() {
         toast.error(t("calendar.settings.resetFailed"));
       }
     } catch (error) {
-      console.error("Failed to reset settings:", error);
+      console.error("Impossible de réinitialiser les paramètres :", error);
       toast.error(t("calendar.settings.resetFailed"));
     }
   };
@@ -217,26 +229,27 @@ export default function CalendarSettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-calendar-settings-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
+      <div className="mobile-page-header flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold text-foreground sm:text-3xl">
             {t("calendar.settings.title")}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-xs leading-4 text-muted-foreground sm:text-base">
             {t("calendar.settings.subtitle")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={resetSettings} disabled={saving}>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+          <Button className="w-full whitespace-nowrap sm:w-auto" size="sm" variant="outline" onClick={resetSettings} disabled={saving}>
             <RotateCcw className="h-4 w-4 mr-2" />
             {t("calendar.settings.resetToDefaults")}
           </Button>
           <Button
+            size="sm"
             onClick={saveSettings}
             disabled={!hasChanges || saving}
-            className="bg-primary hover:bg-primary/90"
+            className="w-full whitespace-nowrap bg-primary hover:bg-primary/90 sm:w-auto"
           >
             <Save className="h-4 w-4 mr-2" />
             {saving
@@ -261,31 +274,31 @@ export default function CalendarSettingsPage() {
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="space-y-6"
+        className="min-w-0 space-y-3 sm:space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="display" className="flex items-center gap-2">
+        <TabsList className="grid h-auto w-full grid-cols-5 gap-1 p-1">
+          <TabsTrigger value="display" className="flex min-w-0 items-center justify-center gap-1 px-1 sm:gap-2 sm:px-3">
             <Eye className="h-4 w-4" />
-            {t("calendar.settings.tabs.display")}
+            <span className="hidden sm:inline">{t("calendar.settings.tabs.display")}</span>
           </TabsTrigger>
-          <TabsTrigger value="time" className="flex items-center gap-2">
+          <TabsTrigger value="time" className="flex min-w-0 items-center justify-center gap-1 px-1 sm:gap-2 sm:px-3">
             <Clock className="h-4 w-4" />
-            {t("calendar.settings.tabs.time")}
+            <span className="hidden sm:inline">{t("calendar.settings.tabs.time")}</span>
           </TabsTrigger>
-          <TabsTrigger value="events" className="flex items-center gap-2">
+          <TabsTrigger value="events" className="flex min-w-0 items-center justify-center gap-1 px-1 sm:gap-2 sm:px-3">
             <Calendar className="h-4 w-4" />
-            {t("calendar.settings.tabs.events")}
+            <span className="hidden sm:inline">{t("calendar.settings.tabs.events")}</span>
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
-            className="flex items-center gap-2"
+            className="flex min-w-0 items-center justify-center gap-1 px-1 sm:gap-2 sm:px-3"
           >
             <Bell className="h-4 w-4" />
-            {t("calendar.settings.tabs.notifications")}
+            <span className="hidden sm:inline">{t("calendar.settings.tabs.notifications")}</span>
           </TabsTrigger>
-          <TabsTrigger value="colors" className="flex items-center gap-2">
+          <TabsTrigger value="colors" className="flex min-w-0 items-center justify-center gap-1 px-1 sm:gap-2 sm:px-3">
             <Palette className="h-4 w-4" />
-            {t("calendar.settings.tabs.colors")}
+            <span className="hidden sm:inline">{t("calendar.settings.tabs.colors")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -852,7 +865,7 @@ export default function CalendarSettingsPage() {
                       style={{ backgroundColor: color }}
                     />
                     <Label className="font-medium">
-                      {type.replace(/_/g, " ")}
+                      {eventColorLabels[type] ?? type.replace(/_/g, " ")}
                     </Label>
                   </div>
                   <Input

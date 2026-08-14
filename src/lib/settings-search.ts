@@ -28,7 +28,7 @@ const settingsIndex = [
   // Profile Settings
   {
     id: "profile-basic-info",
-    title: "Basic Information",
+    title: "Informations générales",
     description: "Update your name, email, phone number, and contact details",
     category: "Profile",
     path: "/dashboard/settings/profile",
@@ -43,12 +43,12 @@ const settingsIndex = [
       "bio",
       "location",
     ],
-    icon: "User",
+    icon: "Utilisateur",
     adminOnly: false,
   },
   {
     id: "profile-emergency-contact",
-    title: "Emergency Contact",
+    title: "Contact d’urgence",
     description: "Set up emergency contact information for safety purposes",
     category: "Profile",
     path: "/dashboard/settings/profile#emergency",
@@ -60,7 +60,7 @@ const settingsIndex = [
       "safety",
       "urgent",
     ],
-    icon: "User",
+    icon: "Utilisateur",
     adminOnly: false,
   },
   {
@@ -78,7 +78,7 @@ const settingsIndex = [
       "professional",
       "network",
     ],
-    icon: "User",
+    icon: "Utilisateur",
     adminOnly: false,
   },
   {
@@ -96,14 +96,14 @@ const settingsIndex = [
       "career",
       "employment",
     ],
-    icon: "User",
+    icon: "Utilisateur",
     adminOnly: false,
   },
 
   // Notification Settings
   {
     id: "notifications-email",
-    title: "Email Notifications",
+    title: "Notifications par e-mail",
     description: "Configure email notification preferences and frequency",
     category: "Notifications",
     path: "/dashboard/settings/notifications#email",
@@ -121,7 +121,7 @@ const settingsIndex = [
   },
   {
     id: "notifications-sms",
-    title: "SMS Notifications",
+    title: "Notifications par SMS",
     description: "Set up text message notifications for urgent alerts",
     category: "Notifications",
     path: "/dashboard/settings/notifications#sms",
@@ -139,7 +139,7 @@ const settingsIndex = [
   },
   {
     id: "notifications-push",
-    title: "Push Notifications",
+    title: "Notifications instantanées",
     description: "Manage browser and app push notifications",
     category: "Notifications",
     path: "/dashboard/settings/notifications#push",
@@ -157,7 +157,7 @@ const settingsIndex = [
   },
   {
     id: "notifications-quiet-hours",
-    title: "Quiet Hours",
+    title: "Heures silencieuses",
     description: "Set quiet hours to pause notifications during specific times",
     category: "Notifications",
     path: "/dashboard/settings/notifications#quiet",
@@ -179,7 +179,7 @@ const settingsIndex = [
     id: "security-password",
     title: "Password & Authentication",
     description: "Change your password and manage authentication settings",
-    category: "Security",
+    category: "Sécurité",
     path: "/dashboard/settings/security#password",
     keywords: [
       "password",
@@ -196,7 +196,7 @@ const settingsIndex = [
     id: "security-2fa",
     title: "Two-Factor Authentication",
     description: "Enable two-factor authentication for enhanced security",
-    category: "Security",
+    category: "Sécurité",
     path: "/dashboard/settings/security#2fa",
     keywords: [
       "2fa",
@@ -214,7 +214,7 @@ const settingsIndex = [
     id: "security-devices",
     title: "Device Management",
     description: "Manage devices that have access to your account",
-    category: "Security",
+    category: "Sécurité",
     path: "/dashboard/settings/security#devices",
     keywords: [
       "devices",
@@ -232,7 +232,7 @@ const settingsIndex = [
     id: "security-audit",
     title: "Security Audit",
     description: "Review your account security status and recommendations",
-    category: "Security",
+    category: "Sécurité",
     path: "/dashboard/settings/security#audit",
     keywords: [
       "audit",
@@ -380,7 +380,7 @@ const settingsIndex = [
     id: "system-branding",
     title: "System Branding",
     description: "Configure system-wide branding and logos",
-    category: "System",
+    category: "Système",
     path: "/dashboard/settings/system#branding",
     keywords: [
       "branding",
@@ -398,7 +398,7 @@ const settingsIndex = [
     id: "system-email",
     title: "Email Configuration",
     description: "Configure SMTP settings for system emails",
-    category: "System",
+    category: "Système",
     path: "/dashboard/settings/system#email",
     keywords: [
       "smtp",
@@ -414,9 +414,9 @@ const settingsIndex = [
   },
   {
     id: "system-payment",
-    title: "Payment Settings",
+    title: "Paramètres des paiements",
     description: "Configure payment gateways and billing settings",
-    category: "System",
+    category: "Système",
     path: "/dashboard/settings/system#payment",
     keywords: [
       "payment",

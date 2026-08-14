@@ -132,10 +132,10 @@ const maintenanceCategories = [
   { key: "landscaping", value: "Landscaping" },
   { key: "cleaning", value: "Cleaning" },
   { key: "pestControl", value: "Pest Control" },
-  { key: "security", value: "Security" },
+  { key: "security", value: "Sécurité" },
   { key: "generalRepair", value: "General Repair" },
   { key: "emergency", value: "Emergency" },
-  { key: "other", value: "Other" },
+  { key: "other", value: "Autre" },
 ];
 
 export function MaintenanceRequestForm({
@@ -165,7 +165,7 @@ export function MaintenanceRequestForm({
       (!unit.currentTenantId || !unit.currentLeaseId)
     ) {
       return t("maintenance.form.unit.statusNeedsSync", {
-        defaultValue: "needs sync",
+        defaultValue: "synchronisation requise",
       });
     }
 
@@ -635,7 +635,7 @@ export function MaintenanceRequestForm({
                           searchPlaceholder={t(
                             "maintenance.form.category.searchPlaceholder",
                             {
-                              defaultValue: "Search categories...",
+                              defaultValue: "Rechercher des catégories…",
                             }
                           )}
                           emptyMessage={t(
@@ -771,7 +771,7 @@ export function MaintenanceRequestForm({
                             searchPlaceholder={t(
                               "maintenance.form.property.searchPlaceholder",
                               {
-                                defaultValue: "Search properties...",
+                                defaultValue: "Rechercher des biens…",
                               }
                             )}
                             emptyMessage={t(
@@ -807,7 +807,7 @@ export function MaintenanceRequestForm({
                               searchPlaceholder={t(
                                 "maintenance.form.unit.searchPlaceholder",
                                 {
-                                  defaultValue: "Search units...",
+                                  defaultValue: "Rechercher des logements…",
                                 }
                               )}
                               emptyMessage={t(
@@ -841,7 +841,7 @@ export function MaintenanceRequestForm({
                             searchPlaceholder={t(
                               "maintenance.form.tenant.searchPlaceholder",
                               {
-                                defaultValue: "Search tenants...",
+                                defaultValue: "Rechercher des locataires…",
                               }
                             )}
                             emptyMessage={

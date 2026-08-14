@@ -393,7 +393,7 @@ export default function AvailablePropertiesPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <Grid3X3 className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">Grid</span>
+                  <span className="ml-1 sm:hidden">Grille</span>
                 </Button>
                 <Button
                   variant={viewMode === "rows" ? "default" : "ghost"}
@@ -402,7 +402,7 @@ export default function AvailablePropertiesPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <Rows3 className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">Rows</span>
+                  <span className="ml-1 sm:hidden">Lignes</span>
                 </Button>
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
@@ -411,7 +411,7 @@ export default function AvailablePropertiesPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <List className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">List</span>
+                  <span className="ml-1 sm:hidden">Liste</span>
                 </Button>
               </div>
             </div>
@@ -430,7 +430,7 @@ export default function AvailablePropertiesPage() {
                 onSearch={handleSearch}
                 isLoading={isSearching}
                 className="w-full"
-                ariaLabel="Search available units"
+                ariaLabel="Rechercher des logements disponibles"
               />
             </div>
 
@@ -999,13 +999,13 @@ export default function AvailablePropertiesPage() {
                 );
                 setFilters((prev) => ({ ...prev, limit: size, page: 1 }));
               }}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

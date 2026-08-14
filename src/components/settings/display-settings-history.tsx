@@ -99,14 +99,14 @@ export function DisplaySettingsHistory({
       const response = await fetch("/api/settings/display/history?limit=50");
 
       if (!response.ok) {
-        throw new Error("Failed to fetch history");
+        throw new Error("Impossible de charger l’historique");
       }
 
       const data = await response.json();
       setHistory(data?.data?.history ?? []);
     } catch (error) {
       logClientError("Fetch history error:", error);
-      onAlert("error", "Failed to load settings history");
+      onAlert("error", "Impossible de charger l’historique des paramètres");
     } finally {
       setIsLoading(false);
     }
@@ -128,18 +128,18 @@ export function DisplaySettingsHistory({
         body: JSON.stringify({
           action: "revert",
           version,
-          reason: `Reverted to version ${version} via history`,
+          reason: `Retour à la version ${version} depuis l’historique`,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || "Failed to revert settings");
+        throw new Error(errorData?.error || "Impossible de restaurer les paramètres");
       }
 
       const result = await response.json();
 
-      onAlert("success", `Settings reverted to version ${version}`);
+      onAlert("success", `Paramètres restaurés à la version ${version}`);
       onSettingsRevert?.(result?.data?.settings);
 
       // Refresh history
@@ -148,7 +148,7 @@ export function DisplaySettingsHistory({
       logClientError("Revert error:", error);
       onAlert(
         "error",
-        error instanceof Error ? error.message : "Failed to revert settings",
+        error instanceof Error ? error.message : "Impossible de restaurer les paramètres",
       );
     } finally {
       setIsReverting(false);
@@ -201,13 +201,13 @@ export function DisplaySettingsHistory({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5" />
-            Settings History
+            Historique des paramètres
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Loading history...</span>
+            <span className="ml-2">Chargement de l’historique…</span>
           </div>
         </CardContent>
       </Card>
@@ -219,17 +219,17 @@ export function DisplaySettingsHistory({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <History className="h-5 w-5" />
-          Settings History
+          Historique des paramètres
         </CardTitle>
         <CardDescription>
-          View and manage your display settings change history
+          Consultez les modifications des paramètres d’affichage
         </CardDescription>
       </CardHeader>
       <CardContent>
         {history.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No settings history available</p>
+            <p>Aucun historique de paramètres disponible</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -361,7 +361,7 @@ export function DisplaySettingsHistory({
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleRevert(entry.version)}
                             disabled={isReverting}
@@ -372,7 +372,7 @@ export function DisplaySettingsHistory({
                                 Reverting...
                               </>
                             ) : (
-                              "Revert Settings"
+                              "Restaurer"
                             )}
                           </AlertDialogAction>
                         </AlertDialogFooter>

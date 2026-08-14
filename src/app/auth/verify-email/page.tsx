@@ -22,9 +22,15 @@ function VerifyEmailInner() {
   const [status, setStatus] = useState<Status>("validating");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-const [whatsappEnabled, setWhatsappEnabled] = useState(false);
-const [companyName, setCompanyName] = useState("GESTION E-IMMO");
+  const [adminWhatsappNumber, setAdminWhatsappNumber] = useState("");
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+  const [companyName, setCompanyName] = useState("GESTION E-IMMO");
+  const [userWhatsappNumber, setUserWhatsappNumber] = useState("");
+  const [whatsappVerificationCode, setWhatsappVerificationCode] = useState("");
+  const [whatsappStatus, setWhatsappStatus] = useState<
+    "not_requested" | "pending" | "verified" | "rejected"
+  >("not_requested");
+  const [openingWhatsApp, setOpeningWhatsApp] = useState(false);
 
 useEffect(() => {
   (async () => {
@@ -33,7 +39,7 @@ useEffect(() => {
       const data = await res.json();
 
       if (res.ok && data?.success && data?.data) {
-        setWhatsappNumber(data.data.whatsappNumber || "");
+        setAdminWhatsappNumber(data.data.whatsappNumber || "");
         setWhatsappEnabled(data.data.whatsappEnabled ?? false);
         setCompanyName(data.data.companyName || "GESTION E-IMMO");
       }
@@ -43,26 +49,62 @@ useEffect(() => {
   })();
 }, []);
 
-const openWhatsApp = () => {
-  const cleanNumber = whatsappNumber.replace(/\D/g, "");
-  if (!cleanNumber) return;
+const openWhatsApp = async () => {
+  if (!whatsappVerificationCode || !email) return;
 
-  const whatsappMessage = encodeURIComponent(
-    `Bonjour ${companyName}, je viens de confirmer mon adresse e-mail ${email} sur E-IMMO et je souhaite confirmer mon numéro WhatsApp.`
-  );
+  setOpeningWhatsApp(true);
+  try {
+    const response = await fetch("/api/user/request-whatsapp-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        code: whatsappVerificationCode,
+        whatsappNumber: userWhatsappNumber,
+      }),
+    });
 
-  window.open(
-    `https://wa.me/${cleanNumber}?text=${whatsappMessage}`,
-    "_blank",
-    "noopener,noreferrer"
-  );
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      throw new Error(
+        "Le serveur n'a pas pu démarrer la vérification WhatsApp."
+      );
+    }
+
+    const data = await response.json();
+    if (!response.ok || data?.success === false) {
+      throw new Error(
+        data?.error || "Impossible de démarrer la vérification WhatsApp."
+      );
+    }
+
+    const payload = data?.data || data;
+    if (payload?.alreadyVerified) {
+      setWhatsappStatus("verified");
+      return;
+    }
+
+    setWhatsappStatus("pending");
+
+    if (payload?.whatsappUrl) {
+      window.open(payload.whatsappUrl, "_blank", "noopener,noreferrer");
+    }
+  } catch (error) {
+    setMessage(
+      error instanceof Error
+        ? error.message
+        : "Impossible de démarrer la vérification WhatsApp."
+    );
+  } finally {
+    setOpeningWhatsApp(false);
+  }
 };
 
   // Validate the token on load.
   useEffect(() => {
     if (!token) {
       setStatus("error");
-      setMessage("No verification token was provided.");
+      setMessage("Aucun jeton de vérification n'a été fourni.");
       return;
     }
 
@@ -73,7 +115,7 @@ const openWhatsApp = () => {
         );
         const data = await res.json();
         if (!res.ok || data?.success === false) {
-          throw new Error(data?.error || "This link is invalid or has expired.");
+          throw new Error(data?.error || "Ce lien est invalide ou a expiré.");
         }
         setEmail(data?.data?.email || "");
         setStatus("ready");
@@ -96,8 +138,18 @@ const openWhatsApp = () => {
       });
       const data = await res.json();
       if (!res.ok || data?.success === false) {
-        throw new Error(data?.error || "Failed to verify your email.");
+        throw new Error(data?.error || "Impossible de vérifier votre adresse e-mail.");
       }
+      const payload = data?.data || data;
+      setUserWhatsappNumber(
+        payload?.whatsappNumber || payload?.phone || ""
+      );
+      setWhatsappVerificationCode(
+        payload?.whatsappVerificationCode || ""
+      );
+      setWhatsappStatus(
+        payload?.whatsappVerificationStatus || "not_requested"
+      );
       setStatus("success");
       setMessage("Votre adresse e-mail a été confirmée avec succès.");
     } catch (err) {
@@ -145,28 +197,68 @@ const openWhatsApp = () => {
           {status === "confirming" && (
             <Button className="w-full" disabled>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Verifying…
+              Vérification…
             </Button>
           )}
 
           {status === "success" && (
   <div className="space-y-3">
-    {whatsappEnabled && whatsappNumber && (
+    {whatsappEnabled && adminWhatsappNumber && (
       <>
         <div className="rounded-lg border bg-muted/40 p-4 text-sm text-muted-foreground">
-          Votre adresse e-mail est maintenant confirmée.
-          Vous pouvez également confirmer votre numéro WhatsApp auprès de{" "}
-          <strong className="text-foreground">{companyName}</strong>.
+          <p>Votre adresse e-mail est maintenant confirmée.</p>
+          <p className="mt-2">
+            Étape suivante : envoyez le message de vérification au WhatsApp
+            officiel de{" "}
+            <strong className="text-foreground">{companyName}</strong>.
+            Le Super Administrateur confirmera ensuite votre numéro.
+          </p>
+
+          {userWhatsappNumber && (
+            <p className="mt-2 font-medium text-foreground">
+              Numéro proposé : {userWhatsappNumber}
+            </p>
+          )}
+
+          {whatsappVerificationCode && (
+            <p className="mt-1 text-xs">
+              Code : {whatsappVerificationCode}
+            </p>
+          )}
         </div>
 
-        <Button
-          type="button"
-          onClick={openWhatsApp}
-          className="w-full bg-green-600 text-white hover:bg-green-700"
-        >
-          <MessageCircle className="mr-2 h-5 w-5" />
-          Confirmer mon WhatsApp
-        </Button>
+        {whatsappStatus === "verified" ? (
+          <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm font-medium text-green-800">
+            Votre numéro WhatsApp est déjà vérifié par E-IMMO.
+          </div>
+        ) : whatsappStatus === "pending" ? (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              Vérification demandée. Après l'envoi du message WhatsApp,
+              E-IMMO confirmera votre numéro depuis l'administration.
+            </div>
+
+            <Button
+              type="button"
+              onClick={openWhatsApp}
+              disabled={openingWhatsApp}
+              className="w-full bg-green-600 text-white hover:bg-green-700"
+            >
+              <MessageCircle className="mr-2 h-5 w-5" />
+              {openingWhatsApp ? "Ouverture de WhatsApp…" : "Rouvrir WhatsApp"}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            onClick={openWhatsApp}
+            disabled={openingWhatsApp || !whatsappVerificationCode}
+            className="w-full bg-green-600 text-white hover:bg-green-700"
+          >
+            <MessageCircle className="mr-2 h-5 w-5" />
+            {openingWhatsApp ? "Préparation…" : "Vérifier mon WhatsApp"}
+          </Button>
+        )}
       </>
     )}
 

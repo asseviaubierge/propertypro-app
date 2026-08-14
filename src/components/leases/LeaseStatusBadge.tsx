@@ -188,22 +188,22 @@ export function LeaseStatusDisplay({
 
     switch (status) {
       case LeaseStatus.DRAFT:
-        return "Lease is in draft mode and needs to be finalized";
+        return "Le bail est en préparation et doit être finalisé";
       case LeaseStatus.PENDING:
-        return "Waiting for tenant signature";
+        return "En attente de la signature du locataire";
       case LeaseStatus.ACTIVE:
         if (end && end < now) {
-          return "Lease has expired but status not updated";
+          return "Le bail a expiré, mais son statut n’a pas encore été actualisé";
         }
         return signedDate
-          ? `Active since ${new Date(signedDate).toLocaleDateString()}`
-          : "Active lease";
+          ? `Actif depuis le ${new Date(signedDate).toLocaleDateString("fr-FR")}`
+          : "Bail actif";
       case LeaseStatus.EXPIRED:
         return end
-          ? `Expired on ${end.toLocaleDateString()}`
-          : "Lease has expired";
+          ? `Expiré le ${end.toLocaleDateString("fr-FR")}`
+          : "Le bail a expiré";
       case LeaseStatus.TERMINATED:
-        return "Lease has been terminated";
+        return "Le bail a été résilié";
       default:
         return "";
     }

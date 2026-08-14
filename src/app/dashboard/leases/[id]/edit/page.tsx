@@ -58,7 +58,7 @@ export default function EditLeasePage({ params }: EditLeasePageProps) {
         );
       }
     } catch (error) {
-      showSimpleError("Load Error", "Failed to fetch lease details");
+      showSimpleError("Erreur de chargement", "Failed to fetch lease details");
       router.push("/dashboard/leases");
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export default function EditLeasePage({ params }: EditLeasePageProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Lease not found</h3>
+          <h3 className="text-lg font-semibold mb-2">Bail introuvable</h3>
           <p className="text-muted-foreground mb-4">
             {`The lease you're trying to edit doesn't exist or has been deleted.`}
           </p>
@@ -101,7 +101,7 @@ export default function EditLeasePage({ params }: EditLeasePageProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Edit Lease</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Modifier le bail</h1>
           <p className="text-muted-foreground">
             {lease.propertyId?.name
               ? `Update the lease agreement for ${lease.propertyId.name}`

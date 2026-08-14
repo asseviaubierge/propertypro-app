@@ -50,17 +50,15 @@ import {
   X,
 } from "lucide-react";
 import {
-  printInvoice,
-  downloadInvoiceAsPDF,
-  type PrintableInvoice,
-} from "@/lib/invoice-print";
+  downloadCanonicalInvoicePdf,
+  printCanonicalInvoicePdf,
+} from "@/lib/invoice/pdf-actions";
 import {
   AnalyticsCard,
   AnalyticsCardGrid,
 } from "@/components/analytics/AnalyticsCard";
 import { useAuthorization } from "@/hooks/useAuthorization";
 import { GlobalPagination } from "@/components/ui/global-pagination";
-import { normalizeInvoiceForPrint } from "@/lib/invoice/invoice-shared";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useViewPreferencesStore } from "@/stores/view-preferences.store";
 import PaymentRecordDialog from "@/components/invoice/PaymentRecordDialog";
@@ -529,97 +527,30 @@ export default function FacturesPage() {
   };
 
   const handleDownloadInvoice = async (inv: Facture) => {
-  try {
-  const response = await fetch(`/api/invoices/${inv._id}`);
-  const data = await response.json();
-  const fullInvoice = data.data;
-    const { getCompanyInfo } = await import("@/lib/utils/company-info");
-
-    const fallback = await getCompanyInfo();
-
-    const owner = (fullInvoice.propertyId as any)?.ownerId;
-
-    const ownerCompany =
-      owner && typeof owner === "object"
-        ? {
-            name:
-              owner.businessName ||
-              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
-
-            address:
-              typeof fullInvoice.propertyId?.address === "string"
-                ? fullInvoice.propertyId.address
-                : "",
-
-            phone: owner.phone || "",
-            email: owner.email || "",
-            logo: owner.businessLogo || "",
-            cip: owner.cip || "",
-            ifu: owner.ifu || "",
-            rccm: owner.rccm || "",
-          }
-        : undefined;
-
-    const printable = normalizeInvoiceForPrint(fullInvoice, {
-      companyInfo: ownerCompany ?? fallback ?? undefined,
-    }) as PrintableInvoice;
-
-    await downloadInvoiceAsPDF(printable);
-
-    showSimpleSuccess(
-      "Téléchargement terminé",
-      t("leases.invoices.toasts.downloadSuccess"),
-    );
-  } catch {
-    showSimpleError(
-      "Échec du téléchargement",
-      t("leases.invoices.toasts.downloadError"),
-    );
-  }
-};
+    try {
+      await downloadCanonicalInvoicePdf(inv._id, inv.invoiceNumber);
+      showSimpleSuccess(
+        "Téléchargement terminé",
+        t("leases.invoices.toasts.downloadSuccess"),
+      );
+    } catch {
+      showSimpleError(
+        "Échec du téléchargement",
+        t("leases.invoices.toasts.downloadError"),
+      );
+    }
+  };
 
   const handlePrintInvoice = async (inv: Facture) => {
-  try {
-    const response = await fetch(`/api/invoices/${inv._id}`);
-    const data = await response.json();
-    const fullInvoice = data.data;
-
-    const { getCompanyInfo } = await import("@/lib/utils/company-info");
-    const fallback = await getCompanyInfo();
-
-    const owner = (fullInvoice.propertyId as any)?.ownerId;
-
-    const ownerCompany =
-      owner && typeof owner === "object"
-        ? {
-            name:
-              owner.businessName ||
-              `${owner.firstName ?? ""} ${owner.lastName ?? ""}`.trim(),
-            address:
-              typeof fullInvoice.propertyId?.address === "string"
-                ? fullInvoice.propertyId.address
-                : "",
-            phone: owner.phone || "",
-            email: owner.email || "",
-            logo: owner.businessLogo || "",
-            cip: owner.cip || "",
-            ifu: owner.ifu || "",
-            rccm: owner.rccm || "",
-          }
-        : undefined;
-
-    const printable = normalizeInvoiceForPrint(fullInvoice, {
-      companyInfo: ownerCompany ?? fallback ?? undefined,
-    }) as PrintableInvoice;
-
-    printInvoice(printable);
-  } catch {
-    showSimpleError(
-      "Échec de l'impression",
-      t("leases.invoices.toasts.printError"),
-    );
-  }
-};
+    try {
+      await printCanonicalInvoicePdf(inv._id);
+    } catch {
+      showSimpleError(
+        "Échec de l'impression",
+        t("leases.invoices.toasts.printError"),
+      );
+    }
+  };
 
   const handleSendInvoice = async (inv: Facture) => {
     if (!inv?.tenantId?.email) {
@@ -631,9 +562,9 @@ export default function FacturesPage() {
         leaseId: inv.leaseId?._id || (inv as any).leaseId,
         invoiceId: inv._id,
         to: inv.tenantId?.email,
-        invoiceNumber: inv.invoiceNumber || "N/A",
-        subject: `Facture ${inv.invoiceNumber || "N/A"}`,
-        message: `Veuillez trouver ci-joint votre facture ${inv.invoiceNumber || "N/A"}.`,
+        invoiceNumber: inv.invoiceNumber || "Non renseigné",
+        subject: `Facture ${inv.invoiceNumber || "Non renseigné"}`,
+        message: `Veuillez trouver ci-joint votre facture ${inv.invoiceNumber || "Non renseigné"}.`,
       };
       const res = await fetch("/api/invoices/email", {
         method: "POST",
@@ -663,7 +594,7 @@ export default function FacturesPage() {
       const data = await res.json();
       if (res.ok && data?.success) {
         showSimpleSuccess(
-          "Facture Deleted",
+          "Facture supprimée",
           t("leases.invoices.toasts.refreshed"),
         );
         fetchFactures(filters, false);
@@ -671,7 +602,7 @@ export default function FacturesPage() {
         throw new Error(data?.error || "Échec de la suppression de la facture");
       }
     } catch {
-      showSimpleError("Delete Failed", "Échec de la suppression de la facture");
+      showSimpleError("Échec de la suppression", "Impossible de supprimer la facture.");
     } finally {
       setDeletingId(null);
     }
@@ -1056,9 +987,9 @@ export default function FacturesPage() {
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-invoices-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {isTenant
@@ -1075,16 +1006,15 @@ export default function FacturesPage() {
                   defaultValue: "Consultez et payez vos factures",
                 })
               : t("invoices.header.subtitle", {
-                  defaultValue:
-                    "Créer et gérer les factures des baux, services et frais",
+                  defaultValue: "Baux, services et frais",
                 })}
           </p>
         </div>
-        <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:flex-nowrap">
+        <div className="grid w-full grid-cols-3 gap-1.5 sm:flex sm:w-auto sm:flex-nowrap sm:gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
+            className="h-10 min-w-0 flex-1 justify-center px-1 text-[10px] leading-none sm:h-9 sm:flex-none sm:px-3 sm:text-sm"
             onClick={() => {
               fetchFactures(filters, true);
               fetchStats();
@@ -1094,7 +1024,7 @@ export default function FacturesPage() {
               );
             }}
           >
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="mr-1 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4" />
             {t("leases.actions.refresh")}
           </Button>
           {!isTenant && (
@@ -1102,22 +1032,22 @@ export default function FacturesPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
+                className="h-10 min-w-0 flex-1 justify-center px-1 text-[10px] leading-none sm:h-9 sm:flex-none sm:px-3 sm:text-sm"
                 onClick={handleProcessLateFees}
               >
-                <AlertTriangle className="mr-2 h-4 w-4" />
+                <AlertTriangle className="mr-1 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4" />
                 {t("leases.invoices.actions.processLateFees")}
               </Button>
               <Button
                 size="sm"
-                className="min-w-0 flex-1 text-xs sm:flex-none sm:text-sm"
+                className="h-10 min-w-0 flex-1 justify-center px-1 text-[10px] leading-none sm:h-9 sm:flex-none sm:px-3 sm:text-sm"
                 onClick={() =>
                   router.push("/dashboard/accounting/invoices/new")
                 }
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-1 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4" />
                 {t("invoices.actions.createInvoice", {
-                  defaultValue: "Créer une facture",
+                  defaultValue: "Facture",
                 })}
               </Button>
             </>
@@ -1213,7 +1143,7 @@ export default function FacturesPage() {
 
       {/* Facture List with Integrated Filters */}
       <Card className="gap-2">
-        <CardHeader>
+        <CardHeader className="px-3 py-4 sm:px-6 sm:py-6">
           {/* Main Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-2">
             <div className="flex items-center gap-3">
@@ -1256,7 +1186,7 @@ export default function FacturesPage() {
           {/* Integrated Filters Bar */}
           <div className="flex flex-col gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
             {/* Search and Filter Controls in one row */}
-            <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+            <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center lg:gap-3">
               {/* Search */}
               <GlobalSearch
                 placeholder={t("leases.invoices.filters.searchPlaceholder")}
@@ -1264,7 +1194,7 @@ export default function FacturesPage() {
                 debounceDelay={300}
                 onSearch={handleSearch}
                 isLoading={isSearching}
-                className="flex-1 min-w-0"
+                className="col-span-2 min-w-0 lg:flex-1"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-white dark:bg-gray-800"
                 ariaLabel="Rechercher des factures"
               />
@@ -1274,7 +1204,7 @@ export default function FacturesPage() {
                 value={filters.status || "all"}
                 onValueChange={handleStatusFilter}
               >
-                <SelectTrigger className="w-40 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-40">
                   <SelectValue
                     placeholder={t("leases.invoices.filters.statusPlaceholder")}
                   />
@@ -1311,7 +1241,7 @@ export default function FacturesPage() {
                   handleSort(sortBy, sortOrder as "asc" | "desc");
                 }}
               >
-                <SelectTrigger className="w-40 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-40">
                   <SelectValue placeholder={t("leases.filters.sortBy")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -1424,7 +1354,7 @@ export default function FacturesPage() {
               </div>
             </div>
           ) : viewMode === "cards" ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 p-4">
+            <div className="grid gap-3 p-0 sm:gap-4 sm:p-4 md:grid-cols-2 lg:grid-cols-3">
               {invoices.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center gap-2 py-12">
                   <FileText className="h-12 w-12 text-muted-foreground" />
@@ -1456,14 +1386,14 @@ export default function FacturesPage() {
                 invoices.map((invoice) => (
                   <Card
                     key={invoice._id}
-                    className="hover:shadow-md transition-shadow"
+                    className="invoice-mobile-card transition-shadow hover:shadow-md"
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1 flex-1">
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-base font-semibold font-mono">
+                            <span className="min-w-0 truncate font-mono text-sm font-semibold sm:text-base">
                               {invoice.invoiceNumber || "—"}
                             </span>
                           </div>
@@ -1557,29 +1487,29 @@ export default function FacturesPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="grid grid-cols-3 gap-1 text-xs sm:gap-2 sm:text-sm">
                         <div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-[10px] text-muted-foreground sm:text-xs">
                             {t("leases.invoices.table.total")}
                           </div>
-                          <div className="font-semibold">
+                          <div className="whitespace-nowrap text-[11px] font-semibold sm:text-sm">
                             {formatCurrency(invoice.totalAmount ?? 0)}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-[10px] text-muted-foreground sm:text-xs">
                             {t("leases.invoices.table.paid")}
                           </div>
-                          <div className="font-medium text-green-600">
+                          <div className="whitespace-nowrap text-[11px] font-medium text-green-600 sm:text-sm">
                             {formatCurrency(invoice.amountPaid ?? 0)}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="text-[10px] text-muted-foreground sm:text-xs">
                             {t("leases.invoices.table.balance")}
                           </div>
                           <div
-                            className={`font-semibold ${
+                            className={`whitespace-nowrap text-[11px] font-semibold sm:text-sm ${
                               (invoice.balanceRemaining ?? 0) > 0
                                 ? "text-red-600"
                                 : "text-green-600"
@@ -1609,6 +1539,18 @@ export default function FacturesPage() {
                               <Eye className="mr-2 h-4 w-4" />
                               {t("leases.invoices.actions.viewDetails")}
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDownloadInvoice(invoice)}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              {t("leases.invoices.actions.downloadPdf")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handlePrintInvoice(invoice)}
+                            >
+                              <Printer className="mr-2 h-4 w-4" />
+                              {t("leases.invoices.actions.print")}
+                            </DropdownMenuItem>
                             {!isTenant && (
                               <>
                                 <DropdownMenuItem
@@ -1620,18 +1562,6 @@ export default function FacturesPage() {
                                 >
                                   <CreditCard className="mr-2 h-4 w-4" />
                                   {t("leases.invoices.actions.recordPayment")}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDownloadInvoice(invoice)}
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  {t("leases.invoices.actions.downloadPdf")}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handlePrintInvoice(invoice)}
-                                >
-                                  <Printer className="mr-2 h-4 w-4" />
-                                  {t("leases.invoices.actions.print")}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => handleSendInvoice(invoice)}
@@ -1709,11 +1639,11 @@ export default function FacturesPage() {
                       },
                       getRowId: (invoice: Facture) => invoice._id,
                       selectAllLabel: t("leases.invoices.selection.selectAll", {
-                        defaultValue: "Select all",
+                        defaultValue: "Tout sélectionner",
                       }),
                       selectRowLabel: () =>
                         t("leases.invoices.selection.selectInvoice", {
-                          defaultValue: "Select invoice",
+                          defaultValue: "Sélectionner la facture",
                         }),
                     }
                   : undefined
@@ -1738,13 +1668,13 @@ export default function FacturesPage() {
               pageSize={filters.limit ?? 12}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

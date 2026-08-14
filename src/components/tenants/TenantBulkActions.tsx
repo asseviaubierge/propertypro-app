@@ -70,11 +70,11 @@ export default function TenantBulkActions({
       label: "Application Submitted",
       icon: Clock,
     },
-    { value: "under_review", label: "Under Review", icon: Clock },
-    { value: "approved", label: "Approved", icon: CheckCircle },
-    { value: "active", label: "Active", icon: UserCheck },
-    { value: "inactive", label: "Inactive", icon: UserX },
-    { value: "moved_out", label: "Moved Out", icon: UserX },
+    { value: "under_review", label: "En cours d’examen", icon: Clock },
+    { value: "approved", label: "Approuvée", icon: CheckCircle },
+    { value: "active", label: "Actif", icon: UserCheck },
+    { value: "inactive", label: "Inactif", icon: UserX },
+    { value: "moved_out", label: "Partis", icon: UserX },
     { value: "terminated", label: "Terminated", icon: XCircle },
   ];
 
@@ -195,7 +195,7 @@ export default function TenantBulkActions({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Bulk Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Actions groupées</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setShowStatusDialog(true)}>
                 <RefreshCw className="mr-2 h-4 w-4" />
@@ -227,7 +227,7 @@ export default function TenantBulkActions({
       <AlertDialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Change Tenant Status</AlertDialogTitle>
+            <AlertDialogTitle>Modifier le statut des locataires</AlertDialogTitle>
             <AlertDialogDescription>
               Change the status for {selectedTenants.length} selected tenant(s).
             </AlertDialogDescription>
@@ -236,7 +236,7 @@ export default function TenantBulkActions({
           <div className="py-4">
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="Select new status" />
+                <SelectValue placeholder="Sélectionner le nouveau statut" />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => {
@@ -255,7 +255,7 @@ export default function TenantBulkActions({
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleStatusChange}
               disabled={!selectedStatus || isLoading}
@@ -270,14 +270,14 @@ export default function TenantBulkActions({
       {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Tenants</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer les locataires</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete {selectedTenants.length} selected
               tenant(s)? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isLoading}

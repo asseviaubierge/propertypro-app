@@ -94,15 +94,15 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = [
-    { value: "general", label: "General", icon: Settings },
-    { value: "appearance", label: "Appearance", icon: Eye },
-    { value: "email", label: "Email", icon: Mail },
-    { value: "payment", label: "Payment", icon: CreditCard },
+    { value: "general", label: "Général", icon: Settings },
+    { value: "appearance", label: "Apparence", icon: Eye },
+    { value: "email", label: "E-mail", icon: Mail },
+    { value: "payment", label: "Paiement", icon: CreditCard },
     { value: "maintenance", label: "Maintenance", icon: Wrench },
-    { value: "security", label: "Security", icon: Shield },
-    { value: "localization", label: "Localization", icon: Globe },
+    { value: "security", label: "Sécurité", icon: Shield },
+    { value: "localization", label: "Localisation", icon: Globe },
     { value: "notifications", label: "Notifications", icon: Bell },
-    { value: "integrations", label: "Integrations", icon: Plug },
+    { value: "integrations", label: "Intégrations", icon: Plug },
   ];
 
   useEffect(() => {
@@ -115,14 +115,14 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
       const response = await fetch("/api/settings/system");
 
       if (!response.ok) {
-        throw new Error("Failed to fetch system settings");
+        throw new Error("Impossible de charger les paramètres système");
       }
 
       const data = await response.json();
       setSettings(data?.settings ?? []);
     } catch (error) {
-      logClientError("Error fetching system settings:", error);
-      onAlert("error", "Failed to load system settings");
+      logClientError("Erreur de chargement des paramètres système :", error);
+      onAlert("error", "Impossible de charger les paramètres système");
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +146,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || "Failed to update setting");
+        throw new Error(errorData?.error || "Impossible de modifier le paramètre");
       }
 
       const result = await response.json();
@@ -163,12 +163,12 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
         return newState;
       });
 
-      onAlert("success", "Setting updated successfully");
+      onAlert("success", "Paramètre modifié");
     } catch (error) {
       logClientError("Setting update error:", error);
       onAlert(
         "error",
-        error instanceof Error ? error.message : "Failed to update setting",
+        error instanceof Error ? error.message : "Impossible de modifier le paramètre",
       );
     }
   };
@@ -187,17 +187,17 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || "Failed to delete setting");
+        throw new Error(errorData?.error || "Impossible de supprimer le paramètre");
       }
 
       // Update local state
       setSettings((prev) => prev.filter((s) => s._id !== settingId));
-      onAlert("success", "Setting deleted successfully");
+      onAlert("success", "Paramètre supprimé");
     } catch (error) {
       logClientError("Setting delete error:", error);
       onAlert(
         "error",
-        error instanceof Error ? error.message : "Failed to delete setting",
+        error instanceof Error ? error.message : "Impossible de supprimer le paramètre",
       );
     }
   };
@@ -218,7 +218,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
           try {
             convertedValue = JSON.parse(newSetting.value);
           } catch {
-            throw new Error("Invalid JSON format for object/array value");
+            throw new Error("Format JSON invalide");
           }
           break;
       }
@@ -236,7 +236,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData?.error || "Failed to create setting");
+        throw new Error(errorData?.error || "Impossible de créer le paramètre");
       }
 
       const result = await response.json();
@@ -256,12 +256,12 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
       });
       setShowAddForm(false);
 
-      onAlert("success", "Setting created successfully");
+      onAlert("success", "Paramètre créé");
     } catch (error) {
       logClientError("Setting create error:", error);
       onAlert(
         "error",
-        error instanceof Error ? error.message : "Failed to create setting",
+        error instanceof Error ? error.message : "Impossible de créer le paramètre",
       );
     }
   };
@@ -277,7 +277,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
         <div className="flex items-center gap-2">
           <span className="text-sm">{String(setting.value)}</span>
           <Badge variant="secondary" className="text-xs">
-            Read Only
+            Lecture seule
           </Badge>
         </div>
       );
@@ -323,7 +323,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
               setEditingSettings(newState);
             }}
           >
-            Cancel
+            Annuler
           </Button>
         </div>
       );
@@ -395,7 +395,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Warning:</strong> System settings control core functionality.
+          <strong>Avertissement :</strong> System settings control core functionality.
           Changes may affect all users and system behavior. Proceed with
           caution.
         </AlertDescription>
@@ -446,7 +446,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                         onClick={() => setShowFilters(!showFilters)}
                       >
                         <Filter className="h-4 w-4 mr-2" />
-                        Filters
+                        Filtres
                       </Button>
                       <Button
                         onClick={() => {
@@ -468,7 +468,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                     <div className="flex-1 relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        placeholder="Search settings..."
+                        placeholder="Rechercher dans les paramètres…"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -480,10 +480,10 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                         onValueChange={setFilterGroup}
                       >
                         <SelectTrigger className="w-48">
-                          <SelectValue placeholder="Filter by group" />
+                          <SelectValue placeholder="Filtrer par groupe" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Groups</SelectItem>
+                          <SelectItem value="">Tous les groupes</SelectItem>
                           {availableGroups.map((group) => (
                             <SelectItem key={group} value={group}>
                               {group.charAt(0).toUpperCase() + group.slice(1)}
@@ -499,12 +499,12 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                 {showAddForm && newSetting.category === category.value && (
                   <Card className="mb-6">
                     <CardHeader>
-                      <CardTitle className="text-lg">Add New Setting</CardTitle>
+                      <CardTitle className="text-lg">Ajouter un paramètre</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="new-key">Key</Label>
+                          <Label htmlFor="new-key">Clé</Label>
                           <Input
                             id="new-key"
                             value={newSetting.key}
@@ -518,7 +518,7 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="new-data-type">Data Type</Label>
+                          <Label htmlFor="new-data-type">Type de donnée</Label>
                           <Select
                             value={newSetting.dataType}
                             onValueChange={(value) =>
@@ -532,18 +532,18 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="string">String</SelectItem>
-                              <SelectItem value="number">Number</SelectItem>
-                              <SelectItem value="boolean">Boolean</SelectItem>
-                              <SelectItem value="object">Object</SelectItem>
-                              <SelectItem value="array">Array</SelectItem>
+                              <SelectItem value="string">Texte</SelectItem>
+                              <SelectItem value="number">Nombre</SelectItem>
+                              <SelectItem value="boolean">Booléen</SelectItem>
+                              <SelectItem value="object">Objet</SelectItem>
+                              <SelectItem value="array">Liste</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="new-value">Value</Label>
+                        <Label htmlFor="new-value">Valeur</Label>
                         <Input
                           id="new-value"
                           value={newSetting.value}
@@ -605,19 +605,19 @@ export function SystemSettings({ onAlert }: SystemSettingsProps) {
                               }))
                             }
                           />
-                          <Label>Editable</Label>
+                          <Label>Modifiable</Label>
                         </div>
                       </div>
 
                       <div className="flex gap-2">
                         <Button onClick={handleAddSetting}>
-                          Create Setting
+                          Créer le paramètre
                         </Button>
                         <Button
                           variant="outline"
                           onClick={() => setShowAddForm(false)}
                         >
-                          Cancel
+                          Annuler
                         </Button>
                       </div>
                     </CardContent>

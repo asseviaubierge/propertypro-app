@@ -209,7 +209,7 @@ function PaymentFormInner({
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Card Information</label>
+            <label className="text-sm font-medium">Informations de la carte</label>
             <div className="p-3 border rounded-md bg-background">
               <CardElement
                 options={cardElementOptions}
@@ -223,7 +223,7 @@ function PaymentFormInner({
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Lock className="h-3 w-3" />
-            <span>Your payment information is secure and encrypted</span>
+            <span>Vos informations de paiement sont sécurisées et chiffrées</span>
           </div>
 
           <Button
@@ -318,7 +318,7 @@ function PaymentForm({
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-            <p className="text-muted-foreground">Initializing payment...</p>
+            <p className="text-muted-foreground">Initialisation du paiement…</p>
           </div>
         </CardContent>
       </Card>
@@ -344,7 +344,7 @@ function PaymentForm({
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto" />
-            <p className="text-muted-foreground">Payment not ready</p>
+            <p className="text-muted-foreground">Paiement non prêt</p>
           </div>
         </CardContent>
       </Card>
@@ -440,7 +440,7 @@ export function PaymentStatus({
     return (
       <div className="flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span>Checking payment status...</span>
+        <span>Vérification de l’état du paiement…</span>
       </div>
     );
   }

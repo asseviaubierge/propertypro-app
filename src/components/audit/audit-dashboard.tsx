@@ -235,7 +235,7 @@ export default function AuditDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Audit Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Tableau de bord d’audit</h2>
           <p className="text-muted-foreground">
             Monitor system activity and security events
           </p>
@@ -243,7 +243,7 @@ export default function AuditDashboard() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchAuditLogs}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            Actualiser
           </Button>
           <Button variant="outline" onClick={exportAuditLogs}>
             <Download className="h-4 w-4 mr-2" />
@@ -277,7 +277,7 @@ export default function AuditDashboard() {
                 <Shield className="h-5 w-5 text-red-600" />
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Security Events
+                    Événements de sécurité
                   </p>
                   <p className="text-2xl font-bold">
                     {stats?.summary?.securityEvents ?? 0}
@@ -326,25 +326,25 @@ export default function AuditDashboard() {
 
       <Tabs defaultValue="logs" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="logs">Activity Logs</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="security">Security Events</TabsTrigger>
+          <TabsTrigger value="logs">Journaux d’activité</TabsTrigger>
+          <TabsTrigger value="analytics">Analyses</TabsTrigger>
+          <TabsTrigger value="security">Événements de sécurité</TabsTrigger>
         </TabsList>
 
         <TabsContent value="logs" className="space-y-4">
           {/* Filters */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Filters</CardTitle>
+              <CardTitle className="text-lg">Filtres</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div className="space-y-2">
-                  <Label>Search</Label>
+                  <Label>Rechercher</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search logs..."
+                      placeholder="Rechercher dans les journaux…"
                       value={filters.search}
                       onChange={(e) =>
                         handleFilterChange("search", e.target.value)
@@ -355,7 +355,7 @@ export default function AuditDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Category</Label>
+                  <Label>Catégorie</Label>
                   <Select
                     value={filters.category || "all"}
                     onValueChange={(value) =>
@@ -363,10 +363,10 @@ export default function AuditDashboard() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All categories" />
+                      <SelectValue placeholder="Toutes les catégories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All categories</SelectItem>
+                      <SelectItem value="all">Toutes les catégories</SelectItem>
                       <SelectItem value="authentication">
                         Authentication
                       </SelectItem>
@@ -379,13 +379,13 @@ export default function AuditDashboard() {
                       <SelectItem value="document_management">
                         Document Management
                       </SelectItem>
-                      <SelectItem value="security">Security</SelectItem>
+                      <SelectItem value="security">Sécurité</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Severity</Label>
+                  <Label>Gravité</Label>
                   <Select
                     value={filters.severity || "all"}
                     onValueChange={(value) =>
@@ -393,20 +393,20 @@ export default function AuditDashboard() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All severities" />
+                      <SelectValue placeholder="Tous les niveaux de gravité" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All severities</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="critical">Critical</SelectItem>
+                      <SelectItem value="all">Tous les niveaux de gravité</SelectItem>
+                      <SelectItem value="low">Faible</SelectItem>
+                      <SelectItem value="medium">Moyenne</SelectItem>
+                      <SelectItem value="high">Élevée</SelectItem>
+                      <SelectItem value="critical">Critique</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Start Date</Label>
+                  <Label>Date de début</Label>
                   <Input
                     type="date"
                     value={filters.startDate}
@@ -417,7 +417,7 @@ export default function AuditDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>End Date</Label>
+                  <Label>Date de fin</Label>
                   <Input
                     type="date"
                     value={filters.endDate}
@@ -455,7 +455,7 @@ export default function AuditDashboard() {
           {/* Audit Logs Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Activity Logs</CardTitle>
+              <CardTitle>Journaux d’activité</CardTitle>
               <CardDescription>
                 Recent system activity and user actions
               </CardDescription>
@@ -464,12 +464,12 @@ export default function AuditDashboard() {
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="h-6 w-6 animate-spin" />
-                  <span className="ml-2">Loading audit logs...</span>
+                  <span className="ml-2">Chargement des journaux d’audit…</span>
                 </div>
               ) : logs.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No audit logs found</p>
+                  <p>Aucun journal d’audit trouvé</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -493,7 +493,7 @@ export default function AuditDashboard() {
                             <User className="h-3 w-3" />
                             {log.userId
                               ? `${log.userId.firstName} ${log.userId.lastName}`
-                              : "System"}
+                              : "Système"}
                           </span>
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
@@ -528,7 +528,7 @@ export default function AuditDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Activity by Category</CardTitle>
+                  <CardTitle>Activité par catégorie</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -549,7 +549,7 @@ export default function AuditDashboard() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Top Active Users</CardTitle>
+                  <CardTitle>Utilisateurs les plus actifs</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -579,7 +579,7 @@ export default function AuditDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-red-600" />
-                Security Events
+                Événements de sécurité
               </CardTitle>
               <CardDescription>
                 Monitor security-related activities and potential threats
@@ -588,7 +588,7 @@ export default function AuditDashboard() {
             <CardContent>
               <div className="text-center py-8 text-muted-foreground">
                 <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Security events monitoring will be displayed here</p>
+                <p>Le suivi des événements de sécurité sera affiché ici</p>
               </div>
             </CardContent>
           </Card>

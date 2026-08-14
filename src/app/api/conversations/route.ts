@@ -21,10 +21,13 @@ export const GET = withPermissionAndDB("profile_management")(
     const type = params.get("type");
     const search = params.get("search")?.trim();
 
-    const query: Record<string, any> = { deletedAt: null };
-    if (!access.isAdmin) {
-      query.participants = { $elemMatch: { userId: user.id, isActive: true } };
-    }
+    // Une liste cohérente : même le Super Admin ne voit ici que les
+    // conversations auxquelles il participe. Il conserve tous ses contacts
+    // autorisés pour démarrer une nouvelle conversation.
+    const query: Record<string, any> = {
+      deletedAt: null,
+      participants: { $elemMatch: { userId: user.id, isActive: true } },
+    };
     if (!includeArchived) query.isArchived = false;
     if (type && ["individual", "group", "announcement"].includes(type)) query.type = type;
     if (propertyId) {

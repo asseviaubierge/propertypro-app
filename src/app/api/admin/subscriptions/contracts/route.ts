@@ -12,7 +12,7 @@ function contractNumber() {
 export const GET = withPermissionAndDB("system_settings")(async () => {
   try {
     const contracts = await SubscriptionContract.find({})
-      .populate("accountId", "firstName lastName email role businessName accountType phone")
+      .populate("accountId", "firstName lastName email role businessName accountType phone whatsappNumber whatsappVerificationStatus whatsappVerifiedAt")
       .sort({ updatedAt: -1 })
       .lean();
     return createSuccessResponse(contracts);
@@ -35,7 +35,7 @@ export const POST = withPermissionAndDB("system_settings")(async (user: any, req
       ...body,
       portfolioSnapshot: snapshot,
       contractNumber: contractNumber(),
-      platformName: "E-IMMO",
+      platformName: "E-IMMO.BJ",
       platformRepresentative: "GESTION E-IMMO",
       createdBy: user._id || user.id,
       updatedBy: user._id || user.id,

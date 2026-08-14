@@ -266,7 +266,7 @@ export function AvatarUpload({
           <CardContent className="p-3">
             <div className="flex items-center gap-2 text-green-700">
               <CheckCircle className="h-4 w-4" />
-              <span className="text-sm">Avatar updated successfully!</span>
+              <span className="text-sm">Photo de profil mise à jour</span>
             </div>
           </CardContent>
         </Card>
@@ -279,7 +279,7 @@ export function AvatarUpload({
           <br />
           Supported formats: JPEG, PNG, WebP
           <br />
-          <span className="text-blue-600">Avatar upload is optional</span>
+          <span className="text-blue-600">La photo de profil est facultative</span>
         </p>
       </div>
     </div>

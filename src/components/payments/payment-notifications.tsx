@@ -316,13 +316,13 @@ export function PaymentNotifications({
       case "sent":
         return (
           <Badge variant="default" className="bg-green-500">
-            Sent
+            Envoyé
           </Badge>
         );
       case "pending":
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="secondary">En attente</Badge>;
       case "failed":
-        return <Badge variant="destructive">Failed</Badge>;
+        return <Badge variant="destructive">Échoué</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -359,12 +359,12 @@ export function PaymentNotifications({
           <DialogTrigger asChild>
             <Button>
               <Settings className="mr-2 h-4 w-4" />
-              Settings
+              Paramètres
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Notification Settings</DialogTitle>
+              <DialogTitle>Paramètres des notifications</DialogTitle>
               <DialogDescription>
                 Configure your payment notification preferences
               </DialogDescription>
@@ -373,10 +373,10 @@ export function PaymentNotifications({
             <div className="space-y-6">
               {/* Email Notifications */}
               <div className="space-y-4">
-                <h4 className="font-semibold">Email Notifications</h4>
+                <h4 className="font-semibold">Notifications par e-mail</h4>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="payment-reminders">Payment Reminders</Label>
+                    <Label htmlFor="payment-reminders">Rappels de paiement</Label>
                     <Switch
                       id="payment-reminders"
                       checked={
@@ -396,7 +396,7 @@ export function PaymentNotifications({
                   </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="payment-confirmations">
-                      Payment Confirmations
+                      Confirmations de paiement
                     </Label>
                     <Switch
                       id="payment-confirmations"
@@ -416,7 +416,7 @@ export function PaymentNotifications({
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="overdue-notices">Overdue Notices</Label>
+                    <Label htmlFor="overdue-notices">Avis de retard</Label>
                     <Switch
                       id="overdue-notices"
                       checked={
@@ -434,7 +434,7 @@ export function PaymentNotifications({
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="receipt-delivery">Receipt Delivery</Label>
+                    <Label htmlFor="receipt-delivery">Envoi des reçus</Label>
                     <Switch
                       id="receipt-delivery"
                       checked={
@@ -457,10 +457,10 @@ export function PaymentNotifications({
 
               {/* Reminder Schedule */}
               <div className="space-y-4">
-                <h4 className="font-semibold">Reminder Schedule</h4>
+                <h4 className="font-semibold">Calendrier des rappels</h4>
                 <div className="space-y-3">
                   <div>
-                    <Label>Days Before Due Date</Label>
+                    <Label>Jours avant l’échéance</Label>
                     <div className="flex gap-2 mt-2">
                       {[7, 5, 3, 1].map((day) => (
                         <Button
@@ -517,7 +517,7 @@ export function PaymentNotifications({
                   </div>
                   {formSettings.reminderSchedule?.overdueReminders && (
                     <div>
-                      <Label>Overdue Reminder Frequency</Label>
+                      <Label>Fréquence des rappels de retard</Label>
                       <Select
                         value={
                           formSettings.reminderSchedule?.overdueFrequency ||
@@ -537,8 +537,8 @@ export function PaymentNotifications({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="daily">Daily</SelectItem>
-                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="daily">Quotidienne</SelectItem>
+                          <SelectItem value="weekly">Hebdomadaire</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -548,10 +548,10 @@ export function PaymentNotifications({
 
               {/* Contact Preferences */}
               <div className="space-y-4">
-                <h4 className="font-semibold">Contact Preferences</h4>
+                <h4 className="font-semibold">Préférences de contact</h4>
                 <div className="space-y-3">
                   <div>
-                    <Label htmlFor="email-address">Email Address</Label>
+                    <Label htmlFor="email-address">Adresse e-mail</Label>
                     <Input
                       id="email-address"
                       type="email"
@@ -637,7 +637,7 @@ export function PaymentNotifications({
                   variant="outline"
                   onClick={() => setShowSettingsDialog(false)}
                 >
-                  Cancel
+                  Annuler
                 </Button>
               </div>
             </div>
@@ -660,10 +660,10 @@ export function PaymentNotifications({
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <h4 className="font-semibold mb-2">Email Notifications</h4>
+                <h4 className="font-semibold mb-2">Notifications par e-mail</h4>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span>Payment Reminders:</span>
+                    <span>Rappels de paiement :</span>
                     <Badge
                       variant={
                         settings.emailNotifications.paymentReminders
@@ -677,7 +677,7 @@ export function PaymentNotifications({
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Payment Confirmations:</span>
+                    <span>Confirmations de paiement :</span>
                     <Badge
                       variant={
                         settings.emailNotifications.paymentConfirmations
@@ -691,7 +691,7 @@ export function PaymentNotifications({
                     </Badge>
                   </div>
                   <div className="flex justify-between">
-                    <span>Overdue Notices:</span>
+                    <span>Avis de retard :</span>
                     <Badge
                       variant={
                         settings.emailNotifications.overdueNotices
@@ -707,10 +707,10 @@ export function PaymentNotifications({
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Reminder Schedule</h4>
+                <h4 className="font-semibold mb-2">Calendrier des rappels</h4>
                 <div className="space-y-1 text-sm">
                   <div>
-                    <span className="font-medium">Days before due:</span>
+                    <span className="font-medium">Jours avant l’échéance :</span>
                     <div className="flex gap-1 mt-1">
                       {settings.reminderSchedule.daysBeforeDue.map((day) => (
                         <Badge key={day} variant="outline" className="text-xs">
@@ -720,7 +720,7 @@ export function PaymentNotifications({
                     </div>
                   </div>
                   <div className="flex justify-between">
-                    <span>Overdue Reminders:</span>
+                    <span>Rappels de retard :</span>
                     <Badge
                       variant={
                         settings.reminderSchedule.overdueReminders
@@ -784,7 +784,7 @@ export function PaymentNotifications({
           ) : (
             <div className="text-center py-8">
               <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No notifications yet</p>
+              <p className="text-muted-foreground">Aucune notification pour le moment</p>
               <p className="text-sm text-muted-foreground">
                 Notifications will appear here when they are sent
               </p>
@@ -800,7 +800,7 @@ export function PaymentNotifications({
             <Receipt className="h-5 w-5" />
             Recent Receipts
           </CardTitle>
-          <CardDescription>Download your payment receipts</CardDescription>
+          <CardDescription>Téléchargez vos reçus de paiement</CardDescription>
         </CardHeader>
         <CardContent>
           {receipts.length > 0 ? (
@@ -838,7 +838,7 @@ export function PaymentNotifications({
           ) : (
             <div className="text-center py-8">
               <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No receipts available</p>
+              <p className="text-muted-foreground">Aucun reçu disponible</p>
               <p className="text-sm text-muted-foreground">
                 Receipts will appear here after successful payments
               </p>

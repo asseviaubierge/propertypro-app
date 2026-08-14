@@ -322,7 +322,7 @@ export function SettingsLayout({
     } catch (error) {
       logClientError("Fetch user data error:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to load user data";
+        error instanceof Error ? error.message : "Impossible de charger les données du compte";
       showAlert("error", errorMessage);
     } finally {
       setIsLoading(false);
@@ -394,18 +394,18 @@ export function SettingsLayout({
       : userSettings;
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <SettingsIcon className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">{t("settings.pageTitle")}</h1>
+    <div className="mobile-settings-page mx-auto min-w-0 max-w-6xl space-y-3 sm:p-6">
+      <div className="mb-4 sm:mb-8">
+        <div className="mb-1 flex items-center gap-2 sm:mb-2 sm:gap-3">
+          <SettingsIcon className="h-6 w-6 text-primary sm:h-8 sm:w-8" />
+          <h1 className="text-xl font-bold sm:text-3xl">{t("settings.pageTitle")}</h1>
         </div>
         <p className="text-muted-foreground">{t("settings.pageDescription")}</p>
       </div>
 
-      <Card>
+      <Card className="settings-shell gap-2">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
+          <CardTitle className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <Icon className="h-5 w-5" />
               {title}
@@ -416,7 +416,7 @@ export function SettingsLayout({
                 size="sm"
                 onClick={fetchUserData}
                 disabled={isLoading}
-                className="text-xs"
+                className="w-full whitespace-nowrap text-xs sm:w-auto"
               >
                 <RefreshCw
                   className={`h-3 w-3 mr-1 ${isLoading ? "animate-spin" : ""}`}
@@ -427,7 +427,7 @@ export function SettingsLayout({
           </CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0 sm:px-6">
           {alert && (
             <Alert
               className={`mb-4 ${

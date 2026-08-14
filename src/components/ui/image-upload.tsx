@@ -73,7 +73,7 @@ export function ImageUpload({
       const remainingSlots = maxFiles - images.length;
 
       if (fileArray.length > remainingSlots) {
-        showSimpleError("Upload Limit", `You can only upload ${remainingSlots} more image(s)`);
+        showSimpleError("Limite de téléversement", `You can only upload ${remainingSlots} more image(s)`);
         return;
       }
 
@@ -121,10 +121,10 @@ export function ImageUpload({
         setImages(updatedImages);
         onImagesUploaded(newImages);
 
-        showSimpleSuccess("Upload Complete", `Successfully uploaded ${newImages.length} image(s)`);
+        showSimpleSuccess("Téléversement terminé", `Successfully uploaded ${newImages.length} image(s)`);
       } catch (error) {
         console.error("Upload error:", error);
-        showSimpleError("Upload Failed", error instanceof Error ? error.message : "Upload failed");
+        showSimpleError("Échec du téléversement", error instanceof Error ? error.message : "Upload failed");
       } finally {
         setUploading(false);
         setUploadProgress(0);

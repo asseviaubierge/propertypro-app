@@ -130,13 +130,13 @@ export default function CurrencyConverter({
         <CardContent className="space-y-6">
           {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">Montant</Label>
             <Input
               id="amount"
               type="number"
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
-              placeholder="Enter amount"
+              placeholder="Saisir le montant"
               className="text-lg"
             />
           </div>
@@ -144,7 +144,7 @@ export default function CurrencyConverter({
           {/* Currency Selection */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div className="space-y-2">
-              <Label htmlFor="from-currency">From</Label>
+              <Label htmlFor="from-currency">De</Label>
               <Select value={fromCurrency} onValueChange={setFromCurrency}>
                 <SelectTrigger>
                   <SelectValue />
@@ -175,7 +175,7 @@ export default function CurrencyConverter({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="to-currency">To</Label>
+              <Label htmlFor="to-currency">Vers</Label>
               <Select value={toCurrency} onValueChange={setToCurrency}>
                 <SelectTrigger>
                   <SelectValue />
@@ -221,7 +221,7 @@ export default function CurrencyConverter({
 
           {/* Quick Conversion Buttons */}
           <div className="space-y-2">
-            <Label>Quick Convert</Label>
+            <Label>Conversion rapide</Label>
             <div className="flex flex-wrap gap-2">
               {popularPairs.map((pair) => (
                 <Button
@@ -243,7 +243,7 @@ export default function CurrencyConverter({
       {showRates && (
         <Card>
           <CardHeader>
-            <CardTitle>Current Exchange Rates</CardTitle>
+            <CardTitle>Taux de change actuels</CardTitle>
             <CardDescription>
               Live exchange rates updated every 15 minutes
             </CardDescription>

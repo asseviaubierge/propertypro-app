@@ -156,13 +156,13 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      [LeaseStatus.ACTIVE]: { variant: "default" as const, label: "Active" },
+      [LeaseStatus.ACTIVE]: { variant: "default" as const, label: "Actif" },
       [LeaseStatus.EXPIRED]: { variant: "secondary" as const, label: "Expired" },
       [LeaseStatus.TERMINATED]: {
         variant: "destructive" as const,
         label: "Terminated",
       },
-      [LeaseStatus.PENDING]: { variant: "outline" as const, label: "Pending" },
+      [LeaseStatus.PENDING]: { variant: "outline" as const, label: "En attente" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || {
@@ -185,7 +185,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Tenant Ledger</h1>
+            <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Compte du locataire</h1>
             <p className="text-muted-foreground">
               Loading tenant information...
             </p>
@@ -226,7 +226,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Tenant Ledger</h1>
+          <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">Compte du locataire</h1>
           <p className="text-muted-foreground">
             Financial history for {tenant.firstName} {tenant.lastName}
           </p>
@@ -265,7 +265,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
             {currentBalance && (
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Current Balance:</span>
+                  <span>Solde actuel :</span>
                   <span
                     className={`font-medium ${
                       currentBalance.currentBalance > 0
@@ -280,7 +280,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
 
                 {currentBalance.overdueAmount > 0 && (
                   <div className="flex justify-between">
-                    <span>Overdue Amount:</span>
+                    <span>Montant en retard :</span>
                     <span className="font-medium text-red-600">
                       {formatCurrency(currentBalance.overdueAmount)}
                     </span>
@@ -289,7 +289,7 @@ export default function TenantLedgerPage({ params }: TenantLedgerPageProps) {
 
                 {currentBalance.lastPaymentDate && (
                   <div className="flex justify-between">
-                    <span>Last Payment:</span>
+                    <span>Dernier paiement :</span>
                     <span>
                       {formatCurrency(currentBalance.lastPaymentAmount || 0)} on{" "}
                       {new Date(

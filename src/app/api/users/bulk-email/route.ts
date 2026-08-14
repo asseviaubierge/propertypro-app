@@ -103,34 +103,34 @@ export const POST = withPermissionAndDB("company_settings")(async (
           subject: subject,
           html: `
               <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #333;">PropertyPro Notification</h2>
+                <h2 style="color: #333;">Notification GESTION E-IMMO</h2>
                 <p>Dear ${targetUser.firstName} ${targetUser.lastName},</p>
                 <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
                   ${message.replace(/\n/g, "<br>")}
                 </div>
                 <p style="color: #666; font-size: 14px;">
                   This message was sent by ${
-                    user.firstName || "PropertyPro Admin"
-                  } via the PropertyPro system.
+                    user.firstName || "Administration GESTION E-IMMO"
+                  } depuis le système GESTION E-IMMO.
                 </p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                 <p style="color: #999; font-size: 12px;">
-                  PropertyPro Property Management System
+                  Plateforme de gestion immobilière GESTION E-IMMO
                 </p>
               </div>
             `,
           text: `
-PropertyPro Notification
+Notification GESTION E-IMMO
 
 Dear ${targetUser.firstName} ${targetUser.lastName},
 
 ${message}
 
 This message was sent by ${
-            user.firstName || "PropertyPro Admin"
-          } via the PropertyPro system.
+            user.firstName || "Administration GESTION E-IMMO"
+          } depuis le système GESTION E-IMMO.
 
-PropertyPro Property Management System
+Plateforme de gestion immobilière GESTION E-IMMO
             `.trim(),
         };
 

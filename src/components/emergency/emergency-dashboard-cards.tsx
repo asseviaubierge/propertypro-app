@@ -162,7 +162,7 @@ export function EmergencyDashboardCards({
       href: "/dashboard/maintenance/emergency?responseTime=critical",
     },
     {
-      title: "Unassigned",
+      title: "Non attribué",
       value: stats.unassignedEmergencies,
       icon: Users,
       color: "text-yellow-600 dark:text-yellow-400",
@@ -268,7 +268,7 @@ export function EmergencyDashboardCards({
             <RefreshCw
               className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            Actualiser
           </Button>
         )}
       </div>

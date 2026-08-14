@@ -201,7 +201,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Informations générales</CardTitle>
               <CardDescription>
                 Update the basic details of this unit
               </CardDescription>
@@ -213,7 +213,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                   <Input
                     id="unitNumber"
                     {...form.register("unitNumber")}
-                    placeholder="e.g., 101, A1"
+                    placeholder="Ex. : 101, A1"
                   />
                   {form.formState.errors.unitNumber && (
                     <p className="text-sm text-red-600">
@@ -223,7 +223,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="unitType">Unit Type *</Label>
+                  <Label htmlFor="unitType">Type de logement *</Label>
                   <Select
                     value={form.watch("unitType")}
                     onValueChange={(value) =>
@@ -234,30 +234,30 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="apartment">Appartement</SelectItem>
                       <SelectItem value="studio">Studio</SelectItem>
-                      <SelectItem value="penthouse">Penthouse</SelectItem>
+                      <SelectItem value="penthouse">Appartement de luxe</SelectItem>
                       <SelectItem value="loft">Loft</SelectItem>
-                      <SelectItem value="room">Room</SelectItem>
+                      <SelectItem value="room">Chambre</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="floor">Floor</Label>
+                <Label htmlFor="floor">Étage</Label>
                 <Input
                   id="floor"
                   type="number"
                   min="0"
                   max="200"
                   {...form.register("floor", { valueAsNumber: true })}
-                  placeholder="e.g., 1, 2, 3"
+                  placeholder="Ex. : 1, 2, 3"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Status *</Label>
+                <Label htmlFor="status">Statut *</Label>
                 <Select
                   value={form.watch("status")}
                   onValueChange={(value) =>
@@ -282,7 +282,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
           {/* Unit Details */}
           <Card>
             <CardHeader>
-              <CardTitle>Unit Details</CardTitle>
+              <CardTitle>Détails du logement</CardTitle>
               <CardDescription>
                 Configure the physical characteristics
               </CardDescription>
@@ -335,7 +335,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
         {/* Financial Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Financial Information</CardTitle>
+            <CardTitle>Informations financières</CardTitle>
             <CardDescription>
               Set the rental and deposit amounts
             </CardDescription>
@@ -343,7 +343,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="rentAmount">Monthly Rent ($) *</Label>
+                <Label htmlFor="rentAmount">Loyer mensuel (FCFA) *</Label>
                 <Input
                   id="rentAmount"
                   type="number"
@@ -360,7 +360,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="securityDeposit">Security Deposit ($) *</Label>
+                <Label htmlFor="securityDeposit">Garantie (FCFA) *</Label>
                 <Input
                   id="securityDeposit"
                   type="number"
@@ -382,7 +382,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
         {/* Unit Features */}
         <Card>
           <CardHeader>
-            <CardTitle>Unit Features</CardTitle>
+            <CardTitle>Équipements du logement</CardTitle>
             <CardDescription>
               Select the features available in this unit
             </CardDescription>
@@ -397,7 +397,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                     form.setValue("balcony", checked as boolean)
                   }
                 />
-                <Label htmlFor="balcony">Balcony</Label>
+                <Label htmlFor="balcony">Balcon</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -408,7 +408,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                     form.setValue("patio", checked as boolean)
                   }
                 />
-                <Label htmlFor="patio">Patio</Label>
+                <Label htmlFor="patio">Terrasse</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -419,7 +419,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                     form.setValue("garden", checked as boolean)
                   }
                 />
-                <Label htmlFor="garden">Garden</Label>
+                <Label htmlFor="garden">Jardin</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -430,7 +430,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                     form.setValue("fireplace", checked as boolean)
                   }
                 />
-                <Label htmlFor="fireplace">Fireplace</Label>
+                <Label htmlFor="fireplace">Cheminée</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -441,7 +441,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
                     form.setValue("walkInCloset", checked as boolean)
                   }
                 />
-                <Label htmlFor="walkInCloset">Walk-in Closet</Label>
+                <Label htmlFor="walkInCloset">Dressing</Label>
               </div>
             </div>
           </CardContent>
@@ -450,7 +450,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
         {/* Notes */}
         <Card>
           <CardHeader>
-            <CardTitle>Additional Notes</CardTitle>
+            <CardTitle>Notes complémentaires</CardTitle>
             <CardDescription>
               Add any additional information about this unit
             </CardDescription>
@@ -458,7 +458,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
           <CardContent>
             <Textarea
               {...form.register("notes")}
-              placeholder="Enter any additional notes about this unit..."
+              placeholder="Saisissez des notes complémentaires sur ce logement…"
               rows={4}
             />
           </CardContent>
@@ -474,7 +474,7 @@ export default function UnitEditPage({ params }: UnitEditPageProps) {
             }
             disabled={isSaving}
           >
-            Cancel
+            Annuler
           </Button>
           <Button type="submit" disabled={isSaving}>
             {isSaving ? (

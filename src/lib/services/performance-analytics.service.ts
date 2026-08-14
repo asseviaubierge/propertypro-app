@@ -283,14 +283,14 @@ class PerformanceAnalyticsService {
     });
 
     trends.push({
-      metric: "Auto-pay Adoption",
+      metric: "Adoption du paiement automatique",
       direction: "up" as "up" | "down" | "stable",
       change: 8.7,
       significance: "high" as "high" | "medium" | "low",
     });
 
     trends.push({
-      metric: "Collection Rate",
+      metric: "Taux d’encaissement",
       direction: "stable" as "up" | "down" | "stable",
       change: 0.5,
       significance: "low" as "high" | "medium" | "low",
@@ -308,7 +308,7 @@ class PerformanceAnalyticsService {
     // System performance insights
     if (metrics.systemPerformance.averageResponseTime > 500) {
       insights.push({
-        category: "Performance",
+        category: "Rendement",
         insight: "Average response time exceeds target threshold",
         impact: "negative" as "positive" | "negative" | "neutral",
         recommendation:
@@ -322,7 +322,7 @@ class PerformanceAnalyticsService {
       metrics.paymentMetrics.totalPayments;
     if (paymentSuccessRate < 0.95) {
       insights.push({
-        category: "Payments",
+        category: "Paiements",
         insight: "Payment success rate below industry benchmark",
         impact: "negative" as "positive" | "negative" | "neutral",
         recommendation:
@@ -403,7 +403,7 @@ class PerformanceAnalyticsService {
 
     // Business metrics benchmarks
     benchmarks.push({
-      metric: "Collection Rate",
+      metric: "Taux d’encaissement",
       current: metrics.businessMetrics.collectionRate * 100,
       target: 95,
       industry: 92,
@@ -416,7 +416,7 @@ class PerformanceAnalyticsService {
     });
 
     benchmarks.push({
-      metric: "Auto-pay Adoption",
+      metric: "Adoption du paiement automatique",
       current: metrics.businessMetrics.autoPayAdoption * 100,
       target: 70,
       industry: 65,
@@ -513,7 +513,7 @@ class PerformanceAnalyticsService {
     belowBenchmarks.forEach((benchmark) => {
       recommendations.push({
         priority: "medium" as "high" | "medium" | "low",
-        category: "Performance",
+        category: "Rendement",
         recommendation: `Improve ${benchmark.metric} to meet industry standards`,
         expectedImpact: `Bring ${
           benchmark.metric

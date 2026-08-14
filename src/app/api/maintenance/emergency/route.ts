@@ -556,8 +556,8 @@ export const POST = withPermissionAndDB("maintenance_management")(async (user: A
         "Plumbing",
         "Electrical",
         "HVAC",
-        "Security",
-        "Other",
+        "Sécurité",
+        "Autre",
       ]),
       contactPhone: z.string().optional(),
       emergencyType: z

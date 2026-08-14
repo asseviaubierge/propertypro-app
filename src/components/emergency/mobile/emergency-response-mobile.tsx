@@ -235,7 +235,7 @@ export function EmergencyResponseMobile({
               <div className="text-2xl font-bold text-blue-600">
                 {formatTime(timer)}
               </div>
-              <div className="text-xs text-blue-700">Work Time</div>
+              <div className="text-xs text-blue-700">Temps de travail</div>
             </div>
           )}
         </CardContent>
@@ -291,7 +291,7 @@ export function EmergencyResponseMobile({
       <Card className="border-red-200 mb-4">
         <CardContent className="p-4">
           <div className="space-y-3">
-            <h3 className="font-medium">Quick Actions</h3>
+            <h3 className="font-medium">Actions rapides</h3>
             <div className="grid gap-2">
               {getStatusActions().map((action, index) => {
                 const Icon = action.icon;
@@ -314,7 +314,7 @@ export function EmergencyResponseMobile({
                 onClick={() => setShowEscalateDialog(true)}
               >
                 <ArrowUp className="mr-3 h-5 w-5" />
-                Escalate Emergency
+                Faire remonter l’urgence
               </Button>
             </div>
           </div>
@@ -324,7 +324,7 @@ export function EmergencyResponseMobile({
       {/* Photo Capture */}
       <Card className="border-red-200 mb-4">
         <CardContent className="p-4">
-          <h3 className="font-medium mb-3">Document Progress</h3>
+          <h3 className="font-medium mb-3">Avancement des documents</h3>
           <input
             type="file"
             accept="image/*"
@@ -366,13 +366,13 @@ export function EmergencyResponseMobile({
               <div className="text-lg font-bold text-red-600">
                 {Math.round(request.hoursSinceCreation)}h
               </div>
-              <div className="text-xs text-gray-600">Time Elapsed</div>
+              <div className="text-xs text-gray-600">Temps écoulé</div>
             </div>
             <div>
               <div className="text-lg font-bold text-blue-600">
                 {new Date(request.createdAt).toLocaleTimeString()}
               </div>
-              <div className="text-xs text-gray-600">Reported At</div>
+              <div className="text-xs text-gray-600">Signalé le</div>
             </div>
           </div>
         </CardContent>
@@ -382,14 +382,14 @@ export function EmergencyResponseMobile({
       <Dialog open={showUpdateDialog} onOpenChange={setShowUpdateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Complete Emergency</DialogTitle>
+            <DialogTitle>Clôturer l’urgence</DialogTitle>
             <DialogDescription>
               Provide details about the completed work
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Work Completed</label>
+              <label className="text-sm font-medium">Travaux réalisés</label>
               <Textarea
                 placeholder="Describe the work completed..."
                 value={updateNotes}
@@ -398,7 +398,7 @@ export function EmergencyResponseMobile({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Estimated Cost</label>
+              <label className="text-sm font-medium">Coût estimé</label>
               <Input
                 type="number"
                 placeholder="0.00"
@@ -413,9 +413,9 @@ export function EmergencyResponseMobile({
               variant="outline"
               onClick={() => setShowUpdateDialog(false)}
             >
-              Cancel
+              Annuler
             </Button>
-            <Button onClick={handleCompleteWork}>Complete Emergency</Button>
+            <Button onClick={handleCompleteWork}>Clôturer l’urgence</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -424,13 +424,13 @@ export function EmergencyResponseMobile({
       <Dialog open={showEscalateDialog} onOpenChange={setShowEscalateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Escalate Emergency</DialogTitle>
+            <DialogTitle>Faire remonter l’urgence</DialogTitle>
             <DialogDescription>
               Provide a reason for escalating this emergency
             </DialogDescription>
           </DialogHeader>
           <div>
-            <label className="text-sm font-medium">Escalation Reason</label>
+            <label className="text-sm font-medium">Motif de la remontée</label>
             <Textarea
               placeholder="Why is this emergency being escalated?"
               value={escalationReason}
@@ -443,7 +443,7 @@ export function EmergencyResponseMobile({
               variant="outline"
               onClick={() => setShowEscalateDialog(false)}
             >
-              Cancel
+              Annuler
             </Button>
             <Button variant="destructive" onClick={handleEscalate}>
               Escalate Now

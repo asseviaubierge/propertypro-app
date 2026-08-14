@@ -575,7 +575,7 @@ ConversationSchema.methods.updateLastMessage = function (message: any) {
     messageId: message._id,
     content: message.content.substring(0, 200),
     senderId: message.senderId,
-    senderName: message.senderName || "Unknown",
+    senderName: message.senderName || "Inconnu",
     createdAt: message.createdAt,
     messageType: message.messageType,
   };

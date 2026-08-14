@@ -34,14 +34,14 @@ export const GET = withAccessAndDB(INVOICE_READ_ACCESS)(
     try {
       const { id } = await params;
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid invoice ID", 400);
+        return createErrorResponse("Identifiant de facture invalide", 400);
       }
 
       const invoice = await Invoice.findOne({
         _id: id,
         $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
       })
-        .populate("tenantId", "firstName lastName email phone")
+        .populate("tenantId", "firstName lastName email phone address city")
         .populate("propertyId", "name address type ownerId managerId units")
         .populate("leaseId", "startDate endDate status propertyId unitId terms")
         .lean();
@@ -85,23 +85,23 @@ export const PUT = withPermissionAndDB("financial_management")(
     try {
       const { id } = await params;
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid invoice ID", 400);
+        return createErrorResponse("Identifiant de facture invalide", 400);
       }
 
       const { success, data: body, error } = await parseRequestBody(request);
       if (!success) return createErrorResponse(error!, 400);
 
       const invoice = await Invoice.findById(id);
-      if (!invoice) return createErrorResponse("Invoice not found", 404);
+      if (!invoice) return createErrorResponse("Facture introuvable", 404);
       if (!(await canAccessInvoice(user, invoice))) {
-        return createErrorResponse("Access denied", 403);
+        return createErrorResponse("Accès refusé", 403);
       }
       if (invoice.deletedAt) {
-        return createErrorResponse("Invoice has been deleted", 409);
+        return createErrorResponse("Cette facture a été supprimée", 409);
       }
       if (invoice.amountPaid > 0 || invoice.status === InvoiceStatus.PAID) {
         return createErrorResponse(
-          "A paid or partially paid invoice cannot be structurally modified",
+          "Une facture payée ou partiellement payée ne peut plus être modifiée en profondeur",
           409
         );
       }
@@ -125,7 +125,7 @@ export const PUT = withPermissionAndDB("financial_management")(
       }
 
       if (updateData.status === InvoiceStatus.PAID) {
-        return createErrorResponse("Use the payment workflow to mark an invoice paid", 400);
+        return createErrorResponse("Utilisez l’encaissement pour marquer cette facture comme payée", 400);
       }
 
       if (Array.isArray(updateData.lineItems)) {
@@ -150,7 +150,7 @@ export const PUT = withPermissionAndDB("financial_management")(
         { path: "leaseId", select: "startDate endDate status propertyId" },
       ]);
 
-      return createSuccessResponse(invoice, "Invoice updated successfully");
+      return createSuccessResponse(invoice, "Facture mise à jour avec succès");
     } catch (error) {
       return handleApiError(error);
     }
@@ -166,44 +166,44 @@ export const PATCH = withPermissionAndDB("financial_management")(
     try {
       const { id } = await params;
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid invoice ID", 400);
+        return createErrorResponse("Identifiant de facture invalide", 400);
       }
       const { success, data: body, error } = await parseRequestBody(request);
       if (!success) return createErrorResponse(error!, 400);
 
       const invoice = await Invoice.findById(id);
-      if (!invoice) return createErrorResponse("Invoice not found", 404);
+      if (!invoice) return createErrorResponse("Facture introuvable", 404);
       if (!(await canAccessInvoice(user, invoice))) {
-        return createErrorResponse("Access denied", 403);
+        return createErrorResponse("Accès refusé", 403);
       }
 
       const action = body.action;
       switch (action) {
         case "issue":
           if (invoice.status !== InvoiceStatus.SCHEDULED) {
-            return createErrorResponse("Only scheduled invoices can be issued", 409);
+            return createErrorResponse("Seules les factures planifiées peuvent être émises", 409);
           }
           invoice.status = InvoiceStatus.ISSUED;
           break;
         case "cancel":
           if (invoice.amountPaid > 0) {
-            return createErrorResponse("Cannot cancel an invoice with payments", 409);
+            return createErrorResponse("Une facture comportant des paiements ne peut pas être annulée", 409);
           }
           invoice.status = InvoiceStatus.CANCELLED;
           break;
         case "restore":
           if (!invoice.deletedAt) {
-            return createErrorResponse("Invoice is not deleted", 409);
+            return createErrorResponse("La facture n’est pas supprimée", 409);
           }
           invoice.deletedAt = undefined;
           invoice.status = InvoiceStatus.SCHEDULED;
           break;
         default:
-          return createErrorResponse("Unsupported invoice action", 400);
+          return createErrorResponse("Action non prise en charge pour cette facture", 400);
       }
 
       await invoice.save();
-      return createSuccessResponse(invoice, "Invoice status updated successfully");
+      return createSuccessResponse(invoice, "Statut de la facture mis à jour avec succès");
     } catch (error) {
       return handleApiError(error);
     }
@@ -219,23 +219,23 @@ export const DELETE = withPermissionAndDB("financial_management")(
     try {
       const { id } = await params;
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid invoice ID", 400);
+        return createErrorResponse("Identifiant de facture invalide", 400);
       }
 
       const invoice = await Invoice.findById(id);
-      if (!invoice) return createErrorResponse("Invoice not found", 404);
+      if (!invoice) return createErrorResponse("Facture introuvable", 404);
       if (!(await canAccessInvoice(user, invoice))) {
-        return createErrorResponse("Access denied", 403);
+        return createErrorResponse("Accès refusé", 403);
       }
       if (invoice.amountPaid > 0) {
-        return createErrorResponse("Cannot delete an invoice with payments", 409);
+        return createErrorResponse("Une facture comportant des paiements ne peut pas être supprimée", 409);
       }
 
       invoice.deletedAt = new Date();
       invoice.status = InvoiceStatus.CANCELLED;
       await invoice.save();
 
-      return createSuccessResponse({ id: invoice._id }, "Invoice deleted successfully");
+      return createSuccessResponse({ id: invoice._id }, "Facture supprimée avec succès");
     } catch (error) {
       return handleApiError(error);
     }

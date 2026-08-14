@@ -222,10 +222,10 @@ export default function AutomatedPaymentDashboard() {
 
   const getStatusBadge = (status: ScheduledTask["status"]) => {
     const statusConfig = {
-      pending: { label: "Pending", variant: "secondary" },
+      pending: { label: "En attente", variant: "secondary" },
       running: { label: "Running", variant: "default" },
       completed: { label: "Completed", variant: "default" },
-      failed: { label: "Failed", variant: "destructive" },
+      failed: { label: "Échoué", variant: "destructive" },
     };
 
     const config = statusConfig[status];
@@ -333,7 +333,7 @@ export default function AutomatedPaymentDashboard() {
             <div className="text-2xl font-bold">
               {metrics.paymentsGenerated}
             </div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <p className="text-xs text-muted-foreground">Ce mois-ci</p>
           </CardContent>
         </Card>
 
@@ -346,13 +346,13 @@ export default function AutomatedPaymentDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics.remindersSent}</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <p className="text-xs text-muted-foreground">Ce mois-ci</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Taux de réussite</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -368,7 +368,7 @@ export default function AutomatedPaymentDashboard() {
 
       <Tabs defaultValue="rules" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="rules">Automation Rules</TabsTrigger>
+          <TabsTrigger value="rules">Règles d’automatisation</TabsTrigger>
           <TabsTrigger value="schedule">Scheduled Tasks</TabsTrigger>
           <TabsTrigger value="history">Execution History</TabsTrigger>
         </TabsList>
@@ -376,7 +376,7 @@ export default function AutomatedPaymentDashboard() {
         <TabsContent value="rules" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Automation Rules</CardTitle>
+              <CardTitle>Règles d’automatisation</CardTitle>
               <CardDescription>
                 Configure and manage automated payment processing rules
               </CardDescription>
@@ -399,7 +399,7 @@ export default function AutomatedPaymentDashboard() {
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-medium">Success Rate</div>
+                        <div className="text-sm font-medium">Taux de réussite</div>
                         <div className="text-lg font-bold text-green-600">
                           {formatPercentage(rule.successRate)}
                         </div>
@@ -408,7 +408,7 @@ export default function AutomatedPaymentDashboard() {
                         </div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-medium">Next Run</div>
+                        <div className="text-sm font-medium">Prochaine exécution</div>
                         <div className="text-sm">
                           {rule.nextRun.toLocaleDateString()}
                         </div>
@@ -468,7 +468,7 @@ export default function AutomatedPaymentDashboard() {
                           {formatCurrency(task.amount)}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Amount
+                          Montant
                         </div>
                       </div>
                       <div className="text-center">

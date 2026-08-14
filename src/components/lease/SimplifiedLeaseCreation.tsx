@@ -867,7 +867,7 @@ Nom et signature                    Nom et signature                    Intermé
                   )}
                   searchPlaceholder={t(
                     "leases.new.form.sections.propertyTenant.search.property",
-                    { defaultValue: "Search properties..." }
+                    { defaultValue: "Rechercher des biens…" }
                   )}
                   emptyMessage={t(
                     "leases.new.form.sections.propertyTenant.messages.noPropertiesFound",
@@ -916,7 +916,7 @@ Nom et signature                    Nom et signature                    Intermé
                   }
                   searchPlaceholder={t(
                     "leases.new.form.sections.propertyTenant.search.unit",
-                    { defaultValue: "Search units..." }
+                    { defaultValue: "Rechercher des logements…" }
                   )}
                   emptyMessage={
                     leaseData.propertyId
@@ -950,7 +950,7 @@ Nom et signature                    Nom et signature                    Intermé
                 )}
                 searchPlaceholder={t(
                   "leases.new.form.sections.propertyTenant.search.tenant",
-                  { defaultValue: "Search tenants..." }
+                  { defaultValue: "Rechercher des locataires…" }
                 )}
                 emptyMessage={t(
                   "leases.new.form.sections.propertyTenant.messages.noTenantFound",

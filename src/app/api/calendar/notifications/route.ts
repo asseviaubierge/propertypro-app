@@ -369,7 +369,7 @@ export function getReminderTimes(
   preferences: any,
   eventPriority: string = "MEDIUM",
 ): number[] {
-  const priorityKey = eventPriority.toLowerCase() + "Priority";
+  const priorityKey = eventPriority.toLowerCase() + "Priorité";
   return (
     preferences.reminderTiming?.[priorityKey] ??
     preferences.reminderTiming?.default ?? [15, 60]

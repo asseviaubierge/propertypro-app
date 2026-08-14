@@ -450,7 +450,7 @@ export default function UserDetailPage({ params }: UserDetailPageProps) {
                   {formatRole(user?.role as UserRole)}
                 </Badge>
                 <Badge variant={user?.isActive ? "default" : "secondary"}>
-                  {user?.isActive ? "Active" : "Inactive"}
+                  {user?.isActive ? "Actif" : "Inactif"}
                 </Badge>
               </CardDescription>
             </CardHeader>
@@ -1076,7 +1076,7 @@ export default function UserDetailPage({ params }: UserDetailPageProps) {
       {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Deactivate User</AlertDialogTitle>
+            <AlertDialogTitle>Désactiver l’utilisateur</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to deactivate {user?.firstName}{" "}
               {user?.lastName}? This action will disable their access to the
@@ -1084,7 +1084,7 @@ export default function UserDetailPage({ params }: UserDetailPageProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteUser}
               disabled={isDeleting}

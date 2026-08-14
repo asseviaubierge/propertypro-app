@@ -189,7 +189,7 @@ export const POST = withPermissionAndDB("maintenance_requests")(
       const maintenanceData: any = {
         title: body.title,
         description: body.description,
-        category: body.category || "Other",
+        category: body.category || "Autre",
         priority: body.priority || "medium",
         propertyId,
         tenantId: user.id, // Always use User ID for consistency

@@ -39,7 +39,7 @@ export default function NewLeaseLoading() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
-                  Basic Information
+                  Informations générales
                 </CardTitle>
                 <CardDescription>
                   Select the property and tenant for this lease
@@ -193,7 +193,7 @@ export default function NewLeaseLoading() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  Renewal Options
+                  Options de renouvellement
                 </CardTitle>
                 <CardDescription>
                   Configure lease renewal settings
@@ -214,7 +214,7 @@ export default function NewLeaseLoading() {
             {/* Notes Section */}
             <Card>
               <CardHeader>
-                <CardTitle>Additional Notes</CardTitle>
+                <CardTitle>Notes complémentaires</CardTitle>
                 <CardDescription>
                   Add any additional notes or special terms for this lease
                 </CardDescription>

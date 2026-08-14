@@ -254,7 +254,7 @@ export const GET = withPermissionAndDB("maintenance_management")(async (user: Au
           tenant: request.tenantId,
           assignedTo: request.assignedTo,
         },
-        escalationReason: escalationMatch ? escalationMatch[1] : "Unknown",
+        escalationReason: escalationMatch ? escalationMatch[1] : "Inconnu",
         timestamp: request.updatedAt,
       };
     });

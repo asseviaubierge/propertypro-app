@@ -581,7 +581,7 @@ export function ProfileSettings({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Avatar Section */}
       <Card>
         <CardHeader>
@@ -593,7 +593,7 @@ export function ProfileSettings({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
             <Avatar className="h-20 w-20" key={avatarKey}>
               <AvatarImage
                 src={avatarUrl || user?.avatar || user?.image || ""}
@@ -636,7 +636,7 @@ export function ProfileSettings({
       </Card>
 
       {/* Single Unified Form */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-6">
         {/* Basic Information */}
         <Card>
           <CardHeader>
@@ -982,17 +982,18 @@ export function ProfileSettings({
         </Card>
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:justify-end sm:gap-3">
           <Button
             size="sm"
             type="button"
             variant="outline"
             onClick={() => form.reset()}
+            className="w-full whitespace-nowrap sm:w-auto"
             disabled={isLoading}
           >
             {t("settings.profile.actions.reset")}
           </Button>
-          <Button size="sm" type="submit" disabled={isLoading}>
+          <Button className="w-full whitespace-nowrap sm:w-auto" size="sm" type="submit" disabled={isLoading}>
             {isLoading
               ? t("settings.profile.actions.saving")
               : t("settings.profile.actions.save")}

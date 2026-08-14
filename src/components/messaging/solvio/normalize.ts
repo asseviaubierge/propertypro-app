@@ -35,7 +35,7 @@ function extractParticipant(raw: any): Participant | null {
 
   return {
     id,
-    name: fullName || email || "Unknown",
+    name: fullName || email || "Inconnu",
     email,
     phone,
     avatar: avatar || null,

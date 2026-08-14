@@ -327,7 +327,7 @@ const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
         {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Remove Image</AlertDialogTitle>
+              <AlertDialogTitle>Supprimer l’image</AlertDialogTitle>
               <AlertDialogDescription>
                 Are you sure you want to remove this image from the property
                 gallery? This action cannot be undone.
@@ -338,14 +338,14 @@ const PropertyImageGallery: React.FC<PropertyImageGalleryProps> = ({
                 onClick={handleDeleteCancel}
                 disabled={loading}
               >
-                Cancel
+                Annuler
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteImage}
                 disabled={loading}
                 className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
               >
-                {loading ? "Removing..." : "Remove Image"}
+                {loading ? "Removing..." : "Supprimer l’image"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

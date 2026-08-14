@@ -450,7 +450,7 @@ export function MaintenanceCrudOperations({
             <SelectValue placeholder="Statut" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statut</SelectItem>
+            <SelectItem value="all">Tous les statuts</SelectItem>
             <SelectItem value={MaintenanceStatut.SUBMITTED}>
               Soumise
             </SelectItem>
@@ -589,7 +589,7 @@ export function MaintenanceCrudOperations({
       <Dialog open={isModifierDialogOpen} onOpenChange={setIsModifierDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitre>Modifier Maintenance Request</DialogTitre>
+            <DialogTitre>Modifier la demande de maintenance</DialogTitre>
             <DialogDescription>
               Mettez à jour les informations de la demande de maintenance.
             </DialogDescription>

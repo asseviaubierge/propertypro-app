@@ -116,7 +116,7 @@ export function PaymentSyncDashboard() {
     setRefreshing(true);
     await loadDashboardData();
     setRefreshing(false);
-    toast.success("Dashboard data refreshed");
+    toast.success("Données du tableau de bord actualisées");
   };
 
   const runMigration = async () => {
@@ -207,7 +207,7 @@ export function PaymentSyncDashboard() {
     return (
       <div className="flex items-center justify-center p-8">
         <RefreshCw className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading dashboard...</span>
+        <span className="ml-2">Chargement du tableau de bord…</span>
       </div>
     );
   }
@@ -217,7 +217,7 @@ export function PaymentSyncDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Payment Synchronization Dashboard
+            Tableau de bord de synchronisation des paiements
           </h1>
           <p className="text-muted-foreground">
             Monitor and manage payment-lease data synchronization
@@ -228,7 +228,7 @@ export function PaymentSyncDashboard() {
             <RefreshCw
               className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            Actualiser
           </Button>
           <Button
             variant={monitoringActive ? "destructive" : "default"}
@@ -271,10 +271,10 @@ export function PaymentSyncDashboard() {
         className="space-y-4"
       >
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="issues">Issues</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="overview">Vue d’ensemble</TabsTrigger>
+          <TabsTrigger value="issues">Anomalies</TabsTrigger>
+          <TabsTrigger value="performance">Rendement</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -339,7 +339,7 @@ export function PaymentSyncDashboard() {
           {recommendations.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Recommendations</CardTitle>
+                <CardTitle>Recommandations</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
@@ -417,9 +417,9 @@ export function PaymentSyncDashboard() {
             <Card>
               <CardContent className="text-center py-8">
                 <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold">No Issues Found</h3>
+                <h3 className="text-lg font-semibold">Aucune anomalie détectée</h3>
                 <p className="text-muted-foreground">
-                  All payment synchronization systems are operating normally
+                  Tous les systèmes de synchronisation des paiements fonctionnent normalement
                 </p>
               </CardContent>
             </Card>
@@ -430,17 +430,17 @@ export function PaymentSyncDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
+                <CardTitle>Indicateurs de rendement</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span>Pending Syncs:</span>
+                  <span>Synchronisations en attente :</span>
                   <span className="font-semibold">
                     {healthReport?.performanceMetrics?.pendingSyncCount ?? 0}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Failure Rate:</span>
+                  <span>Taux d’échec :</span>
                   <span className="font-semibold">
                     {(
                       (healthReport?.performanceMetrics?.failureRate ?? 0) * 100
@@ -449,7 +449,7 @@ export function PaymentSyncDashboard() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Last Sync:</span>
+                  <span>Dernière synchronisation :</span>
                   <span className="font-semibold">
                     {healthReport?.performanceMetrics?.lastSyncTime
                       ? new Date(
@@ -463,17 +463,17 @@ export function PaymentSyncDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle>System Status</CardTitle>
+                <CardTitle>État du système</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span>Monitoring:</span>
+                  <span>Surveillance :</span>
                   <Badge variant={monitoringActive ? "default" : "secondary"}>
-                    {monitoringActive ? "Active" : "Inactive"}
+                    {monitoringActive ? "Actif" : "Inactif"}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Migration:</span>
+                  <span>Migration :</span>
                   <Badge
                     variant={
                       migrationStatus?.migrationNeeded
@@ -494,7 +494,7 @@ export function PaymentSyncDashboard() {
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Monitoring Controls</CardTitle>
+              <CardTitle>Commandes de surveillance</CardTitle>
               <CardDescription>
                 Manage payment synchronization monitoring and maintenance
               </CardDescription>
@@ -502,7 +502,7 @@ export function PaymentSyncDashboard() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">Continuous Monitoring</h4>
+                  <h4 className="font-medium">Surveillance continue</h4>
                   <p className="text-sm text-muted-foreground">
                     Automatically detect and alert on synchronization issues
                   </p>

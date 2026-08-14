@@ -337,19 +337,19 @@ export default function UnitDetailsModal({
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Unit
+                      Supprimer le logement
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Unit</AlertDialogTitle>
+                      <AlertDialogTitle>Supprimer le logement</AlertDialogTitle>
                       <AlertDialogDescription>
                         Are you sure you want to delete this unit? This action
                         cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={handleDeleteUnit}
                         className="bg-red-600 hover:bg-red-700"

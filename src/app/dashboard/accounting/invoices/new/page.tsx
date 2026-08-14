@@ -33,7 +33,7 @@ const INVOICE_CATEGORY_GROUPS: SearchableSelectGroup[] = [
     label: "Frais et charges locataire",
     options: [
       { value: InvoiceType.RENT, label: "Loyer" },
-      { value: InvoiceType.SECURITY_DEPOSIT, label: "Dépôt de garantie" },
+      { value: InvoiceType.SECURITY_DEPOSIT, label: "Garantie" },
       { value: InvoiceType.LATE_FEE, label: "Frais de retard" },
       { value: InvoiceType.APPLICATION_FEE, label: "Frais de dossier" },
       { value: InvoiceType.MOVE_IN_FEE, label: "Frais d'emménagement" },

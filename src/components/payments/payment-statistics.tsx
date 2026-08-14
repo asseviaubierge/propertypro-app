@@ -148,7 +148,7 @@ export function PaymentStatistics({
       {/* Total Revenue */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+          <CardTitle className="text-sm font-medium">Revenu total</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -164,7 +164,7 @@ export function PaymentStatistics({
       {/* Collected Amount */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Collected</CardTitle>
+          <CardTitle className="text-sm font-medium">Encaissé</CardTitle>
           <CheckCircle className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
@@ -181,7 +181,7 @@ export function PaymentStatistics({
       {/* Pending Amount */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Pending</CardTitle>
+          <CardTitle className="text-sm font-medium">En attente</CardTitle>
           <Clock className="h-4 w-4 text-orange-600" />
         </CardHeader>
         <CardContent>
@@ -197,7 +197,7 @@ export function PaymentStatistics({
       {/* Overdue Amount */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Overdue</CardTitle>
+          <CardTitle className="text-sm font-medium">En retard</CardTitle>
           <AlertTriangle className="h-4 w-4 text-red-600" />
         </CardHeader>
         <CardContent>
@@ -213,7 +213,7 @@ export function PaymentStatistics({
       {/* Average Payment */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Average Payment</CardTitle>
+          <CardTitle className="text-sm font-medium">Paiement moyen</CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -229,7 +229,7 @@ export function PaymentStatistics({
       {/* Monthly Growth */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Monthly Growth</CardTitle>
+          <CardTitle className="text-sm font-medium">Croissance mensuelle</CardTitle>
           {monthlyGrowth >= 0 ? (
             <TrendingUp className="h-4 w-4 text-green-600" />
           ) : (
@@ -250,7 +250,7 @@ export function PaymentStatistics({
       {/* Failed Payments */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Failed</CardTitle>
+          <CardTitle className="text-sm font-medium">Échoué</CardTitle>
           <AlertTriangle className="h-4 w-4 text-red-600" />
         </CardHeader>
         <CardContent>
@@ -266,14 +266,14 @@ export function PaymentStatistics({
       {/* Collection Rate */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Collection Rate</CardTitle>
+          <CardTitle className="text-sm font-medium">Taux d’encaissement</CardTitle>
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatPercentage(collectionRate)}
           </div>
-          <p className="text-xs text-muted-foreground">Success rate</p>
+          <p className="text-xs text-muted-foreground">Taux de réussite</p>
         </CardContent>
       </Card>
     </div>
@@ -307,7 +307,7 @@ export function PaymentTypeBreakdown({
           <Building2 className="h-5 w-5" />
           Payment Type Breakdown
         </CardTitle>
-        <CardDescription>Revenue distribution by payment type</CardDescription>
+        <CardDescription>Répartition des revenus par type de paiement</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {Object.entries(paymentsByType).map(([type, amount]) => {

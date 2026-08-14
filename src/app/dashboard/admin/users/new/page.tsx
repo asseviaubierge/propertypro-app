@@ -361,7 +361,7 @@ export default function CreateUserPage() {
           </p>
           <p className="text-sm text-muted-foreground mb-4">
             {t("admin.createUser.accessDeniedRole", {
-              values: { role: session?.user?.role ?? "Unknown" },
+              values: { role: session?.user?.role ?? "Inconnu" },
             })}
           </p>
           <div className="space-y-2">

@@ -296,7 +296,7 @@ export function LogoManagement({
       window.location.reload();
     } catch (error) {
       logClientError("Logo management create error:", error);
-      onAlert("error", "Failed to create custom setting");
+      onAlert("error", "Impossible de créer le paramètre personnalisé");
     }
   };
 
@@ -452,7 +452,7 @@ export function LogoManagement({
                     {/* URL Input as Alternative */}
                     <div className="flex gap-2">
                       <Input
-                        placeholder="Or enter image URL"
+                        placeholder="Ou saisir l’adresse de l’image"
                         defaultValue={setting.value}
                         onBlur={(e) => {
                           if (e.target.value !== setting.value) {
@@ -585,11 +585,11 @@ export function LogoManagement({
                         key: e.target.value,
                       }))
                     }
-                    placeholder="e.g., company_name, brand_tagline"
+                    placeholder="Ex. : nom_entreprise, slogan_marque"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="setting-type">Data Type</Label>
+                  <Label htmlFor="setting-type">Type de donnée</Label>
                   <Select
                     value={newSetting.dataType}
                     onValueChange={(value) =>
@@ -603,10 +603,10 @@ export function LogoManagement({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="string">Text</SelectItem>
-                      <SelectItem value="color">Color</SelectItem>
+                      <SelectItem value="string">Texte</SelectItem>
+                      <SelectItem value="color">Couleur</SelectItem>
                       <SelectItem value="url">URL</SelectItem>
-                      <SelectItem value="file">File</SelectItem>
+                      <SelectItem value="file">Fichier</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -623,7 +623,7 @@ export function LogoManagement({
                       value: e.target.value,
                     }))
                   }
-                  placeholder="Enter the setting value"
+                  placeholder="Saisir la valeur du paramètre"
                 />
               </div>
               <div className="space-y-2">
@@ -637,13 +637,13 @@ export function LogoManagement({
                       description: e.target.value,
                     }))
                   }
-                  placeholder="Describe what this setting is for"
+                  placeholder="Décrire l’utilité de ce paramètre"
                 />
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleAddCustomSetting}>Create Setting</Button>
+                <Button onClick={handleAddCustomSetting}>Créer le paramètre</Button>
                 <Button variant="outline" onClick={() => setShowAddForm(false)}>
-                  Cancel
+                  Annuler
                 </Button>
               </div>
             </CardContent>
@@ -655,7 +655,7 @@ export function LogoManagement({
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <strong>Upload Guidelines:</strong>
+          <strong>Consignes de téléversement :</strong>
           <ul className="mt-2 space-y-1 text-sm">
             <li>• Logos: PNG, JPEG, or SVG format, max 2MB</li>
             <li>

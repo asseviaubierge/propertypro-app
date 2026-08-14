@@ -74,9 +74,9 @@ async function generateReceiptPDF(receipt: any): Promise<Buffer> {
         .text(`Receipt #${receipt.receiptNumber}`, 50, 80, { align: "center" });
 
       // Company Info (you can customize this)
-      doc.fontSize(14).text("PropertyPro", 50, 120);
+      doc.fontSize(14).text("GESTION E-IMMO", 50, 120);
       doc.fontSize(10).text("Property Management Services", 50, 140);
-      doc.text("Email: support@PropertyPro.com", 50, 155);
+      doc.text("E-mail : support@e-immo.bj", 50, 155);
 
       // Receipt Details Box
       doc.rect(50, 180, 500, 120).stroke();

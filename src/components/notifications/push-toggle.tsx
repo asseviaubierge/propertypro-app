@@ -45,7 +45,7 @@ export function PushToggle() {
         ) : (
           <BellOff className="mr-2 h-3.5 w-3.5" />
         )}
-        Désactiver les notifications
+        Désactiver
       </Button>
     );
   }
@@ -57,7 +57,7 @@ export function PushToggle() {
       ) : (
         <Bell className="mr-2 h-3.5 w-3.5" />
       )}
-      Activer les notifications
+      Activer
     </Button>
   );
 }

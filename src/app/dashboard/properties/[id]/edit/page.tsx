@@ -34,7 +34,7 @@ export default function EditPropertyPage() {
         setPropertyData(data);
       } catch (err: any) {
         setError(err.message || "Failed to fetch property details");
-        showSimpleError("Load Error", err.message || "Failed to fetch property details");
+        showSimpleError("Erreur de chargement", err.message || "Failed to fetch property details");
       } finally {
         setLoading(false);
       }

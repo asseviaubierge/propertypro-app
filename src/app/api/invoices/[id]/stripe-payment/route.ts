@@ -144,7 +144,7 @@ export async function POST(
     }
 
     const tenantName =
-      `${tenant.firstName || ""} ${tenant.lastName || ""}`.trim() || "Tenant";
+      `${tenant.firstName || ""} ${tenant.lastName || ""}`.trim() || "Locataire";
 
 
     // Create or get Stripe customer

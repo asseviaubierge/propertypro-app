@@ -289,7 +289,7 @@ InspectionSchema.pre("save", async function (next) {
     const lease = await Lease.findById(this.leaseId);
 
     if (!lease) {
-      return next(new Error("Lease not found"));
+      return next(new Error("Bail introuvable"));
     }
   }
 

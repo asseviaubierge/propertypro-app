@@ -9,6 +9,7 @@ import { HydratedDocument } from "mongoose";
 import { renderInvoicePdf } from "@/lib/invoice/pdf-renderer";
 import { getCompanyInfoServer } from "@/lib/utils/company-info";
 import { normalizeInvoiceForPrint } from "@/lib/invoice/invoice-shared";
+import { invoiceIssuerCompanyInfo } from "@/lib/invoice/issuer-company-info";
 
 export type InvoiceLike =
   | HydratedDocument<IInvoice>
@@ -29,49 +30,18 @@ function ensureInvoiceObject(invoice: InvoiceLike): IInvoice & {
 
 export async function generateInvoicePdfBuffer(
   invoiceInput: InvoiceLike,
-  currencyCodeOverride?: string
+  _currencyCodeOverride?: string
 ): Promise<Buffer> {
   const invoice = ensureInvoiceObject(invoiceInput);
 
-  // Platform information is only a fallback. Each invoice primarily displays
-  // the professional identity of the owner of the billed property.
+  // L'identité de la plateforme n'est qu'un repli. La facture affiche d'abord
+  // le compte qui l'a réellement émise.
   const defaultCompanyInfo = await getCompanyInfoServer();
   // Prefer the account that issued the invoice. Existing invoices fall back to
   // the property's owner, then the assigned manager, then the platform identity.
-  const owner = (invoice as any).issuer || invoice.propertyId?.ownerId || invoice.propertyId?.managerId;
-  const ownerFullName = owner
-    ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
-    : "";
-  const ownerAddress = [owner?.address, owner?.city].filter(Boolean).join(", ");
-
-  const companyInfo = owner
-    ? {
-        ...(defaultCompanyInfo ?? {}),
-        name:
-          ownerFullName ||
-          owner.businessName?.trim() ||
-          defaultCompanyInfo?.name ||
-          "Propriétaire du bien",
-        legalName: owner.businessName?.trim() || undefined,
-        address: ownerAddress || "Adresse non renseignée",
-        phone: owner.phone || "",
-        email: owner.email || "",
-        website: owner.website || "",
-        logo: owner.businessLogo || defaultCompanyInfo?.logo,
-        accountType: owner.accountType || owner.role,
-        roleLabel:
-          owner.role === "manager" || owner.role === "property_manager"
-            ? "Gestionnaire"
-            : owner.role === "tenant"
-              ? "Locataire"
-              : owner.role === "admin" || owner.role === "super_admin"
-                ? "Gestion E-IMMO"
-                : undefined,
-        platformName: "E-IMMO",
-        cip: owner.cip,
-        ifu: owner.ifu,
-        rccm: owner.rccm,
-      }
+  const issuer = (invoice as any).issuer || invoice.propertyId?.ownerId || invoice.propertyId?.managerId;
+  const companyInfo = issuer
+    ? invoiceIssuerCompanyInfo(issuer)
     : defaultCompanyInfo;
 
   // Gestion E-IMMO operates in Benin. Invoice documents are always rendered

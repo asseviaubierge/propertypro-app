@@ -555,19 +555,19 @@ export function LeaseDocuments({ lease, onUpdate }: LeaseDocumentsProps) {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Document</AlertDialogTitle>
+                            <AlertDialogTitle>Supprimer le document</AlertDialogTitle>
                             <AlertDialogDescription>
                               Are you sure you want to remove this document from
                               the lease? This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleRemoveDocument(document)}
                               className="bg-red-600 hover:bg-red-700"
                             >
-                              Remove Document
+                              Supprimer le document
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

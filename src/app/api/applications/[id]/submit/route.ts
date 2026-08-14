@@ -44,7 +44,7 @@ export const POST = withAccessAndDB({
         .populate("applicantId", "firstName lastName email");
 
       if (!application) {
-        return createErrorResponse("Application not found", 404);
+        return createErrorResponse("Candidature introuvable", 404);
       }
 
       // Check permissions - only the applicant or authorized staff can submit

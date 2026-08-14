@@ -317,7 +317,7 @@ export class NotificationAutomation {
               leaseId: lease._id.toString(),
               propertyId: property._id?.toString?.(),
               userEmail: tenantEmail,
-              userName: `${tenant?.firstName || ""} ${tenant?.lastName || ""}`.trim() || "Tenant",
+              userName: `${tenant?.firstName || ""} ${tenant?.lastName || ""}`.trim() || "Locataire",
               propertyName: propertyName,
               rentAmount: lease.terms?.rentAmount || 0,
               dueDate: nextDueDate.toISOString(),
@@ -420,7 +420,7 @@ export class NotificationAutomation {
             invoiceId: payment.invoiceId?.toString?.(),
             propertyId: property._id?.toString?.(),
             userEmail: tenantEmail,
-            userName: `${tenantFirstName || ''} ${tenantLastName || ''}`.trim() || 'Tenant',
+            userName: `${tenantFirstName || ''} ${tenantLastName || ''}`.trim() || 'Locataire',
             propertyName: propertyName,
             rentAmount: payment.amount,
             dueDate: payment.dueDate.toISOString(),
@@ -499,7 +499,7 @@ export class NotificationAutomation {
 
         // Helper to get user name safely
         const getUserName = (user: any) =>
-          `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "User";
+          `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Utilisateur";
 
         // Send notification to tenant
         if (tenant?._id && tenant?.email) {

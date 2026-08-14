@@ -194,7 +194,7 @@ export function OperationLoading({
           size="sm"
           className="text-muted-foreground hover:text-foreground"
         >
-          Cancel
+          Annuler
         </Button>
       )}
     </div>

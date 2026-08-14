@@ -48,7 +48,7 @@ export const GET = withAccessAndDB(APPLICATION_ACCESS)(
         .populate("reviewedBy", "firstName lastName email");
 
       if (!application) {
-        return createErrorResponse("Application not found", 404);
+        return createErrorResponse("Candidature introuvable", 404);
       }
 
       const canAccess =
@@ -89,7 +89,7 @@ export const PUT = withAccessAndDB(APPLICATION_ACCESS)(
 
       const application = await Application.findById(id);
       if (!application) {
-        return createErrorResponse("Application not found", 404);
+        return createErrorResponse("Candidature introuvable", 404);
       }
 
       const canEdit =
@@ -170,7 +170,7 @@ export const DELETE = withAccessAndDB(APPLICATION_ACCESS)(
 
       const application = await Application.findById(id);
       if (!application) {
-        return createErrorResponse("Application not found", 404);
+        return createErrorResponse("Candidature introuvable", 404);
       }
 
       const canDelete =

@@ -909,7 +909,7 @@ PaymentSchema.pre("save", async function (next) {
 
       if (!lease) {
         if (!isInvoiceLinkedPayment) {
-          return next(new Error("Lease not found"));
+          return next(new Error("Bail introuvable"));
         }
       } else if (!isInvoiceLinkedPayment) {
         // Ensure lease belongs to the same tenant and property

@@ -118,7 +118,7 @@ export default function TenantManagementDashboard() {
       emergencyContact: {
         name: "Jane Smith",
         phone: "+1 (555) 987-6543",
-        relationship: "Spouse",
+        relationship: "Conjoint",
       },
       unit: {
         id: "unit_1",
@@ -235,10 +235,10 @@ export default function TenantManagementDashboard() {
 
   const getStatutBadge = (status: Tenant["status"]) => {
     const statusConfig = {
-      active: { label: "Active", variant: "default" },
-      notice_given: { label: "Notice Given", variant: "secondary" },
-      moving_out: { label: "Moving Out", variant: "secondary" },
-      inactive: { label: "Inactive", variant: "outline" },
+      active: { label: "Actif", variant: "default" },
+      notice_given: { label: "Préavis donné", variant: "secondary" },
+      moving_out: { label: "Départ en cours", variant: "secondary" },
+      inactive: { label: "Inactif", variant: "outline" },
     };
 
     const config = statusConfig[status];
@@ -247,7 +247,7 @@ export default function TenantManagementDashboard() {
 
   const getLeaseStatutBadge = (status: Tenant["lease"]["status"]) => {
     const statusConfig = {
-      active: { label: "Active", variant: "default" },
+      active: { label: "Actif", variant: "default" },
       expiring: { label: "Expiring Soon", variant: "secondary" },
       expired: { label: "Expired", variant: "destructive" },
       terminated: { label: "Terminated", variant: "outline" },
@@ -328,7 +328,7 @@ export default function TenantManagementDashboard() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">E-mail</Label>
                     <Input
                       id="email"
                       type="email"
@@ -378,7 +378,7 @@ export default function TenantManagementDashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="deposit">Dépôt de garantie</Label>
+                    <Label htmlFor="deposit">Garantie</Label>
                     <Input id="deposit" type="number" placeholder="1500" />
                   </div>
                 </div>
@@ -483,11 +483,11 @@ export default function TenantManagementDashboard() {
                     <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statut</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="notice_given">Notice Given</SelectItem>
-                    <SelectItem value="moving_out">Moving Out</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    <SelectItem value="active">Actif</SelectItem>
+                    <SelectItem value="notice_given">Préavis donné</SelectItem>
+                    <SelectItem value="moving_out">Départ en cours</SelectItem>
+                    <SelectItem value="inactive">Inactif</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -703,7 +703,7 @@ export default function TenantManagementDashboard() {
         <TabsContent value="applications" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Tenant Demandes</CardTitle>
+              <CardTitle>Demandes des locataires</CardTitle>
               <CardDescription>
                 Examinez et traitez les nouvelles demandes
               </CardDescription>

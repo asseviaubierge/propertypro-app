@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +31,11 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import PaymentRecordDialog from "@/components/invoice/PaymentRecordDialog";
 import { showSimpleError, showSimpleSuccess } from "@/lib/toast-notifications";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
+import {
+  downloadCanonicalInvoicePdf,
+  printCanonicalInvoicePdf,
+} from "@/lib/invoice/pdf-actions";
+import { invoiceIssuerCompanyInfo } from "@/lib/invoice/issuer-company-info";
 
 interface FactureLineItem {
   description: string;
@@ -108,14 +112,6 @@ interface Facture {
   balanceRemaining: number;
   lineItems: FactureLineItem[];
   notes?: string;
-}
-
-interface CompanyInfo {
-  name: string;
-  address: string;
-  phone: string;
-  email: string;
-  logo?: string;
 }
 
 function formatAddress(
@@ -215,7 +211,7 @@ export default function InvoiceDetailsPage() {
             body: JSON.stringify({ orderId: paypalToken }),
           });
         } catch (error) {
-          console.error("PayPal capture failed:", error);
+          console.error("Échec de la confirmation PayPal :", error);
         } finally {
           finishAndRefresh();
         }
@@ -229,7 +225,7 @@ export default function InvoiceDetailsPage() {
             body: JSON.stringify({ sessionId }),
           });
         } catch (error) {
-          console.error("Reconcile failed:", error);
+          console.error("Échec du rapprochement du paiement :", error);
         } finally {
           finishAndRefresh();
         }
@@ -270,23 +266,7 @@ export default function InvoiceDetailsPage() {
     if (!invoice) return;
     setActionLoading("print");
     try {
-      const response = await fetch(`/api/invoices/${invoice._id}/pdf`, {
-        cache: "no-store",
-      });
-      if (!response.ok) throw new Error("Impossible de préparer la facture");
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const previewWindow = window.open(url, "_blank");
-      if (!previewWindow) {
-        URL.revokeObjectURL(url);
-        throw new Error("Impossible d’ouvrir l’aperçu");
-      }
-
-      previewWindow.onload = () => {
-        previewWindow.print();
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-      };
+      await printCanonicalInvoicePdf(invoice._id);
     } catch {
       showSimpleError(
         "Échec de l'impression",
@@ -301,21 +281,7 @@ export default function InvoiceDetailsPage() {
     if (!invoice) return;
     setActionLoading("download");
     try {
-      const response = await fetch(`/api/invoices/${invoice._id}/pdf`, {
-        cache: "no-store",
-      });
-      if (!response.ok) {
-        throw new Error("Impossible de générer le PDF");
-      }
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `facture-${invoice.invoiceNumber}.pdf`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
+      await downloadCanonicalInvoicePdf(invoice._id, invoice.invoiceNumber);
       showSimpleSuccess("Téléchargement terminé", "La facture PDF a été téléchargée.");
     } catch {
       showSimpleError("Échec du téléchargement", "Impossible de télécharger la facture PDF.");
@@ -352,7 +318,7 @@ export default function InvoiceDetailsPage() {
         );
         fetchFactureDetails();
       } else {
-        throw new Error(data?.error || "E-mail failed");
+        throw new Error(data?.error || "Échec de l’envoi de l’e-mail");
       }
     } catch {
       showSimpleError("Échec de l'envoi de l'e-mail", t("leases.invoices.toasts.emailError"));
@@ -428,8 +394,6 @@ export default function InvoiceDetailsPage() {
     : "—";
   const headerSubtitle =
     invoice.lineItems?.[0]?.description || invoice.propertyId?.name || "";
-  const tenantPhone = invoice.tenantId?.phone || "";
-  const tenantEmail = invoice.tenantId?.email || "";
   const statusLabel: Record<string, string> = {
     scheduled: "Planifiée",
     issued: "Émise",
@@ -440,54 +404,22 @@ export default function InvoiceDetailsPage() {
     draft: "Brouillon",
   };
   const issuer = invoice.issuer;
-  const issuerName = issuer
-    ? `${issuer.firstName ?? ""} ${issuer.lastName ?? ""}`.trim() || issuer.businessName || ""
-    : "";
-  const issuerRoleRaw = (issuer?.role || issuer?.accountType || "").toLowerCase();
-  const issuerRole =
-    issuerRoleRaw === "manager" || issuerRoleRaw === "property_manager"
-      ? "Gestionnaire"
-      : issuerRoleRaw === "owner" || issuerRoleRaw === "direct_owner"
-        ? "Propriétaire direct"
-        : issuerRoleRaw === "agency"
-          ? "Agence immobilière"
-          : issuerRoleRaw === "admin" || issuerRoleRaw === "super_admin" || issuerRoleRaw === "e_immo"
-            ? "Gestion E-IMMO"
-            : issuerRoleRaw;
+  const issuerCompanyInfo = invoiceIssuerCompanyInfo(issuer);
 
   const displayInvoice = normalizeInvoiceForPrint(invoice, {
-    companyInfo: issuer
-      ? {
-          name: issuerName || "GESTION E-IMMO",
-          legalName:
-            issuer.businessName && issuer.businessName !== issuerName
-              ? issuer.businessName
-              : undefined,
-          address: [issuer.address, issuer.city].filter(Boolean).join(", "),
-          phone: issuer.phone || "",
-          email: issuer.email || "",
-          website: issuer.website || "",
-          logo: issuer.businessLogo || "",
-          accountType: issuer.accountType || issuer.role || "",
-          roleLabel: issuerRole,
-          cip: issuer.cip || "",
-          ifu: issuer.ifu || "",
-          rccm: issuer.rccm || "",
-          platformName: "E-IMMO",
-        } as any
-      : undefined,
+    companyInfo: issuerCompanyInfo,
   });
   if (invoice.unit?.unitNumber) {
     (displayInvoice.property as any).unit = invoice.unit.unitNumber;
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl p-6 space-y-4">
+    <div className="mx-auto w-full max-w-4xl space-y-4 px-3 py-4 sm:p-6">
       {/* Top bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">
+            <h1 className="break-all text-xl font-semibold tracking-tight">
               {invoice.invoiceNumber}
             </h1>
             <Badge
@@ -505,6 +437,7 @@ export default function InvoiceDetailsPage() {
         <Button
           variant="outline"
           size="sm"
+          className="w-full whitespace-nowrap sm:w-auto"
           onClick={() => router.push("/dashboard/accounting/invoices")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -513,10 +446,11 @@ export default function InvoiceDetailsPage() {
       </div>
 
       {/* Action bar */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center">
         <Button
           variant="outline"
           size="sm"
+          className="w-full whitespace-nowrap md:w-auto"
           onClick={handlePrint}
           disabled={actionLoading === "print"}
         >
@@ -526,6 +460,7 @@ export default function InvoiceDetailsPage() {
         <Button
           variant="outline"
           size="sm"
+          className="w-full whitespace-nowrap md:w-auto"
           onClick={handleDownload}
           disabled={actionLoading === "download"}
         >
@@ -535,6 +470,7 @@ export default function InvoiceDetailsPage() {
         <Button
           variant="outline"
           size="sm"
+          className="w-full whitespace-nowrap md:w-auto"
           onClick={handleEmail}
           disabled={actionLoading === "email"}
         >
@@ -544,6 +480,7 @@ export default function InvoiceDetailsPage() {
         <Button
           variant="outline"
           size="sm"
+          className="w-full whitespace-nowrap md:w-auto"
           onClick={() =>
             router.push(`/dashboard/accounting/invoices/${invoice._id}/edit`)
           }
@@ -556,7 +493,7 @@ export default function InvoiceDetailsPage() {
             <Button
               variant="outline"
               size="sm"
-              className="text-red-600 hover:text-red-700"
+              className="w-full whitespace-nowrap text-red-600 hover:text-red-700 md:w-auto"
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Supprimer
@@ -585,12 +522,12 @@ export default function InvoiceDetailsPage() {
 
         <Button
           size="sm"
-          className="ml-auto bg-emerald-600 text-white hover:bg-emerald-700"
+          className="w-full whitespace-nowrap bg-emerald-600 text-white hover:bg-emerald-700 md:ml-auto md:w-auto"
           onClick={() => setCollectOpen(true)}
           disabled={(invoice.balanceRemaining ?? 0) <= 0}
         >
           <CreditCard className="mr-2 h-4 w-4" />
-          Enregistrer un paiement
+          Encaisser
         </Button>
       </div>
 
@@ -598,13 +535,13 @@ export default function InvoiceDetailsPage() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
           <p className="text-xs text-muted-foreground">Total de la facture</p>
-          <p className="mt-1 text-2xl font-semibold">
+          <p className="mt-1 whitespace-nowrap text-xl font-semibold sm:text-2xl">
             {formatCurrency(invoice.totalAmount ?? 0)}
           </p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <p className="text-xs text-muted-foreground">Montant encaissé</p>
-          <p className="mt-1 text-2xl font-semibold text-emerald-600">
+          <p className="mt-1 whitespace-nowrap text-xl font-semibold text-emerald-600 sm:text-2xl">
             {formatCurrency(invoice.amountPaid ?? 0)}
           </p>
         </div>
@@ -612,14 +549,14 @@ export default function InvoiceDetailsPage() {
           <p className="text-xs text-amber-700 dark:text-amber-400">
             Solde impayé
           </p>
-          <p className="mt-1 text-2xl font-semibold text-amber-700 dark:text-amber-400">
+          <p className="mt-1 whitespace-nowrap text-xl font-semibold text-amber-700 dark:text-amber-400 sm:text-2xl">
             {formatCurrency(invoice.balanceRemaining ?? 0)}
           </p>
         </div>
       </div>
 
       {/* Document de facture unifié : même contenu pour écran, impression et PDF */}
-      <div className="bg-white px-2 py-6 sm:px-6">
+      <div className="overflow-hidden rounded-xl border bg-white px-4 py-5 shadow-sm sm:px-6 sm:py-6">
         <UnifiedInvoiceDocument invoice={displayInvoice} />
       </div>
 

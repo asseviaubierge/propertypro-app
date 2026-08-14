@@ -398,7 +398,7 @@ export default function CommunicationCenter({
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Start Nouveau Conversation</DialogTitle>
+                      <DialogTitle>Nouvelle conversation</DialogTitle>
                       <DialogDescription>
                         Créez une nouvelle conversation avec votre gestionnaire.
                       </DialogDescription>
@@ -545,7 +545,7 @@ export default function CommunicationCenter({
                       <SelectValue placeholder="Statut" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Statut</SelectItem>
+                      <SelectItem value="all">Tous les statuts</SelectItem>
                       <SelectItem value="open">Ouvert</SelectItem>
                       <SelectItem value="pending">En attente</SelectItem>
                       <SelectItem value="closed">Fermé</SelectItem>

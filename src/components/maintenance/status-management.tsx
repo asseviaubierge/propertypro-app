@@ -268,7 +268,7 @@ export function StatusTimeline({
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-lg">Status Timeline</CardTitle>
+        <CardTitle className="text-lg">Historique des statuts</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -405,7 +405,7 @@ export function NextAction({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <h4 className="font-medium text-sm">Next Action</h4>
+      <h4 className="font-medium text-sm">Prochaine action</h4>
       <Button
         variant={nextAction.variant}
         onClick={() => onAction(nextAction.action)}

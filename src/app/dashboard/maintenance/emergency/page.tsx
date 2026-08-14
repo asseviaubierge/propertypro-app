@@ -470,7 +470,7 @@ export default function EmergencyMaintenancePage() {
       return (
         <Badge variant="destructive" className="animate-pulse">
           <AlertTriangle className="w-3 h-3 mr-1" />
-          Critical
+          Critique
         </Badge>
       );
     }
@@ -478,7 +478,7 @@ export default function EmergencyMaintenancePage() {
       return (
         <Badge variant="destructive">
           <Clock className="w-3 h-3 mr-1" />
-          Overdue
+          En retard
         </Badge>
       );
     }
@@ -658,7 +658,7 @@ export default function EmergencyMaintenancePage() {
         ) : (
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-orange-500" />
-            <span className="text-sm text-orange-600">Unassigned</span>
+            <span className="text-sm text-orange-600">Non attribué</span>
           </div>
         ),
     },
@@ -973,7 +973,7 @@ export default function EmergencyMaintenancePage() {
                   <DropdownMenuTrigger asChild>
                     <Button size="sm" disabled={bulkActionLoading}>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Assign To
+                      Attribuer à
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -1300,13 +1300,13 @@ export default function EmergencyMaintenancePage() {
               pageSize={pageSize}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading}
             />

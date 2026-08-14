@@ -320,7 +320,7 @@ export default function DocumentManagement({
       const payload = await response.json();
 
       if (!response.ok || !payload?.success) {
-        throw new Error(payload?.message ?? "Failed to load documents");
+        throw new Error(payload?.message ?? "Échec du chargement des documents");
       }
 
       const normalized: TenantDocument[] = (payload?.data?.documents ?? []).map(
@@ -623,7 +623,7 @@ export default function DocumentManagement({
                 )}
                 <p className="text-xs text-muted-foreground">
                   {t("leases.documents.summary.documentsInCategory", {
-                    defaultValue: "Documents in category",
+                    defaultValue: "Documents de la catégorie",
                   })}
                 </p>
               </CardContent>
@@ -771,7 +771,7 @@ export default function DocumentManagement({
           </CardTitle>
           <CardDescription>
             {t("leases.documents.table.subtitle", {
-              defaultValue: "Access and manage all your lease-related documents",
+              defaultValue: "Consultez et gérez tous les documents liés à vos baux",
             })}
           </CardDescription>
         </CardHeader>
@@ -918,12 +918,12 @@ export default function DocumentManagement({
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                showingLabel={t("common.showing", { defaultValue: "Showing" })}
-                previousLabel={t("common.previous", { defaultValue: "Previous" })}
-                nextLabel={t("common.next", { defaultValue: "Next" })}
+                showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+                previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+                nextLabel={t("common.next", { defaultValue: "Suivant" })}
                 pageLabel={t("common.page", { defaultValue: "Page" })}
-                ofLabel={t("common.of", { defaultValue: "of" })}
-              itemsPerPageLabel={t("common.perPage", { defaultValue: "per page" })}
+                ofLabel={t("common.of", { defaultValue: "sur" })}
+              itemsPerPageLabel={t("common.perPage", { defaultValue: "par page" })}
             />
           </>
           )}
@@ -980,7 +980,7 @@ export default function DocumentManagement({
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       {t("leases.documents.preview.uploadedOn", {
-                        defaultValue: "Uploaded {date}",
+                        defaultValue: "Téléversé le {date}",
                         values: {
                           date: formatLocalizedDate(selectedDocument.uploadedAt),
                         },
@@ -994,7 +994,7 @@ export default function DocumentManagement({
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         {t("leases.documents.preview.status", {
-                          defaultValue: "Status: {status}",
+                          defaultValue: "Statut : {status}",
                           values: { status: toTitleCase(selectedDocument.status) },
                         })}
                       </div>

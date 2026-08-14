@@ -138,7 +138,7 @@ export const POST = withPermissionAndDB("financial_management")(
       // Get lease details
       const lease = await Lease.findById(leaseId);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       // Check for existing deposit on this lease

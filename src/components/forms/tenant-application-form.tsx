@@ -119,7 +119,7 @@ export function TenantApplicationForm({
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Tenant Application</h1>
+        <h1 className="text-3xl font-bold">Candidature de locataire</h1>
         {propertyName && (
           <p className="text-muted-foreground mt-2">
             Applying for: <span className="font-medium">{propertyName}</span>
@@ -147,7 +147,7 @@ export function TenantApplicationForm({
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>Prénom</FormLabel>
                       <FormControl>
                         <Input placeholder="John" {...field} />
                       </FormControl>
@@ -160,7 +160,7 @@ export function TenantApplicationForm({
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>Nom</FormLabel>
                       <FormControl>
                         <Input placeholder="Doe" {...field} />
                       </FormControl>
@@ -176,7 +176,7 @@ export function TenantApplicationForm({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>Adresse e-mail</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -193,7 +193,7 @@ export function TenantApplicationForm({
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Numéro de téléphone</FormLabel>
                       <FormControl>
                         <Input placeholder="+1 (555) 123-4567" {...field} />
                       </FormControl>
@@ -209,7 +209,7 @@ export function TenantApplicationForm({
                   name="dateOfBirth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
+                      <FormLabel>Date de naissance</FormLabel>
                       <FormControl>
                         <FormDatePicker
                           value={
@@ -218,7 +218,7 @@ export function TenantApplicationForm({
                           onChange={(date) =>
                             field.onChange(date?.toISOString().split("T")[0])
                           }
-                          placeholder="Select date of birth"
+                          placeholder="Sélectionner la date de naissance"
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
                           }
@@ -233,7 +233,7 @@ export function TenantApplicationForm({
                   name="ssn"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Social Security Number</FormLabel>
+                      <FormLabel>Numéro d’identification sociale</FormLabel>
                       <FormControl>
                         <Input placeholder="XXX-XX-XXXX" {...field} />
                       </FormControl>
@@ -266,9 +266,9 @@ export function TenantApplicationForm({
                   name="employer"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employer</FormLabel>
+                      <FormLabel>Employeur</FormLabel>
                       <FormControl>
-                        <Input placeholder="Company Name" {...field} />
+                        <Input placeholder="Nom de l’entreprise" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -279,7 +279,7 @@ export function TenantApplicationForm({
                   name="position"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Position/Title</FormLabel>
+                      <FormLabel>Poste / fonction</FormLabel>
                       <FormControl>
                         <Input placeholder="Software Engineer" {...field} />
                       </FormControl>
@@ -295,7 +295,7 @@ export function TenantApplicationForm({
                   name="income"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Annual Income</FormLabel>
+                      <FormLabel>Revenu annuel</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -315,7 +315,7 @@ export function TenantApplicationForm({
                   name="employmentStartDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Employment Start Date</FormLabel>
+                      <FormLabel>Date de début d’emploi</FormLabel>
                       <FormControl>
                         <FormDatePicker
                           value={
@@ -324,7 +324,7 @@ export function TenantApplicationForm({
                           onChange={(date) =>
                             field.onChange(date?.toISOString().split("T")[0])
                           }
-                          placeholder="Select employment start date"
+                          placeholder="Sélectionner la date de début d’emploi"
                           disabled={(date) => date > new Date()}
                         />
                       </FormControl>

@@ -24,78 +24,78 @@ interface PaymentMethodSelectorProps {
 
 const paymentMethodConfig = {
   [PaymentMethod.CREDIT_CARD]: {
-    label: "Credit Card",
+    label: "Carte de crédit",
     description: "Visa, Mastercard, American Express",
     icon: CreditCard,
     color: "bg-blue-50 border-blue-200 text-blue-700",
     selectedColor: "bg-blue-100 border-blue-300",
   },
   [PaymentMethod.DEBIT_CARD]: {
-    label: "Debit Card",
-    description: "Direct debit from bank account",
+    label: "Carte de débit",
+    description: "Prélèvement direct sur le compte bancaire",
     icon: CreditCard,
     color: "bg-green-50 border-green-200 text-green-700",
     selectedColor: "bg-green-100 border-green-300",
   },
   [PaymentMethod.BANK_TRANSFER]: {
     label: "Bank Transfer",
-    description: "Direct bank-to-bank transfer",
+    description: "Virement bancaire direct",
     icon: Building2,
     color: "bg-purple-50 border-purple-200 text-purple-700",
     selectedColor: "bg-purple-100 border-purple-300",
   },
   [PaymentMethod.ACH]: {
     label: "ACH Transfer",
-    description: "Automated Clearing House",
+    description: "Prélèvement bancaire automatisé",
     icon: Building2,
     color: "bg-indigo-50 border-indigo-200 text-indigo-700",
     selectedColor: "bg-indigo-100 border-indigo-300",
   },
   [PaymentMethod.CHECK]: {
-    label: "Check",
-    description: "Physical or electronic check",
+    label: "Chèque",
+    description: "Chèque physique ou électronique",
     icon: FileText,
     color: "bg-gray-50 border-gray-200 text-gray-700",
     selectedColor: "bg-gray-100 border-gray-300",
   },
   [PaymentMethod.CASH]: {
-    label: "Cash",
-    description: "Physical cash payment",
+    label: "Espèces",
+    description: "Paiement en espèces",
     icon: Banknote,
     color: "bg-yellow-50 border-yellow-200 text-yellow-700",
     selectedColor: "bg-yellow-100 border-yellow-300",
   },
   [PaymentMethod.MONEY_ORDER]: {
     label: "Money Order",
-    description: "Certified payment instrument",
+    description: "Titre de paiement certifié",
     icon: FileText,
     color: "bg-orange-50 border-orange-200 text-orange-700",
     selectedColor: "bg-orange-100 border-orange-300",
   },
   [PaymentMethod.PAYPAL]: {
     label: "PayPal",
-    description: "Pay with a PayPal account",
+    description: "Payer avec un compte PayPal",
     icon: Smartphone,
     color: "bg-sky-50 border-sky-200 text-sky-700",
     selectedColor: "bg-sky-100 border-sky-300",
   },
   [PaymentMethod.RAZORPAY]: {
     label: "Razorpay",
-    description: "Cards, UPI, netbanking and wallets",
+    description: "Cartes, services bancaires et portefeuilles numériques",
     icon: Smartphone,
     color: "bg-blue-50 border-blue-200 text-blue-700",
     selectedColor: "bg-blue-100 border-blue-300",
   },
   [PaymentMethod.PAYSTACK]: {
     label: "Paystack",
-    description: "Cards, bank transfer and mobile money",
+    description: "Cartes, virement bancaire et argent mobile",
     icon: Smartphone,
     color: "bg-cyan-50 border-cyan-200 text-cyan-700",
     selectedColor: "bg-cyan-100 border-cyan-300",
   },
   [PaymentMethod.OTHER]: {
-    label: "Other",
-    description: "Alternative payment method",
+    label: "Autre",
+    description: "Mode de paiement alternatif",
     icon: DollarSign,
     color: "bg-slate-50 border-slate-200 text-slate-700",
     selectedColor: "bg-slate-100 border-slate-300",
@@ -219,7 +219,7 @@ export function CompactPaymentMethodSelector({
               {paymentMethodConfig[selectedMethod].label}
             </>
           ) : (
-            "Select payment method"
+            "Sélectionner un mode de paiement"
           )}
         </div>
         <Smartphone className="h-4 w-4" />

@@ -43,7 +43,7 @@ export const GET = withAccessAndDB(LEASE_DOCUMENT_READ_ACCESS)(
       // Find the lease
       const lease = await Lease.findById(id);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       // Check permissions - tenants can only access their own lease documents
@@ -154,7 +154,7 @@ export const POST = withPermissionAndDB([
       // Find the lease
       const lease = await Lease.findById(id);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       if (!canManageLeaseDocuments(user)) {

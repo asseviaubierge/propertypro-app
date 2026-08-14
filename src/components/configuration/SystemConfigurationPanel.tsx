@@ -252,7 +252,7 @@ export default function SystemConfigurationPanel() {
     return (
       <div className="flex items-center justify-center h-64">
         <Settings className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading configuration...</span>
+        <span className="ml-2">Chargement de la configuration…</span>
       </div>
     );
   }
@@ -261,7 +261,7 @@ export default function SystemConfigurationPanel() {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>Failed to load system configuration</AlertDescription>
+        <AlertDescription>Échec du chargement de la configuration système</AlertDescription>
       </Alert>
     );
   }
@@ -350,7 +350,7 @@ export default function SystemConfigurationPanel() {
                       Current: <strong>{rec.currentValue}</strong>
                     </span>
                     <span>
-                      Recommended: <strong>{rec.recommendedValue}</strong>
+                      Recommandé : <strong>{rec.recommendedValue}</strong>
                     </span>
                   </div>
 
@@ -367,10 +367,10 @@ export default function SystemConfigurationPanel() {
       {/* Configuration Tabs */}
       <Tabs defaultValue="grace-periods" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="grace-periods">Grace Periods</TabsTrigger>
-          <TabsTrigger value="late-fees">Late Fees</TabsTrigger>
+          <TabsTrigger value="grace-periods">Délais de grâce</TabsTrigger>
+          <TabsTrigger value="late-fees">Frais de retard</TabsTrigger>
           <TabsTrigger value="communication">Communication</TabsTrigger>
-          <TabsTrigger value="incentives">Auto-pay Incentives</TabsTrigger>
+          <TabsTrigger value="incentives">Avantages du paiement automatique</TabsTrigger>
         </TabsList>
 
         <TabsContent value="grace-periods" className="space-y-4">
@@ -438,7 +438,7 @@ export default function SystemConfigurationPanel() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="autopay-grace">Auto-pay Users (days)</Label>
+                  <Label htmlFor="autopay-grace">Utilisateurs du paiement automatique (jours)</Label>
                   <Input
                     id="autopay-grace"
                     type="number"
@@ -461,7 +461,7 @@ export default function SystemConfigurationPanel() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Late Fee Configuration
+                Configuration des frais de retard
               </CardTitle>
               <CardDescription>
                 Configure late fee structure and automation
@@ -476,14 +476,14 @@ export default function SystemConfigurationPanel() {
                     updateConfig("lateFees.enabled", checked)
                   }
                 />
-                <Label htmlFor="late-fees-enabled">Enable Late Fees</Label>
+                <Label htmlFor="late-fees-enabled">Activer les frais de retard</Label>
               </div>
 
               {config.lateFees.enabled && (
                 <>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="late-grace">Grace Period (days)</Label>
+                      <Label htmlFor="late-grace">Délai de grâce (jours)</Label>
                       <Input
                         id="late-grace"
                         type="number"
@@ -498,7 +498,7 @@ export default function SystemConfigurationPanel() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="fee-type">Fee Structure</Label>
+                      <Label htmlFor="fee-type">Structure des frais</Label>
                       <Select
                         value={config.lateFees.feeStructure.type}
                         onValueChange={(value) =>
@@ -509,10 +509,10 @@ export default function SystemConfigurationPanel() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="percentage">Percentage</SelectItem>
-                          <SelectItem value="tiered">Tiered</SelectItem>
-                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="fixed">Montant fixe</SelectItem>
+                          <SelectItem value="percentage">Pourcentage</SelectItem>
+                          <SelectItem value="tiered">Par paliers</SelectItem>
+                          <SelectItem value="daily">Quotidienne</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -520,7 +520,7 @@ export default function SystemConfigurationPanel() {
 
                   {config.lateFees.feeStructure.type === "fixed" && (
                     <div className="space-y-2">
-                      <Label htmlFor="fixed-amount">Fixed Amount ($)</Label>
+                      <Label htmlFor="fixed-amount">Montant fixe (FCFA)</Label>
                       <Input
                         id="fixed-amount"
                         type="number"
@@ -665,7 +665,7 @@ export default function SystemConfigurationPanel() {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-3">Communication Channels</h4>
+                <h4 className="font-semibold mb-3">Canaux de communication</h4>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Switch
@@ -678,7 +678,7 @@ export default function SystemConfigurationPanel() {
                         )
                       }
                     />
-                    <Label htmlFor="email-enabled">Email Notifications</Label>
+                    <Label htmlFor="email-enabled">Notifications par e-mail</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -692,7 +692,7 @@ export default function SystemConfigurationPanel() {
                         )
                       }
                     />
-                    <Label htmlFor="sms-enabled">SMS Notifications</Label>
+                    <Label htmlFor="sms-enabled">Notifications par SMS</Label>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -708,13 +708,13 @@ export default function SystemConfigurationPanel() {
                         )
                       }
                     />
-                    <Label htmlFor="push-enabled">Push Notifications</Label>
+                    <Label htmlFor="push-enabled">Notifications instantanées</Label>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-semibold mb-3">Business Hours</h4>
+                <h4 className="font-semibold mb-3">Heures d’ouverture</h4>
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Switch
@@ -735,7 +735,7 @@ export default function SystemConfigurationPanel() {
                   {config.communicationTiming.businessHours.enabled && (
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
-                        <Label htmlFor="start-time">Start Time</Label>
+                        <Label htmlFor="start-time">Heure de début</Label>
                         <Input
                           id="start-time"
                           type="time"
@@ -750,7 +750,7 @@ export default function SystemConfigurationPanel() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="end-time">End Time</Label>
+                        <Label htmlFor="end-time">Heure de fin</Label>
                         <Input
                           id="end-time"
                           type="time"
@@ -779,7 +779,7 @@ export default function SystemConfigurationPanel() {
                         )
                       }
                     />
-                    <Label htmlFor="weekends-enabled">Include Weekends</Label>
+                    <Label htmlFor="weekends-enabled">Inclure les fins de semaine</Label>
                   </div>
                 </div>
               </div>
@@ -792,7 +792,7 @@ export default function SystemConfigurationPanel() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5" />
-                Auto-pay Incentives
+                Avantages du paiement automatique
               </CardTitle>
               <CardDescription>
                 Configure incentives to encourage auto-pay adoption
@@ -816,7 +816,7 @@ export default function SystemConfigurationPanel() {
                 <>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="discount-type">Discount Type</Label>
+                      <Label htmlFor="discount-type">Type de remise</Label>
                       <Select
                         value={config.autoPayIncentives.discountType}
                         onValueChange={(value) =>
@@ -827,8 +827,8 @@ export default function SystemConfigurationPanel() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="fixed">Fixed Amount</SelectItem>
-                          <SelectItem value="percentage">Percentage</SelectItem>
+                          <SelectItem value="fixed">Montant fixe</SelectItem>
+                          <SelectItem value="percentage">Pourcentage</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

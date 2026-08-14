@@ -24,19 +24,19 @@ const roleConfig: Record<
     label: "Property Administrator",
     color:
       "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
-    description: "Full system access and control",
+    description: "Accès et contrôle complets du système",
   },
   [UserRole.MANAGER]: {
-    label: "Property Manager",
+    label: "Gestionnaire du bien",
     color:
       "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
-    description: "Manages properties and operations",
+    description: "Gère les biens et les opérations",
   },
   [UserRole.TENANT]: {
-    label: "Tenant",
+    label: "Locataire",
     color:
       "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800",
-    description: "Property tenant with basic access",
+    description: "Locataire avec accès de base",
   },
 };
 

@@ -87,7 +87,7 @@ providers.push(
     name: "credentials",
     credentials: {
       email: {
-        label: "Email",
+        label: "E-mail",
         type: "email",
         placeholder: "Enter your email",
       },

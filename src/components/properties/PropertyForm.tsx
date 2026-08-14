@@ -156,7 +156,7 @@ interface EnhancedPropertyFormProps {
 
 // Essential amenities and features (curated list of most common items)
 const ESSENTIAL_AMENITIES_AND_FEATURES = [
-  "Parking",
+  "Stationnement",
   "In-Unit Laundry",
   "Central AC",
   "Central Heating",
@@ -171,7 +171,7 @@ const ESSENTIAL_AMENITIES_AND_FEATURES = [
   "Fitness Center",
   "Elevator",
   "Storage",
-  "Fireplace",
+  "Cheminée",
 ];
 
 // Map amenity names to translation keys
@@ -261,7 +261,7 @@ const getAmenityCategory = (amenityName: string): string => {
     name.includes("garage") ||
     name.includes("carport")
   ) {
-    return "Parking";
+    return "Stationnement";
   }
 
   // Security amenities
@@ -272,7 +272,7 @@ const getAmenityCategory = (amenityName: string): string => {
     name.includes("alarm") ||
     name.includes("camera")
   ) {
-    return "Security";
+    return "Sécurité";
   }
 
   // Utilities amenities
@@ -283,7 +283,7 @@ const getAmenityCategory = (amenityName: string): string => {
     name.includes("utilities") ||
     name.includes("electric")
   ) {
-    return "Utilities";
+    return "Services publics";
   }
 
   // Recreation amenities
@@ -319,7 +319,7 @@ const getAmenityCategory = (amenityName: string): string => {
   }
 
   // Default to Other
-  return "Other";
+  return "Autre";
 };
 
 interface PropertyOwnerOption {

@@ -64,24 +64,24 @@ export default function TenantSearchSort({
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const sortOptions: SortOption[] = [
-    { field: "name", label: "Name", icon: User },
-    { field: "email", label: "Email", icon: Mail },
-    { field: "phone", label: "Phone", icon: Phone },
+    { field: "name", label: "Nom", icon: User },
+    { field: "email", label: "E-mail", icon: Mail },
+    { field: "phone", label: "Téléphone", icon: Phone },
     { field: "applicationDate", label: "Application Date", icon: Calendar },
     { field: "moveInDate", label: "Move-in Date", icon: Calendar },
     { field: "creditScore", label: "Credit Score", icon: DollarSign },
-    { field: "income", label: "Income", icon: DollarSign },
+    { field: "income", label: "Revenu", icon: DollarSign },
     { field: "createdAt", label: "Created Date", icon: Calendar },
   ];
 
   const statusOptions = [
-    { value: "all", label: "All Statuses" },
+    { value: "all", label: "Tous les statuts" },
     { value: "application_submitted", label: "Application Submitted" },
-    { value: "under_review", label: "Under Review" },
-    { value: "approved", label: "Approved" },
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-    { value: "moved_out", label: "Moved Out" },
+    { value: "under_review", label: "En cours d’examen" },
+    { value: "approved", label: "Approuvée" },
+    { value: "active", label: "Actif" },
+    { value: "inactive", label: "Inactif" },
+    { value: "moved_out", label: "Partis" },
     { value: "terminated", label: "Terminated" },
   ];
 
@@ -112,7 +112,7 @@ export default function TenantSearchSort({
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search tenants by name, email, or phone..."
+            placeholder="Rechercher un locataire par nom, e-mail ou téléphone…"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 pr-10"
@@ -131,7 +131,7 @@ export default function TenantSearchSort({
 
         <Select value={statusFilter} onValueChange={onStatusFilterChange}>
           <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="Filtrer par statut" />
           </SelectTrigger>
           <SelectContent>
             {statusOptions.map((option) => (
@@ -152,11 +152,11 @@ export default function TenantSearchSort({
               )}
               Sort by{" "}
               {sortOptions.find((opt) => opt.field === sortField)?.label ||
-                "Name"}
+                "Nom"}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
+            <DropdownMenuLabel>Options de tri</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {sortOptions.map((option) => {
               const Icon = option.icon;
@@ -272,8 +272,8 @@ export default function TenantSearchSort({
                 Application Date
               </label>
               <div className="flex gap-2">
-                <Input placeholder="From" type="date" />
-                <Input placeholder="To" type="date" />
+                <Input placeholder="De" type="date" />
+                <Input placeholder="Vers" type="date" />
               </div>
             </div>
           </div>
@@ -283,9 +283,9 @@ export default function TenantSearchSort({
               variant="outline"
               onClick={() => setShowAdvancedSearch(false)}
             >
-              Cancel
+              Annuler
             </Button>
-            <Button>Apply Filters</Button>
+            <Button>Appliquer les filtres</Button>
           </div>
         </div>
       )}

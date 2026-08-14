@@ -111,7 +111,7 @@ export default function CommunicationCenter() {
     },
     {
       id: 'tpl_2',
-      name: 'Overdue Notice',
+      name: 'Avis de retard',
       type: 'overdue_notice',
       channel: 'both',
       subject: 'OVERDUE: Payment Required',
@@ -138,12 +138,12 @@ export default function CommunicationCenter() {
 
   const getStatusBadge = (status: CommunicationMessage['status']) => {
     const statusConfig = {
-      draft: { label: 'Draft', variant: 'secondary' },
-      scheduled: { label: 'Scheduled', variant: 'default' },
-      sent: { label: 'Sent', variant: 'default' },
-      delivered: { label: 'Delivered', variant: 'default' },
-      failed: { label: 'Failed', variant: 'destructive' },
-      opened: { label: 'Opened', variant: 'default' },
+      draft: { label: 'Brouillon', variant: 'secondary' },
+      scheduled: { label: 'Planifiée', variant: 'default' },
+      sent: { label: 'Envoyé', variant: 'default' },
+      delivered: { label: 'Distribué', variant: 'default' },
+      failed: { label: 'Échoué', variant: 'destructive' },
+      opened: { label: 'Ouvert', variant: 'default' },
     };
 
     const config = statusConfig[status];
@@ -156,9 +156,9 @@ export default function CommunicationCenter() {
 
   const getPriorityBadge = (priority: CommunicationMessage['priority']) => {
     const priorityConfig = {
-      low: { label: 'Low', variant: 'outline' },
-      medium: { label: 'Medium', variant: 'secondary' },
-      high: { label: 'High', variant: 'default' },
+      low: { label: 'Faible', variant: 'outline' },
+      medium: { label: 'Moyenne', variant: 'secondary' },
+      high: { label: 'Élevée', variant: 'default' },
       urgent: { label: 'Urgent', variant: 'destructive' },
     };
 
@@ -207,7 +207,7 @@ export default function CommunicationCenter() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Communication Center</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Centre de communication</h2>
           <p className="text-muted-foreground">
             Manage tenant communications and automated messaging
           </p>
@@ -222,7 +222,7 @@ export default function CommunicationCenter() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Send New Message</DialogTitle>
+                <DialogTitle>Envoyer un nouveau message</DialogTitle>
                 <DialogDescription>
                   Send a message to tenants via email or SMS
                 </DialogDescription>
@@ -231,37 +231,37 @@ export default function CommunicationCenter() {
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="message-type">Message Type</Label>
+                    <Label htmlFor="message-type">Type de message</Label>
                     <Select value={newMessage.type} onValueChange={(value) => setNewMessage({ ...newMessage, type: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="payment_reminder">Payment Reminder</SelectItem>
-                        <SelectItem value="overdue_notice">Overdue Notice</SelectItem>
+                        <SelectItem value="general">Général</SelectItem>
+                        <SelectItem value="payment_reminder">Rappel de paiement</SelectItem>
+                        <SelectItem value="overdue_notice">Avis de retard</SelectItem>
                         <SelectItem value="maintenance">Maintenance</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="channel">Channel</Label>
+                    <Label htmlFor="channel">Canal</Label>
                     <Select value={newMessage.channel} onValueChange={(value) => setNewMessage({ ...newMessage, channel: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="email">E-mail</SelectItem>
                         <SelectItem value="sms">SMS</SelectItem>
-                        <SelectItem value="both">Both</SelectItem>
+                        <SelectItem value="both">Les deux</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject">Objet</Label>
                   <Input
                     id="subject"
                     value={newMessage.subject}
@@ -271,34 +271,34 @@ export default function CommunicationCenter() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="content">Message Content</Label>
+                  <Label htmlFor="content">Contenu du message</Label>
                   <Textarea
                     id="content"
                     value={newMessage.content}
                     onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
-                    placeholder="Type your message here..."
+                    placeholder="Saisissez votre message ici…"
                     rows={6}
                   />
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="priority">Priority</Label>
+                    <Label htmlFor="priority">Priorité</Label>
                     <Select value={newMessage.priority} onValueChange={(value) => setNewMessage({ ...newMessage, priority: value })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="low">Faible</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
+                        <SelectItem value="high">Élevée</SelectItem>
                         <SelectItem value="urgent">Urgent</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="schedule">Schedule (Optional)</Label>
+                    <Label htmlFor="schedule">Planification (facultative)</Label>
                     <Input
                       id="schedule"
                       type="datetime-local"
@@ -309,7 +309,7 @@ export default function CommunicationCenter() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline">Save Draft</Button>
+                  <Button variant="outline">Enregistrer le brouillon</Button>
                   <Button onClick={handleSendMessage}>
                     <Send className="h-4 w-4 mr-2" />
                     Send Message
@@ -324,9 +324,9 @@ export default function CommunicationCenter() {
       <Tabs defaultValue="messages" className="space-y-4">
         <TabsList>
           <TabsTrigger value="messages">Messages</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="automation">Automation Rules</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="templates">Modèles</TabsTrigger>
+          <TabsTrigger value="automation">Règles d’automatisation</TabsTrigger>
+          <TabsTrigger value="analytics">Analyses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="messages" className="space-y-4">
@@ -338,7 +338,7 @@ export default function CommunicationCenter() {
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search messages..."
+                      placeholder="Rechercher des messages…"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-8"
@@ -348,14 +348,14 @@ export default function CommunicationCenter() {
                 
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
+                    <SelectValue placeholder="Statut" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="sent">Sent</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="opened">Opened</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    <SelectItem value="sent">Envoyé</SelectItem>
+                    <SelectItem value="delivered">Distribué</SelectItem>
+                    <SelectItem value="opened">Ouvert</SelectItem>
+                    <SelectItem value="failed">Échoué</SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -364,10 +364,10 @@ export default function CommunicationCenter() {
                     <SelectValue placeholder="Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="payment_reminder">Payment Reminder</SelectItem>
-                    <SelectItem value="overdue_notice">Overdue Notice</SelectItem>
-                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="all">Tous les types</SelectItem>
+                    <SelectItem value="payment_reminder">Rappel de paiement</SelectItem>
+                    <SelectItem value="overdue_notice">Avis de retard</SelectItem>
+                    <SelectItem value="general">Général</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -397,7 +397,7 @@ export default function CommunicationCenter() {
           {/* Messages List */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Messages</CardTitle>
+              <CardTitle>Messages récents</CardTitle>
               <CardDescription>
                 Communication history and status tracking
               </CardDescription>
@@ -457,7 +457,7 @@ export default function CommunicationCenter() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Message Templates</CardTitle>
+                  <CardTitle>Modèles de messages</CardTitle>
                   <CardDescription>
                     Pre-configured templates for automated messaging
                   </CardDescription>
@@ -484,7 +484,7 @@ export default function CommunicationCenter() {
                     
                     <div className="flex items-center gap-2">
                       <Badge variant={template.isActive ? 'default' : 'secondary'}>
-                        {template.isActive ? 'Active' : 'Inactive'}
+                        {template.isActive ? 'Actif' : 'Inactif'}
                       </Badge>
                       <Button size="sm" variant="outline">
                         Edit
@@ -500,7 +500,7 @@ export default function CommunicationCenter() {
         <TabsContent value="automation" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Automation Rules</CardTitle>
+              <CardTitle>Règles d’automatisation</CardTitle>
               <CardDescription>
                 Configure automated communication workflows
               </CardDescription>
@@ -518,7 +518,7 @@ export default function CommunicationCenter() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Payment Reminders</CardTitle>
+                      <CardTitle className="text-lg">Rappels de paiement</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2 text-sm">
@@ -532,7 +532,7 @@ export default function CommunicationCenter() {
                   
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Overdue Notices</CardTitle>
+                      <CardTitle className="text-lg">Avis de retard</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2 text-sm">
@@ -553,45 +553,45 @@ export default function CommunicationCenter() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Messages Sent</CardTitle>
+                <CardTitle className="text-sm font-medium">Messages envoyés</CardTitle>
                 <Send className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">This month</p>
+                <p className="text-xs text-muted-foreground">Ce mois-ci</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Delivery Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Taux de distribution</CardTitle>
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">98.5%</div>
-                <p className="text-xs text-muted-foreground">Successfully delivered</p>
+                <p className="text-xs text-muted-foreground">Distribués avec succès</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Open Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Taux d’ouverture</CardTitle>
                 <Mail className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">76.2%</div>
-                <p className="text-xs text-muted-foreground">Email open rate</p>
+                <p className="text-xs text-muted-foreground">Taux d’ouverture des e-mails</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Taux de réponse</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">23.1%</div>
-                <p className="text-xs text-muted-foreground">Tenant responses</p>
+                <p className="text-xs text-muted-foreground">Réponses des locataires</p>
               </CardContent>
             </Card>
           </div>

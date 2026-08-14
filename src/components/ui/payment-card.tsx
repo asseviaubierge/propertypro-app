@@ -45,28 +45,28 @@ interface PaymentCardProps {
 }
 
 const paymentTypeLabels = {
-  [PaymentType.RENT]: "Rent",
-  [PaymentType.SECURITY_DEPOSIT]: "Security Deposit",
-  [PaymentType.LATE_FEE]: "Late Fee",
+  [PaymentType.RENT]: "Loyer",
+  [PaymentType.SECURITY_DEPOSIT]: "Garantie",
+  [PaymentType.LATE_FEE]: "Frais de retard",
   [PaymentType.PET_DEPOSIT]: "Pet Deposit",
   [PaymentType.UTILITY]: "Utility",
   [PaymentType.MAINTENANCE]: "Maintenance",
-  [PaymentType.INVOICE]: "Invoice",
-  [PaymentType.OTHER]: "Other",
+  [PaymentType.INVOICE]: "Facture",
+  [PaymentType.OTHER]: "Autre",
 };
 
 const paymentMethodLabels = {
-  [PaymentMethod.CREDIT_CARD]: "Credit Card",
-  [PaymentMethod.DEBIT_CARD]: "Debit Card",
+  [PaymentMethod.CREDIT_CARD]: "Carte de crédit",
+  [PaymentMethod.DEBIT_CARD]: "Carte de débit",
   [PaymentMethod.BANK_TRANSFER]: "Bank Transfer",
   [PaymentMethod.ACH]: "ACH",
-  [PaymentMethod.CHECK]: "Check",
-  [PaymentMethod.CASH]: "Cash",
+  [PaymentMethod.CHECK]: "Chèque",
+  [PaymentMethod.CASH]: "Espèces",
   [PaymentMethod.MONEY_ORDER]: "Money Order",
   [PaymentMethod.PAYPAL]: "PayPal",
   [PaymentMethod.RAZORPAY]: "Razorpay",
   [PaymentMethod.PAYSTACK]: "Paystack",
-  [PaymentMethod.OTHER]: "Other",
+  [PaymentMethod.OTHER]: "Autre",
 };
 import { formatCurrency } from "@/lib/utils/formatting";
 
@@ -116,7 +116,7 @@ export function PaymentCard({
               {hasLateFee && (
                 <Badge variant="destructive" className="text-xs">
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  Late Fee
+                  Frais de retard
                 </Badge>
               )}
               {payment.isRecurring && (

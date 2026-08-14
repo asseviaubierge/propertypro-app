@@ -306,44 +306,44 @@ export default function TenantMaintenanceRequestsPage() {
       <AnalyticsCardGrid className="md:grid-cols-2 lg:grid-cols-4">
         <AnalyticsCard
           title={t("maintenance.myRequests.stats.totalRequests", {
-            defaultValue: "Total Requests",
+            defaultValue: "Total des demandes",
           })}
           value={maintenanceRequests.length}
           description={t("maintenance.myRequests.stats.allLoadedRequests", {
-            defaultValue: "All loaded requests",
+            defaultValue: "Toutes les demandes chargées",
           })}
           icon={Wrench}
           iconColor="primary"
         />
         <AnalyticsCard
           title={t("maintenance.myRequests.stats.filteredResults", {
-            defaultValue: "Filtered Results",
+            defaultValue: "Résultats filtrés",
           })}
           value={filteredRequests.length}
           description={t("maintenance.myRequests.stats.matchingFilters", {
-            defaultValue: "Matching your current filters",
+            defaultValue: "Correspondant aux filtres actuels",
           })}
           icon={Search}
           iconColor="info"
         />
         <AnalyticsCard
           title={t("maintenance.myRequests.stats.openRequests", {
-            defaultValue: "Open Requests",
+            defaultValue: "Demandes ouvertes",
           })}
           value={openRequests}
           description={t("maintenance.myRequests.stats.awaitingAction", {
-            defaultValue: "Awaiting action",
+            defaultValue: "En attente d’action",
           })}
           icon={Clock}
           iconColor="warning"
         />
         <AnalyticsCard
           title={t("maintenance.myRequests.stats.highPriority", {
-            defaultValue: "High Priority",
+            defaultValue: "Priorité élevée",
           })}
           value={highPriorityRequests}
           description={t("maintenance.myRequests.stats.needsAttention", {
-            defaultValue: "Needs attention",
+            defaultValue: "Nécessite une attention",
           })}
           icon={AlertTriangle}
           iconColor="error"
@@ -450,7 +450,7 @@ export default function TenantMaintenanceRequestsPage() {
                   <SelectItem value="Electrical">Electrical</SelectItem>
                   <SelectItem value="HVAC">HVAC</SelectItem>
                   <SelectItem value="Appliances">Appliances</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
+                  <SelectItem value="Autre">Autre</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -470,7 +470,7 @@ export default function TenantMaintenanceRequestsPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  Clear
+                  Effacer
                 </Button>
               )}
             </div>

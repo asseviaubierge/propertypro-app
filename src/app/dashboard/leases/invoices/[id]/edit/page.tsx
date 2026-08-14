@@ -263,11 +263,11 @@ export default function InvoiceEditPage() {
         });
         setHasChanges(false);
       } else {
-        showSimpleError("Load Error", t("leases.invoices.details.toasts.fetchError"));
+        showSimpleError("Erreur de chargement", t("leases.invoices.details.toasts.fetchError"));
         router.push("/dashboard/leases/invoices");
       }
     } catch (error) {
-      showSimpleError("Load Error", t("leases.invoices.details.toasts.fetchError"));
+      showSimpleError("Erreur de chargement", t("leases.invoices.details.toasts.fetchError"));
       router.push("/dashboard/leases/invoices");
     } finally {
       setLoading(false);
@@ -362,7 +362,7 @@ export default function InvoiceEditPage() {
     if (fields.length > 1) {
       remove(index);
     } else {
-      showSimpleError("Validation Error", t("leases.invoices.edit.toasts.atLeastOneLineItemRequired"));
+      showSimpleError("Erreur de validation", t("leases.invoices.edit.toasts.atLeastOneLineItemRequired"));
     }
   };
 

@@ -1135,7 +1135,7 @@ export default function MaintenanceRequestDetailPage() {
       {/* <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Maintenance Request</DialogTitle>
+            <DialogTitle>Supprimer la demande de maintenance</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete this maintenance request? This
               action cannot be undone.
@@ -1146,7 +1146,7 @@ export default function MaintenanceRequestDetailPage() {
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               variant="destructive"

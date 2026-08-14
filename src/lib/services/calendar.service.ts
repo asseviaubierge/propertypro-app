@@ -58,6 +58,7 @@ export interface EventQueryParams {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  scopeQuery?: Record<string, unknown>;
 }
 
 export interface CalendarViewParams {
@@ -198,37 +199,55 @@ export class CalendarService {
       limit = 20,
       sortBy = "startDate",
       sortOrder = "asc",
+      scopeQuery,
     } = params;
 
-    // Build query - explicitly filter for non-deleted events
-    const query: any = {
-      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
-    };
+    // Chaque filtre est placé dans $and afin que la recherche ne remplace
+    // jamais le périmètre utilisateur ou le filtre de suppression logique.
+    const filters: Record<string, unknown>[] = [
+      { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] },
+    ];
 
-    if (startDate || endDate) {
-      query.startDate = {};
-      if (startDate) query.startDate.$gte = startDate;
-      if (endDate) query.startDate.$lte = endDate;
+    if (scopeQuery && Object.keys(scopeQuery).length > 0) {
+      filters.push(scopeQuery);
     }
 
-    if (type) query.type = type;
-    if (status) query.status = status;
-    if (priority) query.priority = priority;
-    if (organizer) query.organizer = new mongoose.Types.ObjectId(organizer);
-    if (propertyId) query.propertyId = new mongoose.Types.ObjectId(propertyId);
-    if (tenantId) query.tenantId = new mongoose.Types.ObjectId(tenantId);
+    if (startDate || endDate) {
+      const dateFilter: Record<string, Date> = {};
+      if (startDate) dateFilter.$gte = startDate;
+      if (endDate) dateFilter.$lte = endDate;
+      filters.push({ startDate: dateFilter });
+    }
+
+    if (type) filters.push({ type });
+    if (status) filters.push({ status });
+    if (priority) filters.push({ priority });
+    if (organizer)
+      filters.push({ organizer: new mongoose.Types.ObjectId(organizer) });
+    if (propertyId)
+      filters.push({ propertyId: new mongoose.Types.ObjectId(propertyId) });
+    if (tenantId)
+      filters.push({ tenantId: new mongoose.Types.ObjectId(tenantId) });
     if (attendeeId)
-      query["attendees.userId"] = new mongoose.Types.ObjectId(attendeeId);
+      filters.push({
+        "attendees.userId": new mongoose.Types.ObjectId(attendeeId),
+      });
 
     // Add search functionality
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { location: { $regex: search, $options: "i" } },
-        { notes: { $regex: search, $options: "i" } },
-      ];
+      filters.push({
+        $or: [
+          { title: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+          { "location.address": { $regex: search, $options: "i" } },
+          { "location.meetingLink": { $regex: search, $options: "i" } },
+          { notes: { $regex: search, $options: "i" } },
+        ],
+      });
     }
+
+    const query: Record<string, unknown> =
+      filters.length === 1 ? filters[0] : { $and: filters };
 
     // Execute query with pagination
     const skip = (page - 1) * limit;

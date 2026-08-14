@@ -182,7 +182,7 @@ export default function TenantApplicationForm({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="firstName">First Name *</Label>
+                  <Label htmlFor="firstName">Prénom *</Label>
                   <Input
                     id="firstName"
                     {...register("firstName")}
@@ -195,7 +195,7 @@ export default function TenantApplicationForm({
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Label htmlFor="lastName">Nom *</Label>
                   <Input
                     id="lastName"
                     {...register("lastName")}
@@ -210,7 +210,7 @@ export default function TenantApplicationForm({
               </div>
 
               <div>
-                <Label htmlFor="email">Email Address *</Label>
+                <Label htmlFor="email">Adresse e-mail *</Label>
                 <Input
                   id="email"
                   type="email"
@@ -226,7 +226,7 @@ export default function TenantApplicationForm({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Label htmlFor="phone">Numéro de téléphone *</Label>
                   <Input
                     id="phone"
                     {...register("phone")}
@@ -240,7 +240,7 @@ export default function TenantApplicationForm({
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                  <Label htmlFor="dateOfBirth">Date de naissance *</Label>
                   <Input
                     id="dateOfBirth"
                     type="date"
@@ -256,7 +256,7 @@ export default function TenantApplicationForm({
               </div>
 
               <div>
-                <Label htmlFor="ssn">Social Security Number (Optional)</Label>
+                <Label htmlFor="ssn">Numéro d’identification sociale (facultatif)</Label>
                 <Input
                   id="ssn"
                   {...register("ssn")}
@@ -287,7 +287,7 @@ export default function TenantApplicationForm({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="employer">Employer *</Label>
+                  <Label htmlFor="employer">Employeur *</Label>
                   <Input
                     id="employer"
                     {...register("employmentInfo.employer")}
@@ -320,7 +320,7 @@ export default function TenantApplicationForm({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="income">Annual Income *</Label>
+                  <Label htmlFor="income">Revenu annuel *</Label>
                   <Input
                     id="income"
                     type="number"
@@ -339,7 +339,7 @@ export default function TenantApplicationForm({
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="startDate">Employment Start Date *</Label>
+                  <Label htmlFor="startDate">Date de début d’emploi *</Label>
                   <Input
                     id="startDate"
                     type="date"
@@ -365,7 +365,7 @@ export default function TenantApplicationForm({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Phone className="h-5 w-5" />
-                Emergency Contact
+                Contact d’urgence
               </CardTitle>
               <CardDescription>
                 Please provide at least one emergency contact
@@ -430,14 +430,14 @@ export default function TenantApplicationForm({
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select relationship" />
+                          <SelectValue placeholder="Sélectionner le lien" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="parent">Parent</SelectItem>
-                          <SelectItem value="sibling">Sibling</SelectItem>
-                          <SelectItem value="spouse">Spouse</SelectItem>
-                          <SelectItem value="friend">Friend</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="sibling">Frère ou sœur</SelectItem>
+                          <SelectItem value="spouse">Conjoint</SelectItem>
+                          <SelectItem value="friend">Ami</SelectItem>
+                          <SelectItem value="other">Autre</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.emergencyContacts?.[index]?.relationship && (
@@ -453,7 +453,7 @@ export default function TenantApplicationForm({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor={`contact-phone-${index}`}>Phone *</Label>
+                      <Label htmlFor={`contact-phone-${index}`}>Téléphone *</Label>
                       <Input
                         id={`contact-phone-${index}`}
                         {...register(`emergencyContacts.${index}.phone`)}
@@ -528,7 +528,7 @@ export default function TenantApplicationForm({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="creditScore">Credit Score (Optional)</Label>
+                <Label htmlFor="creditScore">Cote de solvabilité (facultative)</Label>
                 <Input
                   id="creditScore"
                   type="number"
@@ -563,10 +563,10 @@ export default function TenantApplicationForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="phone">Phone Call</SelectItem>
-                    <SelectItem value="text">Text Message</SelectItem>
-                    <SelectItem value="app">In-App Notification</SelectItem>
+                    <SelectItem value="email">E-mail</SelectItem>
+                    <SelectItem value="phone">Appel téléphonique</SelectItem>
+                    <SelectItem value="text">Message texte</SelectItem>
+                    <SelectItem value="app">Notification dans l’application</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -578,7 +578,7 @@ export default function TenantApplicationForm({
                 <Textarea
                   id="applicationNotes"
                   {...register("applicationNotes")}
-                  placeholder="Any additional information you'd like to share..."
+                  placeholder="Toute information complémentaire que vous souhaitez partager…"
                   rows={4}
                 />
               </div>
@@ -601,24 +601,24 @@ export default function TenantApplicationForm({
             <CardContent className="space-y-6">
               {/* Application Summary */}
               <div className="space-y-4">
-                <h4 className="font-medium">Application Summary</h4>
+                <h4 className="font-medium">Résumé de la candidature</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Name:</span>
+                    <span className="text-muted-foreground">Nom :</span>
                     <p>
                       {watchedValues.firstName} {watchedValues.lastName}
                     </p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Email:</span>
+                    <span className="text-muted-foreground">E-mail :</span>
                     <p>{watchedValues.email}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Phone:</span>
+                    <span className="text-muted-foreground">Téléphone :</span>
                     <p>{watchedValues.phone}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Employer:</span>
+                    <span className="text-muted-foreground">Employeur :</span>
                     <p>{watchedValues.employmentInfo?.employer}</p>
                   </div>
                 </div>
@@ -718,7 +718,7 @@ export default function TenantApplicationForm({
           onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
           disabled={currentStep === 1}
         >
-          Previous
+          Précédent
         </Button>
 
         <Button
@@ -730,7 +730,7 @@ export default function TenantApplicationForm({
             ? "Submitting..."
             : currentStep === totalSteps
             ? "Submit Application"
-            : "Next"}
+            : "Suivant"}
         </Button>
       </div>
     </div>

@@ -69,7 +69,7 @@ export class AutoInvoiceGenerationService {
       );
 
       if (!lease) {
-        throw new Error("Lease not found");
+        throw new Error("Bail introuvable");
       }
 
       const generatedInvoices: HydratedDocument<IInvoice>[] = [];
@@ -174,7 +174,7 @@ export class AutoInvoiceGenerationService {
       gracePeriodEnd: new Date(dueDate.getTime() + 5 * 24 * 60 * 60 * 1000),
       lineItems: [
         {
-          description: "Security Deposit",
+          description: "Dépôt de garantie",
           amount: lease.terms.securityDeposit,
           type: InvoiceType.SECURITY_DEPOSIT,
           quantity: 1,
@@ -206,8 +206,8 @@ export class AutoInvoiceGenerationService {
 
     const tenantName =
       [tenant.firstName, tenant.lastName].filter(Boolean).join(" ").trim() ||
-      "Tenant";
-    const propertyName = property?.name || "Property";
+      "Locataire";
+    const propertyName = property?.name || "Bien";
     const emailService = new EmailService();
 
     // Resolve currency from Display Settings (admin)
@@ -375,7 +375,7 @@ export class AutoInvoiceGenerationService {
       dueDate.getFullYear() === new Date(lease.startDate).getFullYear();
 
     let rentAmount = lease.terms.rentAmount;
-    let description = "Monthly Rent";
+    let description = "Loyer mensuel";
 
     if (isFirstMonth && lease.terms.paymentConfig?.prorationEnabled) {
       const proratedAmount = this.calculateProratedRent(lease, dueDate);
@@ -463,7 +463,7 @@ export class AutoInvoiceGenerationService {
         "tenantId propertyId"
       );
       if (!lease) {
-        throw new Error("Lease not found");
+        throw new Error("Bail introuvable");
       }
 
       const dueDate = new Date(lease.startDate);

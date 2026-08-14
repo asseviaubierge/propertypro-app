@@ -37,7 +37,7 @@ export function PaymentGatewayGate({
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>Online payments unavailable</AlertTitle>
+        <AlertTitle>Paiements en ligne indisponibles</AlertTitle>
         <AlertDescription>
           {isAdmin
             ? "Aucune passerelle de paiement n’est encore configurée. Ajoutez vos identifiants dans Paramètres → Paiements pour accepter les paiements en ligne."

@@ -25,19 +25,19 @@ interface PaymentStatusBadgeProps {
 
 const statusConfig = {
   [PaymentStatus.PENDING]: {
-    label: "Pending",
+    label: "En attente",
     variant: "secondary" as const,
     icon: Clock,
     className: "bg-yellow-100 text-yellow-800 border-yellow-200",
   },
   [PaymentStatus.PAID]: {
-    label: "Paid",
+    label: "Payée",
     variant: "secondary" as const,
     icon: CheckCircle,
     className: "bg-green-100 text-green-800 border-green-200",
   },
   [PaymentStatus.FAILED]: {
-    label: "Failed",
+    label: "Échoué",
     variant: "destructive" as const,
     icon: XCircle,
     className: "bg-red-100 text-red-800 border-red-200",
@@ -49,19 +49,19 @@ const statusConfig = {
     className: "bg-gray-100 text-gray-800 border-gray-200",
   },
   [PaymentStatus.OVERDUE]: {
-    label: "Overdue",
+    label: "En retard",
     variant: "destructive" as const,
     icon: AlertCircle,
     className: "bg-red-100 text-red-800 border-red-200",
   },
   [PaymentStatus.PARTIAL]: {
-    label: "Partial",
+    label: "Partielle",
     variant: "secondary" as const,
     icon: DollarSign,
     className: "bg-orange-100 text-orange-800 border-orange-200",
   },
   [PaymentStatus.CANCELLED]: {
-    label: "Cancelled",
+    label: "Annulée",
     variant: "outline" as const,
     icon: Ban,
     className: "bg-gray-100 text-gray-800 border-gray-200",

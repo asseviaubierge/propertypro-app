@@ -219,7 +219,7 @@ export function UserSessionManagement({
     );
 
     if (minutesAgo < 5) {
-      return { label: "Active", variant: "default" as const };
+      return { label: "Actif", variant: "default" as const };
     } else if (minutesAgo < 30) {
       return { label: "Recent", variant: "secondary" as const };
     } else {
@@ -249,7 +249,7 @@ export function UserSessionManagement({
             <RefreshCw
               className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
             />
-            Refresh
+            Actualiser
           </Button>
         </div>
       </CardHeader>
@@ -273,18 +273,18 @@ export function UserSessionManagement({
         ) : sessions.length === 0 ? (
           <div className="text-center py-8">
             <Shield className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-muted-foreground">No active sessions found</p>
+            <p className="text-muted-foreground">Aucune session active trouvée</p>
           </div>
         ) : (
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Device & Browser</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Last Activity</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Appareil et navigateur</TableHead>
+                  <TableHead>Utilisateur</TableHead>
+                  <TableHead>Emplacement</TableHead>
+                  <TableHead>Dernière activité</TableHead>
+                  <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -424,7 +424,7 @@ export function UserSessionManagement({
               onClick={() => setShowTerminateDialog(false)}
               disabled={isTerminating}
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               variant="destructive"
@@ -436,7 +436,7 @@ export function UserSessionManagement({
               {isTerminating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Terminating...
+                  Résiliation…
                 </>
               ) : (
                 <>

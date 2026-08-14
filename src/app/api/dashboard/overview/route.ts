@@ -836,21 +836,43 @@ export const GET = withPermissionAndDB("profile_management")(
           | string
           | null,
       ) => {
-        if (!record) return "Unknown";
+        if (!record) return "Inconnu";
         if (typeof record === "string") return record;
 
         const first = record.firstName || record.name || "";
         const last = record.lastName || "";
-        return `${first} ${last}`.trim() || record.email || "Unknown";
+        return `${first} ${last}`.trim() || record.email || "Inconnu";
+      };
+
+      const paymentTypeLabels: Record<string, string> = {
+        rent: "le loyer",
+        security_deposit: "le dépôt de garantie",
+        invoice: "une facture",
+        late_fee: "des frais de retard",
+        utility: "des charges",
+        maintenance: "des frais de maintenance",
+        pet_deposit: "un dépôt pour animaux",
+        other: "un paiement",
+      };
+
+      const leaseStatusLabels: Record<string, string> = {
+        draft: "en préparation",
+        pending: "en attente",
+        pending_signature: "en attente de signature",
+        active: "actif",
+        expired: "expiré",
+        terminated: "résilié",
+        cancelled: "annulé",
+        renewed: "renouvelé",
       };
 
       const activities: DashboardOverviewResponse["recentActivities"] = [
         ...recentPayments.map((payment) => {
           const tenantName = formatName(payment?.tenantId);
-          const propertyName = payment?.propertyId?.name || "Portfolio";
-          const description = `${tenantName} paid ${
-            payment?.type || "rent"
-          } for ${propertyName}`;
+          const propertyName = payment?.propertyId?.name || "Portefeuille";
+          const paymentLabel =
+            paymentTypeLabels[String(payment?.type || "rent")] || "un paiement";
+          const description = `${tenantName} a réglé ${paymentLabel} pour ${propertyName}`;
           const timestamp =
             payment?.paidDate?.toISOString?.() ||
             payment?.updatedAt?.toISOString?.() ||
@@ -866,10 +888,10 @@ export const GET = withPermissionAndDB("profile_management")(
           };
         }),
         ...recentMaintenance.map((request) => {
-          const propertyName = request?.propertyId?.name || "Portfolio";
+          const propertyName = request?.propertyId?.name || "Portefeuille";
           const description = `${
-            request?.title || "Maintenance request"
-          } at ${propertyName}`;
+            request?.title || "Demande de maintenance"
+          } — ${propertyName}`;
           const timestamp =
             request?.updatedAt?.toISOString?.() || new Date().toISOString();
 
@@ -910,10 +932,11 @@ export const GET = withPermissionAndDB("profile_management")(
         }),
         ...recentLeases.map((lease) => {
           const tenantName = formatName(lease?.tenantId);
-          const propertyName = lease?.propertyId?.name || "Portfolio";
-          const description = `${tenantName} lease ${
-            lease?.status?.replace(/_/g, " ") || "unknown"
-          } at ${propertyName}`;
+          const propertyName = lease?.propertyId?.name || "Portefeuille";
+          const rawStatus = String(lease?.status || "pending");
+          const description = `${tenantName} — bail ${
+            leaseStatusLabels[rawStatus] || rawStatus.replace(/_/g, " ")
+          } à ${propertyName}`;
           const timestamp =
             lease?.updatedAt?.toISOString?.() || new Date().toISOString();
 

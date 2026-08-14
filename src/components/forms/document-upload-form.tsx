@@ -71,14 +71,14 @@ interface DocumentUploadFormProps {
 const documentCategories = [
   "Legal",
   "Maintenance",
-  "Applications",
+  "Candidatures",
   "Marketing",
-  "Financial",
-  "Insurance",
+  "Financier",
+  "Assurance",
   "Inspection",
   "Contracts",
   "Permits",
-  "General",
+  "Général",
 ];
 
 export function DocumentUploadForm({
@@ -250,7 +250,7 @@ export function DocumentUploadForm({
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Upload Documents</h1>
+        <h1 className="text-3xl font-bold">Téléverser des documents</h1>
         <p className="text-muted-foreground mt-2">
           Upload and organize property-related documents
         </p>
@@ -302,7 +302,7 @@ export function DocumentUploadForm({
                 />
                 <label htmlFor="file-upload">
                   <Button type="button" variant="outline" asChild>
-                    <span>Browse Files</span>
+                    <span>Parcourir les fichiers</span>
                   </Button>
                 </label>
               </div>
@@ -364,7 +364,7 @@ export function DocumentUploadForm({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel>Titre</FormLabel>
                     <FormControl>
                       <Input placeholder="Document title" {...field} />
                     </FormControl>
@@ -382,14 +382,14 @@ export function DocumentUploadForm({
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Document Type</FormLabel>
+                      <FormLabel>Type de document</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select document type" />
+                            <SelectValue placeholder="Sélectionner le type de document" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -412,7 +412,7 @@ export function DocumentUploadForm({
                             Photo/Image
                           </SelectItem>
                           <SelectItem value={DocumentType.OTHER}>
-                            Other
+                            Autre
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -429,14 +429,14 @@ export function DocumentUploadForm({
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>Catégorie</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder="Sélectionner une catégorie" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -458,10 +458,10 @@ export function DocumentUploadForm({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
+                    <FormLabel>Description (facultative)</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Additional details about the document..."
+                        placeholder="Détails complémentaires sur le document…"
                         className="resize-none"
                         rows={3}
                         {...field}
@@ -477,7 +477,7 @@ export function DocumentUploadForm({
           {/* Submit Button */}
           <div className="flex justify-end space-x-4">
             <Button type="button" variant="outline">
-              Cancel
+              Annuler
             </Button>
             <Button
               type="submit"

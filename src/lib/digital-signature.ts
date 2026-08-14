@@ -380,7 +380,7 @@ export class DigitalSignatureService {
       .filter((log) => log.action === "sign" || log.action === "view")
       .map((log) => ({
         action: log.action,
-        user: (log.userId as any)?.email || "Unknown",
+        user: (log.userId as any)?.email || "Inconnu",
         timestamp: log.timestamp,
         details: log.details || "",
         ipAddress: log.ipAddress,

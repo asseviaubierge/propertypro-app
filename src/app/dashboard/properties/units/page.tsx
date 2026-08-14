@@ -341,10 +341,10 @@ export default function AllUnitsPage() {
   const showEmptyState = !loading && !error && units.length === 0;
   const emptyStateDescription = hasActiveFilters
     ? t("properties.available.empty.description", {
-        defaultValue: "Try adjusting your filters to find matching units.",
+        defaultValue: "Modifiez les filtres pour trouver des logements correspondants.",
       })
     : t("properties.available.empty.descriptionStart", {
-        defaultValue: "Get started by adding your first property and unit.",
+        defaultValue: "Commencez par ajouter votre premier bien et son logement.",
       });
   const emptyStateAction =
     showEmptyState && !hasActiveFilters ? (
@@ -420,7 +420,7 @@ export default function AllUnitsPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <Grid3X3 className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">Grid</span>
+                  <span className="ml-1 sm:hidden">Grille</span>
                 </Button>
                 <Button
                   variant={viewMode === "rows" ? "default" : "ghost"}
@@ -429,7 +429,7 @@ export default function AllUnitsPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <Rows3 className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">Rows</span>
+                  <span className="ml-1 sm:hidden">Lignes</span>
                 </Button>
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
@@ -438,7 +438,7 @@ export default function AllUnitsPage() {
                   className="h-8 flex-1 sm:flex-none sm:px-3"
                 >
                   <List className="h-4 w-4" />
-                  <span className="ml-1 sm:hidden">List</span>
+                  <span className="ml-1 sm:hidden">Liste</span>
                 </Button>
               </div>
             </div>
@@ -455,7 +455,7 @@ export default function AllUnitsPage() {
                 onSearch={handleSearch}
                 isLoading={isSearching}
                 className="w-full"
-                ariaLabel="Search units"
+                ariaLabel="Rechercher des logements"
               />
             </div>
 
@@ -984,13 +984,13 @@ export default function AllUnitsPage() {
                 router.push(`/dashboard/properties/units?${params.toString()}`);
                 setFilters((p) => ({ ...p, limit: size, page: 1 }));
               }}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

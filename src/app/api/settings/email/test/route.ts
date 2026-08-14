@@ -115,9 +115,9 @@ export const POST = withPermissionAndDB("system_settings")(
         );
       }
 
-      const template = buildTestEmail(fromName || "PropertyPro", to);
+      const template = buildTestEmail(fromName || "GESTION E-IMMO", to);
       const info = await transporter.sendMail({
-        from: `${fromName || "PropertyPro"} <${fromEmail}>`,
+        from: `${fromName || "GESTION E-IMMO"} <${fromEmail}>`,
         to,
         subject: template.subject,
         html: template.html,

@@ -407,7 +407,7 @@ class SystemConfigurationService {
   private compareToBenchmarks() {
     const benchmarks = [
       {
-        parameter: "Grace Period (days)",
+        parameter: "Délai de grâce (jours)",
         current: this.currentConfig.gracePeriods.default,
         industry: 5,
         status:

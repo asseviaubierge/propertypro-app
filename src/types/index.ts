@@ -79,6 +79,26 @@ export interface IUser extends Document, IUserMethods {
   firstName: string;
   lastName: string;
   phone?: string;
+  whatsappNumber?: string;
+  whatsappVerificationStatus?: "not_requested" | "pending" | "verified" | "rejected";
+  whatsappVerificationCode?: string;
+  whatsappVerificationRequestedAt?: Date;
+  whatsappVerificationRejectedAt?: Date;
+  whatsappVerifiedAt?: Date;
+  whatsappVerifiedBy?: Types.ObjectId | string;
+  whatsappPreviousNumber?: string;
+  whatsappChangeRequestedNumber?: string;
+  whatsappChangeReason?: string;
+  whatsappChangeStatus?:
+    | "none"
+    | "pending"
+    | "approved"
+    | "verification_pending"
+    | "rejected"
+    | "completed";
+  whatsappChangeRequestedAt?: Date;
+  whatsappChangeReviewedAt?: Date;
+  whatsappChangeReviewedBy?: Types.ObjectId | string;
   role: string;
   // Professional / management identity
   accountType?: AccountType;

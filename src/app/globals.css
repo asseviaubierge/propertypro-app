@@ -395,6 +395,92 @@
   }
 }
 
+/* Présentation cohérente des actions et respect des zones sûres mobiles. */
+@media (max-width: 639px) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  button,
+  [role="button"],
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+.mobile-install-prompt {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  z-index: 80;
+  display: flex;
+  width: min(calc(100vw - 2rem), 30rem);
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--popover);
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  color: var(--popover-foreground);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+.mobile-install-prompt__icon {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.mobile-install-prompt__button {
+  min-height: 2.5rem;
+  flex: 0 0 auto;
+  border-radius: 0.65rem;
+  background: #dc2626;
+  padding: 0 0.8rem;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.mobile-install-prompt__close {
+  position: absolute;
+  right: 0.35rem;
+  top: 0.35rem;
+  display: flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--muted-foreground);
+}
+
+@media (min-width: 768px) {
+  .mobile-install-prompt {
+    bottom: 1.5rem;
+  }
+}
+
+@media (display-mode: standalone) {
+  .mobile-install-prompt {
+    display: none;
+  }
+}
+
 /* Premium Animations */
 @keyframes shimmer {
   0% {
@@ -690,6 +776,12 @@
    Règles limitées au téléphone. Le Desktop conserve le CSS historique.
    ========================================================================== */
 @media (max-width: 767px) {
+  .dashboard-layout [data-slot="select-content"] {
+    max-height: calc(var(--radix-select-content-available-height) - 4rem) !important;
+    max-width: calc(100vw - 1.5rem) !important;
+    overscroll-behavior: contain;
+  }
+
   .mobile-navigation-overlay {
     background: transparent !important;
   }
@@ -726,34 +818,34 @@
     min-width: 0 !important;
   }
 
-  .dashboard-layout main button,
-  .dashboard-layout main [role="button"],
-  .dashboard-layout main a {
+  .dashboard-layout main[data-dashboard-page="module"] button,
+  .dashboard-layout main[data-dashboard-page="module"] [role="button"],
+  .dashboard-layout main[data-dashboard-page="module"] a {
     max-width: 100%;
   }
 
-  .dashboard-layout main button,
-  .dashboard-layout main [role="button"] {
+  .dashboard-layout main[data-dashboard-page="module"] button,
+  .dashboard-layout main[data-dashboard-page="module"] [role="button"] {
     min-width: 0;
-    white-space: normal;
+    white-space: nowrap;
     overflow-wrap: normal;
     word-break: normal;
   }
 
-  .dashboard-layout main button > span,
-  .dashboard-layout main [role="button"] > span {
+  .dashboard-layout main[data-dashboard-page="module"] button > span,
+  .dashboard-layout main[data-dashboard-page="module"] [role="button"] > span {
     min-width: 0;
-    white-space: normal;
+    white-space: nowrap;
     overflow-wrap: normal;
     word-break: normal;
   }
 
-  .dashboard-layout main .flex > *,
-  .dashboard-layout main .grid > * {
+  .dashboard-layout main[data-dashboard-page="module"] .flex > *,
+  .dashboard-layout main[data-dashboard-page="module"] .grid > * {
     min-width: 0;
   }
 
-  .dashboard-layout main [class*="gap-"][class*="flex"] {
+  .dashboard-layout main[data-dashboard-page="module"] [class*="gap-"][class*="flex"] {
     max-width: 100%;
   }
 }
@@ -761,24 +853,102 @@
 
 /* === E-IMMO MOBILE : BOUTONS SANS DÉBORDEMENT (CIBLÉ) === */
 @media (max-width: 767px) {
-  .dashboard-layout main button,
-  .dashboard-layout main a[role="button"] {
+  .dashboard-layout main[data-dashboard-page="module"] button,
+  .dashboard-layout main[data-dashboard-page="module"] a[role="button"] {
     max-width: 100%;
     min-width: 0;
   }
 
-  .dashboard-layout main button span,
-  .dashboard-layout main a[role="button"] span {
+  .dashboard-layout main[data-dashboard-page="module"] button span,
+  .dashboard-layout main[data-dashboard-page="module"] a[role="button"] span {
     min-width: 0;
     overflow-wrap: normal !important;
     word-break: normal !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
   }
 
-  .dashboard-layout main button:not(:has(> svg:only-child)),
-  .dashboard-layout main a[role="button"] {
-    height: auto;
+  .dashboard-layout main[data-dashboard-page="module"] button:not(:has(> svg:only-child)),
+  .dashboard-layout main[data-dashboard-page="module"] a[role="button"] {
     min-height: 2.125rem;
-    line-height: 1.15;
+    line-height: 1;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] [data-slot="button"]:not(:has(> svg:only-child)) {
+    height: 2.75rem !important;
+    min-height: 2.75rem !important;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] [data-slot="card-title"],
+  .dashboard-layout main[data-dashboard-page="module"] label {
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-page-header {
+    gap: 0.5rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-page-header > div:first-child p {
+    max-width: 100%;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-reports-page [data-slot="card-title"] {
+    font-size: 0.6875rem;
+    line-height: 0.95rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-reports-page [data-slot="card-content"] > .whitespace-nowrap {
+    font-size: 0.8125rem;
+    line-height: 1rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-revenues-page [data-slot="card-title"] {
+    font-size: 0.6875rem;
+    line-height: 0.95rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-revenues-page [data-slot="card-content"] > .whitespace-nowrap {
+    font-size: 0.8125rem;
+    line-height: 1rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .invoice-mobile-card [data-slot="card-header"],
+  .dashboard-layout main[data-dashboard-page="module"] .invoice-mobile-card [data-slot="card-content"] {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .notification-header-actions > [data-slot="button"] {
+    width: 100%;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .settings-shell {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-calendar-settings-page [data-slot="card"] {
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-calendar-settings-page [data-slot="card-header"],
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-calendar-settings-page [data-slot="card-content"] {
+    min-width: 0;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-calendar-settings-page [data-slot="card-description"],
+  .dashboard-layout main[data-dashboard-page="module"] .mobile-calendar-settings-page p {
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 }

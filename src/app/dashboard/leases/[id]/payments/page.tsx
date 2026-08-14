@@ -52,10 +52,10 @@ export default function LeasePaymentManagementPage() {
       if (data.success && data.data) {
         setLease(data.data);
       } else {
-        showSimpleError("Load Error", "Failed to load lease data");
+        showSimpleError("Erreur de chargement", "Failed to load lease data");
       }
     } catch (error) {
-      showSimpleError("Load Error", "Failed to load lease data");
+      showSimpleError("Erreur de chargement", "Failed to load lease data");
     } finally {
       setLoading(false);
     }
@@ -151,7 +151,7 @@ export default function LeasePaymentManagementPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Payment Management</h1>
+            <h1 className="text-2xl font-bold">Gestion des paiements</h1>
             <p className="text-muted-foreground">
               {lease.propertyId?.name} - {lease.tenantId?.firstName}{" "}
               {lease.tenantId?.lastName}
@@ -168,7 +168,7 @@ export default function LeasePaymentManagementPage() {
             <RefreshCw
               className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            Actualiser
           </Button>
 
           <Button onClick={handleSetupPaymentSystem}>
@@ -189,14 +189,14 @@ export default function LeasePaymentManagementPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Property</p>
+              <p className="text-sm text-muted-foreground">Bien</p>
               <p className="font-medium">{lease.propertyId?.name}</p>
               <p className="text-sm text-muted-foreground">
                 {lease.propertyId?.address}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Tenant</p>
+              <p className="text-sm text-muted-foreground">Locataire</p>
               <p className="font-medium">
                 {lease.tenantId?.firstName} {lease.tenantId?.lastName}
               </p>
@@ -205,14 +205,14 @@ export default function LeasePaymentManagementPage() {
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Lease Period</p>
+              <p className="text-sm text-muted-foreground">Période du bail</p>
               <p className="font-medium">
                 {new Date(lease.startDate).toLocaleDateString()} -{" "}
                 {new Date(lease.endDate).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Monthly Rent</p>
+              <p className="text-sm text-muted-foreground">Loyer mensuel</p>
               <p className="font-medium text-lg">
                 ${lease.terms?.rentAmount?.toLocaleString() || "N/A"}
               </p>
@@ -230,7 +230,7 @@ export default function LeasePaymentManagementPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
-            Dashboard
+            Tableau de bord
           </TabsTrigger>
           <TabsTrigger value="payments" className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
@@ -242,7 +242,7 @@ export default function LeasePaymentManagementPage() {
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Settings
+            Paramètres
           </TabsTrigger>
         </TabsList>
 
@@ -266,7 +266,7 @@ export default function LeasePaymentManagementPage() {
         <TabsContent value="invoices" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Invoice Management</CardTitle>
+              <CardTitle>Gestion des factures</CardTitle>
               <CardDescription>
                 Generate, view, and manage invoices for this lease
               </CardDescription>
@@ -275,12 +275,12 @@ export default function LeasePaymentManagementPage() {
               <EnhancedLeaseInvoice
                 lease={lease}
                 companyInfo={{
-                  name: "PropertyPro Management",
+                  name: "GESTION E-IMMO",
                   address:
                     "123 Business Avenue, Suite 100, Business City, BC 12345",
                   phone: "+1 (555) 123-4567",
-                  email: "info@PropertyPro.com",
-                  website: "www.PropertyPro.com",
+                  email: "contact@e-immo.bj",
+                  website: "www.e-immo.bj",
                 }}
                 onInvoiceGenerated={(fileName) => {
                   showSimpleSuccess("Invoice Generated", `Invoice generated: ${fileName}`);
@@ -299,7 +299,7 @@ export default function LeasePaymentManagementPage() {
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Settings</CardTitle>
+              <CardTitle>Paramètres des paiements</CardTitle>
               <CardDescription>
                 Configure payment automation and preferences
               </CardDescription>
@@ -316,52 +316,52 @@ export default function LeasePaymentManagementPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Auto-Create Payments</h4>
+                    <h4 className="font-medium mb-2">Créer automatiquement les paiements</h4>
                     <p className="text-sm text-muted-foreground mb-2">
                       Automatically generate recurring rent payments
                     </p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Active</span>
+                      <span className="text-sm">Actif</span>
                     </div>
                   </div>
 
                   <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Auto-Generate Invoices</h4>
+                    <h4 className="font-medium mb-2">Générer automatiquement les factures</h4>
                     <p className="text-sm text-muted-foreground mb-2">
                       Automatically create invoices when payments are due
                     </p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Active</span>
+                      <span className="text-sm">Actif</span>
                     </div>
                   </div>
 
                   <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Auto-Email Invoices</h4>
+                    <h4 className="font-medium mb-2">Envoyer automatiquement les factures par e-mail</h4>
                     <p className="text-sm text-muted-foreground mb-2">
                       Automatically email invoices to tenants
                     </p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Active</span>
+                      <span className="text-sm">Actif</span>
                     </div>
                   </div>
 
                   <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Status Synchronization</h4>
+                    <h4 className="font-medium mb-2">Synchronisation des statuts</h4>
                     <p className="text-sm text-muted-foreground mb-2">
                       Sync payment status with lease status
                     </p>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Active</span>
+                      <span className="text-sm">Actif</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t">
-                  <h4 className="font-medium mb-2">Accepted Payment Methods</h4>
+                  <h4 className="font-medium mb-2">Modes de paiement acceptés</h4>
                   <div className="flex flex-wrap gap-2">
                     {lease.terms?.paymentConfig?.acceptedPaymentMethods?.map(
                       (method) => (

@@ -451,9 +451,9 @@ export default function InspectionsPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
+      <div className="mobile-inspections-page min-w-0 space-y-3 sm:space-y-6">
+        <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
               {t("inspections.header.title")}
             </h1>
@@ -461,10 +461,11 @@ export default function InspectionsPage() {
               {t("inspections.errorHeader.subtitle")}
             </p>
           </div>
-          <Link href="/dashboard/inspections/new">
-            <Button>
+          <Link className="w-full sm:w-auto" href="/dashboard/inspections/new">
+            <Button className="w-full whitespace-nowrap sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
-              {t("inspections.actions.scheduleInspection")}
+              <span className="sm:hidden">Planifier</span>
+              <span className="hidden sm:inline">{t("inspections.actions.scheduleInspection")}</span>
             </Button>
           </Link>
         </div>
@@ -481,29 +482,30 @@ export default function InspectionsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-inspections-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("inspections.header.title")}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-xs leading-4 text-muted-foreground sm:text-base">
             {t("inspections.header.subtitle")}
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Link href="/dashboard/inspections/new">
-            <Button size="sm">
+        <div className="grid w-full grid-cols-1 sm:flex sm:w-auto">
+          <Link className="w-full sm:w-auto" href="/dashboard/inspections/new">
+            <Button className="w-full whitespace-nowrap sm:w-auto" size="sm">
               <Plus className="h-4 w-4" />
-              {t("inspections.actions.scheduleInspection")}
+              <span className="sm:hidden">Planifier</span>
+              <span className="hidden sm:inline">{t("inspections.actions.scheduleInspection")}</span>
             </Button>
           </Link>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-4">
         <Card className="gap-0">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -613,8 +615,8 @@ export default function InspectionsPage() {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
-            <div className="relative flex-1 min-w-0">
+          <div className="grid grid-cols-2 gap-2 rounded-lg border border-gray-200/60 bg-gray-50/50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50 lg:flex lg:items-center lg:gap-4 lg:p-4">
+            <div className="relative col-span-2 min-w-0 lg:flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder={t("inspections.filters.searchPlaceholder")}
@@ -624,9 +626,9 @@ export default function InspectionsPage() {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="col-span-2 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-3">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-10 w-[140px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-[140px]">
                   <SelectValue placeholder={t("inspections.filters.status")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -649,7 +651,7 @@ export default function InspectionsPage() {
               </Select>
 
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="h-10 w-[140px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-[140px]">
                   <SelectValue placeholder={t("inspections.filters.type")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -675,7 +677,7 @@ export default function InspectionsPage() {
                 value={conditionFilter}
                 onValueChange={setConditionFilter}
               >
-                <SelectTrigger className="h-10 w-[140px] border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-[140px]">
                   <SelectValue placeholder={t("inspections.filters.condition")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -707,7 +709,7 @@ export default function InspectionsPage() {
                     setTypeFilter("ALL_TYPES");
                     setConditionFilter("ALL_CONDITIONS");
                   }}
-                  className="h-10 px-3 text-gray-500 hover:text-gray-700"
+                  className="h-10 w-full px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
                   {t("inspections.actions.clear")}

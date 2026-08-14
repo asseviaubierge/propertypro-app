@@ -489,7 +489,7 @@ export class PaymentAnalyticsService {
 
       return {
         tenantId: data._id.toString(),
-        tenantName: data.tenantName || "Unknown",
+        tenantName: data.tenantName || "Inconnu",
         totalPayments: data.totalPayments,
         onTimePayments: data.onTimePayments,
         latePayments: data.latePayments,

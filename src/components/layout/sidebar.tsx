@@ -428,6 +428,13 @@ const navigationSections: NavSection[] = [
             roles: [UserRole.ADMIN],
             requiredPermissions: ["system_settings"],
           },
+          {
+            title: "WhatsApp utilisateurs",
+            href: "/dashboard/admin/whatsapp",
+            icon: MessageCircle,
+            roles: [UserRole.ADMIN],
+            requiredPermissions: ["system_settings"],
+          },
         ],
       },
       {
@@ -968,7 +975,7 @@ export function Sidebar({ className, isCollapsed = false, hideHeader = false, on
   // (e.g. "/images/logo-light.png") that isn't shipped as a file, so rendering
   // it through next/image 400s and shows a broken image. In that case fall back
   // to a dynamic text wordmark built from the central company name instead.
-  const companyName = (branding.companyName ?? "").trim() || "PropertyPro";
+  const companyName = (branding.companyName ?? "").trim() || "GESTION E-IMMO";
   const isMissingLogoAsset = (url?: string) =>
     !url || url.startsWith("/images/logo");
   const [logoError, setLogoError] = useState(false);
@@ -1105,7 +1112,7 @@ export function Sidebar({ className, isCollapsed = false, hideHeader = false, on
                 "flex items-center w-full rounded-lg transition-colors hover:bg-sidebar-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 isCollapsed ? "justify-center p-1" : "gap-3 p-2 text-left",
               )}
-              aria-label="Open user menu"
+              aria-label="Ouvrir le menu utilisateur"
             >
               <Avatar className="h-8 w-8">
                 <AvatarImage

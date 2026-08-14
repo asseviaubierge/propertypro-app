@@ -166,7 +166,7 @@ export default function OverduePaymentsPage() {
       }
     } catch (error) {
       showSimpleError(
-        "Load Error",
+        "Erreur de chargement",
         error instanceof Error
           ? error.message
           : t("payments.overdue.toasts.loadError")
@@ -544,7 +544,7 @@ export default function OverduePaymentsPage() {
                 isLoading={isLoading}
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-red-400 dark:focus:border-red-500 focus:ring-1 focus:ring-red-400 dark:focus:ring-red-500 bg-white dark:bg-gray-800"
-                ariaLabel="Search overdue invoices"
+                ariaLabel="Rechercher des factures en retard"
               />
 
               {/* Filters */}
@@ -614,7 +614,7 @@ export default function OverduePaymentsPage() {
                     className="h-10 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                   >
                     <XCircle className="h-4 w-4 mr-2" />
-                    {t("common.clearFilters") || "Clear"}
+                    {t("common.clearFilters") || "Effacer"}
                   </Button>
                 )}
               </div>
@@ -647,16 +647,16 @@ export default function OverduePaymentsPage() {
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
                 showingLabel={t("common.showing", {
-                  defaultValue: "Showing",
+                  defaultValue: "Affichage de",
                 })}
                 previousLabel={t("common.previous", {
-                  defaultValue: "Previous",
+                  defaultValue: "Précédent",
                 })}
-                nextLabel={t("common.next", { defaultValue: "Next" })}
+                nextLabel={t("common.next", { defaultValue: "Suivant" })}
                 pageLabel={t("common.page", { defaultValue: "Page" })}
-                ofLabel={t("common.of", { defaultValue: "of" })}
+                ofLabel={t("common.of", { defaultValue: "sur" })}
                 itemsPerPageLabel={t("common.perPage", {
-                  defaultValue: "per page",
+                  defaultValue: "par page",
                 })}
                 disabled={isLoading}
               />

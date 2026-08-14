@@ -237,7 +237,7 @@ export default function InvoiceTable({
                       <TableHead>Montant</TableHead>
                       <TableHead>Date d'échéance</TableHead>
                       <TableHead>Statut</TableHead>
-                      <TableHead>Days En retard</TableHead>
+                      <TableHead>Jours de retard</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -336,12 +336,12 @@ export default function InvoiceTable({
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                showingLabel={t("common.showing", { defaultValue: "Showing" })}
-                previousLabel={t("common.previous", { defaultValue: "Previous" })}
-                nextLabel={t("common.next", { defaultValue: "Next" })}
+                showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+                previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+                nextLabel={t("common.next", { defaultValue: "Suivant" })}
                 pageLabel={t("common.page", { defaultValue: "Page" })}
-                ofLabel={t("common.of", { defaultValue: "of" })}
-                itemsPerPageLabel={t("common.perPage", { defaultValue: "per page" })}
+                ofLabel={t("common.of", { defaultValue: "sur" })}
+                itemsPerPageLabel={t("common.perPage", { defaultValue: "par page" })}
               />
             </>
           )}

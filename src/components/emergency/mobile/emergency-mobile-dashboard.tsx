@@ -205,7 +205,7 @@ export function EmergencyMobileDashboard({
             <Zap className="h-6 w-6" />
             Emergencies
           </h1>
-          <p className="text-sm text-red-600">Active emergency requests</p>
+          <p className="text-sm text-red-600">Demandes d’urgence actives</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -234,7 +234,7 @@ export function EmergencyMobileDashboard({
               <div className="text-2xl font-bold text-red-600">
                 {stats.activeEmergencies}
               </div>
-              <div className="text-xs text-red-700">Active</div>
+              <div className="text-xs text-red-700">Actif</div>
             </CardContent>
           </Card>
           <Card className="border-orange-200">
@@ -242,7 +242,7 @@ export function EmergencyMobileDashboard({
               <div className="text-2xl font-bold text-orange-600">
                 {stats.overdueEmergencies}
               </div>
-              <div className="text-xs text-orange-700">Overdue</div>
+              <div className="text-xs text-orange-700">En retard</div>
             </CardContent>
           </Card>
           <Card className="border-red-300">
@@ -250,7 +250,7 @@ export function EmergencyMobileDashboard({
               <div className="text-2xl font-bold text-red-700">
                 {stats.criticalCount}
               </div>
-              <div className="text-xs text-red-800">Critical</div>
+              <div className="text-xs text-red-800">Critique</div>
             </CardContent>
           </Card>
           <Card className="border-yellow-200">
@@ -258,7 +258,7 @@ export function EmergencyMobileDashboard({
               <div className="text-2xl font-bold text-yellow-600">
                 {stats.unassignedEmergencies}
               </div>
-              <div className="text-xs text-yellow-700">Unassigned</div>
+              <div className="text-xs text-yellow-700">Non attribué</div>
             </CardContent>
           </Card>
         </div>

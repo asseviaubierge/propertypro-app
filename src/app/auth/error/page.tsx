@@ -27,105 +27,105 @@ function AuthErrorContent() {
       case "Configuration":
         return {
           icon: AlertCircle,
-          title: "Configuration Error",
-          description: "There is a problem with the server configuration.",
-          suggestion: "Please contact the administrator.",
+          title: "Erreur de configuration",
+          description: "La configuration du serveur présente un problème.",
+          suggestion: "Contactez l’administrateur.",
           color: "red",
         };
       case "AccessDenied":
         return {
           icon: UserX,
-          title: "Access Denied",
-          description: "You do not have permission to sign in.",
-          suggestion: "Please contact your administrator if you believe this is an error.",
+          title: "Accès refusé",
+          description: "Vous n’avez pas l’autorisation de vous connecter.",
+          suggestion: "Contactez votre administrateur si vous pensez qu’il s’agit d’une erreur.",
           color: "orange",
         };
       case "Verification":
         return {
           icon: Mail,
-          title: "Verification Required",
-          description: "The verification token has expired or has already been used.",
-          suggestion: "Please request a new verification email.",
+          title: "Vérification requise",
+          description: "Le lien de vérification a expiré ou a déjà été utilisé.",
+          suggestion: "Demandez un nouvel e-mail de vérification.",
           color: "blue",
         };
       case "OAuthSignin":
         return {
           icon: Shield,
-          title: "OAuth Sign In Error",
-          description: "Error occurred while trying to sign in with the OAuth provider.",
-          suggestion: "Please try again or use a different sign-in method.",
+          title: "Erreur de connexion externe",
+          description: "Une erreur est survenue pendant la connexion au service externe.",
+          suggestion: "Réessayez ou utilisez un autre mode de connexion.",
           color: "purple",
         };
       case "OAuthCallback":
         return {
           icon: Shield,
-          title: "OAuth Callback Error",
-          description: "Error occurred during the OAuth callback process.",
-          suggestion: "Please try signing in again.",
+          title: "Erreur de retour de connexion",
+          description: "Une erreur est survenue lors du retour du service de connexion.",
+          suggestion: "Essayez de vous connecter à nouveau.",
           color: "purple",
         };
       case "OAuthCreateAccount":
         return {
           icon: Shield,
-          title: "Account Creation Error",
-          description: "Could not create an account with the OAuth provider.",
-          suggestion: "The email might already be in use. Try signing in instead.",
+          title: "Erreur de création du compte",
+          description: "Le compte n’a pas pu être créé avec ce service externe.",
+          suggestion: "Cette adresse e-mail est peut-être déjà utilisée. Essayez de vous connecter.",
           color: "purple",
         };
       case "EmailCreateAccount":
         return {
           icon: Mail,
-          title: "Email Account Error",
-          description: "Could not create an account with the provided email.",
-          suggestion: "The email might already be in use. Try signing in instead.",
+          title: "Erreur du compte e-mail",
+          description: "Le compte n’a pas pu être créé avec l’adresse fournie.",
+          suggestion: "Cette adresse e-mail est peut-être déjà utilisée. Essayez de vous connecter.",
           color: "blue",
         };
       case "Callback":
         return {
           icon: AlertCircle,
-          title: "Callback Error",
-          description: "Error occurred during the authentication callback.",
-          suggestion: "Please try signing in again.",
+          title: "Erreur de retour d’authentification",
+          description: "Une erreur est survenue pendant le retour d’authentification.",
+          suggestion: "Essayez de vous connecter à nouveau.",
           color: "red",
         };
       case "OAuthAccountNotLinked":
         return {
           icon: Shield,
-          title: "Account Not Linked",
-          description: "This email is already associated with another account.",
-          suggestion: "Please sign in using your original sign-in method.",
+          title: "Compte non associé",
+          description: "Cette adresse e-mail est déjà associée à un autre compte.",
+          suggestion: "Connectez-vous avec votre mode de connexion initial.",
           color: "orange",
         };
       case "EmailSignin":
         return {
           icon: Mail,
-          title: "Email Sign In Error",
-          description: "The email sign-in link is invalid or has expired.",
-          suggestion: "Please request a new sign-in link.",
+          title: "Erreur de connexion par e-mail",
+          description: "Le lien de connexion est invalide ou a expiré.",
+          suggestion: "Demandez un nouveau lien de connexion.",
           color: "blue",
         };
       case "CredentialsSignin":
         return {
           icon: Key,
-          title: "Invalid Credentials",
-          description: "The email or password you entered is incorrect.",
-          suggestion: "Please check your credentials and try again.",
+          title: "Identifiants incorrects",
+          description: "L’adresse e-mail ou le mot de passe est incorrect.",
+          suggestion: "Vérifiez vos identifiants et réessayez.",
           color: "red",
         };
       case "SessionRequired":
         return {
           icon: Shield,
-          title: "Session Required",
-          description: "You must be signed in to access this page.",
-          suggestion: "Please sign in to continue.",
+          title: "Connexion requise",
+          description: "Vous devez être connecté pour accéder à cette page.",
+          suggestion: "Connectez-vous pour continuer.",
           color: "orange",
         };
       default:
         return {
           icon: AlertCircle,
-          title: "Authentication Error",
-          description: "An unexpected error occurred during authentication.",
-          suggestion: "Please try again or contact support if the problem persists.",
+          title: "Erreur d’authentification",
+          description: "Une erreur inattendue est survenue pendant l’authentification.",
+          suggestion: "Réessayez ou contactez l’assistance si le problème persiste.",
           color: "red",
         };
     }
@@ -153,7 +153,7 @@ function AuthErrorContent() {
           {/* Error Alert */}
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>What happened?</AlertTitle>
+            <AlertTitle>Que s’est-il passé ?</AlertTitle>
             <AlertDescription className="mt-2">
               {errorDetails.description}
             </AlertDescription>
@@ -161,7 +161,7 @@ function AuthErrorContent() {
 
           {/* Suggestion */}
           <div className="bg-muted/50 border border-border rounded-lg p-4">
-            <p className="text-sm font-medium mb-2">What should I do?</p>
+            <p className="text-sm font-medium mb-2">Que dois-je faire ?</p>
             <p className="text-sm text-muted-foreground">
               {errorDetails.suggestion}
             </p>
@@ -170,7 +170,7 @@ function AuthErrorContent() {
           {/* Error Code (for debugging) */}
           {error && (
             <div className="text-center text-xs text-muted-foreground">
-              <p>Error Code: <code className="font-mono bg-muted px-2 py-1 rounded">{error}</code></p>
+              <p>Code d’erreur : <code className="font-mono bg-muted px-2 py-1 rounded">{error}</code></p>
             </div>
           )}
 
@@ -182,7 +182,7 @@ function AuthErrorContent() {
               size="lg"
             >
               <RefreshCw className="size-4" />
-              Try Signing In Again
+              Réessayer de se connecter
             </Button>
 
             <div className="grid grid-cols-2 gap-3">
@@ -192,7 +192,7 @@ function AuthErrorContent() {
                 className="gap-2"
               >
                 <ArrowLeft className="size-4" />
-                Go Back
+                Retour
               </Button>
               <Button
                 onClick={() => router.push("/")}
@@ -200,7 +200,7 @@ function AuthErrorContent() {
                 className="gap-2"
               >
                 <Home className="size-4" />
-                Home
+                Accueil
               </Button>
             </div>
           </div>
@@ -208,7 +208,7 @@ function AuthErrorContent() {
           {/* Additional Help */}
           <div className="pt-4 border-t border-border/50 text-center">
             <p className="text-xs text-muted-foreground mb-3">
-              Need more help?
+              Besoin d’aide ?
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">
               <Button
@@ -217,7 +217,7 @@ function AuthErrorContent() {
                 size="sm"
                 className="text-xs"
               >
-                <a href="/auth/forgot-password">Reset Password</a>
+                <a href="/auth/forgot-password">Réinitialiser le mot de passe</a>
               </Button>
               <Button
                 asChild
@@ -225,7 +225,7 @@ function AuthErrorContent() {
                 size="sm"
                 className="text-xs"
               >
-                <a href="/auth/signup">Create Account</a>
+                <a href="/auth/signup">Créer un compte</a>
               </Button>
               <Button
                 asChild
@@ -233,7 +233,7 @@ function AuthErrorContent() {
                 size="sm"
                 className="text-xs"
               >
-                <a href="mailto:support@propertypro.com">Contact Support</a>
+                <a href="mailto:support@e-immo.bj">Contacter l’assistance</a>
               </Button>
             </div>
           </div>
@@ -256,4 +256,3 @@ export default function AuthErrorPage() {
     </Suspense>
   );
 }
-

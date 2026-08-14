@@ -389,7 +389,7 @@ export default function PaymentProcessingPage({
               <div>
                 <p className="font-medium">
                   {payment.tenantId?.userId?.firstName || ""}{" "}
-                  {payment.tenantId?.userId?.lastName || "Tenant"}
+                  {payment.tenantId?.userId?.lastName || "Locataire"}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {payment.tenantId?.userId?.email || "N/A"}

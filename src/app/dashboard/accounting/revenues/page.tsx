@@ -236,16 +236,16 @@ export default function RevenuesPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="mobile-revenues-page min-w-0 space-y-3 sm:space-y-4">
       {/* Header */}
-      <div>
+      <div className="mobile-page-header">
         <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
           {t("nav.accounting.revenues", { defaultValue: "Revenus" })}
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base">
           {t("revenues.subtitle", {
             defaultValue:
-              "Suivez les revenus provenant des loyers, pénalités, dépôts et autres sources",
+              "Loyers, pénalités et autres revenus",
           })}
         </p>
       </div>
@@ -254,14 +254,14 @@ export default function RevenuesPage() {
       <AnalyticsCardGrid className="lg:grid-cols-4">
         <AnalyticsCard
           title={t("revenues.stats.totalRevenue", {
-            defaultValue: "Revenus totaux",
+            defaultValue: "Revenus",
           })}
           value={formatCurrency(summary?.totalRevenue || 0)}
           icon={DollarSign}
           iconColor="primary"
         />
         <AnalyticsCard
-          title={t("revenues.stats.collected", { defaultValue: "Montant encaissé" })}
+          title={t("revenues.stats.collected", { defaultValue: "Encaissé" })}
           value={formatCurrency(summary?.totalCollected || 0)}
           icon={CheckCircle}
           iconColor="success"
@@ -276,9 +276,9 @@ export default function RevenuesPage() {
         />
         <AnalyticsCard
           title={t("revenues.stats.collectionRate", {
-            defaultValue: "Taux de recouvrement",
+            defaultValue: "Recouvrement",
           })}
-          value={`${summary?.collectionRate || 0}%`}
+          value={`${Number(summary?.collectionRate || 0).toFixed(1)}%`}
           icon={Percent}
           iconColor="info"
           description={t("revenues.stats.ytd", {
@@ -300,7 +300,7 @@ export default function RevenuesPage() {
               <div>
                 <CardTitle className="text-base">
                   {t("revenues.charts.monthlyTrends", {
-                    defaultValue: "Évolution mensuelle des revenus",
+                    defaultValue: "Revenus mensuels",
                   })}
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -325,7 +325,7 @@ export default function RevenuesPage() {
                     tick={{ fontSize: 11 }}
                     tickLine={false}
                     tickFormatter={(v) =>
-                      `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
+                      v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
                     }
                   />
                   <Tooltip

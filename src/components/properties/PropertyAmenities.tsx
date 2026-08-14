@@ -71,13 +71,13 @@ const amenityCategories = [
   "Living",
   "Bedroom",
   "Outdoor",
-  "Parking",
-  "Security",
-  "Utilities",
+  "Stationnement",
+  "Sécurité",
+  "Services publics",
   "Recreation",
   "Laundry",
   "Climate",
-  "Other",
+  "Autre",
 ];
 
 const categoryIcons: Record<
@@ -410,7 +410,7 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
       {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Amenity</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer l’équipement</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to remove &quot;{amenityToDelete}&quot; from
               the property amenities? This action cannot be undone.
@@ -418,14 +418,14 @@ const PropertyAmenities: React.FC<PropertyAmenitiesProps> = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleDeleteCancel} disabled={loading}>
-              Cancel
+              Annuler
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAmenity}
               disabled={loading}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {loading ? "Removing..." : "Remove Amenity"}
+              {loading ? "Removing..." : "Supprimer l’équipement"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

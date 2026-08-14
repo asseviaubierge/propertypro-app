@@ -242,9 +242,9 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="mobile-reports-page min-w-0 space-y-4 sm:space-y-6 sm:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
             {t("reports.title",{defaultValue:"Rapports"})}
@@ -253,9 +253,9 @@ export default function ReportsPage() {
             {t("reports.description",{defaultValue:"Consultez les rapports financiers et statistiques."})}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-1.5 sm:flex sm:w-auto sm:gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="h-11 w-full min-w-0 px-2 text-xs sm:h-9 sm:w-40 sm:px-3 sm:text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -267,16 +267,17 @@ export default function ReportsPage() {
             </SelectContent>
           </Select>
           <Button
+            className="px-2 text-[10px] sm:px-3 sm:text-sm"
             variant="outline"
             size="sm"
             onClick={() => fetchReport(activeTab, dateRange)}
             disabled={isLoading}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`mr-1 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4 ${isLoading ? "animate-spin" : ""}`} />
             {t("reports.actions.refresh",{defaultValue:"Actualiser"})}
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExport} disabled={isLoading}>
-            <Download className="h-4 w-4 mr-2" />
+          <Button className="px-2 text-[10px] sm:px-3 sm:text-sm" variant="outline" size="sm" onClick={handleExport} disabled={isLoading}>
+            <Download className="mr-1 h-3.5 w-3.5 shrink-0 sm:mr-2 sm:h-4 sm:w-4" />
             {t("reports.actions.export",{defaultValue:"Exporter"})}
           </Button>
         </div>

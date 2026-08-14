@@ -80,7 +80,7 @@ class LeaseExpiryNotificationTester {
       // Create test tenant user
       const testTenant = await User.create({
         firstName: "Test",
-        lastName: "Tenant",
+        lastName: "Locataire",
         email: `test-tenant-${Date.now()}@example.com`,
         role: "tenant",
         password: "test123456",
@@ -242,7 +242,7 @@ class LeaseExpiryNotificationTester {
       const manager = property?.managerId as any;
 
       const recipients = [];
-      if (tenant && tenant.email) recipients.push("Tenant");
+      if (tenant && tenant.email) recipients.push("Locataire");
       if (owner && owner.email) recipients.push("Owner");
       if (manager && manager.email && manager._id.toString() !== owner?._id.toString()) {
         recipients.push("Manager");

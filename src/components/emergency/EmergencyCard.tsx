@@ -100,7 +100,7 @@ export default function EmergencyCard({
       return (
         <Badge variant="destructive" className="animate-pulse">
           <AlertTriangle className="h-3 w-3 mr-1" />
-          Critical
+          Critique
         </Badge>
       );
     }
@@ -111,7 +111,7 @@ export default function EmergencyCard({
           className="bg-orange-100 dark:bg-orange-950/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-800"
         >
           <Timer className="h-3 w-3 mr-1" />
-          Overdue
+          En retard
         </Badge>
       );
     }
@@ -253,7 +253,7 @@ export default function EmergencyCard({
             ) : (
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-orange-600" />
-                <span className="text-sm text-orange-600">Unassigned</span>
+                <span className="text-sm text-orange-600">Non attribué</span>
               </div>
             )}
             {request.estimatedCost && (
@@ -267,7 +267,7 @@ export default function EmergencyCard({
             <div className="flex items-center gap-2">
               <Link href={`/dashboard/maintenance/${request._id}`}>
                 <Button variant="outline" size="sm">
-                  View Details
+                  Voir les détails
                 </Button>
               </Link>
               {request.status !== MaintenanceStatus.COMPLETED && (

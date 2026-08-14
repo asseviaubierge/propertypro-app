@@ -113,7 +113,7 @@ export default function AdvancedReportingDashboard() {
     },
     {
       id: "rpt_2",
-      name: "Occupancy Analysis",
+      name: "Analyse de l’occupation",
       type: "occupancy",
       description:
         "Detailed occupancy rates, vacancy analysis, and turnover metrics",
@@ -170,8 +170,8 @@ export default function AdvancedReportingDashboard() {
 
   const getStatusBadge = (status: ReportData["status"]) => {
     const statusConfig = {
-      active: { label: "Active", variant: "default" },
-      inactive: { label: "Inactive", variant: "secondary" },
+      active: { label: "Actif", variant: "default" },
+      inactive: { label: "Inactif", variant: "secondary" },
       generating: { label: "Generating", variant: "default" },
       error: { label: "Error", variant: "destructive" },
     };
@@ -238,12 +238,12 @@ export default function AdvancedReportingDashboard() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                Create Report
+                Créer le rapport
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Create Custom Report</DialogTitle>
+                <DialogTitle>Créer un rapport personnalisé</DialogTitle>
                 <DialogDescription>
                   Configure a new report with custom parameters and scheduling
                 </DialogDescription>
@@ -252,21 +252,21 @@ export default function AdvancedReportingDashboard() {
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="report-name">Report Name</Label>
-                    <Input id="report-name" placeholder="Enter report name" />
+                    <Label htmlFor="report-name">Nom du rapport</Label>
+                    <Input id="report-name" placeholder="Saisir le nom du rapport" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="report-type">Report Type</Label>
+                    <Label htmlFor="report-type">Type de rapport</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
+                        <SelectValue placeholder="Sélectionner un type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="financial">Financial</SelectItem>
-                        <SelectItem value="occupancy">Occupancy</SelectItem>
-                        <SelectItem value="payment">Payment</SelectItem>
-                        <SelectItem value="tenant">Tenant</SelectItem>
+                        <SelectItem value="financial">Financier</SelectItem>
+                        <SelectItem value="occupancy">Occupation</SelectItem>
+                        <SelectItem value="payment">Paiement</SelectItem>
+                        <SelectItem value="tenant">Locataire</SelectItem>
                         <SelectItem value="maintenance">Maintenance</SelectItem>
                       </SelectContent>
                     </Select>
@@ -280,18 +280,18 @@ export default function AdvancedReportingDashboard() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="frequency">Frequency</Label>
+                    <Label htmlFor="frequency">Fréquence</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select frequency" />
+                        <SelectValue placeholder="Sélectionner la fréquence" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
-                        <SelectItem value="yearly">Yearly</SelectItem>
-                        <SelectItem value="on-demand">On Demand</SelectItem>
+                        <SelectItem value="daily">Quotidienne</SelectItem>
+                        <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                        <SelectItem value="monthly">Mensuelle</SelectItem>
+                        <SelectItem value="quarterly">Trimestrielle</SelectItem>
+                        <SelectItem value="yearly">Annuelle</SelectItem>
+                        <SelectItem value="on-demand">À la demande</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -300,20 +300,20 @@ export default function AdvancedReportingDashboard() {
                     <Label htmlFor="format">Format</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select format" />
+                        <SelectValue placeholder="Sélectionner le format" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="pdf">PDF</SelectItem>
                         <SelectItem value="excel">Excel</SelectItem>
                         <SelectItem value="csv">CSV</SelectItem>
-                        <SelectItem value="dashboard">Dashboard</SelectItem>
+                        <SelectItem value="dashboard">Tableau de bord</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="recipients">Email Recipients</Label>
+                  <Label htmlFor="recipients">Destinataires par e-mail</Label>
                   <Input
                     id="recipients"
                     placeholder="email1@example.com, email2@example.com"
@@ -321,8 +321,8 @@ export default function AdvancedReportingDashboard() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline">Save Draft</Button>
-                  <Button>Create Report</Button>
+                  <Button variant="outline">Enregistrer le brouillon</Button>
+                  <Button>Créer le rapport</Button>
                 </div>
               </div>
             </DialogContent>
@@ -332,11 +332,11 @@ export default function AdvancedReportingDashboard() {
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="financial">Financial</TabsTrigger>
-          <TabsTrigger value="occupancy">Occupancy</TabsTrigger>
-          <TabsTrigger value="payments">Payments</TabsTrigger>
-          <TabsTrigger value="scheduled">Scheduled Reports</TabsTrigger>
+          <TabsTrigger value="overview">Vue d’ensemble</TabsTrigger>
+          <TabsTrigger value="financial">Financier</TabsTrigger>
+          <TabsTrigger value="occupancy">Occupation</TabsTrigger>
+          <TabsTrigger value="payments">Paiements</TabsTrigger>
+          <TabsTrigger value="scheduled">Rapports planifiés</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -345,7 +345,7 @@ export default function AdvancedReportingDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Revenue
+                  Revenu total
                 </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -381,7 +381,7 @@ export default function AdvancedReportingDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Occupancy Rate
+                  Taux d’occupation
                 </CardTitle>
                 <Building2 className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -399,7 +399,7 @@ export default function AdvancedReportingDashboard() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Collection Rate
+                  Taux d’encaissement
                 </CardTitle>
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
@@ -418,7 +418,7 @@ export default function AdvancedReportingDashboard() {
           {/* Financial Trend Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Financial Performance Trend</CardTitle>
+              <CardTitle>Évolution du rendement financier</CardTitle>
               <CardDescription>
                 Monthly revenue, expenses, and net income over the last 6 months
               </CardDescription>
@@ -464,7 +464,7 @@ export default function AdvancedReportingDashboard() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Report Actions</CardTitle>
+              <CardTitle>Actions rapides de rapport</CardTitle>
               <CardDescription>
                 Generate commonly used reports instantly
               </CardDescription>
@@ -473,19 +473,19 @@ export default function AdvancedReportingDashboard() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <DollarSign className="h-6 w-6" />
-                  <span>Monthly P&L</span>
+                  <span>Résultat mensuel</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <Building2 className="h-6 w-6" />
-                  <span>Occupancy Report</span>
+                  <span>Rapport d’occupation</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <FileText className="h-6 w-6" />
-                  <span>Rent Roll</span>
+                  <span>État locatif</span>
                 </Button>
                 <Button variant="outline" className="h-20 flex-col space-y-2">
                   <Users className="h-6 w-6" />
-                  <span>Tenant Report</span>
+                  <span>Rapport des locataires</span>
                 </Button>
               </div>
             </CardContent>
@@ -497,7 +497,7 @@ export default function AdvancedReportingDashboard() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle>Financial Reports</CardTitle>
+                  <CardTitle>Rapports financiers</CardTitle>
                   <CardDescription>
                     Comprehensive financial analysis and reporting
                   </CardDescription>
@@ -511,10 +511,10 @@ export default function AdvancedReportingDashboard() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="last_30_days">Last 30 Days</SelectItem>
-                      <SelectItem value="last_quarter">Last Quarter</SelectItem>
-                      <SelectItem value="last_year">Last Year</SelectItem>
-                      <SelectItem value="ytd">Year to Date</SelectItem>
+                      <SelectItem value="last_30_days">30 derniers jours</SelectItem>
+                      <SelectItem value="last_quarter">Trimestre précédent</SelectItem>
+                      <SelectItem value="last_year">Année précédente</SelectItem>
+                      <SelectItem value="ytd">Depuis le début de l’année</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button onClick={() => handleExportReport("pdf")}>
@@ -529,43 +529,43 @@ export default function AdvancedReportingDashboard() {
                 {/* Revenue Breakdown */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Revenue Breakdown</CardTitle>
+                    <CardTitle className="text-lg">Répartition des revenus</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span>Rental Income</span>
+                        <span>Revenus locatifs</span>
                         <span className="font-medium">
                           {formatCurrency(115000)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Late Fees</span>
+                        <span>Frais de retard</span>
                         <span className="font-medium">
                           {formatCurrency(3500)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Pet Fees</span>
+                        <span>Frais pour animaux</span>
                         <span className="font-medium">
                           {formatCurrency(2800)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Parking Fees</span>
+                        <span>Frais de stationnement</span>
                         <span className="font-medium">
                           {formatCurrency(2200)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Other Income</span>
+                        <span>Autres revenus</span>
                         <span className="font-medium">
                           {formatCurrency(1500)}
                         </span>
                       </div>
                       <hr />
                       <div className="flex justify-between font-bold">
-                        <span>Total Revenue</span>
+                        <span>Revenu total</span>
                         <span>{formatCurrency(125000)}</span>
                       </div>
                     </div>
@@ -575,7 +575,7 @@ export default function AdvancedReportingDashboard() {
                 {/* Expense Breakdown */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Expense Breakdown</CardTitle>
+                    <CardTitle className="text-lg">Répartition des dépenses</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -586,32 +586,32 @@ export default function AdvancedReportingDashboard() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Utilities</span>
+                        <span>Services publics</span>
                         <span className="font-medium">
                           {formatCurrency(12000)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Insurance</span>
+                        <span>Assurance</span>
                         <span className="font-medium">
                           {formatCurrency(8000)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Property Tax</span>
+                        <span>Taxe foncière</span>
                         <span className="font-medium">
                           {formatCurrency(5000)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Management Fees</span>
+                        <span>Frais de gestion</span>
                         <span className="font-medium">
                           {formatCurrency(2000)}
                         </span>
                       </div>
                       <hr />
                       <div className="flex justify-between font-bold">
-                        <span>Total Expenses</span>
+                        <span>Total des dépenses</span>
                         <span>{formatCurrency(45000)}</span>
                       </div>
                     </div>
@@ -622,7 +622,7 @@ export default function AdvancedReportingDashboard() {
               {/* Profit & Loss Chart */}
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Profit & Loss Trend</CardTitle>
+                  <CardTitle>Évolution des résultats</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -662,7 +662,7 @@ export default function AdvancedReportingDashboard() {
         <TabsContent value="occupancy" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Occupancy Analysis</CardTitle>
+              <CardTitle>Analyse de l’occupation</CardTitle>
               <CardDescription>
                 Detailed occupancy metrics and vacancy analysis
               </CardDescription>
@@ -671,7 +671,7 @@ export default function AdvancedReportingDashboard() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Current Occupancy</CardTitle>
+                    <CardTitle className="text-sm">Occupation actuelle</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">94%</div>
@@ -697,17 +697,17 @@ export default function AdvancedReportingDashboard() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Turnover Rate</CardTitle>
+                    <CardTitle className="text-sm">Taux de rotation</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">15%</div>
-                    <p className="text-xs text-muted-foreground">Annual rate</p>
+                    <p className="text-xs text-muted-foreground">Taux annuel</p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Lease Renewals</CardTitle>
+                    <CardTitle className="text-sm">Renouvellements de baux</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">85%</div>
@@ -724,7 +724,7 @@ export default function AdvancedReportingDashboard() {
         <TabsContent value="payments" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Payment Collection Reports</CardTitle>
+              <CardTitle>Rapports d’encaissement</CardTitle>
               <CardDescription>
                 Detailed payment analysis and collection performance
               </CardDescription>
@@ -733,11 +733,11 @@ export default function AdvancedReportingDashboard() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Collection Rate</CardTitle>
+                    <CardTitle className="text-sm">Taux d’encaissement</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">96%</div>
-                    <p className="text-xs text-muted-foreground">This month</p>
+                    <p className="text-xs text-muted-foreground">Ce mois-ci</p>
                   </CardContent>
                 </Card>
 
@@ -757,7 +757,7 @@ export default function AdvancedReportingDashboard() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Late Payment Rate</CardTitle>
+                    <CardTitle className="text-sm">Taux de retard</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">8%</div>
@@ -769,11 +769,11 @@ export default function AdvancedReportingDashboard() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Auto-pay Adoption</CardTitle>
+                    <CardTitle className="text-sm">Adoption du paiement automatique</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">72%</div>
-                    <p className="text-xs text-muted-foreground">Of tenants</p>
+                    <p className="text-xs text-muted-foreground">Des locataires</p>
                   </CardContent>
                 </Card>
               </div>
@@ -791,14 +791,14 @@ export default function AdvancedReportingDashboard() {
                   onValueChange={setSelectedReportType}
                 >
                   <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="All Report Types" />
+                    <SelectValue placeholder="Tous les types de rapports" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Report Types</SelectItem>
-                    <SelectItem value="financial">Financial</SelectItem>
-                    <SelectItem value="occupancy">Occupancy</SelectItem>
-                    <SelectItem value="payment">Payment</SelectItem>
-                    <SelectItem value="tenant">Tenant</SelectItem>
+                    <SelectItem value="all">Tous les types de rapports</SelectItem>
+                    <SelectItem value="financial">Financier</SelectItem>
+                    <SelectItem value="occupancy">Occupation</SelectItem>
+                    <SelectItem value="payment">Paiement</SelectItem>
+                    <SelectItem value="tenant">Locataire</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -813,7 +813,7 @@ export default function AdvancedReportingDashboard() {
           {/* Scheduled Reports List */}
           <Card>
             <CardHeader>
-              <CardTitle>Scheduled Reports</CardTitle>
+              <CardTitle>Rapports planifiés</CardTitle>
               <CardDescription>
                 Manage automated report generation and distribution
               </CardDescription>

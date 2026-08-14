@@ -37,8 +37,8 @@ interface PaymentMethodSelectorProps {
 export function PaymentMethodSelector({
   value,
   onValueChange,
-  placeholder = "Select payment method",
-  label = "Payment Method",
+  placeholder = "Sélectionner un mode de paiement",
+  label = "Mode de paiement",
   description,
   required = false,
   disabled = false,
@@ -65,21 +65,21 @@ export function PaymentMethodSelector({
   const getPaymentMethodLabel = (method: PaymentMethod) => {
     switch (method) {
       case PaymentMethod.CREDIT_CARD:
-        return "Credit Card";
+        return "Carte de crédit";
       case PaymentMethod.DEBIT_CARD:
-        return "Debit Card";
+        return "Carte de débit";
       case PaymentMethod.BANK_TRANSFER:
         return "Bank Transfer";
       case PaymentMethod.ACH:
         return "ACH Transfer";
       case PaymentMethod.CHECK:
-        return "Check";
+        return "Chèque";
       case PaymentMethod.CASH:
-        return "Cash";
+        return "Espèces";
       case PaymentMethod.MONEY_ORDER:
         return "Money Order";
       case PaymentMethod.OTHER:
-        return "Other";
+        return "Autre";
       default:
         return method;
     }
@@ -96,7 +96,7 @@ export function PaymentMethodSelector({
       case PaymentMethod.ACH:
         return "Automated Clearing House transfer";
       case PaymentMethod.CHECK:
-        return "Physical or electronic check";
+        return "Chèque physique ou électronique";
       case PaymentMethod.CASH:
         return "Cash payment";
       case PaymentMethod.MONEY_ORDER:
@@ -144,7 +144,7 @@ export function PaymentMethodSelector({
 export function SimplePaymentMethodSelector({
   value,
   onValueChange,
-  placeholder = "Select payment method",
+  placeholder = "Sélectionner un mode de paiement",
   disabled = false,
 }: {
   value?: PaymentMethod;
@@ -174,21 +174,21 @@ export function SimplePaymentMethodSelector({
   const getPaymentMethodLabel = (method: PaymentMethod) => {
     switch (method) {
       case PaymentMethod.CREDIT_CARD:
-        return "Credit Card";
+        return "Carte de crédit";
       case PaymentMethod.DEBIT_CARD:
-        return "Debit Card";
+        return "Carte de débit";
       case PaymentMethod.BANK_TRANSFER:
         return "Bank Transfer";
       case PaymentMethod.ACH:
         return "ACH Transfer";
       case PaymentMethod.CHECK:
-        return "Check";
+        return "Chèque";
       case PaymentMethod.CASH:
-        return "Cash";
+        return "Espèces";
       case PaymentMethod.MONEY_ORDER:
         return "Money Order";
       case PaymentMethod.OTHER:
-        return "Other";
+        return "Autre";
       default:
         return method;
     }

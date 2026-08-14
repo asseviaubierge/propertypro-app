@@ -35,7 +35,7 @@ export const POST = withPermissionAndDB(["lease_create", "lease_management"])(
 
       const currentLease = await Lease.findById(id);
       if (!currentLease || currentLease.deletedAt) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
       if (!(await canAccessLease(user, currentLease))) {
         return createErrorResponse("Access denied", 403);

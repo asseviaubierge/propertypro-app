@@ -89,22 +89,22 @@ const documentTypeDefaultLabels: Record<string, string> = {
   lease: "Lease",
   notice: "Notice",
   maintenance: "Maintenance",
-  insurance: "Insurance",
+  insurance: "Assurance",
   identification: "Identification",
-  income: "Income",
+  income: "Revenu",
   inspection: "Inspection",
   receipt: "Receipt",
-  other: "Other",
+  other: "Autre",
 };
 
 const documentCategoryDefaultLabels: Record<string, string> = {
   lease: "Lease",
-  payments: "Payments",
+  payments: "Paiements",
   maintenance: "Maintenance",
-  insurance: "Insurance",
+  insurance: "Assurance",
   identification: "Identification",
-  notices: "Notices",
-  general: "General",
+  notices: "Avis",
+  general: "Général",
 };
 
 interface TenantDocumentUploadDialogProps {
@@ -167,7 +167,7 @@ export default function TenantDocumentUploadDialog({
           .max(
             500,
             t("leases.documents.upload.validation.descriptionMax", {
-              defaultValue: "Description must be 500 characters or less",
+              defaultValue: "La description doit contenir au maximum 500 caractères",
             })
           )
           .optional()
@@ -177,7 +177,7 @@ export default function TenantDocumentUploadDialog({
           .max(
             200,
             t("leases.documents.upload.validation.tagsMax", {
-              defaultValue: "Tags must be 200 characters or less",
+              defaultValue: "Les étiquettes doivent contenir au maximum 200 caractères",
             })
           )
           .optional()
@@ -226,7 +226,7 @@ export default function TenantDocumentUploadDialog({
       if (incomingFiles.length + selectedFiles.length > MAX_FILES) {
         toast.error(
           t("leases.documents.upload.errors.maxFiles", {
-            defaultValue: "You can upload up to {maxFiles} files at a time.",
+            defaultValue: "Vous pouvez téléverser jusqu’à {maxFiles} fichiers à la fois.",
             values: { maxFiles: MAX_FILES },
           })
         );
@@ -320,7 +320,7 @@ export default function TenantDocumentUploadDialog({
     if (selectedFiles.length === 0) {
       toast.error(
         t("leases.documents.upload.validation.selectAtLeastOneFile", {
-          defaultValue: "Select at least one file to upload",
+          defaultValue: "Sélectionnez au moins un fichier à téléverser",
         })
       );
       return;
@@ -559,7 +559,7 @@ export default function TenantDocumentUploadDialog({
                   <UploadIcon className="h-8 w-8 text-muted-foreground" />
                   <div className="text-sm text-muted-foreground">
                     {t("leases.documents.upload.form.dropzone.help", {
-                      defaultValue: "Drag and drop files here, or",
+                      defaultValue: "Déposez les fichiers ici, ou",
                     })}
                   </div>
                   <Button type="button" variant="outline" size="sm">

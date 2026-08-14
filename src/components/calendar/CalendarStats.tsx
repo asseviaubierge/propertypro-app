@@ -54,7 +54,7 @@ export function CalendarStats() {
   return (
     <AnalyticsCardGrid className="md:grid-cols-2 lg:grid-cols-4">
       <AnalyticsCard
-        title="Total des événements"
+        title="Événements"
         value={stats.totalEvents}
         icon={CalendarDays}
         iconColor="primary"
@@ -72,7 +72,7 @@ export function CalendarStats() {
         iconColor="warning"
       />
       <AnalyticsCard
-        title="Réponses en attente"
+        title="En attente"
         value={stats.pendingRSVPs}
         icon={Users}
         iconColor="info"

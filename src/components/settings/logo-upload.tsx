@@ -388,7 +388,7 @@ export function LogoUpload({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
                     <AlertDialogAction onClick={onRemove}>
                       Remove
                     </AlertDialogAction>
@@ -473,7 +473,7 @@ export function LogoUpload({
           <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
           <div className="text-sm">
             <p className="font-medium text-red-700 dark:text-red-300">
-              Validation Error
+              Erreur de validation
             </p>
             <ul className="mt-1 text-red-600 dark:text-red-400 space-y-1">
               {validationErrors.map((error, index) => (
@@ -489,7 +489,7 @@ export function LogoUpload({
           <Info className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
           <div className="text-sm">
             <p className="font-medium text-yellow-700 dark:text-yellow-300">
-              Recommendations
+              Recommandations
             </p>
             <ul className="mt-1 text-yellow-600 dark:text-yellow-400 space-y-1">
               {validationWarnings.map((warning, index) => (
@@ -503,19 +503,19 @@ export function LogoUpload({
       {/* Upload Requirements */}
       <div className="text-xs text-muted-foreground space-y-1">
         <div className="flex items-center justify-between">
-          <span>Max size:</span>
+          <span>Taille maximale :</span>
           <Badge variant="outline" className="text-xs">
             {formatFileSize(validation.maxFileSize)}
           </Badge>
         </div>
         <div className="flex items-center justify-between">
-          <span>Formats:</span>
+          <span>Formats :</span>
           <Badge variant="outline" className="text-xs">
             {validation.allowedFormats.join(", ").toUpperCase()}
           </Badge>
         </div>
         <div className="flex items-center justify-between">
-          <span>Recommended:</span>
+          <span>Recommandé :</span>
           <Badge variant="outline" className="text-xs">
             {validation.recommendedDimensions.width}×
             {validation.recommendedDimensions.height}px

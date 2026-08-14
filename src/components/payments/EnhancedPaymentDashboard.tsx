@@ -140,7 +140,7 @@ export function EnhancedPaymentDashboard({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            Payment Dashboard
+            Tableau de bord des paiements
           </h2>
           <p className="text-muted-foreground">
             Real-time payment analytics and collection metrics
@@ -156,7 +156,7 @@ export function EnhancedPaymentDashboard({
             <RefreshCw
               className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            Actualiser
           </Button>
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
@@ -191,7 +191,7 @@ export function EnhancedPaymentDashboard({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Collection Rate
+                  Taux d’encaissement
                 </p>
                 <p className="text-2xl font-bold">
                   {formatPercentage(
@@ -292,16 +292,16 @@ export function EnhancedPaymentDashboard({
       {/* Detailed Analytics */}
       <Tabs defaultValue="aging" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="aging">Aging Report</TabsTrigger>
-          <TabsTrigger value="behavior">Payment Behavior</TabsTrigger>
-          <TabsTrigger value="cashflow">Cash Flow</TabsTrigger>
-          <TabsTrigger value="trends">Trends</TabsTrigger>
+          <TabsTrigger value="aging">Rapport d’ancienneté</TabsTrigger>
+          <TabsTrigger value="behavior">Comportement de paiement</TabsTrigger>
+          <TabsTrigger value="cashflow">Trésorerie</TabsTrigger>
+          <TabsTrigger value="trends">Évolutions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="aging" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Aging Report</CardTitle>
+              <CardTitle>Rapport d’ancienneté</CardTitle>
               <CardDescription>
                 Breakdown of overdue payments by age
               </CardDescription>
@@ -309,7 +309,7 @@ export function EnhancedPaymentDashboard({
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground">0-30 Days</p>
+                  <p className="text-sm text-muted-foreground">0 à 30 jours</p>
                   <p className="text-2xl font-bold text-green-600">
                     {formatCurrency(metrics.agingReport.current.amount)}
                   </p>
@@ -318,7 +318,7 @@ export function EnhancedPaymentDashboard({
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground">31-60 Days</p>
+                  <p className="text-sm text-muted-foreground">31 à 60 jours</p>
                   <p className="text-2xl font-bold text-yellow-600">
                     {formatCurrency(metrics.agingReport.early.amount)}
                   </p>
@@ -327,7 +327,7 @@ export function EnhancedPaymentDashboard({
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground">61-90 Days</p>
+                  <p className="text-sm text-muted-foreground">61 à 90 jours</p>
                   <p className="text-2xl font-bold text-orange-600">
                     {formatCurrency(metrics.agingReport.serious.amount)}
                   </p>
@@ -336,7 +336,7 @@ export function EnhancedPaymentDashboard({
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <p className="text-sm text-muted-foreground">90+ Days</p>
+                  <p className="text-sm text-muted-foreground">Plus de 90 jours</p>
                   <p className="text-2xl font-bold text-red-600">
                     {formatCurrency(metrics.agingReport.critical.amount)}
                   </p>
@@ -353,7 +353,7 @@ export function EnhancedPaymentDashboard({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Payment Timing</CardTitle>
+                <CardTitle>Délais de paiement</CardTitle>
                 <CardDescription>
                   On-time vs late payment analysis
                 </CardDescription>
@@ -361,19 +361,19 @@ export function EnhancedPaymentDashboard({
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">On-time Payments</span>
+                    <span className="text-sm">Paiements à temps</span>
                     <Badge variant="secondary">
                       {metrics.paymentBehavior.onTimePayments}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Late Payments</span>
+                    <span className="text-sm">Paiements en retard</span>
                     <Badge variant="destructive">
                       {metrics.paymentBehavior.latePayments}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Average Late Days</span>
+                    <span className="text-sm">Retard moyen en jours</span>
                     <span className="text-sm font-medium">
                       {metrics.paymentBehavior.averageLateDays} days
                     </span>
@@ -384,7 +384,7 @@ export function EnhancedPaymentDashboard({
 
             <Card>
               <CardHeader>
-                <CardTitle>Repeat Offenders</CardTitle>
+                <CardTitle>Retards récurrents</CardTitle>
                 <CardDescription>
                   Tenants with multiple late payments
                 </CardDescription>
@@ -421,7 +421,7 @@ export function EnhancedPaymentDashboard({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Next Month Projection</CardTitle>
+                <CardTitle>Projection du mois prochain</CardTitle>
                 <CardDescription>
                   Expected vs projected collections
                 </CardDescription>
@@ -429,7 +429,7 @@ export function EnhancedPaymentDashboard({
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Expected</span>
+                    <span className="text-sm">Attendu</span>
                     <span className="font-medium">
                       {formatCurrency(
                         metrics.cashFlowProjection.nextMonth.expected
@@ -437,7 +437,7 @@ export function EnhancedPaymentDashboard({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Projected</span>
+                    <span className="text-sm">Projeté</span>
                     <span className="font-medium">
                       {formatCurrency(
                         metrics.cashFlowProjection.nextMonth.projected
@@ -445,7 +445,7 @@ export function EnhancedPaymentDashboard({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Confidence</span>
+                    <span className="text-sm">Fiabilité</span>
                     <Badge variant="secondary">
                       {formatPercentage(
                         metrics.cashFlowProjection.nextMonth.confidence * 100
@@ -459,12 +459,12 @@ export function EnhancedPaymentDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>3-Month Outlook</CardTitle>
-                <CardDescription>Quarterly projection summary</CardDescription>
+                <CardDescription>Résumé des projections trimestrielles</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Expected</span>
+                    <span className="text-sm">Attendu</span>
                     <span className="font-medium">
                       {formatCurrency(
                         metrics.cashFlowProjection.next3Months.expected
@@ -472,7 +472,7 @@ export function EnhancedPaymentDashboard({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Projected</span>
+                    <span className="text-sm">Projeté</span>
                     <span className="font-medium">
                       {formatCurrency(
                         metrics.cashFlowProjection.next3Months.projected
@@ -480,7 +480,7 @@ export function EnhancedPaymentDashboard({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Confidence</span>
+                    <span className="text-sm">Fiabilité</span>
                     <Badge variant="secondary">
                       {formatPercentage(
                         metrics.cashFlowProjection.next3Months.confidence * 100
@@ -496,13 +496,13 @@ export function EnhancedPaymentDashboard({
         <TabsContent value="trends" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Performance Trends</CardTitle>
-              <CardDescription>Historical performance analysis</CardDescription>
+              <CardTitle>Évolution du rendement</CardTitle>
+              <CardDescription>Analyse historique du rendement</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8 text-muted-foreground">
                 <TrendingUp className="h-12 w-12 mx-auto mb-4" />
-                <p>Trend analysis coming soon</p>
+                <p>L’analyse des évolutions sera bientôt disponible</p>
                 <p className="text-sm">
                   Historical data visualization will be available here
                 </p>

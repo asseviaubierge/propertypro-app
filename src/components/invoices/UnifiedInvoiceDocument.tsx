@@ -50,6 +50,19 @@ function roleLabel(value?: string) {
   return value || "";
 }
 
+function lineTypeLabel(value?: string) {
+  const labels: Record<string, string> = {
+    rent: "Loyer",
+    security_deposit: "Garantie",
+    pet_deposit: "Garantie animal",
+    late_fee: "Retard",
+    maintenance: "Maintenance",
+    utility: "Charges",
+    other: "Autre",
+  };
+  return labels[String(value || "").toLowerCase()] || "";
+}
+
 export function UnifiedInvoiceDocument({ invoice, title = "FACTURE", className = "" }: UnifiedInvoiceDocumentProps) {
   const company: any = invoice.companyInfo || {};
   const tenant: any = invoice.tenant || {};
@@ -100,7 +113,7 @@ export function UnifiedInvoiceDocument({ invoice, title = "FACTURE", className =
         </div>
       </header>
 
-      <section className="mt-10 grid gap-8 md:grid-cols-2">
+      <section className="mt-7 grid gap-6 sm:mt-10 md:grid-cols-2 md:gap-8">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Facturé par</p>
           <p className="mt-2 text-base font-bold">{company.name || "—"}</p>
@@ -118,15 +131,35 @@ export function UnifiedInvoiceDocument({ invoice, title = "FACTURE", className =
       </section>
 
       {(property.name || lease?.startDate || lease?.endDate) ? (
-        <section className="mt-8 grid gap-5 bg-slate-50 px-5 py-4 text-sm sm:grid-cols-3">
+        <section className="mt-7 grid gap-4 rounded-lg bg-slate-50 px-4 py-4 text-sm sm:mt-8 sm:grid-cols-3 sm:px-5">
           <div><p className="text-xs uppercase tracking-wide text-slate-500">Bien</p><p className="mt-1 font-semibold">{property.name || "—"}</p></div>
           <div><p className="text-xs uppercase tracking-wide text-slate-500">Unité</p><p className="mt-1 font-semibold">{property.unit || "—"}</p></div>
           <div><p className="text-xs uppercase tracking-wide text-slate-500">Période du bail</p><p className="mt-1 font-semibold">{lease?.startDate ? dateText(lease.startDate) : "—"}{lease?.endDate ? ` → ${dateText(lease.endDate)}` : ""}</p></div>
         </section>
       ) : null}
 
-      <section className="mt-10">
-        <div className="overflow-x-auto">
+      <section className="mt-8 sm:mt-10">
+        <div className="space-y-3 sm:hidden">
+          {invoice.lineItems.length ? invoice.lineItems.map((item, index) => (
+            <div key={`${item.description}-mobile-${index}`} className="rounded-lg border border-slate-200 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-semibold">{item.description}</p>
+                  {lineTypeLabel(item.type) ? <p className="mt-1 text-xs text-slate-500">{lineTypeLabel(item.type)}</p> : null}
+                </div>
+                <p className="shrink-0 whitespace-nowrap text-sm font-bold">{money(item.total, currency)}</p>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                <span>Qté : {item.quantity}</span>
+                <span className="whitespace-nowrap">Prix : {money(item.unitPrice, currency)}</span>
+              </div>
+            </div>
+          )) : (
+            <p className="rounded-lg bg-slate-50 px-3 py-6 text-center text-sm text-slate-500">Aucune ligne de facture</p>
+          )}
+        </div>
+
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[620px] border-separate border-spacing-0 text-sm">
             <thead>
               <tr className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
@@ -141,7 +174,7 @@ export function UnifiedInvoiceDocument({ invoice, title = "FACTURE", className =
               {invoice.lineItems.length ? invoice.lineItems.map((item, index) => (
                 <tr key={`${item.description}-${index}`} className="odd:bg-white even:bg-slate-50/40">
                   <td className="px-3 py-4 text-slate-500">{index + 1}</td>
-                  <td className="px-3 py-4"><p className="font-semibold">{item.description}</p>{item.type ? <p className="text-xs text-slate-500">{item.type === "rent" ? "Loyer" : item.type}</p> : null}</td>
+                  <td className="px-3 py-4"><p className="font-semibold">{item.description}</p>{lineTypeLabel(item.type) ? <p className="text-xs text-slate-500">{lineTypeLabel(item.type)}</p> : null}</td>
                   <td className="px-3 py-4 text-right">{item.quantity}</td>
                   <td className="px-3 py-4 text-right">{money(item.unitPrice, currency)}</td>
                   <td className="px-3 py-4 text-right font-semibold">{money(item.total, currency)}</td>
@@ -156,13 +189,13 @@ export function UnifiedInvoiceDocument({ invoice, title = "FACTURE", className =
 
       <section className="mt-8 flex justify-end">
         <dl className="w-full max-w-sm space-y-2 text-sm">
-          <div className="flex justify-between"><dt className="text-slate-500">Sous-total</dt><dd>{money(invoice.totals.subtotal, currency)}</dd></div>
-          {invoice.totals.shippingAmount ? <div className="flex justify-between"><dt className="text-slate-500">Frais</dt><dd>{money(invoice.totals.shippingAmount, currency)}</dd></div> : null}
-          {invoice.totals.discountAmount ? <div className="flex justify-between"><dt className="text-slate-500">Remise</dt><dd>-{money(invoice.totals.discountAmount, currency)}</dd></div> : null}
-          {invoice.totals.taxAmount ? <div className="flex justify-between"><dt className="text-slate-500">Taxes</dt><dd>{money(invoice.totals.taxAmount, currency)}</dd></div> : null}
-          <div className="flex justify-between pt-3 text-lg font-black"><dt>Total</dt><dd>{money(invoice.totals.total, currency)}</dd></div>
-          <div className="flex justify-between"><dt className="text-slate-500">Montant payé</dt><dd>{money(invoice.totals.amountPaid, currency)}</dd></div>
-          <div className="flex justify-between font-semibold"><dt>Solde dû</dt><dd>{money(invoice.totals.balanceDue, currency)}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-slate-500">Sous-total</dt><dd className="whitespace-nowrap">{money(invoice.totals.subtotal, currency)}</dd></div>
+          {invoice.totals.shippingAmount ? <div className="flex justify-between gap-3"><dt className="text-slate-500">Frais</dt><dd className="whitespace-nowrap">{money(invoice.totals.shippingAmount, currency)}</dd></div> : null}
+          {invoice.totals.discountAmount ? <div className="flex justify-between gap-3"><dt className="text-slate-500">Remise</dt><dd className="whitespace-nowrap">-{money(invoice.totals.discountAmount, currency)}</dd></div> : null}
+          {invoice.totals.taxAmount ? <div className="flex justify-between gap-3"><dt className="text-slate-500">Taxes</dt><dd className="whitespace-nowrap">{money(invoice.totals.taxAmount, currency)}</dd></div> : null}
+          <div className="flex justify-between gap-3 pt-3 text-base font-black sm:text-lg"><dt>Total</dt><dd className="whitespace-nowrap">{money(invoice.totals.total, currency)}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-slate-500">Montant payé</dt><dd className="whitespace-nowrap">{money(invoice.totals.amountPaid, currency)}</dd></div>
+          <div className="flex justify-between gap-3 font-semibold"><dt>Solde dû</dt><dd className="whitespace-nowrap">{money(invoice.totals.balanceDue, currency)}</dd></div>
         </dl>
       </section>
 

@@ -130,7 +130,7 @@ export const PUT = withPermissionAndDB(["lease_edit", "lease_management"])(
       // Find the lease
       const lease = await Lease.findById(id);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       if (!(await canAccessLease(user, lease))) {
@@ -229,7 +229,7 @@ export const DELETE = withPermissionAndDB(["lease_edit", "lease_management"])(
       // Find the lease
       const lease = await Lease.findById(id);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       if (!(await canAccessLease(user, lease))) {
@@ -287,7 +287,7 @@ export const PATCH = withAccessAndDB(LEASE_PATCH_ACCESS)(
       // Find the lease
       const lease = await Lease.findById(id);
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       if (!(await canAccessLease(user, lease))) {

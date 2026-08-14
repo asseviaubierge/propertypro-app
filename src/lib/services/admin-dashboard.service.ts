@@ -100,7 +100,7 @@ function toObjectId(id: Types.ObjectId | string): string {
 function formatName(user: any): string {
   const first = user?.firstName || "";
   const last = user?.lastName || "";
-  return `${first} ${last}`.trim() || user?.email || "Unknown";
+  return `${first} ${last}`.trim() || user?.email || "Inconnu";
 }
 
 function calculateServiceScore(status: HealthCheckResult["status"]): number {
@@ -136,7 +136,7 @@ function deriveDatabaseStatus(services: HealthCheckResult[]) {
 
   if (!databaseService) {
     return {
-      label: "Unknown",
+      label: "Inconnu",
       status: "offline" as const,
       lastChecked: new Date().toISOString(),
       responseTime: null,

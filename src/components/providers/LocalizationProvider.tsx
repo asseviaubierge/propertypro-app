@@ -83,9 +83,7 @@ export function LocalizationProvider({
   // Currency + language now flow from the global SettingsProvider (single source of truth).
   const { settings: displaySettings } = useSettings();
 
-  const [currentLocale, setCurrentLocale] = useState(
-    initialLocale || localizationService.getCurrentLocale()
-  );
+  const [currentLocale, setCurrentLocale] = useState("fr-FR");
   const [currentCurrency, setCurrentCurrency] = useState(
     initialCurrency || localizationService.getCurrentCurrency()
   );
@@ -136,18 +134,13 @@ export function LocalizationProvider({
     const initializeLocalization = async () => {
       try {
         // Load user preferences from localStorage
-        const savedLocale = localStorage.getItem("GestionEImmo-locale");
+        const savedLocale = "fr-FR";
         const savedCurrency = localStorage.getItem("GestionEImmo-currency");
 
-        if (savedLocale && !initialLocale) {
-          localizationService.setLocale(savedLocale);
-          setCurrentLocale(savedLocale);
-          setLocale(localizationService.getLocale(savedLocale));
-        } else if (initialLocale) {
-          localizationService.setLocale(initialLocale);
-          setCurrentLocale(initialLocale);
-          setLocale(localizationService.getLocale(initialLocale));
-        }
+        localizationService.setLocale(savedLocale);
+        setCurrentLocale(savedLocale);
+        setLocale(localizationService.getLocale(savedLocale));
+        localStorage.setItem("GestionEImmo-locale", savedLocale);
 
         if (savedCurrency && !initialCurrency) {
           applyCurrency(savedCurrency);
@@ -168,7 +161,8 @@ export function LocalizationProvider({
   }, [initialLocale, initialCurrency, applyCurrency]);
 
   const handleSetLocale = useCallback(
-    (localeCode: string) => {
+    (_localeCode: string) => {
+      const localeCode = "fr-FR";
       localizationService.setLocale(localeCode);
       setCurrentLocale(localeCode);
       setLocale(localizationService.getLocale(localeCode));
@@ -269,7 +263,7 @@ export function LocalizationProvider({
     );
   };
 
-  const language = (currentLocale || "en").split("-")[0].toLowerCase();
+  const language = "fr";
 
   const t = useCallback(
     (key: string, options?: TranslateOptions) => {

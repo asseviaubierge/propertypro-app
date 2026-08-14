@@ -111,10 +111,10 @@ export default function MyLeasesPage() {
       if (data.success) {
         setLeases(data.data.allLeases || []);
       } else {
-        showSimpleError("Load Error", t("leases.toasts.fetchYourLeasesError"));
+        showSimpleError("Erreur de chargement", t("leases.toasts.fetchYourLeasesError"));
       }
     } catch {
-      showSimpleError("Load Error", t("leases.toasts.fetchYourLeasesError"));
+      showSimpleError("Erreur de chargement", t("leases.toasts.fetchYourLeasesError"));
     } finally {
       setLoading(false);
     }

@@ -315,19 +315,19 @@ export default function ExpiringLeasesPage() {
     if (days <= 7) {
       return (
         <Badge variant="destructive">
-          {t("leases.expiring.urgency.critical", { defaultValue: "Critical" })}
+          {t("leases.expiring.urgency.critical", { defaultValue: "Critique" })}
         </Badge>
       );
     } else if (days <= 30) {
       return (
         <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
-          {t("leases.expiring.urgency.warning", { defaultValue: "Warning" })}
+          {t("leases.expiring.urgency.warning", { defaultValue: "Avertissement" })}
         </Badge>
       );
     } else {
       return (
         <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-          {t("leases.expiring.urgency.upcoming", { defaultValue: "Upcoming" })}
+          {t("leases.expiring.urgency.upcoming", { defaultValue: "À venir" })}
         </Badge>
       );
     }
@@ -337,7 +337,7 @@ export default function ExpiringLeasesPage() {
   const leaseColumns: DataTableColumn<LeaseResponse>[] = [
     {
       id: "property",
-      header: t("leases.expiring.table.property", { defaultValue: "Property" }),
+      header: t("leases.expiring.table.property", { defaultValue: "Bien" }),
       cell: (lease) => (
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
@@ -372,7 +372,7 @@ export default function ExpiringLeasesPage() {
     },
     {
       id: "tenant",
-      header: t("leases.expiring.table.tenant", { defaultValue: "Tenant" }),
+      header: t("leases.expiring.table.tenant", { defaultValue: "Locataire" }),
       cell: (lease) => (
         <div className="flex items-center space-x-3">
           <Avatar className="h-8 w-8">
@@ -402,7 +402,7 @@ export default function ExpiringLeasesPage() {
     },
     {
       id: "rentAmount",
-      header: t("leases.expiring.table.rent", { defaultValue: "Rent" }),
+      header: t("leases.expiring.table.rent", { defaultValue: "Loyer" }),
       visibility: "md",
       cell: (lease) => (
         <div>
@@ -418,7 +418,7 @@ export default function ExpiringLeasesPage() {
     {
       id: "expiryDate",
       header: t("leases.expiring.table.expiryDate", {
-        defaultValue: "Expiry Date",
+        defaultValue: "Date d’expiration",
       }),
       visibility: "lg",
       cell: (lease) => (
@@ -428,7 +428,7 @@ export default function ExpiringLeasesPage() {
     {
       id: "daysLeft",
       header: t("leases.expiring.table.daysLeft", {
-        defaultValue: "Days Left",
+        defaultValue: "Jours restants",
       }),
       visibility: "md",
       cell: (lease) => {
@@ -442,7 +442,7 @@ export default function ExpiringLeasesPage() {
     },
     {
       id: "urgency",
-      header: t("leases.expiring.table.urgency", { defaultValue: "Urgency" }),
+      header: t("leases.expiring.table.urgency", { defaultValue: "Urgence" }),
       visibility: "md",
       cell: (lease) => {
         const days = getDaysUntilExpiry(lease.endDate);
@@ -470,7 +470,7 @@ export default function ExpiringLeasesPage() {
               <Link href={`/dashboard/leases/${lease._id}`}>
                 <Eye className="mr-2 h-4 w-4" />
                 {t("leases.expiring.table.viewDetails", {
-                  defaultValue: "View Details",
+                  defaultValue: "Voir les détails",
                 })}
               </Link>
             </DropdownMenuItem>
@@ -478,7 +478,7 @@ export default function ExpiringLeasesPage() {
               <Link href={`/dashboard/leases/${lease._id}?action=renew`}>
                 <RotateCcw className="mr-2 h-4 w-4" />
                 {t("leases.expiring.table.renewLease", {
-                  defaultValue: "Renew Lease",
+                  defaultValue: "Renouveler le bail",
                 })}
               </Link>
             </DropdownMenuItem>
@@ -488,7 +488,7 @@ export default function ExpiringLeasesPage() {
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   <Download className="mr-2 h-4 w-4" />
                   {t("leases.expiring.table.downloadPdf", {
-                    defaultValue: "Download PDF",
+                    defaultValue: "Télécharger le PDF",
                   })}
                 </DropdownMenuItem>
               }
@@ -566,7 +566,7 @@ export default function ExpiringLeasesPage() {
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("leases.expiring.card.subtitle", {
-                    defaultValue: "Leases expiring soon that require attention",
+                    defaultValue: "Baux arrivant bientôt à échéance et nécessitant une attention",
                   })}
                 </p>
               </div>
@@ -749,13 +749,13 @@ export default function ExpiringLeasesPage() {
               pageSize={filters.limit ?? 10}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

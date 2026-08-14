@@ -180,7 +180,7 @@ export const PATCH = withAccessAndDB(MAINTENANCE_STATUS_WRITE_ACCESS)(
 
           if (notes) {
             const timestamp = new Date().toISOString();
-            const userName = `${user.firstName || "User"} ${
+            const userName = `${user.firstName || "Utilisateur"} ${
               user.lastName || ""
             }`.trim();
             const completionNote = `[${timestamp}] ${userName} (Completion): ${notes}`;
@@ -298,7 +298,7 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
         {
           status: MaintenanceStatus.SUBMITTED,
           timestamp: maintenanceRequest.createdAt,
-          user: "System",
+          user: "Système",
           action: "Request submitted",
         },
       ];
@@ -310,7 +310,7 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
           user:
             `${(maintenanceRequest.assignedTo as any)?.firstName || ""} ${
               (maintenanceRequest.assignedTo as any)?.lastName || ""
-            }`.trim() || "Unknown",
+            }`.trim() || "Inconnu",
           action: "Request assigned",
         });
       }
@@ -322,7 +322,7 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
           user:
             `${(maintenanceRequest.assignedTo as any)?.firstName || ""} ${
               (maintenanceRequest.assignedTo as any)?.lastName || ""
-            }`.trim() || "Unknown",
+            }`.trim() || "Inconnu",
           action: "Work started",
         });
       }
@@ -337,7 +337,7 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
           user:
             `${(maintenanceRequest.assignedTo as any)?.firstName || ""} ${
               (maintenanceRequest.assignedTo as any)?.lastName || ""
-            }`.trim() || "Unknown",
+            }`.trim() || "Inconnu",
           action: "Work completed",
         });
       }
@@ -346,7 +346,7 @@ export const GET = withAccessAndDB(MAINTENANCE_STATUS_READ_ACCESS)(
         statusHistory.push({
           status: MaintenanceStatus.CANCELLED,
           timestamp: maintenanceRequest.updatedAt,
-          user: "System",
+          user: "Système",
           action: "Request cancelled",
         });
       }

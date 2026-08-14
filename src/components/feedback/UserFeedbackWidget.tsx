@@ -212,7 +212,7 @@ export default function UserFeedbackWidget() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Feedback</CardTitle>
+              <CardTitle className="text-sm font-medium">Total des avis</CardTitle>
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -225,7 +225,7 @@ export default function UserFeedbackWidget() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+              <CardTitle className="text-sm font-medium">Note moyenne</CardTitle>
               <Star className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -238,7 +238,7 @@ export default function UserFeedbackWidget() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Satisfaction Trend</CardTitle>
+              <CardTitle className="text-sm font-medium">Évolution de la satisfaction</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -253,7 +253,7 @@ export default function UserFeedbackWidget() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Issues</CardTitle>
+              <CardTitle className="text-sm font-medium">Anomalies actives</CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -273,7 +273,7 @@ export default function UserFeedbackWidget() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>User Feedback</CardTitle>
+              <CardTitle>Avis des utilisateurs</CardTitle>
               <CardDescription>
                 Share your experience and help us improve
               </CardDescription>
@@ -282,12 +282,12 @@ export default function UserFeedbackWidget() {
               <DialogTrigger asChild>
                 <Button>
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  Submit Feedback
+                  Envoyer un avis
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[525px]">
                 <DialogHeader>
-                  <DialogTitle>Submit Feedback</DialogTitle>
+                  <DialogTitle>Envoyer un avis</DialogTitle>
                   <DialogDescription>
                     Help us improve by sharing your experience
                   </DialogDescription>
@@ -305,14 +305,14 @@ export default function UserFeedbackWidget() {
                     <Label htmlFor="category">Category *</Label>
                     <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder="Sélectionner une catégorie" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="usability">Usability</SelectItem>
-                        <SelectItem value="performance">Performance</SelectItem>
-                        <SelectItem value="feature_request">Feature Request</SelectItem>
-                        <SelectItem value="bug_report">Bug Report</SelectItem>
-                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="usability">Facilité d’utilisation</SelectItem>
+                        <SelectItem value="performance">Rendement</SelectItem>
+                        <SelectItem value="feature_request">Demande d’amélioration</SelectItem>
+                        <SelectItem value="bug_report">Signalement d’anomalie</SelectItem>
+                        <SelectItem value="general">Général</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -349,30 +349,30 @@ export default function UserFeedbackWidget() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="feature">Related Feature (Optional)</Label>
+                    <Label htmlFor="feature">Fonction associée (facultatif)</Label>
                     <Select value={formData.feature} onValueChange={(value) => setFormData({ ...formData, feature: value })}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select feature" />
+                        <SelectValue placeholder="Sélectionner la fonction" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="payment_dashboard">Payment Dashboard</SelectItem>
-                        <SelectItem value="payment_processing">Payment Processing</SelectItem>
-                        <SelectItem value="tenant_portal">Tenant Portal</SelectItem>
-                        <SelectItem value="auto_pay">Auto-pay</SelectItem>
-                        <SelectItem value="reports">Reports</SelectItem>
+                        <SelectItem value="payment_dashboard">Tableau de bord des paiements</SelectItem>
+                        <SelectItem value="payment_processing">Traitement des paiements</SelectItem>
+                        <SelectItem value="tenant_portal">Espace locataire</SelectItem>
+                        <SelectItem value="auto_pay">Paiement automatique</SelectItem>
+                        <SelectItem value="reports">Rapports</SelectItem>
                         <SelectItem value="communication">Communication</SelectItem>
-                        <SelectItem value="late_fees">Late Fees</SelectItem>
+                        <SelectItem value="late_fees">Frais de retard</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="flex justify-end gap-2">
                     <Button variant="outline" onClick={() => setIsOpen(false)}>
-                      Cancel
+                      Annuler
                     </Button>
                     <Button onClick={submitFeedback} disabled={loading}>
                       <Send className="h-4 w-4 mr-2" />
-                      {loading ? 'Submitting...' : 'Submit Feedback'}
+                      {loading ? 'Submitting...' : 'Envoyer un avis'}
                     </Button>
                   </div>
                 </div>
@@ -384,8 +384,8 @@ export default function UserFeedbackWidget() {
         <CardContent>
           <Tabs defaultValue="recent" className="space-y-4">
             <TabsList>
-              <TabsTrigger value="recent">Recent Feedback</TabsTrigger>
-              <TabsTrigger value="summary">Summary</TabsTrigger>
+              <TabsTrigger value="recent">Avis récents</TabsTrigger>
+              <TabsTrigger value="summary">Résumé</TabsTrigger>
             </TabsList>
 
             <TabsContent value="recent" className="space-y-4">
@@ -427,7 +427,7 @@ export default function UserFeedbackWidget() {
                           <div className="mt-3 p-3 bg-muted rounded-md">
                             <div className="flex items-center gap-2 mb-1">
                               <Users className="h-4 w-4" />
-                              <span className="text-sm font-medium">Admin Response</span>
+                              <span className="text-sm font-medium">Réponse de l’administrateur</span>
                             </div>
                             <p className="text-sm">{item.adminResponse}</p>
                           </div>
@@ -444,7 +444,7 @@ export default function UserFeedbackWidget() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Category Breakdown</CardTitle>
+                      <CardTitle>Répartition par catégorie</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -460,7 +460,7 @@ export default function UserFeedbackWidget() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Status Breakdown</CardTitle>
+                      <CardTitle>Répartition par statut</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
@@ -476,7 +476,7 @@ export default function UserFeedbackWidget() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Common Issues</CardTitle>
+                      <CardTitle>Anomalies fréquentes</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-1">
@@ -491,7 +491,7 @@ export default function UserFeedbackWidget() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Top Requests</CardTitle>
+                      <CardTitle>Demandes principales</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-1">

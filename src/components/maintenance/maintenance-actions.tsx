@@ -326,7 +326,7 @@ export function MaintenanceActions({
               variant="outline"
               onClick={() => setAssignDialogOpen(false)}
             >
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleAssign} disabled={!selectedTechnician}>
               Assign
@@ -373,7 +373,7 @@ export function MaintenanceActions({
               variant="outline"
               onClick={() => setCompleteDialogOpen(false)}
             >
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleComplete}>Marquer comme terminée</Button>
           </DialogFooter>

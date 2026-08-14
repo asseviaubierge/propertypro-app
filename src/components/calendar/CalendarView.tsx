@@ -68,6 +68,15 @@ interface CalendarViewProps {
   showToolbar?: boolean;
   showFilters?: boolean;
   showSettings?: boolean;
+  settings?: {
+    weekends: boolean;
+    businessHours: { startTime: string; endTime: string };
+    defaultEventDuration: string;
+    slotDuration: string;
+    snapDuration: string;
+    timezone: string;
+    firstDay: number;
+  };
 }
 
 interface CalendarData {
@@ -176,6 +185,7 @@ export default function CalendarView({
   showToolbar = true,
   showFilters = true,
   showSettings = true,
+  settings: externalSettings,
 }: CalendarViewProps) {
   const { t } = useLocalizationContext();
 
@@ -273,6 +283,10 @@ export default function CalendarView({
     firstDay: 0, // Sunday
   });
 
+  useEffect(() => {
+    if (externalSettings) setCalendarSettings(externalSettings);
+  }, [externalSettings]);
+
   // Convert IEvent to CalendarEvent format
   const convertToCalendarEvent = useCallback((event: IEvent): CalendarEvent => {
     return {
@@ -334,6 +348,7 @@ export default function CalendarView({
           const params = new URLSearchParams({
             startDate: formatISO(start),
             endDate: formatISO(end),
+            limit: "200",
           });
 
           // Apply filters
@@ -678,24 +693,24 @@ export default function CalendarView({
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <Card>
+    <div className={`min-w-0 space-y-3 sm:space-y-4 ${className ?? ""}`}>
+      <Card className="min-w-0 gap-3">
         {/* Header */}
         {showToolbar && (
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <CardHeader className="flex min-w-0 flex-col items-start gap-2 px-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="min-w-0 space-y-1">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
                 {t("calendar.header.title")}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-xs leading-4 text-gray-600 dark:text-gray-400 sm:text-sm">
                 {t("calendar.header.subtitleAdmin")}
               </p>
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:w-auto sm:flex-wrap sm:gap-3">
               {/* View Selector */}
               <Select value={currentView} onValueChange={changeView}>
-                <SelectTrigger className="w-40 border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500/20 bg-white dark:bg-gray-800">
+                <SelectTrigger className="w-full border-gray-200 bg-white focus:border-blue-500 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-gray-200 dark:border-gray-700">
@@ -746,8 +761,8 @@ export default function CalendarView({
         )}
         {/* Main Calendar */}
 
-        <CardContent>
-          <div className="calendar-container bg-white dark:bg-gray-900">
+        <CardContent className="min-w-0 px-2 sm:px-6">
+          <div className="calendar-container min-w-0 overflow-x-auto bg-white dark:bg-gray-900">
             <FullCalendar
               ref={calendarRef}
               plugins={[

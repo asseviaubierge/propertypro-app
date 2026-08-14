@@ -76,7 +76,7 @@ export function useLocalization(): LocalizationContextType {
     const loadUserPreferences = async () => {
       try {
         // Try to load from localStorage first
-        const savedLocale = localStorage.getItem("GestionEImmo-locale");
+        const savedLocale = "fr-FR";
         const savedCurrency = localStorage.getItem("GestionEImmo-currency");
 
         if (savedLocale) {
@@ -98,7 +98,8 @@ export function useLocalization(): LocalizationContextType {
   }, []);
 
   const handleSetLocale = useCallback(
-    (localeCode: string) => {
+    (_localeCode: string) => {
+      const localeCode = "fr-FR";
       localizationService.setLocale(localeCode);
       setCurrentLocale(localeCode);
       setLocale(localizationService.getLocale(localeCode));
@@ -153,7 +154,7 @@ export function useLocalization(): LocalizationContextType {
     []
   );
 
-  const language = (currentLocale || "en").split("-")[0].toLowerCase();
+  const language = "fr";
 
   const t = useCallback(
     (key: string, options?: TranslateOptions) => {

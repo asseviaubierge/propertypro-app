@@ -286,7 +286,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
                     onClick={() => setShowDeleteDialog(true)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Lease
+                    Supprimer le bail
                   </DropdownMenuItem> */}
                 </>
               )}
@@ -828,7 +828,7 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
       {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Lease</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer le bail</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this lease? This action cannot be
               undone. The lease for {lease.propertyId?.name || "this property"}{" "}
@@ -836,13 +836,13 @@ export default function LeaseDetailsPage({ params }: LeaseDetailsPageProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700"
             >
-              {isDeleting ? "Suppression..." : "Delete Lease"}
+              {isDeleting ? "Suppression..." : "Supprimer le bail"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

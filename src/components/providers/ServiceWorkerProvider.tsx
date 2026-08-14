@@ -40,9 +40,9 @@ export function ServiceWorkerProvider() {
               newWorker.state === "activated" &&
               navigator.serviceWorker.controller
             ) {
-              toast("A new version is available", {
+              toast("Une nouvelle version est disponible", {
                 action: {
-                  label: "Reload",
+                  label: "Actualiser",
                   onClick: () => window.location.reload(),
                 },
                 duration: Infinity,
@@ -51,7 +51,7 @@ export function ServiceWorkerProvider() {
           });
         });
       } catch (error) {
-        console.error("Service worker registration failed", error);
+        console.error("Échec de l’enregistrement du service hors ligne", error);
       }
     };
 

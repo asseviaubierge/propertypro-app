@@ -76,7 +76,7 @@ export async function validateInspectionRelations(
       .select("propertyId tenantId deletedAt")
       .lean();
     if (!lease || lease.deletedAt) {
-      return { ok: false, status: 404, message: "Lease not found" };
+      return { ok: false, status: 404, message: "Bail introuvable" };
     }
     if (idOf(lease.propertyId) !== propertyId) {
       return { ok: false, status: 400, message: "Lease does not belong to this property" };

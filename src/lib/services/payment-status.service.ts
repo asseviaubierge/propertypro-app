@@ -721,7 +721,7 @@ class PaymentStatusService {
 
     // TODO: Implement dedicated audit log system
     // await AuditLog.create({
-    //   entityType: 'Payment',
+    //   entityType: 'Paiement',
     //   entityId: payment._id,
     //   action: 'status_change',
     //   fromValue: fromStatus,

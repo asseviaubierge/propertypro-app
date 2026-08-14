@@ -26,6 +26,7 @@ interface CalendarStats {
 export function CalendarAnalytics() {
   const [stats, setStats] = useState<CalendarStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const isMountedRef = React.useRef(true);
   const { t } = useLocalizationContext();
 
@@ -83,15 +84,19 @@ export function CalendarAnalytics() {
 
   const loadStats = async () => {
     try {
+      setLoadError(false);
       const response = await fetch("/api/calendar/stats");
       if (response.ok && isMountedRef.current) {
         const result = await response.json();
         if (isMountedRef.current) {
           setStats(result?.data ?? null);
         }
+      } else if (isMountedRef.current) {
+        setLoadError(true);
       }
     } catch (error) {
-      console.error("Failed to load calendar stats:", error);
+      console.error("Impossible de charger les analyses du calendrier :", error);
+      if (isMountedRef.current) setLoadError(true);
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -181,12 +186,25 @@ export function CalendarAnalytics() {
     );
   }
 
-  if (!stats) {
-    return null;
+  if (!stats || loadError) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
+          {t("calendar.analytics.loadError")}
+        </CardContent>
+      </Card>
+    );
   }
 
+  const typeEntries = Object.entries(stats.eventsByType).filter(
+    ([, count]) => count > 0,
+  );
+  const statusEntries = Object.entries(stats.eventsByStatus).filter(
+    ([, count]) => count > 0,
+  );
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-6">
       {/* Event Types Distribution */}
       <Card className="gap-3">
         <CardHeader>
@@ -197,7 +215,7 @@ export function CalendarAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {Object.entries(stats.eventsByType).map(([type, count]) => (
+            {typeEntries.map(([type, count]) => (
               <div key={type} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div
@@ -211,6 +229,11 @@ export function CalendarAnalytics() {
                 <Badge variant="secondary">{count}</Badge>
               </div>
             ))}
+            {typeEntries.length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                {t("calendar.analytics.empty")}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -225,7 +248,7 @@ export function CalendarAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {Object.entries(stats.eventsByStatus).map(([status, count]) => (
+            {statusEntries.map(([status, count]) => (
               <div key={status} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {status === EventStatus.COMPLETED && (
@@ -244,6 +267,11 @@ export function CalendarAnalytics() {
                 <Badge className={getStatusColor(status)}>{count}</Badge>
               </div>
             ))}
+            {statusEntries.length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                {t("calendar.analytics.empty")}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

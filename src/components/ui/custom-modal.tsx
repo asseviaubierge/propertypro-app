@@ -21,7 +21,7 @@
  *     Content goes here
  *   </CustomModalBody>
  *   <CustomModalFooter>
- *     <Button onClick={() => setIsOpen(false)}>Close</Button>
+ *     <Button onClick={() => setIsOpen(false)}>Fermer</Button>
  *   </CustomModalFooter>
  * </CustomModal>
  * ```
@@ -125,7 +125,7 @@ export function CustomModalHeader({
         <button
           onClick={onClose}
           className="ml-4 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
-          aria-label="Close modal"
+          aria-label="Fermer la fenêtre"
         >
           <X className="h-5 w-5" />
         </button>

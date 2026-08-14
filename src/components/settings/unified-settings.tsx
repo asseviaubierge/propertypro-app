@@ -248,7 +248,7 @@ export function UnifiedSettings({
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading settings...</span>
+        <span className="ml-2">Chargement des paramètres…</span>
       </div>
     );
   }
@@ -268,7 +268,7 @@ export function UnifiedSettings({
     },
     {
       value: "security",
-      label: "Security",
+      label: "Sécurité",
       icon: Shield,
       description: "Security and authentication settings",
     },
@@ -290,7 +290,7 @@ export function UnifiedSettings({
   if (isAdmin) {
     tabs.push({
       value: "system",
-      label: "System",
+      label: "Système",
       icon: SettingsIcon,
       description: "System configuration and administration",
     });
@@ -301,7 +301,7 @@ export function UnifiedSettings({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">Paramètres</h1>
           <p className="text-muted-foreground">
             Manage your account and application preferences
           </p>
@@ -374,7 +374,7 @@ export function UnifiedSettings({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search settings..."
+            placeholder="Rechercher dans les paramètres…"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             className="pl-10 pr-10"
@@ -495,7 +495,7 @@ export function UnifiedSettings({
             <CardContent className="space-y-6">
               {/* Avatar Upload */}
               <div className="space-y-2">
-                <Label>Profile Picture</Label>
+                <Label>Photo de profil</Label>
                 <FileUpload
                   onFilesSelected={(files) => {
                     if (files.length > 0) {
@@ -525,7 +525,7 @@ export function UnifiedSettings({
                       ? [
                           {
                             id: "avatar",
-                            name: "Profile Picture",
+                            name: "Photo de profil",
                             size: 0,
                             type: "image",
                             url: settings.profile.avatar,
@@ -540,7 +540,7 @@ export function UnifiedSettings({
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">Prénom</Label>
                   <Input
                     id="firstName"
                     value={settings.profile?.firstName ?? ""}
@@ -550,7 +550,7 @@ export function UnifiedSettings({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">Nom</Label>
                   <Input
                     id="lastName"
                     value={settings.profile?.lastName ?? ""}
@@ -562,7 +562,7 @@ export function UnifiedSettings({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Adresse e-mail</Label>
                 <Input
                   id="email"
                   type="email"
@@ -574,7 +574,7 @@ export function UnifiedSettings({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Numéro de téléphone</Label>
                 <Input
                   id="phone"
                   value={settings.profile?.phone ?? ""}
@@ -585,7 +585,7 @@ export function UnifiedSettings({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio">Présentation</Label>
                 <Textarea
                   id="bio"
                   value={settings.profile?.bio ?? ""}
@@ -605,7 +605,7 @@ export function UnifiedSettings({
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="jobTitle">Job Title</Label>
+                    <Label htmlFor="jobTitle">Intitulé du poste</Label>
                     <Input
                       id="jobTitle"
                       value={settings.profile?.jobTitle ?? ""}
@@ -615,7 +615,7 @@ export function UnifiedSettings({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company">Company</Label>
+                    <Label htmlFor="company">Entreprise</Label>
                     <Input
                       id="company"
                       value={settings.profile?.company ?? ""}
@@ -630,10 +630,10 @@ export function UnifiedSettings({
               {/* Emergency Contact */}
               <Separator />
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Emergency Contact</h3>
+                <h3 className="text-lg font-medium">Contact d’urgence</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="emergencyName">Contact Name</Label>
+                    <Label htmlFor="emergencyName">Nom du contact</Label>
                     <Input
                       id="emergencyName"
                       value={settings.profile?.emergencyContact?.name ?? ""}
@@ -646,7 +646,7 @@ export function UnifiedSettings({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="emergencyPhone">Contact Phone</Label>
+                    <Label htmlFor="emergencyPhone">Téléphone du contact</Label>
                     <Input
                       id="emergencyPhone"
                       value={settings.profile?.emergencyContact?.phone ?? ""}
@@ -660,7 +660,7 @@ export function UnifiedSettings({
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="emergencyRelationship">Relationship</Label>
+                  <Label htmlFor="emergencyRelationship">Lien</Label>
                   <Input
                     id="emergencyRelationship"
                     value={
@@ -722,7 +722,7 @@ export function UnifiedSettings({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-medium">Email Notifications</h3>
+                    <h3 className="text-lg font-medium">Notifications par e-mail</h3>
                     <p className="text-sm text-muted-foreground">
                       Receive notifications via email
                     </p>
@@ -742,7 +742,7 @@ export function UnifiedSettings({
                   <div className="ml-4 space-y-3 border-l-2 border-muted pl-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="paymentReminders">
-                        Payment Reminders
+                        Rappels de paiement
                       </Label>
                       <Switch
                         id="paymentReminders"
@@ -777,7 +777,7 @@ export function UnifiedSettings({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="leaseReminders">Lease Reminders</Label>
+                      <Label htmlFor="leaseReminders">Rappels de bail</Label>
                       <Switch
                         id="leaseReminders"
                         checked={
@@ -792,7 +792,7 @@ export function UnifiedSettings({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="systemAlerts">System Alerts</Label>
+                      <Label htmlFor="systemAlerts">Alertes système</Label>
                       <Switch
                         id="systemAlerts"
                         checked={
@@ -807,7 +807,7 @@ export function UnifiedSettings({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="marketingEmails">Marketing Emails</Label>
+                      <Label htmlFor="marketingEmails">E-mails commerciaux</Label>
                       <Switch
                         id="marketingEmails"
                         checked={
@@ -825,7 +825,7 @@ export function UnifiedSettings({
 
                     {/* Email Frequency */}
                     <div className="space-y-2">
-                      <Label htmlFor="emailFrequency">Email Frequency</Label>
+                      <Label htmlFor="emailFrequency">Fréquence des e-mails</Label>
                       <Select
                         value={
                           settings.notifications?.email?.frequency ??
@@ -839,12 +839,12 @@ export function UnifiedSettings({
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select frequency" />
+                          <SelectValue placeholder="Sélectionner la fréquence" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="immediate">Immediate</SelectItem>
-                          <SelectItem value="daily">Daily Digest</SelectItem>
-                          <SelectItem value="weekly">Weekly Summary</SelectItem>
+                          <SelectItem value="immediate">Immédiate</SelectItem>
+                          <SelectItem value="daily">Résumé quotidien</SelectItem>
+                          <SelectItem value="weekly">Résumé hebdomadaire</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -852,7 +852,7 @@ export function UnifiedSettings({
                     {/* Quiet Hours */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="emailQuietHours">Quiet Hours</Label>
+                        <Label htmlFor="emailQuietHours">Heures silencieuses</Label>
                         <Switch
                           id="emailQuietHours"
                           checked={
@@ -873,7 +873,7 @@ export function UnifiedSettings({
                       {settings.notifications?.email?.quietHours?.enabled && (
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="emailQuietStart">Start Time</Label>
+                            <Label htmlFor="emailQuietStart">Heure de début</Label>
                             <Input
                               id="emailQuietStart"
                               type="time"
@@ -894,7 +894,7 @@ export function UnifiedSettings({
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="emailQuietEnd">End Time</Label>
+                            <Label htmlFor="emailQuietEnd">Heure de fin</Label>
                             <Input
                               id="emailQuietEnd"
                               type="time"
@@ -927,7 +927,7 @@ export function UnifiedSettings({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-medium">SMS Notifications</h3>
+                    <h3 className="text-lg font-medium">Notifications par SMS</h3>
                     <p className="text-sm text-muted-foreground">
                       Receive notifications via text message
                     </p>
@@ -962,7 +962,7 @@ export function UnifiedSettings({
                     </div>
                     <div className="flex items-center justify-between">
                       <Label htmlFor="smsPaymentReminders">
-                        Payment Reminders
+                        Rappels de paiement
                       </Label>
                       <Switch
                         id="smsPaymentReminders"
@@ -978,7 +978,7 @@ export function UnifiedSettings({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="smsSystemAlerts">System Alerts</Label>
+                      <Label htmlFor="smsSystemAlerts">Alertes système</Label>
                       <Switch
                         id="smsSystemAlerts"
                         checked={
@@ -1002,7 +1002,7 @@ export function UnifiedSettings({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-medium">Push Notifications</h3>
+                    <h3 className="text-lg font-medium">Notifications instantanées</h3>
                     <p className="text-sm text-muted-foreground">
                       Receive browser push notifications
                     </p>
@@ -1022,7 +1022,7 @@ export function UnifiedSettings({
                   <div className="ml-4 space-y-3 border-l-2 border-muted pl-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="pushPaymentReminders">
-                        Payment Reminders
+                        Rappels de paiement
                       </Label>
                       <Switch
                         id="pushPaymentReminders"
@@ -1137,12 +1137,12 @@ export function UnifiedSettings({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select theme" />
+                    <SelectValue placeholder="Sélectionner le thème" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="light">Light</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
+                    <SelectItem value="system">Système</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
@@ -1166,7 +1166,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select language" />
+                        <SelectValue placeholder="Sélectionner la langue" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="en">English</SelectItem>
@@ -1187,7 +1187,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select timezone" />
+                        <SelectValue placeholder="Sélectionner le fuseau horaire" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="America/New_York">
@@ -1222,10 +1222,10 @@ export function UnifiedSettings({
 
               {/* Date & Time Format */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Date & Time Format</h3>
+                <h3 className="text-lg font-medium">Format de date et d’heure</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="dateFormat">Date Format</Label>
+                    <Label htmlFor="dateFormat">Format de date</Label>
                     <Select
                       value={settings.display?.dateFormat ?? "MM/DD/YYYY"}
                       onValueChange={(value) =>
@@ -1233,7 +1233,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select date format" />
+                        <SelectValue placeholder="Sélectionner le format de date" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MM/DD/YYYY">
@@ -1257,7 +1257,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select time format" />
+                        <SelectValue placeholder="Sélectionner le format d’heure" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="12h">12-hour (2:30 PM)</SelectItem>
@@ -1283,7 +1283,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select density" />
+                        <SelectValue placeholder="Sélectionner la densité" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="compact">Compact</SelectItem>
@@ -1301,11 +1301,11 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select font size" />
+                        <SelectValue placeholder="Sélectionner la taille du texte" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="small">Small</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
                         <SelectItem value="large">Large</SelectItem>
                       </SelectContent>
                     </Select>
@@ -1317,11 +1317,11 @@ export function UnifiedSettings({
 
               {/* Interface Options */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Interface Options</h3>
+                <h3 className="text-lg font-medium">Options de l’interface</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="compactMode">Compact Mode</Label>
+                      <Label htmlFor="compactMode">Mode compact</Label>
                       <p className="text-sm text-muted-foreground">
                         Reduce spacing and padding for more content
                       </p>
@@ -1336,7 +1336,7 @@ export function UnifiedSettings({
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="sidebarCollapsed">Collapse Sidebar</Label>
+                      <Label htmlFor="sidebarCollapsed">Réduire le menu latéral</Label>
                       <p className="text-sm text-muted-foreground">
                         Start with sidebar collapsed by default
                       </p>
@@ -1366,7 +1366,7 @@ export function UnifiedSettings({
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="highContrast">High Contrast</Label>
+                      <Label htmlFor="highContrast">Contraste élevé</Label>
                       <p className="text-sm text-muted-foreground">
                         Increase contrast for better accessibility
                       </p>
@@ -1386,10 +1386,10 @@ export function UnifiedSettings({
 
               {/* Dashboard Layout */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Dashboard Layout</h3>
+                <h3 className="text-lg font-medium">Disposition du tableau de bord</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="dashboardLayout">Default Layout</Label>
+                    <Label htmlFor="dashboardLayout">Disposition par défaut</Label>
                     <Select
                       value={settings.display?.dashboardLayout ?? "grid"}
                       onValueChange={(value) =>
@@ -1397,17 +1397,17 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select layout" />
+                        <SelectValue placeholder="Sélectionner la disposition" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="grid">Grid View</SelectItem>
-                        <SelectItem value="list">List View</SelectItem>
-                        <SelectItem value="card">Card View</SelectItem>
+                        <SelectItem value="grid">Vue en grille</SelectItem>
+                        <SelectItem value="list">Vue en liste</SelectItem>
+                        <SelectItem value="card">Vue en cartes</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="itemsPerPage">Items Per Page</Label>
+                    <Label htmlFor="itemsPerPage">Éléments par page</Label>
                     <Select
                       value={String(settings.display?.itemsPerPage ?? 25)}
                       onValueChange={(value) =>
@@ -1419,7 +1419,7 @@ export function UnifiedSettings({
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select items per page" />
+                        <SelectValue placeholder="Sélectionner le nombre d’éléments par page" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="10">10 items</SelectItem>
@@ -1487,14 +1487,14 @@ export function UnifiedSettings({
                   {/* Branding Settings */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Branding</CardTitle>
+                      <CardTitle className="text-lg">Identité visuelle</CardTitle>
                       <CardDescription>
                         Configure company branding and logos
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Company Name</Label>
+                        <Label>Nom de l’entreprise</Label>
                         <Input
                           placeholder="Gestion E-Immo"
                           value={settings.system?.branding?.companyName ?? ""}
@@ -1513,7 +1513,7 @@ export function UnifiedSettings({
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Company Logo</Label>
+                        <Label>Logo de l’entreprise</Label>
                         <FileUpload
                           acceptedFileTypes={[
                             "image/jpeg",
@@ -1572,7 +1572,7 @@ export function UnifiedSettings({
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label>SMTP Host</Label>
+                        <Label>Serveur SMTP</Label>
                         <Input
                           placeholder="smtp.gmail.com"
                           value={settings.system?.email?.smtpHost ?? ""}
@@ -1591,7 +1591,7 @@ export function UnifiedSettings({
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>SMTP Port</Label>
+                        <Label>Port SMTP</Label>
                         <Input
                           type="number"
                           placeholder="587"
@@ -1616,7 +1616,7 @@ export function UnifiedSettings({
                   {/* Security Settings */}
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Security</CardTitle>
+                      <CardTitle className="text-lg">Sécurité</CardTitle>
                       <CardDescription>
                         System-wide security configuration
                       </CardDescription>
@@ -1624,7 +1624,7 @@ export function UnifiedSettings({
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label>Force 2FA for Admins</Label>
+                          <Label>Imposer la double authentification aux administrateurs</Label>
                           <p className="text-sm text-muted-foreground">
                             Require two-factor authentication for admin users
                           </p>
@@ -1649,7 +1649,7 @@ export function UnifiedSettings({
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Session Timeout (minutes)</Label>
+                        <Label>Expiration de session (minutes)</Label>
                         <Input
                           type="number"
                           placeholder="30"
@@ -1684,7 +1684,7 @@ export function UnifiedSettings({
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label>Maintenance Mode</Label>
+                          <Label>Mode maintenance</Label>
                           <p className="text-sm text-muted-foreground">
                             Enable maintenance mode for system updates
                           </p>
@@ -1708,7 +1708,7 @@ export function UnifiedSettings({
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label>Backup Frequency</Label>
+                        <Label>Fréquence des sauvegardes</Label>
                         <Select
                           value={
                             settings.system?.maintenance?.backupFrequency ??
@@ -1731,10 +1731,10 @@ export function UnifiedSettings({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="hourly">Hourly</SelectItem>
-                            <SelectItem value="daily">Daily</SelectItem>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="hourly">Toutes les heures</SelectItem>
+                            <SelectItem value="daily">Quotidienne</SelectItem>
+                            <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                            <SelectItem value="monthly">Mensuelle</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

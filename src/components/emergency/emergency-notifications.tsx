@@ -68,7 +68,7 @@ export function EmergencyNotifications({
           read: false,
           actions: [
             {
-              label: "View Details",
+              label: "Voir les détails",
               href: "/dashboard/maintenance/req1",
               variant: "default",
             },
@@ -268,7 +268,7 @@ export function EmergencyNotifications({
             )}
           </div>
           <Button variant="outline" size="sm" onClick={fetchNotifications}>
-            Refresh
+            Actualiser
           </Button>
         </CardTitle>
       </CardHeader>

@@ -4,6 +4,7 @@ import { User } from "lucide-react";
 import { SettingsLayout } from "@/components/settings/settings-layout";
 import { ProfileSettings } from "@/components/settings/profile-settings";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
+import { WhatsAppVerificationCard } from "@/components/settings/WhatsAppVerificationCard";
 
 export default function ProfileSettingsPage() {
   const { t } = useLocalizationContext();
@@ -17,11 +18,14 @@ export default function ProfileSettingsPage() {
       showRefresh={true}
     >
       {({ userProfile, onUpdate, onAlert }) => (
-        <ProfileSettings
-          user={userProfile}
-          onUpdate={onUpdate}
-          onAlert={onAlert}
-        />
+        <>
+          <ProfileSettings
+            user={userProfile}
+            onUpdate={onUpdate}
+            onAlert={onAlert}
+          />
+          <WhatsAppVerificationCard />
+        </>
       )}
     </SettingsLayout>
   );

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ContractSafeguardsEditor from "@/components/subscriptions/ContractSafeguardsEditor";
+import { buildSubscriptionContractText } from "@/lib/subscriptions/contract-template";
 
 type Account = {
   _id: string;
@@ -61,6 +63,7 @@ export default function SubscriptionsAdminPage() {
   const [saving, setSaving] = useState(false);
   const [contractEdited, setContractEdited] = useState(false);
   const [portfolio, setPortfolio] = useState<PortfolioSnapshot | null>(null);
+  const [portfolioLoading, setPortfolioLoading] = useState(false);
   const [portfolioAnomalies, setPortfolioAnomalies] = useState<string[]>([]);
 
   const [form, setForm] = useState<any>({
@@ -108,6 +111,40 @@ export default function SubscriptionsAdminPage() {
       notifyOnLeaseTermination: true,
       notifyOnLeaseExpiration: true
     },
+    safeguards: {
+      manualPaymentRegister: true,
+      manualOwnerPayoutRegister: true,
+      independentEvidenceArchive: true,
+      independentBackups: true,
+      backupFrequency: "Quotidienne + sauvegardes périodiques",
+      outageReconciliation: true,
+      immutableAuditTrail: true,
+      incidentNotification: true,
+      financialInstructionVerification: true,
+      employeeFraudControls: true,
+      professionalLiabilityInsurance: false,
+      propertyInsuranceRequired: true,
+      tenantLiabilityInsuranceRecommended: true,
+      cyberInsurance: false,
+      thirdPartyFundsProtection: false,
+      guaranteeReserveRequired: true,
+      guaranteeReserveAmount: 0,
+      forceMajeureNotes: "",
+    },
+    onboardingChecklist: {
+      ownerIdentityVerified: false, ownershipDocumentsVerified: false, existingOccupantsDeclared: false,
+      existingLeasesCollected: false, priorArrearsDeclared: false, depositsAdvancesDeclared: false,
+      propertyConditionRecorded: false, knownDisputesDeclared: false, payoutCoordinatesVerified: false,
+    },
+    offboardingChecklist: {
+      closureStatementRequired: true, finalFinancialStatement: true, depositsTransferred: true,
+      documentsDelivered: true, activeLeasesTransferred: true, openDisputesRecorded: true,
+    },
+    complianceRules: {
+      identityVerification: true, dataUseNoticeAccepted: true, occupantContactUseRestricted: true,
+      accountSecurityAcknowledged: true, collectionAuthorization: true, legalProceedingsNeedApproval: true,
+      taxResponsibilityAcknowledged: true, deathSuccessionProcedure: true, propertySaleProcedure: true,
+    },
     conditions: "",
     specialClauses: "",
     contractBody: "",
@@ -139,19 +176,39 @@ export default function SubscriptionsAdminPage() {
     if (!form.accountId) {
       setPortfolio(null);
       setPortfolioAnomalies([]);
+      setPortfolioLoading(false);
       return;
     }
-    fetch(`/api/admin/subscriptions/portfolio/${form.accountId}`, { cache: "no-store" })
-      .then((r) => r.json())
+
+    const controller = new AbortController();
+    setPortfolio(null);
+    setPortfolioAnomalies([]);
+    setPortfolioLoading(true);
+
+    fetch(
+      `/api/admin/subscriptions/portfolio/${form.accountId}?snapshotOnly=1`,
+      { cache: "no-store", signal: controller.signal }
+    )
+      .then(async (r) => {
+        const payload = await r.json();
+        if (!r.ok) throw new Error(payload?.message || "Synchronisation impossible");
+        return payload;
+      })
       .then((payload) => {
         const data = unwrap(payload);
         setPortfolio(data?.snapshot || null);
         setPortfolioAnomalies(data?.anomalies || []);
       })
-      .catch(() => {
+      .catch((error) => {
+        if (error?.name === "AbortError") return;
         setPortfolio(null);
         setPortfolioAnomalies([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setPortfolioLoading(false);
       });
+
+    return () => controller.abort();
   }, [form.accountId]);
 
   const selected = useMemo(
@@ -194,129 +251,16 @@ export default function SubscriptionsAdminPage() {
       : " — sans date de fin définie"
   }`;
 
-  const generatedContract = useMemo(() => {
-    const r = form.mandateRules;
-    const period = `${startParts.day} ${MONTHS[Number(startParts.month)]} ${startParts.year}${
-      endParts.day && endParts.month !== "" && endParts.year
-        ? ` au ${endParts.day} ${MONTHS[Number(endParts.month)]} ${endParts.year}`
-        : " — sans date de fin définie"
-    }`;
-
-    return `CONTRAT E-IMMO
-${typeLabel.toUpperCase()}
-
-ENTRE LES SOUSSIGNÉS
-
-1. GESTION E-IMMO, agissant à travers la plateforme E-IMMO, ci-après dénommée « E-IMMO »,
-
-ET
-
-2. ${selectedName}${selected?.email ? `, e-mail : ${selected.email}` : ""}${selected?.phone ? `, téléphone : ${selected.phone}` : ""}, ci-après dénommé « le Contractant ».
-
-ARTICLE 1 — OBJET
-Le présent contrat définit l'utilisation des services E-IMMO et, lorsqu'un mandat est choisi, les pouvoirs de gestion confiés à E-IMMO.
-
-ARTICLE 2 — TYPE DE CONTRAT ET RÉMUNÉRATION
-Type : ${typeLabel}.
-Tarification : ${pricingText}.
-Périodicité : ${form.billingPeriod === "monthly" ? "Mensuelle" : "Annuelle"}.
-
-ARTICLE 3 — CAPACITÉ CONTRACTUELLE AUTORISÉE
-Propriétés autorisées : ${form.maxProperties}.
-Ménages / unités autorisés : ${form.maxUnits}.
-Locataires actifs autorisés : ${form.maxActiveTenants}.
-Tranche commerciale : ${form.tierLabel}.
-Ces valeurs sont les limites autorisées par le contrat et non le nombre déjà enregistré dans le système.
-
-ARTICLE 4 — ÉTAT RÉEL DU PORTEFEUILLE
-Propriétés enregistrées : ${portfolio?.propertyCount ?? 0}.
-Unités enregistrées : ${portfolio?.unitCount ?? 0}.
-Unités occupées : ${portfolio?.occupiedUnitCount ?? 0}.
-Unités vacantes : ${portfolio?.vacantUnitCount ?? 0}.
-Locataires actifs : ${portfolio?.activeTenantCount ?? 0}.
-Baux actifs : ${portfolio?.activeLeaseCount ?? 0}.
-Ces données sont calculées automatiquement à partir des propriétés et des baux.
-
-ARTICLE 5 — DURÉE
-Période : ${period}.
-Renouvellement : ${form.renewalMode === "automatic" ? "Automatique" : "Manuel"}.
-
-ARTICLE 6 — REVERSEMENT AU PROPRIÉTAIRE
-Jour mensuel de reversement : le ${r.ownerPayoutDay} de chaque mois.
-Règle : ${
-      r.payoutRule === "collected"
-        ? "sommes réellement encaissées"
-        : r.payoutRule === "guaranteed"
-          ? "revenu garanti prévu au présent contrat"
-          : "conditions particulières convenues entre les parties"
-    }.
-${r.payoutNotes || ""}
-
-ARTICLE 7 — BAUX, OCCUPATION ET REMPLACEMENT D'OCCUPANT
-Les baux sont synchronisés avec le contrat. Toute activation, résiliation, expiration ou renouvellement doit être journalisé.
-Une unité occupée doit être reliée à un bail actif. Une résiliation n'entraîne la vacance effective qu'à la sortie réelle de l'occupant.
-Remplacement d'un occupant : ${
-      r.tenantReplacementAuthority === "automatic"
-        ? "E-IMMO est autorisé à rechercher et installer un nouvel occupant selon le mandat"
-        : r.tenantReplacementAuthority === "owner_approval"
-          ? "l'accord du propriétaire est requis avant l'installation d'un nouvel occupant"
-          : "E-IMMO n'est pas autorisé à remplacer l'occupant sans avenant"
-    }.
-
-ARTICLE 8 — VACANCE / INOCCUPATION
-E-IMMO suit toute période de vacance entre la sortie effective d'un occupant et l'entrée du suivant.
-${
-  r.vacancyCoverageEnabled
-    ? `Couverture de vacance : ${r.vacancyCoverageDays} jours, plafond ${Number(r.vacancyCoverageCap || 0).toLocaleString("fr-FR")} FCFA.`
-    : "Aucune garantie financière de vacance n'est prévue, sauf clause particulière."
-}
-Le propriétaire doit voir en temps réel si chaque unité est occupée ou vacante.
-
-ARTICLE 9 — AVANCES, CAUTIONS ET DÉPÔTS
-${r.advancePolicy}
-${r.depositPolicy}
-Les avances sont imputées progressivement aux échéances concernées et ne sont jamais transformées artificiellement en nouveaux encaissements mensuels.
-
-ARTICLE 10 — IMPAYÉS ET GARANTIE DE REVENU
-${
-  r.guaranteedIncomeEnabled
-    ? `Garantie prévue : montant ${Number(r.guaranteedIncomeAmount || 0).toLocaleString("fr-FR")} FCFA, taux ${Number(r.guaranteedIncomeRate || 0)} %, maximum ${Number(r.guaranteeMaxUnpaidMonths || 0)} mois d'impayés, plafond annuel ${Number(r.guaranteeAnnualCap || 0).toLocaleString("fr-FR")} FCFA. Les avances E-IMMO restent distinctes des paiements réellement effectués par les locataires.`
-    : "E-IMMO n'assume pas automatiquement les impayés des occupants, sauf clause particulière."
-}
-
-ARTICLE 11 — TRANSPARENCE TOTALE DU PROPRIÉTAIRE
-Le propriétaire dispose d'un accès de supervision sur ses biens : occupants, baux, paiements, impayés, avances, cautions, dépenses, factures, maintenances, inspections, périodes de vacance et reversements.
-${r.ownerCanViewOccupantContacts ? "Les coordonnées téléphone et WhatsApp des occupants de ses propres biens sont visibles dans son espace de supervision." : "Les coordonnées directes des occupants ne sont pas affichées."}
-Cette transparence ne confère pas automatiquement au propriétaire les mêmes droits de modification que ceux confiés à E-IMMO.
-
-ARTICLE 12 — DÉPENSES ET MAINTENANCE
-${
-  Number(r.expenseApprovalThreshold || 0) > 0
-    ? `E-IMMO peut engager les dépenses prévues par le mandat jusqu'à ${Number(r.expenseApprovalThreshold).toLocaleString("fr-FR")} FCFA. Au-delà, l'accord du propriétaire est requis.`
-    : "Les dépenses nécessitant un accord du propriétaire restent soumises aux conditions particulières du contrat."
-}
-
-ARTICLE 13 — CONDITIONS GÉNÉRALES
-${form.conditions || "À compléter ou modifier manuellement avant validation."}
-
-ARTICLE 14 — CLAUSES PARTICULIÈRES
-${form.specialClauses || "Aucune clause particulière n'est renseignée à ce stade."}
-
-ARTICLE 15 — VALIDATION
-Le présent contrat reste intégralement modifiable avant validation. Son activation doit précéder l'utilisation au-delà des capacités autorisées.
-
-Fait entre E-IMMO et ${selectedName}.`;
-  }, [
-    form,
-    selectedName,
-    selected?.email,
-    selected?.phone,
-    pricingText,
-    typeLabel,
-    portfolio,
-    startParts,
-    endParts,
-  ]);
+  const generatedContract = useMemo(() =>
+    buildSubscriptionContractText({
+      form,
+      account: selected,
+      accountName: selectedName,
+      portfolio,
+      periodText,
+    }),
+    [form, selected, selectedName, portfolio, periodText]
+  );
 
   useEffect(() => {
     if (!contractEdited) {
@@ -362,8 +306,7 @@ Fait entre E-IMMO et ${selectedName}.`;
       if (!r.ok) throw new Error(payload?.error || "Création impossible");
 
       const created = unwrap(payload);
-      await load();
-      if (created?._id) router.push(`/dashboard/admin/subscriptions/${created._id}`);
+      if (created?._id) router.replace(`/dashboard/admin/subscriptions/${created._id}`);
       else alert("Contrat créé.");
     } catch (e: any) {
       alert(e.message);
@@ -415,6 +358,11 @@ Fait entre E-IMMO et ${selectedName}.`;
           <section className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
             <h2 className="text-lg font-bold sm:text-xl">État réel synchronisé</h2>
             <p className="mt-1 text-xs text-slate-500">Ces données viennent automatiquement des propriétés et baux. Elles ne remplacent pas les limites du contrat.</p>
+            {portfolioLoading && (
+              <p className="mt-2 text-xs font-medium text-slate-600">
+                Synchronisation du portefeuille…
+              </p>
+            )}
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
               {[
                 ["Propriétés", portfolio?.propertyCount ?? 0],
@@ -426,7 +374,9 @@ Fait entre E-IMMO et ${selectedName}.`;
               ].map(([label, value]) => (
                 <div key={String(label)} className="rounded-xl bg-slate-50 p-3">
                   <p className="text-xs text-slate-500">{label}</p>
-                  <p className="text-xl font-bold">{value}</p>
+                  <p className="text-xl font-bold">
+                    {portfolioLoading ? "…" : value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -684,8 +634,19 @@ Fait entre E-IMMO et ${selectedName}.`;
           )}
         </section>
 
+        <ContractSafeguardsEditor
+          safeguards={form.safeguards || {}}
+          onboardingChecklist={form.onboardingChecklist || {}}
+          offboardingChecklist={form.offboardingChecklist || {}}
+          complianceRules={form.complianceRules || {}}
+          onSafeguardsChange={(key, value) => { setContractEdited(false); setForm((f:any) => ({ ...f, safeguards: { ...f.safeguards, [key]: value } })); }}
+          onOnboardingChange={(key, value) => { setContractEdited(false); setForm((f:any) => ({ ...f, onboardingChecklist: { ...f.onboardingChecklist, [key]: value } })); }}
+          onOffboardingChange={(key, value) => { setContractEdited(false); setForm((f:any) => ({ ...f, offboardingChecklist: { ...f.offboardingChecklist, [key]: value } })); }}
+          onComplianceChange={(key, value) => { setContractEdited(false); setForm((f:any) => ({ ...f, complianceRules: { ...f.complianceRules, [key]: value } })); }}
+        />
+
         <section className="min-w-0 rounded-2xl bg-white p-4 shadow-sm sm:p-5">
-          <h2 className="text-lg font-bold sm:text-xl">5. Contrat modifiable</h2>
+          <h2 className="text-lg font-bold sm:text-xl">6. Contrat modifiable</h2>
           <p className="mt-2 text-sm leading-5 text-slate-600">
             Le texte ci-dessous est généré automatiquement à partir des options choisies. Tu peux ensuite modifier
             manuellement n'importe quelle phrase avant validation.

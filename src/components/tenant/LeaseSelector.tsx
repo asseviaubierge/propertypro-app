@@ -155,7 +155,7 @@ export default function LeaseSelector({
         <SelectTrigger className={cn("w-64", className)}>
           <SelectValue
             placeholder={t("leases.myLeases.filters.selectLease", {
-              defaultValue: "Select a lease",
+              defaultValue: "Sélectionner un bail",
             })}
           />
         </SelectTrigger>
@@ -198,7 +198,7 @@ export default function LeaseSelector({
               </div>
             ) : (
               t("leases.myLeases.filters.selectLease", {
-                defaultValue: "Select lease...",
+                defaultValue: "Sélectionner un bail…",
               })
             )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

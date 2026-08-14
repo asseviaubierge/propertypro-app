@@ -213,48 +213,48 @@ export default function PaymentAnalyticsPage() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <Select value={dateRange} onValueChange={setDateRange}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select date range" />
+                  <SelectValue placeholder="Sélectionner une période" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="7">Last 7 days</SelectItem>
-                  <SelectItem value="30">Last 30 days</SelectItem>
-                  <SelectItem value="90">Last 3 months</SelectItem>
-                  <SelectItem value="180">Last 6 months</SelectItem>
-                  <SelectItem value="365">Last year</SelectItem>
+                  <SelectItem value="7">7 derniers jours</SelectItem>
+                  <SelectItem value="30">30 derniers jours</SelectItem>
+                  <SelectItem value="90">3 derniers mois</SelectItem>
+                  <SelectItem value="180">6 derniers mois</SelectItem>
+                  <SelectItem value="365">Année dernière</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filtrer par statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value={PaymentStatus.PENDING}>En attente</SelectItem>
                 <SelectItem value={PaymentStatus.PENDING}>
                   Processing
                 </SelectItem>
                 <SelectItem value={PaymentStatus.PAID}>
                   Completed
                 </SelectItem>
-                <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
+                <SelectItem value={PaymentStatus.FAILED}>Échoué</SelectItem>
                 <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by type" />
+                <SelectValue placeholder="Filtrer par type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value={PaymentType.RENT}>Rent</SelectItem>
+                <SelectItem value="all">Tous les types</SelectItem>
+                <SelectItem value={PaymentType.RENT}>Loyer</SelectItem>
                 <SelectItem value={PaymentType.SECURITY_DEPOSIT}>
-                  Security Deposit
+                  Garantie
                 </SelectItem>
-                <SelectItem value={PaymentType.INVOICE}>Invoice</SelectItem>
-                <SelectItem value={PaymentType.LATE_FEE}>Late Fee</SelectItem>
+                <SelectItem value={PaymentType.INVOICE}>Facture</SelectItem>
+                <SelectItem value={PaymentType.LATE_FEE}>Frais de retard</SelectItem>
                 <SelectItem value={PaymentType.PET_DEPOSIT}>
                   Pet Deposit
                 </SelectItem>
@@ -262,7 +262,7 @@ export default function PaymentAnalyticsPage() {
                 <SelectItem value={PaymentType.MAINTENANCE}>
                   Maintenance
                 </SelectItem>
-                <SelectItem value={PaymentType.OTHER}>Other</SelectItem>
+                <SelectItem value={PaymentType.OTHER}>Autre</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -345,18 +345,18 @@ export default function PaymentAnalyticsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Date Range</span>
+              <span className="text-sm text-muted-foreground">Période</span>
               <span className="font-medium">
-                {dateRange === "7" && "Last 7 days"}
-                {dateRange === "30" && "Last 30 days"}
-                {dateRange === "90" && "Last 3 months"}
-                {dateRange === "180" && "Last 6 months"}
-                {dateRange === "365" && "Last year"}
+                {dateRange === "7" && "7 derniers jours"}
+                {dateRange === "30" && "30 derniers jours"}
+                {dateRange === "90" && "3 derniers mois"}
+                {dateRange === "180" && "6 derniers mois"}
+                {dateRange === "365" && "Année dernière"}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">
-                Total Revenue
+                Revenu total
               </span>
               <span className="font-medium">
                 {new Intl.NumberFormat("en-US", {

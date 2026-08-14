@@ -345,7 +345,7 @@ export default function LeaseInvoicesPage() {
             ),
           });
         } else {
-          showSimpleError("Load Error", t("leases.invoices.toasts.fetchTenantError"));
+          showSimpleError("Erreur de chargement", t("leases.invoices.toasts.fetchTenantError"));
         }
       } else {
         // For admin/manager, use the existing invoices API
@@ -427,11 +427,11 @@ export default function LeaseInvoicesPage() {
             hasPrev: page > 1,
           });
         } else {
-          showSimpleError("Load Error", t("leases.invoices.toasts.fetchError"));
+          showSimpleError("Erreur de chargement", t("leases.invoices.toasts.fetchError"));
         }
       }
     } catch {
-      showSimpleError("Load Error", t("leases.invoices.toasts.fetchError"));
+      showSimpleError("Erreur de chargement", t("leases.invoices.toasts.fetchError"));
     } finally {
       setLoading(false);
       setIsSearching(false);
@@ -941,7 +941,7 @@ export default function LeaseInvoicesPage() {
             title={t("leases.invoices.stats.total")}
             value={stats.total}
             description={t("leases.invoices.stats.totalDescription", {
-              defaultValue: "All invoices",
+              defaultValue: "Toutes les factures",
             })}
             icon={FileText}
             iconColor="primary"
@@ -950,7 +950,7 @@ export default function LeaseInvoicesPage() {
             title={t("leases.invoices.stats.paid")}
             value={stats.paid}
             description={t("leases.invoices.stats.paidDescription", {
-              defaultValue: "Successfully paid",
+              defaultValue: "Payées avec succès",
             })}
             icon={CheckCircle}
             iconColor="success"
@@ -959,18 +959,18 @@ export default function LeaseInvoicesPage() {
             title={t("leases.invoices.stats.overdue")}
             value={stats.overdue}
             description={t("leases.invoices.stats.overdueDescription", {
-              defaultValue: "Needs attention",
+              defaultValue: "Nécessite une attention",
             })}
             icon={AlertTriangle}
             iconColor="warning"
           />
           <AnalyticsCard
             title={t("leases.invoices.stats.balance", {
-              defaultValue: "Balance",
+              defaultValue: "Solde",
             })}
             value={formatCurrency(stats.overdueAmount)}
             description={t("leases.invoices.stats.balanceDescription", {
-              defaultValue: "Outstanding balance",
+              defaultValue: "Solde impayé",
             })}
             icon={DollarSign}
             iconColor="error"
@@ -1084,7 +1084,7 @@ export default function LeaseInvoicesPage() {
                 isLoading={isSearching}
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-400 dark:focus:ring-blue-500 bg-white dark:bg-gray-800"
-                ariaLabel="Search invoices"
+                ariaLabel="Rechercher des factures"
               />
 
               {/* Filter Controls */}
@@ -1173,7 +1173,7 @@ export default function LeaseInvoicesPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("leases.filters.clear") || "Clear"}
+                  {t("leases.filters.clear") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -1525,11 +1525,11 @@ export default function LeaseInvoicesPage() {
                       },
                       getRowId: (invoice: Invoice) => invoice._id,
                       selectAllLabel: t("leases.invoices.selection.selectAll", {
-                        defaultValue: "Select all",
+                        defaultValue: "Tout sélectionner",
                       }),
                       selectRowLabel: () =>
                         t("leases.invoices.selection.selectInvoice", {
-                          defaultValue: "Select invoice",
+                          defaultValue: "Sélectionner la facture",
                         }),
                     }
                   : undefined
@@ -1554,13 +1554,13 @@ export default function LeaseInvoicesPage() {
               pageSize={filters.limit ?? 12}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

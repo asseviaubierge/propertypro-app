@@ -65,12 +65,12 @@ export const EMERGENCY_TEMPLATES = {
     subject: "🚨 EMERGENCY: New Critical Maintenance Request",
     body: `
       <h2 style="color: #dc2626;">EMERGENCY MAINTENANCE REQUEST</h2>
-      <p><strong>Property:</strong> {{propertyName}}</p>
+      <p><strong>Bien :</strong> {{propertyName}}</p>
       <p><strong>Address:</strong> {{propertyAddress}}</p>
       <p><strong>Emergency Type:</strong> {{emergencyType}}</p>
       <p><strong>Title:</strong> {{title}}</p>
       <p><strong>Description:</strong> {{description}}</p>
-      <p><strong>Tenant:</strong> {{tenantName}} ({{tenantPhone}})</p>
+      <p><strong>Locataire :</strong> {{tenantName}} ({{tenantPhone}})</p>
       <p><strong>Safety Risk:</strong> {{safetyRisk}}</p>
       <p><strong>Immediate Action Taken:</strong> {{immediateAction}}</p>
       <p><strong>Created:</strong> {{createdAt}}</p>
@@ -95,7 +95,7 @@ export const EMERGENCY_TEMPLATES = {
     body: `
       <h2 style="color: #dc2626;">Emergency Request Assigned to You</h2>
       <p>You have been assigned an emergency maintenance request:</p>
-      <p><strong>Property:</strong> {{propertyName}}</p>
+      <p><strong>Bien :</strong> {{propertyName}}</p>
       <p><strong>Title:</strong> {{title}}</p>
       <p><strong>Emergency Type:</strong> {{emergencyType}}</p>
       <p><strong>Safety Risk:</strong> {{safetyRisk}}</p>
@@ -120,7 +120,7 @@ export const EMERGENCY_TEMPLATES = {
     body: `
       <h2 style="color: #dc2626;">OVERDUE EMERGENCY REQUEST</h2>
       <p>The following emergency request is past the 2-hour SLA:</p>
-      <p><strong>Property:</strong> {{propertyName}}</p>
+      <p><strong>Bien :</strong> {{propertyName}}</p>
       <p><strong>Title:</strong> {{title}}</p>
       <p><strong>Time Elapsed:</strong> {{timeElapsed}}</p>
       <p><strong>Assigned To:</strong> {{assignedTo}}</p>
@@ -144,7 +144,7 @@ export const EMERGENCY_TEMPLATES = {
     body: `
       <h2 style="color: #dc2626;">ESCALATED EMERGENCY REQUEST</h2>
       <p>An emergency request has been escalated to you:</p>
-      <p><strong>Property:</strong> {{propertyName}}</p>
+      <p><strong>Bien :</strong> {{propertyName}}</p>
       <p><strong>Title:</strong> {{title}}</p>
       <p><strong>Original Assignee:</strong> {{originalAssignee}}</p>
       <p><strong>Escalation Reason:</strong> {{escalationReason}}</p>
@@ -169,7 +169,7 @@ export const EMERGENCY_TEMPLATES = {
     body: `
       <h2 style="color: #16a34a;">Emergency Request Completed</h2>
       <p>The following emergency request has been resolved:</p>
-      <p><strong>Property:</strong> {{propertyName}}</p>
+      <p><strong>Bien :</strong> {{propertyName}}</p>
       <p><strong>Title:</strong> {{title}}</p>
       <p><strong>Resolved By:</strong> {{resolvedBy}}</p>
       <p><strong>Resolution Time:</strong> {{resolutionTime}}</p>
@@ -180,7 +180,7 @@ export const EMERGENCY_TEMPLATES = {
       </div>
       
       <a href="{{viewUrl}}" style="background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-        View Details
+        Voir les détails
       </a>
     `,
     smsText:
@@ -444,7 +444,7 @@ export class EmergencyNotificationService {
     const mockRecipients: NotificationRecipient[] = [
       {
         id: "manager1",
-        name: "Property Manager",
+        name: "Gestionnaire du bien",
         email: "manager@property.com",
         phone: "+1234567890",
         role: "property_manager",

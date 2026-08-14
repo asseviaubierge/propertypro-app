@@ -10,6 +10,18 @@ import { withPermissionAndDB } from "@/lib/api-utils";
 import { publish } from "@/lib/realtime/bus";
 import { sendPushToUsers } from "@/lib/push/send";
 
+function hasActiveParticipant(conversation: any, userId: string): boolean {
+  return (
+    Array.isArray(conversation?.participants) &&
+    conversation.participants.some(
+      (participant: any) =>
+        participant?.isActive !== false &&
+        String(participant?.userId?._id ?? participant?.userId ?? "") ===
+          String(userId),
+    )
+  );
+}
+
 // GET /api/conversations/[id]/messages - Get messages for a conversation
 export const GET = withPermissionAndDB("profile_management")(
   async (
@@ -21,7 +33,7 @@ export const GET = withPermissionAndDB("profile_management")(
       const { id: conversationId } = await params;
       if (!conversationId || !Types.ObjectId.isValid(conversationId)) {
         return NextResponse.json(
-          { error: "Invalid conversation ID" },
+          { error: "Identifiant de conversation invalide" },
           { status: 400 }
         );
       }
@@ -34,21 +46,20 @@ export const GET = withPermissionAndDB("profile_management")(
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         return NextResponse.json(
-          { error: "Conversation not found" },
+          { error: "Conversation introuvable" },
           { status: 404 }
         );
       }
 
-      const activeParticipant = (conversation as any).getActiveParticipant?.(
-        user.id
-      );
-
-      if (!activeParticipant) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      if (!hasActiveParticipant(conversation, user.id)) {
+        return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
       }
 
       // Get messages with pagination
-      const messages = await Message.find({ conversationId })
+      const messages = await Message.find({
+        conversationId,
+        deletedAt: null,
+      })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -56,7 +67,10 @@ export const GET = withPermissionAndDB("profile_management")(
         .lean();
 
       // Get total count for pagination
-      const total = await Message.countDocuments({ conversationId });
+      const total = await Message.countDocuments({
+        conversationId,
+        deletedAt: null,
+      });
 
       return NextResponse.json({
         messages: messages.reverse(), // Reverse to show oldest first
@@ -70,9 +84,9 @@ export const GET = withPermissionAndDB("profile_management")(
         },
       });
     } catch (error) {
-      console.error("Get messages error:", error);
+      console.error("Erreur de chargement des messages :", error);
       return NextResponse.json(
-        { error: "Failed to fetch messages" },
+        { error: "Impossible de charger les messages" },
         { status: 500 }
       );
     }
@@ -90,7 +104,7 @@ export const POST = withPermissionAndDB("profile_management")(
       const { id: conversationId } = await params;
       if (!conversationId || !Types.ObjectId.isValid(conversationId)) {
         return NextResponse.json(
-          { error: "Invalid conversation ID" },
+          { error: "Identifiant de conversation invalide" },
           { status: 400 }
         );
       }
@@ -105,7 +119,7 @@ export const POST = withPermissionAndDB("profile_management")(
       // Validate input
       if (!content || content.trim().length === 0) {
         return NextResponse.json(
-          { error: "Message content is required" },
+          { error: "Le contenu du message est obligatoire" },
           { status: 400 }
         );
       }
@@ -114,26 +128,22 @@ export const POST = withPermissionAndDB("profile_management")(
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         return NextResponse.json(
-          { error: "Conversation not found" },
+          { error: "Conversation introuvable" },
           { status: 404 }
         );
       }
 
       if (!Types.ObjectId.isValid(user.id)) {
         return NextResponse.json(
-          { error: "Invalid sender ID" },
+          { error: "Identifiant d’expéditeur invalide" },
           { status: 400 }
         );
       }
 
       const senderObjectId = new Types.ObjectId(user.id);
 
-      const activeParticipant = (conversation as any).getActiveParticipant?.(
-        user.id
-      );
-
-      if (!activeParticipant) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      if (!hasActiveParticipant(conversation, user.id)) {
+        return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
       }
 
       // Create new message
@@ -155,7 +165,7 @@ export const POST = withPermissionAndDB("profile_management")(
       const senderFullName =
         [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
         user.email ||
-        "Unknown User";
+        "Utilisateur";
 
       // Update conversation's last message and timestamp
       await Conversation.findByIdAndUpdate(
@@ -228,9 +238,9 @@ export const POST = withPermissionAndDB("profile_management")(
 
       return NextResponse.json({ message: messagePayload }, { status: 201 });
     } catch (error) {
-      console.error("Send message error:", error);
+      console.error("Erreur d’envoi du message :", error);
       return NextResponse.json(
-        { error: "Failed to send message" },
+        { error: "Impossible d’envoyer le message" },
         { status: 500 }
       );
     }
@@ -248,7 +258,7 @@ export const PUT = withPermissionAndDB("profile_management")(
       const { id: conversationId } = await params;
       if (!conversationId || !Types.ObjectId.isValid(conversationId)) {
         return NextResponse.json(
-          { error: "Invalid conversation ID" },
+          { error: "Identifiant de conversation invalide" },
           { status: 400 }
         );
       }
@@ -259,24 +269,20 @@ export const PUT = withPermissionAndDB("profile_management")(
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
         return NextResponse.json(
-          { error: "Conversation not found" },
+          { error: "Conversation introuvable" },
           { status: 404 }
         );
       }
 
-      const activeParticipant = (conversation as any).getActiveParticipant?.(
-        user.id
-      );
-
-      if (!activeParticipant) {
-        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      if (!hasActiveParticipant(conversation, user.id)) {
+        return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
       }
 
       if (action === "mark_as_read" && messageIds && Array.isArray(messageIds)) {
         // Mark messages as read
         if (!Types.ObjectId.isValid(user.id)) {
           return NextResponse.json(
-            { error: "Invalid user ID" },
+            { error: "Identifiant utilisateur invalide" },
             { status: 400 }
           );
         }
@@ -287,7 +293,7 @@ export const PUT = withPermissionAndDB("profile_management")(
 
         if (validMessageIds.length === 0) {
           return NextResponse.json(
-            { error: "No valid message IDs provided" },
+            { error: "Aucun identifiant de message valide" },
             { status: 400 }
           );
         }
@@ -333,11 +339,11 @@ export const PUT = withPermissionAndDB("profile_management")(
         return NextResponse.json({ success: true, action: "marked_as_read" });
       }
 
-      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+      return NextResponse.json({ error: "Action invalide" }, { status: 400 });
     } catch (error) {
-      console.error("Update messages error:", error);
+      console.error("Erreur de mise à jour des messages :", error);
       return NextResponse.json(
-        { error: "Failed to update messages" },
+        { error: "Impossible de mettre à jour les messages" },
         { status: 500 }
       );
     }

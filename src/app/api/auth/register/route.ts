@@ -80,7 +80,7 @@ export const POST = withDatabase(async (request: NextRequest) => {
       landlord: UserRole.MANAGER,
       property_owner: UserRole.MANAGER,
       "Property Owner": UserRole.MANAGER,
-      "Property Manager": UserRole.MANAGER,
+      "Gestionnaire du bien": UserRole.MANAGER,
       maintenance_staff: UserRole.MANAGER,
       "Maintenance Staff": UserRole.MANAGER,
       leasing_agent: UserRole.MANAGER,

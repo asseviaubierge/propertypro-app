@@ -238,7 +238,7 @@ export class DemoDataService {
     const users = [
       {
         firstName: "Admin",
-        lastName: "User",
+        lastName: "Utilisateur",
         email: adminEmail,
         password: adminPassword,
         role: UserRole.ADMIN,
@@ -315,7 +315,7 @@ export class DemoDataService {
         },
         unitCount: 24,
         description: "Modern apartment complex with amenities",
-        features: ["Pool", "Gym", "Parking", "Laundry"],
+        features: ["Pool", "Gym", "Stationnement", "Laundry"],
       },
       {
         name: "Oak Street Townhomes",
@@ -329,7 +329,7 @@ export class DemoDataService {
         },
         unitCount: 12,
         description: "Luxury townhomes in prime location",
-        features: ["Garage", "Garden", "Fireplace"],
+        features: ["Garage", "Jardin", "Cheminée"],
       },
       {
         name: "Pine Valley Condos",
@@ -343,7 +343,7 @@ export class DemoDataService {
         },
         unitCount: 36,
         description: "Waterfront condominiums with ocean views",
-        features: ["Ocean View", "Balcony", "Pool", "Concierge"],
+        features: ["Ocean View", "Balcon", "Pool", "Concierge"],
       },
       {
         name: "Maple Grove Houses",
@@ -357,7 +357,7 @@ export class DemoDataService {
         },
         unitCount: 1,
         description: "Single family homes in quiet neighborhood",
-        features: ["Garden", "Garage", "Fireplace"],
+        features: ["Jardin", "Garage", "Cheminée"],
       },
       {
         name: "Downtown Lofts",
@@ -371,7 +371,7 @@ export class DemoDataService {
         },
         unitCount: 18,
         description: "Modern lofts in the heart of downtown",
-        features: ["High Ceilings", "Exposed Brick", "Parking"],
+        features: ["High Ceilings", "Exposed Brick", "Stationnement"],
       },
     ];
 
@@ -411,7 +411,7 @@ export class DemoDataService {
         securityDeposit,
         yearBuilt,
         totalArea: 1000 + Math.floor(Math.random() * 2000),
-        amenities: features || ["Parking", "Laundry"],
+        amenities: features || ["Stationnement", "Laundry"],
         isActive: true,
         // Set multi-unit properties
         isMultiUnit: unitCount > 1,

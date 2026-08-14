@@ -236,7 +236,7 @@ export function EmergencyQuickReport({
                 className="w-full mt-4"
                 onClick={onCancel}
               >
-                Cancel
+                Annuler
               </Button>
             )}
           </CardContent>
@@ -277,7 +277,7 @@ export function EmergencyQuickReport({
               }
             >
               <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select property" />
+                <SelectValue placeholder="Sélectionner un bien" />
               </SelectTrigger>
               <SelectContent>
                 {properties.map((property) => (
@@ -329,7 +329,7 @@ export function EmergencyQuickReport({
           {/* Contact Phone */}
           <div>
             <label className="text-sm font-medium text-red-700">
-              Contact Phone
+              Téléphone du contact
             </label>
             <Input
               type="tel"
@@ -347,7 +347,7 @@ export function EmergencyQuickReport({
 
           {/* Location */}
           <div>
-            <label className="text-sm font-medium text-red-700">Location</label>
+            <label className="text-sm font-medium text-red-700">Emplacement</label>
             <div className="flex gap-2 mt-1">
               <Input
                 placeholder="Specific location (e.g., Unit 204, Basement)"

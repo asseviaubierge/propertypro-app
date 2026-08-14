@@ -35,7 +35,7 @@ function buildIcons(favicon: string): ManifestIcon[] {
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const branding = await getPublicBranding();
-  const companyName = branding.companyName || "PropertyPro";
+  const companyName = branding.companyName || "GESTION E-IMMO";
 
   // Shortcuts reuse the dynamic, DB-backed app icon (resolved from the current
   // branding favicon) instead of static /icons/shortcut-*.png files that are
@@ -50,10 +50,10 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
 
   return {
     id: "/",
-    name: `${companyName} - Property Management System`,
+    name: `${companyName} - Gestion immobilière`,
     short_name: companyName,
     description:
-      "Comprehensive property management solution for landlords, property managers, and tenants",
+      "Application complète de gestion immobilière pour propriétaires, gestionnaires et locataires",
     start_url: "/",
     scope: "/",
     display: "standalone",
@@ -61,35 +61,35 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     background_color: "#ffffff",
     theme_color: branding.primaryColor || "#2563eb",
     orientation: "portrait-primary",
-    lang: "en-US",
+    lang: "fr-FR",
     categories: ["business", "productivity", "finance"],
     icons: buildIcons(branding.favicon),
     shortcuts: [
       {
-        name: "Dashboard",
-        short_name: "Dashboard",
-        description: "View property management dashboard",
+        name: "Tableau de bord",
+        short_name: "Tableau de bord",
+        description: "Consulter le tableau de bord immobilier",
         url: "/dashboard",
         icons: shortcutIcons,
       },
       {
-        name: "Properties",
-        short_name: "Properties",
-        description: "Manage properties",
+        name: "Biens",
+        short_name: "Biens",
+        description: "Gérer les biens immobiliers",
         url: "/dashboard/properties",
         icons: shortcutIcons,
       },
       {
-        name: "Tenants",
-        short_name: "Tenants",
-        description: "Manage tenants",
+        name: "Locataires",
+        short_name: "Locataires",
+        description: "Gérer les locataires",
         url: "/dashboard/tenants",
         icons: shortcutIcons,
       },
       {
-        name: "Payments",
-        short_name: "Payments",
-        description: "Track payments",
+        name: "Paiements",
+        short_name: "Paiements",
+        description: "Suivre les paiements",
         url: "/dashboard/payments",
         icons: shortcutIcons,
       },

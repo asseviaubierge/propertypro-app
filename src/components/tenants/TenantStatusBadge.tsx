@@ -31,7 +31,7 @@ const getStatusInfo = (status?: TenantStatus, t?: (key: string) => string) => {
       darkBgColor: "dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
     },
     under_review: {
-      label: t ? t("tenants.status.underReview") : "Under Review",
+      label: t ? t("tenants.status.underReview") : "En cours d’examen",
       color: "outline" as const,
       icon: Clock,
       bgColor: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -39,7 +39,7 @@ const getStatusInfo = (status?: TenantStatus, t?: (key: string) => string) => {
         "dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800",
     },
     approved: {
-      label: t ? t("tenants.status.approved") : "Approved",
+      label: t ? t("tenants.status.approved") : "Approuvée",
       color: "default" as const,
       icon: CheckCircle,
       bgColor: "bg-green-50 text-green-700 border-green-200",
@@ -47,7 +47,7 @@ const getStatusInfo = (status?: TenantStatus, t?: (key: string) => string) => {
         "dark:bg-green-950 dark:text-green-300 dark:border-green-800",
     },
     active: {
-      label: t ? t("tenants.status.active") : "Active",
+      label: t ? t("tenants.status.active") : "Actif",
       color: "default" as const,
       icon: UserCheck,
       bgColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -55,14 +55,14 @@ const getStatusInfo = (status?: TenantStatus, t?: (key: string) => string) => {
         "dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800",
     },
     inactive: {
-      label: t ? t("tenants.status.inactive") : "Inactive",
+      label: t ? t("tenants.status.inactive") : "Inactif",
       color: "secondary" as const,
       icon: UserX,
       bgColor: "bg-gray-50 text-gray-700 border-gray-200",
       darkBgColor: "dark:bg-gray-950 dark:text-gray-300 dark:border-gray-800",
     },
     moved_out: {
-      label: t ? t("tenants.status.movedOut") : "Moved Out",
+      label: t ? t("tenants.status.movedOut") : "Partis",
       color: "secondary" as const,
       icon: UserX,
       bgColor: "bg-purple-50 text-purple-700 border-purple-200",

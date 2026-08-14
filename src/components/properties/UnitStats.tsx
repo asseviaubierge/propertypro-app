@@ -112,7 +112,7 @@ export default function UnitStats({
         title={
           variant === "available"
             ? t("properties.available.stats.availableUnits.title", {
-                defaultValue: "Available Units",
+                defaultValue: "Logements disponibles",
               })
             : t("properties.available.stats.totalUnits.title")
         }
@@ -165,7 +165,7 @@ export default function UnitStats({
       {variant === "available" ? (
         <AnalyticsCard
           title={t("properties.available.stats.averageSize.title", {
-            defaultValue: "Average Size",
+            defaultValue: "Surface moyenne",
           })}
           value={`${averageSquareFootage.toLocaleString()} ft²`}
           description={t("properties.available.stats.averageSize.description", {

@@ -53,12 +53,12 @@ export default function NotificationTest() {
     type: "payment_reminder",
     priority: "normal",
     userId: "",
-    title: "Test Notification",
+    title: "Notification de test",
     message: "This is a test notification message.",
   });
 
   const notificationTypes = [
-    { value: "payment_reminder", label: "Payment Reminder" },
+    { value: "payment_reminder", label: "Rappel de paiement" },
     { value: "payment_overdue", label: "Payment Overdue" },
     { value: "lease_expiry", label: "Lease Expiry" },
     { value: "maintenance_update", label: "Maintenance Update" },
@@ -68,10 +68,10 @@ export default function NotificationTest() {
   ];
 
   const priorityLevels = [
-    { value: "low", label: "Low", color: "bg-gray-500" },
+    { value: "low", label: "Faible", color: "bg-gray-500" },
     { value: "normal", label: "Normal", color: "bg-blue-500" },
-    { value: "high", label: "High", color: "bg-orange-500" },
-    { value: "critical", label: "Critical", color: "bg-red-500" },
+    { value: "high", label: "Élevée", color: "bg-orange-500" },
+    { value: "critical", label: "Critique", color: "bg-red-500" },
   ];
 
   const handleInputChange = (field: keyof TestNotification, value: string) => {
@@ -84,7 +84,7 @@ export default function NotificationTest() {
   const sendTestNotification = async () => {
     if (!notification.userId || !notification.title || !notification.message) {
       toast({
-        title: "Validation Error",
+        title: "Erreur de validation",
         description: "Please fill in all required fields.",
         variant: "destructive",
       });
@@ -136,7 +136,7 @@ export default function NotificationTest() {
       !notification.scheduledFor
     ) {
       toast({
-        title: "Validation Error",
+        title: "Erreur de validation",
         description:
           "Please fill in all required fields including scheduled time.",
         variant: "destructive",
@@ -222,13 +222,13 @@ export default function NotificationTest() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="notification-type">Notification Type</Label>
+              <Label htmlFor="notification-type">Type de notification</Label>
               <Select
                 value={notification.type}
                 onValueChange={(value) => handleInputChange("type", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select notification type" />
+                  <SelectValue placeholder="Sélectionner le type de notification" />
                 </SelectTrigger>
                 <SelectContent>
                   {notificationTypes.map((type) => (
@@ -241,13 +241,13 @@ export default function NotificationTest() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority Level</Label>
+              <Label htmlFor="priority">Niveau de priorité</Label>
               <Select
                 value={notification.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
+                  <SelectValue placeholder="Sélectionner la priorité" />
                 </SelectTrigger>
                 <SelectContent>
                   {priorityLevels.map((priority) => (
@@ -264,20 +264,20 @@ export default function NotificationTest() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="user-id">User ID</Label>
+            <Label htmlFor="user-id">Identifiant de l’utilisateur</Label>
             <Input
               id="user-id"
-              placeholder="Enter user ID to send notification to"
+              placeholder="Saisir l’identifiant du destinataire"
               value={notification.userId}
               onChange={(e) => handleInputChange("userId", e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">Notification Title</Label>
+            <Label htmlFor="title">Titre de la notification</Label>
             <Input
               id="title"
-              placeholder="Enter notification title"
+              placeholder="Saisir le titre de la notification"
               value={notification.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
             />
@@ -287,7 +287,7 @@ export default function NotificationTest() {
             <Label htmlFor="message">Message</Label>
             <Textarea
               id="message"
-              placeholder="Enter notification message"
+              placeholder="Saisir le message de notification"
               value={notification.message}
               onChange={(e) => handleInputChange("message", e.target.value)}
               rows={3}
@@ -295,7 +295,7 @@ export default function NotificationTest() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="scheduled-for">Schedule For (Optional)</Label>
+            <Label htmlFor="scheduled-for">Planifier pour (facultatif)</Label>
             <Input
               id="scheduled-for"
               type="datetime-local"
@@ -328,7 +328,7 @@ export default function NotificationTest() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Notification Preview</CardTitle>
+          <CardTitle>Aperçu de la notification</CardTitle>
           <CardDescription>
             Preview how your notification will appear.
           </CardDescription>

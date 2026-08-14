@@ -121,6 +121,44 @@ export default function PaymentsPage() {
   const [paymentToRefund, setPaymentToRefund] = useState<string | null>(null);
   const [isRefunding, setIsRefunding] = useState(false);
 
+  const paymentStatusLabel = (status: PaymentStatus) =>
+    ({
+      [PaymentStatus.PENDING]: "En attente",
+      [PaymentStatus.PAID]: "Payé",
+      [PaymentStatus.PARTIAL]: "Partiellement payé",
+      [PaymentStatus.OVERDUE]: "En retard",
+      [PaymentStatus.CANCELLED]: "Annulé",
+      [PaymentStatus.FAILED]: "Échoué",
+      [PaymentStatus.REFUNDED]: "Remboursé",
+    })[status] || String(status).replaceAll("_", " ");
+
+  const paymentTypeLabel = (type: PaymentType) =>
+    ({
+      [PaymentType.RENT]: "Loyer",
+      [PaymentType.SECURITY_DEPOSIT]: "Garantie",
+      [PaymentType.INVOICE]: "Facture",
+      [PaymentType.LATE_FEE]: "Frais de retard",
+      [PaymentType.UTILITY]: "Services publics",
+      [PaymentType.MAINTENANCE]: "Maintenance",
+      [PaymentType.PET_DEPOSIT]: "Dépôt pour animaux",
+      [PaymentType.OTHER]: "Autre",
+    })[type] || String(type).replaceAll("_", " ");
+
+  const paymentMethodLabel = (method: PaymentMethod) =>
+    ({
+      [PaymentMethod.CREDIT_CARD]: "Carte de crédit",
+      [PaymentMethod.DEBIT_CARD]: "Carte de débit",
+      [PaymentMethod.BANK_TRANSFER]: "Virement bancaire",
+      [PaymentMethod.ACH]: "Prélèvement bancaire",
+      [PaymentMethod.CHECK]: "Chèque",
+      [PaymentMethod.CASH]: "Espèces",
+      [PaymentMethod.MONEY_ORDER]: "Mandat postal",
+      [PaymentMethod.PAYPAL]: "PayPal",
+      [PaymentMethod.RAZORPAY]: "Razorpay",
+      [PaymentMethod.PAYSTACK]: "Paystack",
+      [PaymentMethod.OTHER]: "Autre",
+    })[method] || String(method).replaceAll("_", " ");
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -385,7 +423,7 @@ export default function PaymentsPage() {
           variant={getTypeColor(payment.type) as any}
           className="capitalize"
         >
-          {payment.type.replace("_", " ")}
+          {paymentTypeLabel(payment.type)}
         </Badge>
       ),
     },
@@ -407,7 +445,7 @@ export default function PaymentsPage() {
             className="flex items-center gap-1 w-fit"
           >
             <StatusIcon className="h-3 w-3" />
-            {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+            {paymentStatusLabel(payment.status)}
           </Badge>
         );
       },
@@ -543,14 +581,14 @@ export default function PaymentsPage() {
           </p>
         </div>
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
-          <Link href="/dashboard/payments/analytics">
-            <Button variant="outline" size="sm" className="w-full justify-center px-2 text-xs sm:w-auto sm:px-3 sm:text-sm">
+          <Link href="/dashboard/payments/analytics" className="min-w-0">
+            <Button variant="outline" size="sm" className="h-11 w-full justify-center px-2 text-xs sm:h-9 sm:w-auto sm:px-3 sm:text-sm">
               <BarChart3 className="mr-1.5 h-4 w-4 shrink-0 sm:mr-2" />
               {t("payments.header.analytics")}
             </Button>
           </Link>
-          <Link href="/dashboard/payments/new">
-            <Button size="sm" className="w-full justify-center px-2 text-xs sm:w-auto sm:px-3 sm:text-sm">
+          <Link href="/dashboard/payments/new" className="min-w-0">
+            <Button size="sm" className="h-11 w-full justify-center px-2 text-xs sm:h-9 sm:w-auto sm:px-3 sm:text-sm">
               <Plus className="mr-1.5 h-4 w-4 shrink-0 sm:mr-2" />
               {t("payments.header.addPayment")}
             </Button>
@@ -645,7 +683,7 @@ export default function PaymentsPage() {
                 isLoading={isLoading}
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-green-400 dark:focus:border-green-500 focus:ring-1 focus:ring-green-400 dark:focus:ring-green-500 bg-white dark:bg-gray-800"
-                ariaLabel="Search payments"
+                ariaLabel="Rechercher des paiements"
               />
 
               {/* Filters */}
@@ -822,8 +860,7 @@ export default function PaymentsPage() {
                               className="text-xs"
                             >
                               <StatusIcon className="h-3 w-3 mr-1" />
-                              {payment.status.charAt(0).toUpperCase() +
-                                payment.status.slice(1)}
+                              {paymentStatusLabel(payment.status)}
                             </Badge>
                           </div>
                           <DropdownMenu>
@@ -881,7 +918,7 @@ export default function PaymentsPage() {
                           variant={getTypeColor(payment.type) as any}
                           className="w-fit text-xs capitalize"
                         >
-                          {payment.type.replace("_", " ")}
+                          {paymentTypeLabel(payment.type)}
                         </Badge>
                       </CardHeader>
                       <CardContent className="space-y-3">
@@ -933,7 +970,7 @@ export default function PaymentsPage() {
                               {t("payments.card.method")}
                             </span>
                             <span className="capitalize">
-                              {payment.paymentMethod.replace("_", " ")}
+                              {paymentMethodLabel(payment.paymentMethod)}
                             </span>
                           </div>
                         )}
@@ -953,16 +990,16 @@ export default function PaymentsPage() {
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
                 showingLabel={t("common.showing", {
-                  defaultValue: "Showing",
+                  defaultValue: "Affichage de",
                 })}
                 previousLabel={t("common.previous", {
-                  defaultValue: "Previous",
+                  defaultValue: "Précédent",
                 })}
-                nextLabel={t("common.next", { defaultValue: "Next" })}
+                nextLabel={t("common.next", { defaultValue: "Suivant" })}
                 pageLabel={t("common.page", { defaultValue: "Page" })}
-                ofLabel={t("common.of", { defaultValue: "of" })}
+                ofLabel={t("common.of", { defaultValue: "sur" })}
                 itemsPerPageLabel={t("common.perPage", {
-                  defaultValue: "per page",
+                  defaultValue: "par page",
                 })}
                 disabled={isLoading}
               />
@@ -1020,7 +1057,7 @@ export default function PaymentsPage() {
                 isLoading={isLoading}
                 className="flex-1 min-w-0"
                 inputClassName="h-10 border-gray-200 dark:border-gray-700 focus:border-green-400 dark:focus:border-green-500 focus:ring-1 focus:ring-green-400 dark:focus:ring-green-500 bg-white dark:bg-gray-800"
-                ariaLabel="Search payments"
+                ariaLabel="Rechercher des paiements"
               />
 
               {/* Filters */}
@@ -1198,16 +1235,16 @@ export default function PaymentsPage() {
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
                 showingLabel={t("common.showing", {
-                  defaultValue: "Showing",
+                  defaultValue: "Affichage de",
                 })}
                 previousLabel={t("common.previous", {
-                  defaultValue: "Previous",
+                  defaultValue: "Précédent",
                 })}
-                nextLabel={t("common.next", { defaultValue: "Next" })}
+                nextLabel={t("common.next", { defaultValue: "Suivant" })}
                 pageLabel={t("common.page", { defaultValue: "Page" })}
-                ofLabel={t("common.of", { defaultValue: "of" })}
+                ofLabel={t("common.of", { defaultValue: "sur" })}
                 itemsPerPageLabel={t("common.perPage", {
-                  defaultValue: "per page",
+                  defaultValue: "par page",
                 })}
                 disabled={isLoading}
               />
@@ -1220,14 +1257,14 @@ export default function PaymentsPage() {
       {/* <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Confirmer cette action ?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
               payment record.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeletePayment}
               disabled={isDeleting}

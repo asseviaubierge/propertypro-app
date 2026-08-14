@@ -11,11 +11,21 @@ const MESSAGES_POLL_MS = 20_000;
 export function useConversations(userId: string | null) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
+      setError(null);
       const res = await fetch("/api/conversations", { cache: "no-store" });
-      if (!res.ok) return;
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        setError(
+          payload?.error ||
+            payload?.message ||
+            "Impossible de charger les discussions",
+        );
+        return;
+      }
       const payload = await res.json();
       const list = Array.isArray(payload)
         ? payload
@@ -29,7 +39,7 @@ export function useConversations(userId: string | null) {
         .filter((c): c is Conversation => Boolean(c));
       setConversations(normalized);
     } catch {
-      // silent fail; polling will retry
+      setError("Impossible de charger les discussions");
     } finally {
       setLoading(false);
     }
@@ -48,7 +58,7 @@ export function useConversations(userId: string | null) {
     void load();
   });
 
-  return { conversations, loading, refresh: load };
+  return { conversations, loading, error, refresh: load };
 }
 
 export function useMessages(conversationId: string | null, userId: string | null) {

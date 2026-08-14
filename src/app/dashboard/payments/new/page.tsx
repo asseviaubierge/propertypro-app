@@ -8,9 +8,7 @@ import { useSession } from "next-auth/react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,8 +40,57 @@ interface Property {
 
 interface Lease {
   id: string;
+  tenantId: string;
+  propertyId: string;
+  unitId?: string;
   propertyName: string;
   tenantName: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+}
+
+function referenceId(value: any): string {
+  return String(value?._id || value?.id || value || "");
+}
+
+function propertyAddress(property: any): string {
+  if (typeof property?.address === "string") return property.address;
+  return [
+    property?.address?.street,
+    property?.address?.city,
+    property?.address?.state,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
+async function fetchAllScopedLeases(): Promise<any[]> {
+  const allLeases: any[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const response = await fetch(`/api/leases?page=${page}&limit=100`);
+    if (!response.ok) {
+      throw new Error("Impossible de charger les baux associés.");
+    }
+
+    const payload = await response.json();
+    allLeases.push(...(Array.isArray(payload?.data) ? payload.data : []));
+    totalPages = Math.max(
+      1,
+      Number(
+        payload?.pagination?.totalPages ||
+          payload?.pagination?.pages ||
+          payload?.pagination?.total_pages ||
+          1,
+      ),
+    );
+    page += 1;
+  } while (page <= totalPages);
+
+  return allLeases;
 }
 
 export default function NewPaymentPage() {
@@ -63,31 +110,35 @@ export default function NewPaymentPage() {
       try {
         setIsDataLoading(true);
 
-        // Fetch tenants, properties, and leases in parallel
-        const [tenantsRes, propertiesRes, leasesRes] = await Promise.all([
+        // Les baux constituent la source de vérité des relations entre
+        // locataires, propriétés et unités.
+        const [tenantsRes, propertiesRes, leaseRows] = await Promise.all([
           fetch("/api/tenants"),
           fetch("/api/properties"),
-          fetch("/api/leases"),
+          fetchAllScopedLeases(),
         ]);
+
+        const tenantMap = new Map<string, Tenant>();
+        const propertyMap = new Map<string, Property>();
 
         if (tenantsRes.ok) {
           const tenantsData = await tenantsRes.json();
-          setTenants(
-            tenantsData.data?.map((tenant: any) => ({
-              id: tenant._id,
+          (Array.isArray(tenantsData?.data) ? tenantsData.data : []).forEach(
+            (tenant: any) => tenantMap.set(referenceId(tenant), {
+              id: referenceId(tenant),
               name: `${tenant.firstName} ${tenant.lastName}`,
               email: tenant.email,
-            })) || []
+            }),
           );
         }
 
         if (propertiesRes.ok) {
           const propertiesData = await propertiesRes.json();
-          setProperties(
-            propertiesData.data?.map((property: any) => ({
-              id: property._id,
+          (Array.isArray(propertiesData?.data) ? propertiesData.data : []).forEach(
+            (property: any) => propertyMap.set(referenceId(property), {
+              id: referenceId(property),
               name: property.name,
-              address: `${property.address?.street || ""}, ${property.address?.city || ""}, ${property.address?.state || ""}`,
+              address: propertyAddress(property),
               isMultiUnit: property.isMultiUnit,
               units: property.units?.map((unit: any) => ({
                 _id: unit._id,
@@ -96,22 +147,71 @@ export default function NewPaymentPage() {
                 rentAmount: unit.rentAmount,
                 status: unit.status,
               })) || [],
-            })) || []
+            }),
           );
         }
 
-        if (leasesRes.ok) {
-          const leasesData = await leasesRes.json();
-          setLeases(
-            leasesData.data?.map((lease: any) => ({
-              id: lease._id,
-              propertyName: lease.propertyId?.name || "Propriété inconnue",
-              tenantName: lease.tenantId?.firstName
-                ? `${lease.tenantId.firstName} ${lease.tenantId.lastName}`
-                : "Locataire inconnu",
-            })) || []
-          );
-        }
+        const mappedLeases = leaseRows
+          .map((lease: any) => {
+            const tenantId = referenceId(lease?.tenantId);
+            const propertyId = referenceId(lease?.propertyId);
+            if (!tenantId || !propertyId) return null;
+
+            if (!tenantMap.has(tenantId) && lease?.tenantId) {
+              tenantMap.set(tenantId, {
+                id: tenantId,
+                name:
+                  `${lease.tenantId?.firstName || ""} ${lease.tenantId?.lastName || ""}`.trim() ||
+                  "Locataire",
+                email: lease.tenantId?.email || "",
+              });
+            }
+
+            if (!propertyMap.has(propertyId) && lease?.propertyId) {
+              propertyMap.set(propertyId, {
+                id: propertyId,
+                name: lease.propertyId?.name || "Propriété",
+                address: propertyAddress(lease.propertyId),
+                isMultiUnit: lease.propertyId?.isMultiUnit,
+                units: Array.isArray(lease.propertyId?.units)
+                  ? lease.propertyId.units.map((unit: any) => ({
+                      _id: referenceId(unit),
+                      unitNumber: unit.unitNumber,
+                      type: unit.type,
+                      rentAmount: unit.rentAmount,
+                      status: unit.status,
+                    }))
+                  : [],
+              });
+            }
+
+            return {
+              id: referenceId(lease),
+              tenantId,
+              propertyId,
+              unitId: referenceId(lease?.unitId) || undefined,
+              propertyName: lease.propertyId?.name || "Propriété",
+              tenantName:
+                `${lease.tenantId?.firstName || ""} ${lease.tenantId?.lastName || ""}`.trim() ||
+                "Locataire",
+              startDate: lease.startDate,
+              endDate: lease.endDate,
+              status: lease.status,
+            } satisfies Lease;
+          })
+          .filter((lease): lease is Lease => Boolean(lease?.id));
+
+        const linkedTenantIds = new Set(mappedLeases.map((lease) => lease.tenantId));
+        const linkedPropertyIds = new Set(mappedLeases.map((lease) => lease.propertyId));
+        setTenants(
+          Array.from(tenantMap.values()).filter((tenant) => linkedTenantIds.has(tenant.id)),
+        );
+        setProperties(
+          Array.from(propertyMap.values()).filter((property) =>
+            linkedPropertyIds.has(property.id),
+          ),
+        );
+        setLeases(mappedLeases);
       } catch (error) {
         toast.error(
           error instanceof Error
@@ -272,6 +372,7 @@ export default function NewPaymentPage() {
         tenants={tenants}
         properties={properties}
         leases={leases}
+        requireLease
       />
     </div>
   );

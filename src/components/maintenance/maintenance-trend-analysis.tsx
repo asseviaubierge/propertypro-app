@@ -318,7 +318,7 @@ export function MaintenanceTrendAnalysis({
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Coût Analysis</CardTitle>
+                <CardTitle>Analyse mensuelle des coûts</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>

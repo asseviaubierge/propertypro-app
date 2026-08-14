@@ -139,12 +139,12 @@ export default function TenantWorkflowDashboard({
   };
 
   const statusLabels = {
-    application_submitted: "Applications",
-    under_review: "Under Review",
-    approved: "Approved",
-    active: "Active",
-    inactive: "Inactive",
-    moved_out: "Moved Out",
+    application_submitted: "Candidatures",
+    under_review: "En cours d’examen",
+    approved: "Approuvée",
+    active: "Actif",
+    inactive: "Inactif",
+    moved_out: "Partis",
     terminated: "Terminated",
   };
 
@@ -171,14 +171,14 @@ export default function TenantWorkflowDashboard({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+            <CardTitle className="text-sm font-medium">Total des locataires</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {statistics.overview.totalTenants}
             </div>
-            <p className="text-xs text-muted-foreground">All tenant records</p>
+            <p className="text-xs text-muted-foreground">Tous les dossiers de locataires</p>
           </CardContent>
         </Card>
 
@@ -218,14 +218,14 @@ export default function TenantWorkflowDashboard({
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Moved Out</CardTitle>
+            <CardTitle className="text-sm font-medium">Partis</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {statistics.overview.movedOutTenants}
             </div>
-            <p className="text-xs text-muted-foreground">Former tenants</p>
+            <p className="text-xs text-muted-foreground">Anciens locataires</p>
           </CardContent>
         </Card>
       </div>
@@ -235,7 +235,7 @@ export default function TenantWorkflowDashboard({
         {/* Status Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Tenant Status Distribution</CardTitle>
+            <CardTitle>Répartition des statuts des locataires</CardTitle>
             <CardDescription>
               Current status breakdown of all tenants
             </CardDescription>
@@ -280,7 +280,7 @@ export default function TenantWorkflowDashboard({
         {/* Application Trends */}
         <Card>
           <CardHeader>
-            <CardTitle>Application Trends</CardTitle>
+            <CardTitle>Évolution des candidatures</CardTitle>
             <CardDescription>
               Monthly application and approval trends
             </CardDescription>
@@ -296,10 +296,10 @@ export default function TenantWorkflowDashboard({
                   <Bar
                     dataKey="applications"
                     fill="#3b82f6"
-                    name="Applications"
+                    name="Candidatures"
                   />
-                  <Bar dataKey="approved" fill="#10b981" name="Approved" />
-                  <Bar dataKey="rejected" fill="#ef4444" name="Rejected" />
+                  <Bar dataKey="approved" fill="#10b981" name="Approuvée" />
+                  <Bar dataKey="rejected" fill="#ef4444" name="Rejetée" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -310,7 +310,7 @@ export default function TenantWorkflowDashboard({
       {/* Background Check Status */}
       <Card>
         <CardHeader>
-          <CardTitle>Background Check Status</CardTitle>
+          <CardTitle>État des vérifications d’antécédents</CardTitle>
           <CardDescription>
             Current background check processing status
           </CardDescription>
@@ -356,8 +356,8 @@ export default function TenantWorkflowDashboard({
       {hasTenantManagement && (
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tenant management actions</CardDescription>
+            <CardTitle>Actions rapides</CardTitle>
+            <CardDescription>Actions courantes de gestion des locataires</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -375,7 +375,7 @@ export default function TenantWorkflowDashboard({
               </Button>
               <Button variant="outline" size="sm">
                 <Users className="h-4 w-4 mr-2" />
-                Bulk Actions
+                Actions groupées
               </Button>
             </div>
           </CardContent>

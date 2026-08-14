@@ -47,7 +47,7 @@ export const POST = withPermissionAndDB([
         .populate("applicantId", "firstName lastName email");
 
       if (!application) {
-        return createErrorResponse("Application not found", 404);
+        return createErrorResponse("Candidature introuvable", 404);
       }
 
       // Check if application can be approved

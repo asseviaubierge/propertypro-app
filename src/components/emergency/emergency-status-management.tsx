@@ -290,7 +290,7 @@ export function EmergencyStatusManagement({
         {/* Current Status Info */}
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Time Elapsed</Label>
+            <Label className="text-sm font-medium">Temps écoulé</Label>
             <div
               className={`text-lg font-bold ${
                 request.isOverdue ? "text-red-600" : "text-orange-600"
@@ -306,7 +306,7 @@ export function EmergencyStatusManagement({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Assigned To</Label>
+            <Label className="text-sm font-medium">Attribuée à</Label>
             <div className="flex items-center gap-2">
               {request.assignedUser ? (
                 <>
@@ -323,7 +323,7 @@ export function EmergencyStatusManagement({
               ) : (
                 <span className="text-orange-600 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4" />
-                  Unassigned
+                  Non attribué
                 </span>
               )}
             </div>
@@ -332,7 +332,7 @@ export function EmergencyStatusManagement({
 
         {/* Emergency Contact Info */}
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h4 className="font-medium text-red-700 mb-2">Emergency Contact</h4>
+          <h4 className="font-medium text-red-700 mb-2">Contact d’urgence</h4>
           <div className="grid gap-2 md:grid-cols-2">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-red-600" />
@@ -379,17 +379,17 @@ export function EmergencyStatusManagement({
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Assign Emergency Request</DialogTitle>
+              <DialogTitle>Attribuer la demande d’urgence</DialogTitle>
               <DialogDescription>
                 Select a staff member to handle this emergency request.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Assign To</Label>
+                <Label>Attribuer à</Label>
                 <Select value={assignTo} onValueChange={setAssignTo}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select staff member" />
+                    <SelectValue placeholder="Sélectionner un membre du personnel" />
                   </SelectTrigger>
                   <SelectContent>
                     {availableStaff.map((staff) => (
@@ -413,7 +413,7 @@ export function EmergencyStatusManagement({
                 variant="outline"
                 onClick={() => setAssignmentDialogOpen(false)}
               >
-                Cancel
+                Annuler
               </Button>
               <Button onClick={handleAssignment} disabled={loading}>
                 Assign
@@ -429,7 +429,7 @@ export function EmergencyStatusManagement({
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Escalate Emergency Request</DialogTitle>
+              <DialogTitle>Faire remonter la demande d’urgence</DialogTitle>
               <DialogDescription>
                 Escalate this emergency to a higher authority for immediate
                 attention.
@@ -445,7 +445,7 @@ export function EmergencyStatusManagement({
                 />
               </div>
               <div>
-                <Label>Escalate To (Optional)</Label>
+                <Label>Transmettre à (facultatif)</Label>
                 <Select value={escalateTo} onValueChange={setEscalateTo}>
                   <SelectTrigger>
                     <SelectValue placeholder="Auto-assign to available manager" />
@@ -466,9 +466,9 @@ export function EmergencyStatusManagement({
                 </Select>
               </div>
               <div>
-                <Label>Additional Notes</Label>
+                <Label>Notes complémentaires</Label>
                 <Textarea
-                  placeholder="Any additional information..."
+                  placeholder="Informations complémentaires…"
                   value={escalationNotes}
                   onChange={(e) => setEscalationNotes(e.target.value)}
                 />
@@ -479,7 +479,7 @@ export function EmergencyStatusManagement({
                 variant="outline"
                 onClick={() => setEscalationDialogOpen(false)}
               >
-                Cancel
+                Annuler
               </Button>
               <Button
                 variant="destructive"
@@ -499,7 +499,7 @@ export function EmergencyStatusManagement({
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Complete Emergency Request</DialogTitle>
+              <DialogTitle>Terminer la demande d’urgence</DialogTitle>
               <DialogDescription>
                 Mark this emergency request as completed and provide final
                 details.
@@ -507,7 +507,7 @@ export function EmergencyStatusManagement({
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label>Completion Notes</Label>
+                <Label>Notes de clôture</Label>
                 <Textarea
                   placeholder="Describe the work completed and resolution..."
                   value={completionNotes}
@@ -515,7 +515,7 @@ export function EmergencyStatusManagement({
                 />
               </div>
               <div>
-                <Label>Actual Cost (Optional)</Label>
+                <Label>Coût réel (facultatif)</Label>
                 <Input
                   type="number"
                   placeholder="0.00"
@@ -529,7 +529,7 @@ export function EmergencyStatusManagement({
                 variant="outline"
                 onClick={() => setCompletionDialogOpen(false)}
               >
-                Cancel
+                Annuler
               </Button>
               <Button onClick={handleCompletion} disabled={loading}>
                 Mark Complete

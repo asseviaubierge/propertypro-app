@@ -161,7 +161,7 @@ export async function POST(
         payment_intent_data: {
           description: `Invoice ${invoice.invoiceNumber}`,
           metadata: {
-            source: "PropertyPro",
+            source: "GESTION E-IMMO",
             paymentId: payment._id.toString(),
             invoiceId: invoice._id.toString(),
             invoiceNumber: invoice.invoiceNumber,
@@ -171,7 +171,7 @@ export async function POST(
           },
         },
         metadata: {
-          source: "PropertyPro",
+          source: "GESTION E-IMMO",
           paymentId: payment._id.toString(),
           invoiceId: invoice._id.toString(),
           invoiceNumber: invoice.invoiceNumber,

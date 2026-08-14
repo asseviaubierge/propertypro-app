@@ -109,7 +109,7 @@ class PaymentService {
       })
       .populate("propertyId");
     if (!lease) {
-      throw new Error("Lease not found");
+      throw new Error("Bail introuvable");
     }
 
     const payments: IPayment[] = [];
@@ -445,7 +445,7 @@ class PaymentService {
     if (leaseId) {
       const lease = await Lease.findById(leaseId).session(session || null);
       if (!lease) {
-        throw new Error("Lease not found");
+        throw new Error("Bail introuvable");
       }
 
       if (!lease.tenantId.equals(tenantId)) {

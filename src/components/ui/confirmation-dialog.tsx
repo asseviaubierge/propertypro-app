@@ -200,7 +200,7 @@ export function AssignConfirmationDialog({
 }: AssignConfirmationDialogProps) {
   return (
     <ConfirmationDialog
-      title="Assign Technician"
+      title="Attribuer un technicien"
       description={`Are you sure you want to assign "${itemName}" to ${technicianName}?`}
       confirmText="Assign"
       onConfirm={onConfirm}

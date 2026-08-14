@@ -234,7 +234,7 @@ export default function LeasesPage() {
           });
         } else {
           showSimpleError(
-            "Load Error",
+            "Erreur de chargement",
             t("leases.toasts.fetchYourLeasesError")
           );
         }
@@ -327,7 +327,7 @@ export default function LeasesPage() {
         });
       }
     } catch {
-      showSimpleError("Load Error", t("leases.toasts.fetchError"));
+      showSimpleError("Erreur de chargement", t("leases.toasts.fetchError"));
     } finally {
       setLoading(false);
       setIsSearching(false);
@@ -687,7 +687,7 @@ export default function LeasesPage() {
               >
                 <XCircle className="h-4 w-4 mr-2" />
                 {t("leases.actions.terminate", {
-                  defaultValue: "Terminate Lease",
+                  defaultValue: "Résilier le bail",
                 })}
               </DropdownMenuItem>
             )}
@@ -696,7 +696,7 @@ export default function LeasesPage() {
             {filters.archived && (
               <DropdownMenuItem onClick={() => handleUnarchiveLease(lease)}>
                 <ArchiveRestore className="h-4 w-4 mr-2" />
-                {t("leases.actions.unarchive", { defaultValue: "Restore" })}
+                {t("leases.actions.unarchive", { defaultValue: "Restaurer" })}
               </DropdownMenuItem>
             )}
 
@@ -706,7 +706,7 @@ export default function LeasesPage() {
                 lease.status === LeaseStatus.EXPIRED) && (
                 <DropdownMenuItem onClick={() => handleArchiveLease(lease)}>
                   <Archive className="h-4 w-4 mr-2" />
-                  {t("leases.actions.archive", { defaultValue: "Archive" })}
+                  {t("leases.actions.archive", { defaultValue: "Archiver" })}
                 </DropdownMenuItem>
               )}
 
@@ -872,21 +872,21 @@ export default function LeasesPage() {
       fetchLeases(filters, false);
       fetchStats();
     } catch {
-      showSimpleError("Delete Failed", "Failed to delete leases");
+      showSimpleError("Échec de suppression", "Impossible de supprimer les baux");
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-leases-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="mobile-page-header flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("leases.header.title")}
           </h1>
-          <p className="text-muted-foreground">{t("leases.header.subtitle")}</p>
+          <p className="text-xs leading-4 text-muted-foreground sm:text-base">{t("leases.header.subtitle")}</p>
         </div>
-        <Button size="sm" onClick={() => router.push("/dashboard/leases/new")}>
+        <Button className="h-11 w-full justify-center px-3 text-xs sm:h-9 sm:w-auto sm:text-sm" size="sm" onClick={() => router.push("/dashboard/leases/new")}>
           <Plus className="mr-2 h-4 w-4" />
           {t("leases.actions.createLease")}
         </Button>
@@ -989,7 +989,7 @@ export default function LeasesPage() {
               onSearch={handleSearch}
               isLoading={isSearching}
               className="flex-1 min-w-0"
-              ariaLabel="Search leases"
+              ariaLabel="Rechercher des baux"
             />
 
             {/* Filter Controls */}
@@ -1039,10 +1039,10 @@ export default function LeasesPage() {
                 <Archive className="h-4 w-4 mr-2" />
                 {filters.archived
                   ? t("leases.actions.viewActive", {
-                      defaultValue: "View Active",
+                      defaultValue: "Voir les actifs",
                     })
                   : t("leases.actions.viewArchived", {
-                      defaultValue: "Archived",
+                      defaultValue: "Archivés",
                     })}
               </Button>
 
@@ -1098,7 +1098,7 @@ export default function LeasesPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("leases.filters.clear") || "Clear"}
+                  {t("leases.filters.clear") || "Effacer"}
                 </Button>
               )}
             </div>
@@ -1244,13 +1244,13 @@ export default function LeasesPage() {
               pageSize={filters.limit ?? 12}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />
@@ -1265,19 +1265,19 @@ export default function LeasesPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Leases</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer les baux</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete {selectedLeases.length} selected
               lease(s)? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDelete}
               className="bg-red-600 hover:bg-red-700"
             >
-              Delete Leases
+              Supprimer les baux
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1293,7 +1293,7 @@ export default function LeasesPage() {
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-600" />
               {t("leases.actions.terminate", {
-                defaultValue: "Terminate Lease",
+                defaultValue: "Résilier le bail",
               })}
             </AlertDialogTitle>
             <AlertDialogDescription>
@@ -1327,10 +1327,10 @@ export default function LeasesPage() {
             >
               {isTerminating
                 ? t("leases.actions.terminating", {
-                    defaultValue: "Terminating...",
+                    defaultValue: "Résiliation…",
                   })
                 : t("leases.actions.terminate", {
-                    defaultValue: "Terminate Lease",
+                    defaultValue: "Résilier le bail",
                   })}
             </Button>
           </AlertDialogFooter>

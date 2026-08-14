@@ -165,8 +165,8 @@ export function generateInvoiceHTML(
         normalized.tenant.lastName || ""
       }`.trim() ||
       normalized.tenant.name ||
-      "Tenant"
-    : "Tenant";
+      "Locataire"
+    : "Locataire";
 
   const property =
     normalized.property ||
@@ -191,7 +191,7 @@ export function generateInvoiceHTML(
   const rawLogo = typeof company.logo === "string" ? company.logo.trim() : "";
   const hasLogo = rawLogo.length > 0;
   const safeLogoUrl = rawLogo.replace(/"/g, "%22");
-  const safeCompanyAlt = (company.name || "Company").replace(/"/g, "&quot;");
+  const safeCompanyAlt = (company.name || "Entreprise").replace(/"/g, "&quot;");
   const logoContainerStyle = hasLogo
     ? "width:40px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; overflow:hidden; background-color:#ffffff;"
     : "width:40px; height:40px; background-color:#10b981; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; overflow:hidden;";

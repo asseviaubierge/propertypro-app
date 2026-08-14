@@ -1,7 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -38,16 +37,11 @@ import {
 } from "@/components/ui/form";
 import {
   CreditCard,
-  Calendar,
   User,
-  Building2,
-  FileText,
-  Banknote,
   Loader2,
   Lock,
 } from "lucide-react";
 import { PaymentType, PaymentMethod } from "@/types";
-import { paymentCreateSchema } from "@/lib/validations";
 import { FormDatePicker } from "@/components/ui/date-picker";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
 
@@ -118,8 +112,19 @@ interface PaymentFormProps {
   initialData?: Partial<PaymentFormData>;
   tenants?: Array<{ id: string; name: string; email: string }>;
   properties?: Array<{ id: string; name: string; address: string; isMultiUnit?: boolean; units?: Unit[] }>;
-  leases?: Array<{ id: string; propertyName: string; tenantName: string }>;
+  leases?: Array<{
+    id: string;
+    tenantId: string;
+    propertyId: string;
+    unitId?: string;
+    propertyName: string;
+    tenantName: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }>;
   enableStripePayment?: boolean;
+  requireLease?: boolean;
 }
 
 // Inner form component that can use Stripe hooks
@@ -133,6 +138,7 @@ function PaymentFormInner({
   properties = [],
   leases = [],
   enableStripePayment = true,
+  requireLease = false,
   stripeClientSecret,
   onInitializeStripe,
   stripeInitializing,
@@ -176,6 +182,7 @@ function PaymentFormInner({
   const watchedType = form.watch("type");
   const watchedPaymentMethod = form.watch("paymentMethod");
   const watchedAmount = form.watch("amount");
+  const watchedLeaseId = form.watch("leaseId");
   const isStripePayment = enableStripePayment && (watchedPaymentMethod === PaymentMethod.CREDIT_CARD || watchedPaymentMethod === PaymentMethod.DEBIT_CARD);
 
   // Initialize Stripe when credit card is selected and amount is valid
@@ -222,7 +229,7 @@ function PaymentFormInner({
       } else {
         toast.error("Le paiement n’a pas abouti.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Une erreur inattendue est survenue.");
     } finally {
       setProcessingStripe(false);
@@ -230,6 +237,14 @@ function PaymentFormInner({
   };
 
   const handleFormSubmit = async (data: PaymentFormData) => {
+    if (requireLease && !data.leaseId) {
+      form.setError("leaseId", {
+        type: "manual",
+        message: "Sélectionnez le bail correspondant.",
+      });
+      return;
+    }
+
     if (isStripePayment) {
       await handleStripePayment();
     } else {
@@ -237,17 +252,111 @@ function PaymentFormInner({
     }
   };
 
-  // Get selected property details for unit selection
-  const selectedPropertyData = properties.find(p => p.id === selectedProperty);
-  const isMultiUnit = selectedPropertyData?.isMultiUnit && (selectedPropertyData?.units?.length ?? 0) > 0;
-  const availableUnits = selectedPropertyData?.units || [];
+  const linkedTenants = useMemo(() => {
+    const tenantIds = new Set(leases.map((lease) => lease.tenantId));
+    return tenants.filter((tenant) => tenantIds.has(tenant.id));
+  }, [leases, tenants]);
 
-  // Filter leases based on selected tenant and property
-  const filteredLeases = leases.filter((lease) => {
-    if (!selectedTenant && !selectedProperty) return true;
-    // This would need to be implemented based on actual lease data structure
-    return true;
-  });
+  const filteredProperties = useMemo(() => {
+    if (!selectedTenant) return [];
+    const propertyIds = new Set(
+      leases
+        .filter((lease) => lease.tenantId === selectedTenant)
+        .map((lease) => lease.propertyId),
+    );
+    return properties.filter((property) => propertyIds.has(property.id));
+  }, [leases, properties, selectedTenant]);
+
+  const filteredLeases = useMemo(
+    () =>
+      leases.filter(
+        (lease) =>
+          lease.tenantId === selectedTenant &&
+          lease.propertyId === selectedProperty,
+      ),
+    [leases, selectedProperty, selectedTenant],
+  );
+
+  const selectedLease = leases.find(
+    (lease) => lease.id === watchedLeaseId,
+  );
+  const selectedPropertyData = properties.find(
+    (property) => property.id === selectedProperty,
+  );
+  const availableUnits = (selectedPropertyData?.units || []).filter(
+    (unit) => selectedLease?.unitId && unit._id === selectedLease.unitId,
+  );
+  const isMultiUnit = Boolean(
+    selectedPropertyData?.isMultiUnit && selectedLease?.unitId && availableUnits.length,
+  );
+
+  const setFormRelation = (
+    tenantId: string,
+    propertyId: string,
+    leaseId: string,
+    unitId = "",
+  ) => {
+    setSelectedTenant(tenantId);
+    setSelectedProperty(propertyId);
+    form.setValue("tenantId", tenantId, { shouldValidate: true });
+    form.setValue("propertyId", propertyId, { shouldValidate: true });
+    form.setValue("leaseId", leaseId, { shouldValidate: true });
+    form.setValue("unitId", unitId, { shouldValidate: true });
+  };
+
+  const selectOnlyCompatibleLease = (tenantId: string, propertyId: string) => {
+    const compatibleLeases = leases.filter(
+      (lease) =>
+        lease.tenantId === tenantId && lease.propertyId === propertyId,
+    );
+    if (compatibleLeases.length === 1) {
+      const lease = compatibleLeases[0];
+      setFormRelation(tenantId, propertyId, lease.id, lease.unitId || "");
+      return;
+    }
+    setFormRelation(tenantId, propertyId, "", "");
+  };
+
+  const handleTenantChange = (tenantId: string) => {
+    const compatibleProperties = Array.from(
+      new Set(
+        leases
+          .filter((lease) => lease.tenantId === tenantId)
+          .map((lease) => lease.propertyId),
+      ),
+    );
+    const propertyId =
+      compatibleProperties.includes(selectedProperty)
+        ? selectedProperty
+        : compatibleProperties.length === 1
+          ? compatibleProperties[0]
+          : "";
+
+    if (propertyId) {
+      selectOnlyCompatibleLease(tenantId, propertyId);
+    } else {
+      setFormRelation(tenantId, "", "", "");
+    }
+  };
+
+  const handlePropertyChange = (propertyId: string) => {
+    selectOnlyCompatibleLease(selectedTenant, propertyId);
+  };
+
+  const handleLeaseChange = (leaseId: string) => {
+    const lease = leases.find((candidate) => candidate.id === leaseId);
+    if (!lease) {
+      form.setValue("leaseId", "", { shouldValidate: true });
+      form.setValue("unitId", "", { shouldValidate: true });
+      return;
+    }
+    setFormRelation(
+      lease.tenantId,
+      lease.propertyId,
+      lease.id,
+      lease.unitId || "",
+    );
+  };
 
   const getPaymentTypeDescription = (type: PaymentType) => {
     switch (type) {
@@ -527,13 +636,13 @@ function PaymentFormInner({
                   <div className="border rounded-lg p-4 bg-muted/50">
                     <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
-                      Card Payment Details
+                      Détails du paiement par carte
                     </h4>
 
                     {stripeInitializing && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Initializing secure payment...</span>
+                        <span>Préparation du paiement sécurisé…</span>
                       </div>
                     )}
 
@@ -556,7 +665,7 @@ function PaymentFormInner({
                         )}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mt-3">
                           <Lock className="h-3 w-3" />
-                          <span>Your payment information is secure and encrypted</span>
+                          <span>Vos informations de paiement sont sécurisées et chiffrées</span>
                         </div>
                       </>
                     )}
@@ -642,11 +751,8 @@ function PaymentFormInner({
                         {t("payments.new.form.tenantProperty.tenantLabel")}
                       </FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setSelectedTenant(value);
-                        }}
-                        defaultValue={field.value}
+                        onValueChange={handleTenantChange}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -658,7 +764,7 @@ function PaymentFormInner({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {tenants.map((tenant) => (
+                          {linkedTenants.map((tenant) => (
                             <SelectItem key={tenant.id} value={tenant.id}>
                               <div>
                                 <div className="font-medium">{tenant.name}</div>
@@ -684,32 +790,32 @@ function PaymentFormInner({
                         {t("payments.new.form.tenantProperty.propertyLabel")}
                       </FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setSelectedProperty(value);
-                          // Clear unit selection when property changes
-                          form.setValue("unitId", "");
-                        }}
-                        defaultValue={field.value}
+                        onValueChange={handlePropertyChange}
+                        value={field.value}
+                        disabled={!selectedTenant}
                       >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue
-                              placeholder={t(
-                                "payments.new.form.tenantProperty.propertyPlaceholder"
-                              )}
+                              placeholder={
+                                selectedTenant
+                                  ? t(
+                                      "payments.new.form.tenantProperty.propertyPlaceholder",
+                                    )
+                                  : "Sélectionnez d’abord un locataire"
+                              }
                             />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {properties.map((property) => (
+                          {filteredProperties.map((property) => (
                             <SelectItem key={property.id} value={property.id}>
                               <div>
                                 <div className="font-medium">
                                   {property.name}
                                   {property.isMultiUnit && (
                                     <span className="ml-2 text-xs text-muted-foreground">
-                                      ({property.units?.length || 0} units)
+                                      ({property.units?.length || 0} unités)
                                     </span>
                                   )}
                                 </div>
@@ -738,7 +844,22 @@ function PaymentFormInner({
                         Unité
                       </FormLabel>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          const lease = leases.find(
+                            (candidate) => candidate.id === form.getValues("leaseId"),
+                          );
+                          if (
+                            lease?.unitId &&
+                            value !== lease.unitId
+                          ) {
+                            form.setError("unitId", {
+                              type: "manual",
+                              message: "Cette unité ne correspond pas au bail sélectionné.",
+                            });
+                            return;
+                          }
+                          field.onChange(value);
+                        }}
                         value={field.value}
                       >
                         <FormControl>
@@ -783,18 +904,31 @@ function PaymentFormInner({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      {t("payments.new.form.tenantProperty.leaseLabel")}
+                      {requireLease
+                        ? "Bail associé"
+                        : t("payments.new.form.tenantProperty.leaseLabel")}
                     </FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      onValueChange={handleLeaseChange}
+                      value={field.value}
+                      disabled={
+                        !selectedTenant ||
+                        !selectedProperty ||
+                        filteredLeases.length === 0
+                      }
                     >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue
-                            placeholder={t(
-                              "payments.new.form.tenantProperty.leasePlaceholder"
-                            )}
+                            placeholder={
+                              selectedTenant && selectedProperty
+                                ? requireLease
+                                  ? "Sélectionner le bail"
+                                  : t(
+                                      "payments.new.form.tenantProperty.leasePlaceholder",
+                                    )
+                                : "Sélectionnez d’abord le locataire et la propriété"
+                            }
                           />
                         </SelectTrigger>
                       </FormControl>
@@ -807,6 +941,9 @@ function PaymentFormInner({
                               </div>
                               <div className="text-sm text-muted-foreground">
                                 {lease.tenantName}
+                                {lease.startDate && lease.endDate
+                                  ? ` • ${new Date(lease.startDate).toLocaleDateString("fr-FR")} – ${new Date(lease.endDate).toLocaleDateString("fr-FR")}`
+                                  : ""}
                               </div>
                             </div>
                           </SelectItem>
@@ -835,14 +972,14 @@ function PaymentFormInner({
               {processingStripe ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing Payment...
+                  Traitement du paiement…
                 </>
               ) : isLoading ? (
                 t("payments.new.form.buttons.saving")
               ) : isStripePayment ? (
                 <>
                   <CreditCard className="mr-2 h-4 w-4" />
-                  Pay Now
+                  Payer
                 </>
               ) : initialData ? (
                 t("payments.new.form.buttons.update")
@@ -868,6 +1005,7 @@ export function PaymentForm({
   properties = [],
   leases = [],
   enableStripePayment = true,
+  requireLease = false,
 }: PaymentFormProps) {
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
   const [stripeInitializing, setStripeInitializing] = useState(false);
@@ -899,13 +1037,13 @@ export function PaymentForm({
         setStripeClientSecret(result.data.clientSecret);
         return result.data.clientSecret;
       } else {
-        const message = result.error || "Failed to initialize payment";
+        const message = result.error || "Impossible de préparer le paiement";
         setStripeError(message);
         return null;
       }
     } catch (error) {
-      console.error("Error initializing Stripe payment:", error);
-      setStripeError("Failed to initialize payment session");
+      console.error("Échec de la préparation du paiement Stripe :", error);
+      setStripeError("Impossible de préparer la session de paiement");
       return null;
     } finally {
       setStripeInitializing(false);
@@ -931,6 +1069,7 @@ export function PaymentForm({
         properties={properties}
         leases={leases}
         enableStripePayment={enableStripePayment}
+        requireLease={requireLease}
         stripeClientSecret={stripeClientSecret}
         onInitializeStripe={initializeStripePayment}
         stripeInitializing={stripeInitializing}

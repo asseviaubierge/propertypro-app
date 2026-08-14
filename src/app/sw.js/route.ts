@@ -1,18 +1,20 @@
 const buildId = process.env.NEXT_PUBLIC_APP_BUILD_ID || "dev";
 
 const serviceWorker = `
-const STATIC_CACHE = "propertypro-static-${buildId}";
-const OFFLINE_URL = "/offline.html";
+const STATIC_CACHE = "gestion-e-immo-static-${buildId}";
+const OFFLINE_URL = "/hors-ligne";
 const PRECACHE_URLS = [
   OFFLINE_URL,
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
+  "/api/branding/pwa-icon/192",
+  "/api/branding/pwa-icon/512",
   "/favicon.ico"
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(STATIC_CACHE).then((cache) =>
+      Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
@@ -22,7 +24,10 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames
-          .filter((cacheName) => cacheName.startsWith("propertypro-static-") && cacheName !== STATIC_CACHE)
+          .filter((cacheName) =>
+            (cacheName.startsWith("gestion-e-immo-static-") || cacheName.startsWith("propertypro-static-")) &&
+            cacheName !== STATIC_CACHE
+          )
           .map((cacheName) => caches.delete(cacheName))
       )
     )
@@ -35,13 +40,13 @@ self.addEventListener("push", (event) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch (err) {
-    data = { title: "New notification", body: event.data ? event.data.text() : "" };
+    data = { title: "Nouvelle notification", body: event.data ? event.data.text() : "" };
   }
-  const title = data.title || "PropertyPro";
+  const title = data.title || "GESTION E-IMMO";
   const options = {
     body: data.body || "",
-    icon: data.icon || "/icons/icon-192x192.png",
-    badge: data.badge || "/icons/icon-192x192.png",
+    icon: data.icon || "/api/branding/pwa-icon/192",
+    badge: data.badge || "/api/branding/pwa-icon/192",
     tag: data.tag,
     data: { url: data.url || "/" },
   };

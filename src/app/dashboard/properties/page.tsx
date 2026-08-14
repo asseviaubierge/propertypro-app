@@ -888,7 +888,7 @@ export default function PropertiesPage() {
           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {property.isMultiUnit && (property.totalUnits ?? 0) > 1
               ? `${property.totalUnits ?? 0} Units`
-              : "Unit"}
+              : "Logement"}
           </div>
           <div className="flex items-center space-x-2 text-xs">
             {property.isMultiUnit ? (
@@ -1212,7 +1212,7 @@ export default function PropertiesPage() {
                 onSearch={handleSearch}
                 isLoading={isSearching}
                 className="w-full"
-                ariaLabel="Search properties"
+                ariaLabel="Rechercher des biens"
               />
             </div>
 

@@ -141,7 +141,7 @@ export class PaymentCommunicationService {
       name: "7-Day Payment Reminder",
       subject: "Rent Payment Due in 7 Days - {{propertyName}}",
       htmlContent: `
-        <h2>Payment Reminder</h2>
+        <h2>Rappel de paiement</h2>
         <p>Dear {{tenantName}},</p>
         <p>This is a friendly reminder that your rent payment of <strong>{{amount}}</strong> for {{propertyName}} is due on {{dueDate}}.</p>
         <p><strong>Payment Details:</strong></p>
@@ -161,7 +161,7 @@ export class PaymentCommunicationService {
       name: "3-Day Payment Reminder",
       subject: "Rent Payment Due in 3 Days - {{propertyName}}",
       htmlContent: `
-        <h2>Payment Reminder</h2>
+        <h2>Rappel de paiement</h2>
         <p>Dear {{tenantName}},</p>
         <p>Your rent payment of <strong>{{amount}}</strong> for {{propertyName}} is due in 3 days on {{dueDate}}.</p>
         <p>Please ensure your payment is submitted on time to avoid any late fees.</p>

@@ -55,9 +55,14 @@ export function MessagesClient({ userId }: MessagesClientProps) {
   const [rightPanelView, setRightPanelView] =
     useState<RightPanelView>("profile");
   const [mediaTab, setMediaTab] = useState<MediaTab>("media");
+  const [isMobile, setIsMobile] = useState(false);
 
-  const { conversations, loading: conversationsLoading, refresh: refreshConversations } =
-    useConversations(userId);
+  const {
+    conversations,
+    loading: conversationsLoading,
+    error: conversationsError,
+    refresh: refreshConversations,
+  } = useConversations(userId);
   const {
     messages,
     loading: messagesLoading,
@@ -69,8 +74,21 @@ export function MessagesClient({ userId }: MessagesClientProps) {
     [conversations, selectedConversationId]
   );
 
-  // Auto-select first conversation
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    const updateViewport = () => {
+      setIsMobile(media.matches);
+      if (media.matches) setSelectedConversationId(null);
+    };
+    updateViewport();
+    media.addEventListener("change", updateViewport);
+    return () => media.removeEventListener("change", updateViewport);
+  }, []);
+
+  // Sélection automatique uniquement sur ordinateur. Sur mobile, la liste
+  // reste visible jusqu’au choix explicite d’une discussion.
+  useEffect(() => {
+    if (isMobile) return;
     if (conversationsLoading) return;
     if (conversations.length === 0) {
       if (selectedConversationId) setSelectedConversationId(null);
@@ -82,7 +100,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
     if (!stillExists) {
       setSelectedConversationId(conversations[0].id);
     }
-  }, [conversations, conversationsLoading, selectedConversationId]);
+  }, [conversations, conversationsLoading, selectedConversationId, isMobile]);
 
   // Reset right panel on conversation change
   useEffect(() => {
@@ -234,12 +252,12 @@ export function MessagesClient({ userId }: MessagesClientProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_300px] h-[calc(100vh-8rem)] md:h-[calc(100vh-7rem)] rounded-xl overflow-hidden border border-border/50 bg-card/50 backdrop-blur-sm">
+      <div className="grid h-[calc(100dvh-8rem)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm md:h-[calc(100vh-7rem)] lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_300px]">
         {/* ============ LEFT: Conversations ============ */}
-        <div className="flex flex-col overflow-hidden border-r border-border/50 bg-card">
+        <div className={cn("flex-col overflow-hidden border-r border-border/50 bg-card", selectedConversationId ? "hidden lg:flex" : "flex")}>
           <div className="px-4 py-3 shrink-0">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-xl font-bold">Chats</h2>
+              <h2 className="text-xl font-bold">Discussions</h2>
               <Button
                 size="icon"
                 variant="ghost"
@@ -250,6 +268,20 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
+            {conversationsError && (
+              <div className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+                <p>{conversationsError}</p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 h-7 px-2 text-xs text-red-700"
+                  onClick={() => void refreshConversations()}
+                >
+                  Réessayer
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto px-2 pb-2">
@@ -264,13 +296,22 @@ export function MessagesClient({ userId }: MessagesClientProps) {
         </div>
 
         {/* ============ CENTER: Thread ============ */}
-        <div className="flex flex-col overflow-hidden">
+        <div className={cn("flex-col overflow-hidden", selectedConversationId ? "flex" : "hidden lg:flex")}>
           {selectedConversation ? (
             <>
               {/* Header */}
               <div className="px-4 py-2.5 border-b border-border/50 bg-card shrink-0">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 rounded-full lg:hidden"
+                      aria-label="Retour aux discussions"
+                      onClick={() => setSelectedConversationId(null)}
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
                     <div className="flex items-center gap-2.5">
                       <div className="relative">
                         <Avatar className="h-9 w-9">

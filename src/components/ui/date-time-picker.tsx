@@ -201,7 +201,7 @@ export function FormDateTimePicker({
           <div className="border-t border-border/40 sm:border-t-0 sm:border-l bg-muted/20">
             <div className="p-3 space-y-3">
               <div className="text-sm font-medium text-foreground/80">
-                Time
+                Heure
               </div>
               <div className="flex items-center gap-2">
                 <Select
@@ -268,7 +268,7 @@ export function FormDateTimePicker({
                   className="h-8"
                   onClick={handleClear}
                 >
-                  Clear
+                  Effacer
                 </Button>
               </div>
             </div>

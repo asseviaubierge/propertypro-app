@@ -136,7 +136,7 @@ export function EmergencyAnalytics({
 
     // Create CSV data
     const csvData = [
-      ["Metric", "Value"],
+      ["Metric", "Valeur"],
       ["Total Emergencies", data.overview.totalEmergencies],
       ["Active Emergencies", data.overview.activeEmergencies],
       ["Overdue Emergencies", data.overview.overdueEmergencies],
@@ -191,7 +191,7 @@ export function EmergencyAnalytics({
       <Card className={className}>
         <CardContent className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
           <AlertTriangle className="h-12 w-12 text-red-500" />
-          <h3 className="text-lg font-semibold">Failed to Load Analytics</h3>
+          <h3 className="text-lg font-semibold">Échec du chargement des analyses</h3>
           <p className="text-muted-foreground text-center">{error}</p>
           <Button onClick={handleRefresh} variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
@@ -302,7 +302,7 @@ export function EmergencyAnalytics({
           </Select>
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
+            Actualiser
           </Button>
           <Button variant="outline" size="sm" onClick={exportData}>
             <Download className="mr-2 h-4 w-4" />

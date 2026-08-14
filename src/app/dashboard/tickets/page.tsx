@@ -242,11 +242,12 @@ export default function TicketsPage() {
             </div>
           </div>
         ),
-        className: "min-w-[200px]",
+        className: "min-w-[120px] sm:min-w-[200px]",
       },
       {
         id: "status",
         header: t("tickets.table.status"),
+        visibility: "sm" as const,
         cell: (ticket) => (
           <div className="flex flex-col gap-1">
             <TicketStatusBadge status={ticket.status} />
@@ -310,7 +311,7 @@ export default function TicketsPage() {
               <span className="text-sm text-gray-700 dark:text-gray-300">
                 {typeof ticket.createdBy.userId === "object"
                   ? `${ticket.createdBy.userId.firstName} ${ticket.createdBy.userId.lastName}`
-                  : "Unknown"}
+                  : "Inconnu"}
               </span>
               <Badge variant="secondary" className="capitalize text-xs">
                 {ticket.createdBy.role}
@@ -365,10 +366,10 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mobile-tickets-page min-w-0 space-y-3 sm:space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
             <Ticket className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
@@ -381,10 +382,10 @@ export default function TicketsPage() {
             </p>
           </div>
         </div>
-        <Link href="/dashboard/tickets/new">
+        <Link className="w-full sm:w-auto" href="/dashboard/tickets/new">
           <Button
             size="sm"
-            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            className="w-full whitespace-nowrap bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             {t("tickets.newTicket")}
@@ -444,9 +445,9 @@ export default function TicketsPage() {
           </div>
 
           {/* Integrated Filters Bar */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
+          <div className="grid grid-cols-2 gap-2 rounded-lg border border-gray-200/60 bg-gray-50/50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50 lg:flex lg:items-center lg:gap-4 lg:p-4">
             {/* Search */}
-            <div className="flex-1 min-w-0">
+            <div className="col-span-2 min-w-0 lg:flex-1">
               <GlobalSearch
                 onSearch={handleSearch}
                 placeholder={t("tickets.search.placeholder")}
@@ -456,14 +457,14 @@ export default function TicketsPage() {
             </div>
 
             {/* Filter Controls */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="col-span-2 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-3">
               <Select
                 value={filters.status || "all"}
                 onValueChange={(v) =>
                   handleFilterChange("status", v === "all" ? undefined : v)
                 }
               >
-                <SelectTrigger className="w-35 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-35">
                   <SelectValue placeholder={t("tickets.filters.allStatus")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -491,7 +492,7 @@ export default function TicketsPage() {
                   handleFilterChange("priority", v === "all" ? undefined : v)
                 }
               >
-                <SelectTrigger className="w-35 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-35">
                   <SelectValue placeholder={t("tickets.filters.allPriority")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -519,7 +520,7 @@ export default function TicketsPage() {
                   handleFilterChange("category", v === "all" ? undefined : v)
                 }
               >
-                <SelectTrigger className="w-40 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-40">
                   <SelectValue
                     placeholder={t("tickets.filters.allCategories")}
                   />
@@ -562,8 +563,8 @@ export default function TicketsPage() {
                   setFilters((prev) => ({ ...prev, sortBy, sortOrder }));
                 }}
               >
-                <SelectTrigger className="w-35 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                  <SelectValue placeholder="Sort" />
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 lg:w-35">
+                  <SelectValue placeholder="Trier" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="createdAt-desc">
@@ -593,7 +594,7 @@ export default function TicketsPage() {
                       sortOrder: "desc",
                     })
                   }
-                  className="h-10 px-3 text-gray-500 hover:text-gray-700"
+                  className="col-span-2 h-10 w-full px-3 text-gray-500 hover:text-gray-700 lg:col-span-1 lg:w-auto"
                 >
                   <X className="h-4 w-4 mr-1" />
                   {t("tickets.filters.clear")}
@@ -872,6 +873,8 @@ export default function TicketsPage() {
                 columns={ticketColumns}
                 data={tickets}
                 loading={loading}
+                containerClassName="mobile-ticket-table"
+                tableClassName="table-fixed sm:table-auto"
                 getRowKey={(ticket) => ticket._id}
                 onRowClick={(ticket) =>
                   router.push(`/dashboard/tickets/${ticket._id}`)

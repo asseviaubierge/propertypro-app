@@ -82,7 +82,7 @@ class LeasePaymentSyncService {
       // 1. Fetch lease with all required data
       const lease = await this.getLeaseWithDetails(leaseId);
       if (!lease) {
-        throw new Error("Lease not found");
+        throw new Error("Bail introuvable");
       }
 
       // 2. Create payment schedule if enabled
@@ -182,7 +182,7 @@ class LeasePaymentSyncService {
     try {
       const lease = await this.getLeaseWithDetails(leaseId);
       if (!lease) {
-        throw new Error("Lease not found");
+        throw new Error("Bail introuvable");
       }
 
       // Get all payments for this lease
@@ -225,7 +225,7 @@ class LeasePaymentSyncService {
                     .slice(-8)
                     .toUpperCase()}`,
                   subject: `Invoice for ${
-                    lease.propertyId?.name || "Property"
+                    lease.propertyId?.name || "Bien"
                   } - Payment Due`,
                   message: this.generateInvoiceEmailMessage(
                     lease,
@@ -419,7 +419,7 @@ class LeasePaymentSyncService {
     payment: IPayment,
     config: InvoiceGenerationConfig
   ): string {
-    let message = `Dear ${lease.tenantId?.firstName || "Tenant"},\n\n`;
+    let message = `Dear ${lease.tenantId?.firstName || "Locataire"},\n\n`;
     message += `Please find attached your invoice for ${
       lease.propertyId?.name || "your rental property"
     }.\n\n`;

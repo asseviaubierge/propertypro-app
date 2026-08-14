@@ -120,16 +120,15 @@ export async function GET(request: Request): Promise<Response> {
       return imageResponse(await fetchRemoteAsset(url));
     }
 
-    // No source: serve the global branding logo (favicon, then logoLight) to
+    // No source: serve the document logo first; the favicon is only a fallback.
     // match getCompanyInfo()'s selection.
     const branding = await getPublicBranding();
-    const target = branding.favicon || branding.logoLight;
+    const target = branding.logoLight || branding.favicon;
     const image = target.startsWith("/")
       ? await readPublicAsset(target)
       : await fetchRemoteAsset(new URL(target));
     return imageResponse(image);
-  } catch (error) {
-    console.error("Branding logo proxy error:", error);
+  } catch {
     try {
       return imageResponse(
         await readPublicAsset(DEFAULT_PUBLIC_BRANDING.favicon),

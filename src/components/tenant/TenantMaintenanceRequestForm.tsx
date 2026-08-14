@@ -49,10 +49,10 @@ const MAINTENANCE_CATEGORIES = [
   "Landscaping",
   "Pest Control",
   "Cleaning",
-  "Security",
+  "Sécurité",
   "General Repair",
   "Emergency",
-  "Other",
+  "Autre",
 ] as const;
 
 // Validation schema creator function that accepts translation function
@@ -130,7 +130,7 @@ export default function TenantMaintenanceRequestForm({
     defaultValues: {
       title: "",
       description: "",
-      category: "Other",
+      category: "Autre",
       priority: "medium",
       leaseId: "",
       unitId: "",

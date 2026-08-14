@@ -648,8 +648,8 @@ export default function TenantApplicationsPage() {
                   })}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("common.showing", { defaultValue: "Showing" })} {rangeFrom}
-                  -{rangeTo} {t("common.of", { defaultValue: "of" })}{" "}
+                  {t("common.showing", { defaultValue: "Affichage de" })} {rangeFrom}
+                  -{rangeTo} {t("common.of", { defaultValue: "sur" })}{" "}
                   {paginationTotal}
                 </p>
               </div>
@@ -707,7 +707,7 @@ export default function TenantApplicationsPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("properties.filters.clear", { defaultValue: "Clear" })}
+                  {t("properties.filters.clear", { defaultValue: "Effacer" })}
                 </Button>
               )}
             </div>
@@ -748,13 +748,13 @@ export default function TenantApplicationsPage() {
               pageSize={filters.limit}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-              showingLabel={t("common.showing", { defaultValue: "Showing" })}
-              previousLabel={t("common.previous", { defaultValue: "Previous" })}
-              nextLabel={t("common.next", { defaultValue: "Next" })}
+              showingLabel={t("common.showing", { defaultValue: "Affichage de" })}
+              previousLabel={t("common.previous", { defaultValue: "Précédent" })}
+              nextLabel={t("common.next", { defaultValue: "Suivant" })}
               pageLabel={t("common.page", { defaultValue: "Page" })}
-              ofLabel={t("common.of", { defaultValue: "of" })}
+              ofLabel={t("common.of", { defaultValue: "sur" })}
               itemsPerPageLabel={t("common.perPage", {
-                defaultValue: "per page",
+                defaultValue: "par page",
               })}
               disabled={loading || isSearching}
             />

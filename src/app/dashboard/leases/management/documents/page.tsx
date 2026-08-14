@@ -94,10 +94,10 @@ export default function LeaseManagementDocumentsPage() {
       if (data.success) {
         setDocuments(data.data?.documents || []);
       } else {
-        showSimpleError("Load Error", "Failed to load documents");
+        showSimpleError("Erreur de chargement", "Échec du chargement des documents");
       }
     } catch (error) {
-      showSimpleError("Load Error", "Failed to load documents");
+      showSimpleError("Erreur de chargement", "Échec du chargement des documents");
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ export default function LeaseManagementDocumentsPage() {
               Document Management
             </h1>
             <p className="text-muted-foreground">
-              Access and manage all your lease-related documents
+              Consultez et gérez tous les documents liés à vos baux
             </p>
           </div>
         </div>
@@ -189,11 +189,11 @@ export default function LeaseManagementDocumentsPage() {
             className="gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            Refresh
+            Actualiser
           </Button>
           <Button size="sm" className="gap-2">
             <Upload className="h-4 w-4" />
-            Upload Document
+            Téléverser un document
           </Button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function LeaseManagementDocumentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Documents
+              Total des documents
             </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -221,34 +221,34 @@ export default function LeaseManagementDocumentsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Lease Agreements
+              Contrats de bail
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {categoryStats.lease_agreement}
             </div>
-            <p className="text-xs text-muted-foreground">Active agreements</p>
+            <p className="text-xs text-muted-foreground">Contrats actifs</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Amendments</CardTitle>
+            <CardTitle className="text-sm font-medium">Modifications</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{categoryStats.amendment}</div>
-            <p className="text-xs text-muted-foreground">Contract changes</p>
+            <p className="text-xs text-muted-foreground">Modifications contractuelles</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notices</CardTitle>
+            <CardTitle className="text-sm font-medium">Avis</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{categoryStats.notice}</div>
-            <p className="text-xs text-muted-foreground">Official notices</p>
+            <p className="text-xs text-muted-foreground">Avis officiels</p>
           </CardContent>
         </Card>
 
@@ -262,7 +262,7 @@ export default function LeaseManagementDocumentsPage() {
             <div className="text-2xl font-bold">
               {categoryStats.addendum + categoryStats.other}
             </div>
-            <p className="text-xs text-muted-foreground">Addendums & misc</p>
+            <p className="text-xs text-muted-foreground">Avenants et divers</p>
           </CardContent>
         </Card>
       </div>
@@ -272,24 +272,24 @@ export default function LeaseManagementDocumentsPage() {
         <div className="flex flex-1 items-center space-x-2">
           {/* Global Search Component with 300ms debounce (client-side filtering) */}
           <GlobalSearch
-            placeholder="Search documents..."
+            placeholder="Rechercher des documents…"
             initialValue={searchTerm}
             debounceDelay={300}
             onSearch={handleSearch}
             className="flex-1 max-w-sm"
-            ariaLabel="Search documents"
+            ariaLabel="Rechercher des documents"
           />
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder="Catégorie" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="lease_agreement">Lease Agreements</SelectItem>
-              <SelectItem value="amendment">Amendments</SelectItem>
-              <SelectItem value="addendum">Addendums</SelectItem>
-              <SelectItem value="notice">Notices</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              <SelectItem value="all">Toutes les catégories</SelectItem>
+              <SelectItem value="lease_agreement">Contrats de bail</SelectItem>
+              <SelectItem value="amendment">Modifications</SelectItem>
+              <SelectItem value="addendum">Avenants</SelectItem>
+              <SelectItem value="notice">Avis</SelectItem>
+              <SelectItem value="other">Autre</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -299,7 +299,7 @@ export default function LeaseManagementDocumentsPage() {
       {loading ? (
         <Card>
           <CardHeader>
-            <CardTitle>Loading Documents...</CardTitle>
+            <CardTitle>Chargement des documents…</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

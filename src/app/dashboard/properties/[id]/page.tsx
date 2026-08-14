@@ -1142,7 +1142,7 @@ export default function PropertyDetailsPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Property</AlertDialogTitle>
+            <AlertDialogTitle>Supprimer le bien</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete &quot;{property?.name}&quot;? This
               action cannot be undone. All associated data including leases,
@@ -1150,13 +1150,13 @@ export default function PropertyDetailsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteProperty}
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {isDeleting ? "Suppression..." : "Delete Property"}
+              {isDeleting ? "Suppression..." : "Supprimer le bien"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

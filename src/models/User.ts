@@ -115,6 +115,83 @@ const UserSchema = new Schema<
         "Please enter a valid phone number",
       ],
     },
+    whatsappNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    whatsappVerificationStatus: {
+      type: String,
+      enum: ["not_requested", "pending", "verified", "rejected"],
+      default: "not_requested",
+      index: true,
+    },
+    whatsappVerificationCode: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+    whatsappVerificationRequestedAt: {
+      type: Date,
+      default: null,
+    },
+    whatsappVerificationRejectedAt: {
+      type: Date,
+      default: null,
+    },
+    whatsappVerifiedAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    whatsappVerifiedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    whatsappPreviousNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    whatsappChangeRequestedNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    whatsappChangeReason: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+      default: "",
+    },
+    whatsappChangeStatus: {
+      type: String,
+      enum: [
+        "none",
+        "pending",
+        "approved",
+        "verification_pending",
+        "rejected",
+        "completed",
+      ],
+      default: "none",
+      index: true,
+    },
+    whatsappChangeRequestedAt: {
+      type: Date,
+      default: null,
+    },
+    whatsappChangeReviewedAt: {
+      type: Date,
+      default: null,
+    },
+    whatsappChangeReviewedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     role: {
       type: String,
       default: UserRole.TENANT,
@@ -682,11 +759,11 @@ UserSchema.virtual("displayStatus").get(function (this: UserDocument) {
 
   const statusMap: Record<string, string> = {
     application_submitted: "Application Submitted",
-    under_review: "Under Review",
-    approved: "Approved",
+    under_review: "En cours d’examen",
+    approved: "Approuvée",
     active: "Active Tenant",
-    inactive: "Inactive",
-    moved_out: "Moved Out",
+    inactive: "Inactif",
+    moved_out: "Partis",
     terminated: "Terminated",
   };
 

@@ -522,7 +522,7 @@ export class PaymentDashboardService {
       averageLateDays: Math.round(timing.averageLateDays * 10) / 10,
       repeatOffenders: repeatOffendersData.map((item) => ({
         tenantId: item._id.toString(),
-        tenantName: item.tenantName || "Unknown",
+        tenantName: item.tenantName || "Inconnu",
         latePaymentCount: item.latePaymentCount,
         averageLateDays: Math.round(item.averageLateDays * 10) / 10,
       })),

@@ -200,7 +200,7 @@ export function PreferencesDrawer() {
         <Button
           variant="outline"
           size="icon"
-          aria-label="Preferences"
+          aria-label="Préférences"
           className="text-muted-foreground hover:text-primary"
         >
           <Settings className="h-[1.2rem] w-[1.2rem]" />
@@ -216,7 +216,7 @@ export function PreferencesDrawer() {
       >
         <SheetHeader className="px-5 py-4 flex flex-row items-center justify-between sticky top-0 z-10 bg-background border-b border-border/30">
           <SheetTitle className="text-lg font-bold tracking-tight">
-            Preferences
+            Préférences
           </SheetTitle>
           <div className="flex items-center">
             <Button
@@ -279,7 +279,7 @@ export function PreferencesDrawer() {
             <SectionContainer label="NAV" icon={<Info className="h-2.5 w-2.5" />}>
               <div className="space-y-3">
                 <span className="text-xs text-muted-foreground font-medium">
-                  Color
+                  Couleur
                 </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   <NavColorCard

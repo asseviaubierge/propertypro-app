@@ -176,11 +176,11 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50/30 dark:bg-gray-900/30 min-h-screen">
+    <div className="mobile-calendar-page min-h-screen min-w-0 space-y-3 bg-gray-50/30 dark:bg-gray-900/30 sm:space-y-6 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+      <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
             {t("calendar.header.title")}
             {isTenant && (
               <span className="ml-3 text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -188,19 +188,19 @@ export default function CalendarPage() {
               </span>
             )}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-xs leading-4 text-gray-600 dark:text-gray-400 sm:text-base">
             {isTenant
               ? t("calendar.header.subtitleTenant")
               : t("calendar.header.subtitleAdmin")}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:w-auto sm:gap-3">
           {/* Only show New Event button for admin and manager */}
           {canCreateEvents && (
             <Button
               size="sm"
               onClick={() => handleCreateEvent()}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+              className="w-full whitespace-nowrap border-0 bg-blue-600 text-white shadow-lg hover:bg-blue-700 hover:shadow-xl sm:w-auto"
             >
               <Calendar className="h-4 w-4 mr-2" />
               {t("calendar.header.newEvent")}
@@ -264,7 +264,7 @@ export default function CalendarPage() {
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="space-y-8"
+        className="space-y-4 sm:space-y-8"
       >
         <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border-0">
           <TabsTrigger
@@ -293,7 +293,8 @@ export default function CalendarPage() {
             onCreateEvent={canCreateEvents ? handleCreateEvent : undefined}
             editable={canCreateEvents}
             selectable={canCreateEvents}
-            className="min-h-[600px]"
+            className="min-h-[520px] overflow-hidden sm:min-h-[600px]"
+            settings={calendarSettings}
           />
         </TabsContent>
 

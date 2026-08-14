@@ -4,7 +4,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { Payment } from "@/models";
+import { Lease, Payment } from "@/models";
 import { UserRole, PaymentStatus } from "@/types";
 import {
   AuthenticatedAccessUser,
@@ -14,6 +14,7 @@ import {
   parseRequestBody,
   withAccessAndDB,
   withPermissionAndDB,
+  isValidObjectId,
 } from "@/lib/api-utils";
 import { buildPaymentScopeQuery } from "@/lib/payment-access";
 import { canAccessProperty } from "@/lib/property-scope";
@@ -62,7 +63,7 @@ export const GET = withAccessAndDB(PAYMENT_READ_ACCESS)(
       }
       if (propertyId && !user.isTenant) {
         if (!(await canAccessProperty(user, propertyId))) {
-          return createErrorResponse("Access denied for this property", 403);
+          return createErrorResponse("Accès refusé pour cette propriété", 403);
         }
         query.propertyId = propertyId;
       }
@@ -154,7 +155,7 @@ export const GET = withAccessAndDB(PAYMENT_READ_ACCESS)(
         total = count;
       }
 
-      return createSuccessResponse(payments, "Payments retrieved successfully", {
+      return createSuccessResponse(payments, "Paiements récupérés avec succès", {
         page,
         limit,
         total,
@@ -179,25 +180,87 @@ export const POST = withPermissionAndDB([
       }
 
       if (!body.tenantId || !body.propertyId || !body.amount || !body.type) {
-        return createErrorResponse("Missing required fields", 400);
+        return createErrorResponse("Des informations obligatoires sont manquantes", 400);
       }
 
       if (body.amount <= 0 || body.amount > 100000) {
         return createErrorResponse(
-          "Amount must be between $0.01 and $100,000",
+          "Le montant doit être compris entre 1 et 100 000 FCFA",
           400
+        );
+      }
+
+      if (
+        !isValidObjectId(body.tenantId) ||
+        !isValidObjectId(body.propertyId)
+      ) {
+        return createErrorResponse(
+          "Le locataire ou la propriété sélectionnée est invalide",
+          400,
         );
       }
 
       if (!(await canAccessProperty(user, body.propertyId))) {
         return createErrorResponse(
-          "You can only create payments for properties you own or manage",
+          "Vous pouvez créer un paiement uniquement pour un bien que vous gérez",
           403
         );
       }
 
-      const payment = new Payment({
+      const requestedLeaseId =
+        typeof body.leaseId === "string" && body.leaseId.trim()
+          ? body.leaseId.trim()
+          : null;
+      const requestedUnitId =
+        typeof body.unitId === "string" && body.unitId.trim()
+          ? body.unitId.trim()
+          : null;
+
+      if (requestedLeaseId && !isValidObjectId(requestedLeaseId)) {
+        return createErrorResponse("Le bail sélectionné est invalide", 400);
+      }
+      if (requestedUnitId && !isValidObjectId(requestedUnitId)) {
+        return createErrorResponse("L’unité sélectionnée est invalide", 400);
+      }
+
+      const relationshipQuery: Record<string, unknown> = {
+        tenantId: body.tenantId,
+        propertyId: body.propertyId,
+        deletedAt: null,
+        archivedAt: null,
+      };
+      if (requestedLeaseId) relationshipQuery._id = requestedLeaseId;
+      if (requestedUnitId) relationshipQuery.unitId = requestedUnitId;
+
+      const relatedLeases = await Lease.find(relationshipQuery)
+        .select("_id tenantId propertyId unitId")
+        .sort({ startDate: -1 })
+        .limit(2)
+        .lean();
+
+      if (relatedLeases.length === 0) {
+        return createErrorResponse(
+          "Le locataire, la propriété et le bail sélectionnés ne correspondent pas",
+          400,
+        );
+      }
+
+      if (!requestedLeaseId && relatedLeases.length > 1) {
+        return createErrorResponse(
+          "Plusieurs baux correspondent : sélectionnez le bail concerné",
+          400,
+        );
+      }
+
+      const relatedLease = relatedLeases[0] as any;
+      const normalizedPaymentData = {
         ...body,
+        leaseId: relatedLease._id,
+        unitId: relatedLease.unitId || undefined,
+      };
+
+      const payment = new Payment({
+        ...normalizedPaymentData,
         createdBy: user.id,
         status: PaymentStatus.PENDING,
       });
@@ -206,7 +269,7 @@ export const POST = withPermissionAndDB([
       await payment.populate("propertyId", "name address");
       await payment.populate("tenantId", "firstName lastName email phone");
 
-      return createSuccessResponse(payment, "Payment created successfully");
+      return createSuccessResponse(payment, "Paiement créé avec succès");
     } catch (error) {
       return handleApiError(error);
     }
@@ -228,11 +291,11 @@ export const PUT = withPermissionAndDB([
       const { paymentIds, updates } = body;
 
       if (!paymentIds || !Array.isArray(paymentIds) || paymentIds.length === 0) {
-        return createErrorResponse("Payment IDs are required", 400);
+        return createErrorResponse("Les identifiants des paiements sont obligatoires", 400);
       }
 
       if (!updates || typeof updates !== "object") {
-        return createErrorResponse("Updates object is required", 400);
+        return createErrorResponse("Les modifications à appliquer sont obligatoires", 400);
       }
 
       const scopedBulkQuery = await buildPaymentScopeQuery(user, {
@@ -249,7 +312,7 @@ export const PUT = withPermissionAndDB([
           matchedCount: result.matchedCount,
           modifiedCount: result.modifiedCount,
         },
-        `${result.modifiedCount} payments updated successfully`
+        `${result.modifiedCount} paiement(s) mis à jour avec succès`
       );
     } catch (error) {
       return handleApiError(error);
@@ -265,14 +328,14 @@ export const DELETE = withPermissionAndDB(
   async (user: AuthenticatedAccessUser, request: NextRequest) => {
     try {
       if (!user.isAdmin) {
-        return createErrorResponse("Insufficient permissions", 403);
+        return createErrorResponse("Autorisations insuffisantes", 403);
       }
 
       const { searchParams } = new URL(request.url);
       const paymentIds = searchParams.get("ids")?.split(",");
 
       if (!paymentIds || paymentIds.length === 0) {
-        return createErrorResponse("Payment IDs are required", 400);
+        return createErrorResponse("Les identifiants des paiements sont obligatoires", 400);
       }
 
       const scopedBulkQuery = await buildPaymentScopeQuery(user, {
@@ -295,7 +358,7 @@ export const DELETE = withPermissionAndDB(
           matchedCount: result.matchedCount,
           modifiedCount: result.modifiedCount,
         },
-        `${result.modifiedCount} payments deleted successfully`
+        `${result.modifiedCount} paiement(s) supprimé(s) avec succès`
       );
     } catch (error) {
       return handleApiError(error);

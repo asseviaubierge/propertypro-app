@@ -190,7 +190,7 @@ export function LeaseDepositCard({
             <div className="p-2 rounded-lg bg-warning/10">
               <ShieldCheck className="h-5 w-5 text-warning" />
             </div>
-            Dépôt de garantie
+            Garantie
           </div>
           {deposit && getStatusBadge(deposit.status)}
         </CardTitle>

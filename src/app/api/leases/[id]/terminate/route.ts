@@ -54,7 +54,7 @@ export const POST = withAccessAndDB(LEASE_PATCH_ACCESS)(
         .populate("propertyId", "name address")) as any;
 
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       // Check permissions
@@ -201,7 +201,7 @@ export const GET = withAccessAndDB(LEASE_PATCH_ACCESS)(
         .populate("propertyId", "name address")) as any;
 
       if (!lease) {
-        return createErrorResponse("Lease not found", 404);
+        return createErrorResponse("Bail introuvable", 404);
       }
 
       // Check permissions
@@ -249,7 +249,7 @@ export const GET = withAccessAndDB(LEASE_PATCH_ACCESS)(
           "Lease violation",
           "Property sale",
           "Renovation required",
-          "Other",
+          "Autre",
         ],
       };
 

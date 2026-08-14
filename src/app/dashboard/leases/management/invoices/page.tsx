@@ -69,10 +69,10 @@ export default function LeaseManagementInvoicesPage() {
       if (data.success) {
         setInvoices(data.data?.invoices || []);
       } else {
-        showSimpleError("Load Error", "Failed to load invoices");
+        showSimpleError("Erreur de chargement", "Failed to load invoices");
       }
     } catch (error) {
-      showSimpleError("Load Error", "Failed to load invoices");
+      showSimpleError("Erreur de chargement", "Failed to load invoices");
     } finally {
       setLoading(false);
     }
@@ -160,7 +160,7 @@ export default function LeaseManagementInvoicesPage() {
           </Link>
           <div>
             <h1 className="text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
-              Invoice Management
+              Gestion des factures
             </h1>
             <p className="text-muted-foreground">
               View and manage all your invoices across all properties
@@ -175,7 +175,7 @@ export default function LeaseManagementInvoicesPage() {
           className="gap-2"
         >
           <RefreshCw className="h-4 w-4" />
-          Refresh
+          Actualiser
         </Button>
       </div>
 
@@ -234,7 +234,7 @@ export default function LeaseManagementInvoicesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Ce mois-ci</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -249,7 +249,7 @@ export default function LeaseManagementInvoicesPage() {
                 }).length
               }
             </div>
-            <p className="text-xs text-muted-foreground">Invoices issued</p>
+            <p className="text-xs text-muted-foreground">Factures émises</p>
           </CardContent>
         </Card>
       </div>
@@ -259,23 +259,23 @@ export default function LeaseManagementInvoicesPage() {
         <div className="flex flex-1 items-center space-x-2">
           {/* Global Search Component with 300ms debounce (client-side filtering) */}
           <GlobalSearch
-            placeholder="Search invoices..."
+            placeholder="Rechercher des factures…"
             initialValue={searchTerm}
             debounceDelay={300}
             onSearch={handleSearch}
             className="flex-1 max-w-sm"
-            ariaLabel="Search invoices"
+            ariaLabel="Rechercher des factures"
           />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="issued">Issued</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-              <SelectItem value="partial">Partial</SelectItem>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              <SelectItem value="paid">Payée</SelectItem>
+              <SelectItem value="issued">Émise</SelectItem>
+              <SelectItem value="overdue">En retard</SelectItem>
+              <SelectItem value="partial">Partielle</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -285,7 +285,7 @@ export default function LeaseManagementInvoicesPage() {
       {loading ? (
         <Card>
           <CardHeader>
-            <CardTitle>Loading Invoices...</CardTitle>
+            <CardTitle>Chargement des factures…</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

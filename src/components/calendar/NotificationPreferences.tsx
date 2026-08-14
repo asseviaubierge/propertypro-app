@@ -225,7 +225,7 @@ export function NotificationPreferences({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Email Notifications
+            Notifications par e-mail
           </CardTitle>
           <CardDescription>
             Configure when to receive email notifications
@@ -330,7 +330,7 @@ export function NotificationPreferences({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Smartphone className="h-5 w-5" />
-            SMS Notifications
+            Notifications par SMS
           </CardTitle>
           <CardDescription>
             Configure SMS notifications for urgent events
@@ -428,7 +428,7 @@ export function NotificationPreferences({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            Quiet Hours
+            Heures silencieuses
           </CardTitle>
           <CardDescription>
             Set hours when notifications should be silenced

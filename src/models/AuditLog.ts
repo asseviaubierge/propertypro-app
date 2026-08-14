@@ -269,7 +269,7 @@ AuditLogSchema.virtual("userDisplayName").get(function () {
   if (this.userEmail) {
     return this.userEmail;
   }
-  return "System";
+  return "Système";
 });
 
 // Static methods

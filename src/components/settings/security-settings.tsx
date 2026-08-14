@@ -165,7 +165,7 @@ export function SecuritySettings({ user, onAlert }: SecuritySettingsProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Email Verification */}
       <Card id="verification">
         <CardHeader>
@@ -204,6 +204,7 @@ export function SecuritySettings({ user, onAlert }: SecuritySettingsProps) {
                 type="button"
                 variant="outline"
                 onClick={handleSendVerification}
+                className="w-full whitespace-nowrap sm:w-auto"
                 disabled={verifyLoading}
               >
                 {verifyLoading && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -275,7 +276,7 @@ export function SecuritySettings({ user, onAlert }: SecuritySettingsProps) {
                 required
               />
             </div>
-            <Button type="submit" disabled={pwLoading}>
+            <Button className="w-full whitespace-nowrap sm:w-auto" type="submit" disabled={pwLoading}>
               {pwLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               {pwLoading
                 ? t("settings.security.password.submitting")
@@ -328,7 +329,7 @@ export function SecuritySettings({ user, onAlert }: SecuritySettingsProps) {
                 required
               />
             </div>
-            <Button type="submit" disabled={emailLoading}>
+            <Button className="w-full whitespace-nowrap sm:w-auto" type="submit" disabled={emailLoading}>
               {emailLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               {emailLoading
                 ? t("settings.security.email.submitting")

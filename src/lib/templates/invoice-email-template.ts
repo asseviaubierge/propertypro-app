@@ -25,8 +25,8 @@ export function buildInvoiceEmailHtml(
 ): string {
   const {
     message,
-    propertyName = "Property",
-    tenantName = "Tenant",
+    propertyName = "Bien",
+    tenantName = "Locataire",
     invoiceNumber,
     amountDue,
     dueDate,
@@ -67,8 +67,8 @@ export function buildInvoiceEmailHtml(
           
           <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #1976d2; margin: 0 0 10px 0;">Invoice Details</h3>
-            <p style="margin: 5px 0;"><strong>Property:</strong> ${propertyName}</p>
-            <p style="margin: 5px 0;"><strong>Tenant:</strong> ${tenantName}</p>
+            <p style="margin: 5px 0;"><strong>Bien :</strong> ${propertyName}</p>
+            <p style="margin: 5px 0;"><strong>Locataire :</strong> ${tenantName}</p>
             ${
               invoiceNumber
                 ? `<p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNumber}</p>`

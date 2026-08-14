@@ -74,7 +74,7 @@ export default function LeasesDocumentsPage() {
         throw new Error(
           payload?.message ??
             t("leases.documents.toasts.fetchLeaseDetailsError", {
-              defaultValue: "Failed to load lease details",
+              defaultValue: "Échec du chargement des détails du bail",
             })
         );
       }
@@ -82,11 +82,11 @@ export default function LeasesDocumentsPage() {
       setLeases(payload?.data?.allLeases ?? []);
     } catch (error) {
       showSimpleError(
-        t("leases.documents.toasts.loadErrorTitle", { defaultValue: "Load Error" }),
+        t("leases.documents.toasts.loadErrorTitle", { defaultValue: "Erreur de chargement" }),
         error instanceof Error
           ? error.message
           : t("leases.documents.toasts.fetchLeaseDetailsError", {
-              defaultValue: "Failed to load lease details",
+              defaultValue: "Échec du chargement des détails du bail",
             })
       );
     }
@@ -103,7 +103,7 @@ export default function LeasesDocumentsPage() {
         throw new Error(
           payload?.message ??
             t("leases.documents.toasts.fetchDocumentsError", {
-              defaultValue: "Failed to load documents",
+              defaultValue: "Échec du chargement des documents",
             })
         );
       }
@@ -116,11 +116,11 @@ export default function LeasesDocumentsPage() {
       return true;
     } catch (error) {
       showSimpleError(
-        t("leases.documents.toasts.loadErrorTitle", { defaultValue: "Load Error" }),
+        t("leases.documents.toasts.loadErrorTitle", { defaultValue: "Erreur de chargement" }),
         error instanceof Error
           ? error.message
           : t("leases.documents.toasts.fetchDocumentsError", {
-              defaultValue: "Failed to load documents",
+              defaultValue: "Échec du chargement des documents",
             })
       );
       return false;
@@ -142,9 +142,9 @@ export default function LeasesDocumentsPage() {
     const success = await fetchDocuments();
     if (success) {
       showSimpleSuccess(
-        t("leases.documents.toasts.updatedTitle", { defaultValue: "Updated" }),
+        t("leases.documents.toasts.updatedTitle", { defaultValue: "Mis à jour" }),
         t("leases.documents.toasts.updatedDescription", {
-          defaultValue: "Documents updated",
+          defaultValue: "Documents mis à jour",
         })
       );
     }
@@ -254,7 +254,7 @@ export default function LeasesDocumentsPage() {
             </h1>
             <p className="text-muted-foreground text-sm">
               {t("leases.documents.header.subtitle", {
-                defaultValue: "Access and manage your lease-related documents",
+                defaultValue: "Consultez et gérez les documents liés à vos baux",
               })}
             </p>
           </div>
@@ -273,12 +273,12 @@ export default function LeasesDocumentsPage() {
             ) : (
               <RefreshCw className="h-4 w-4" />
             )}
-            {t("leases.actions.refresh", { defaultValue: "Refresh" })}
+            {t("leases.actions.refresh", { defaultValue: "Actualiser" })}
           </Button>
           <Button size="sm" className="gap-2" onClick={handleOpenUpload}>
             <Upload className="h-4 w-4" />
             {t("leases.documents.actions.uploadDocument", {
-              defaultValue: "Upload Document",
+              defaultValue: "Téléverser un document",
             })}
           </Button>
         </div>
@@ -287,7 +287,7 @@ export default function LeasesDocumentsPage() {
       <AnalyticsCardGrid className="md:grid-cols-2 lg:grid-cols-4">
         <AnalyticsCard
           title={t("leases.documents.summary.totalDocuments", {
-            defaultValue: "Total Documents",
+            defaultValue: "Total des documents",
           })}
           value={documentsLoading ? "..." : documents.length}
           description={t("leases.documents.summary.totalSize", {
@@ -299,33 +299,33 @@ export default function LeasesDocumentsPage() {
         />
         <AnalyticsCard
           title={t("leases.documents.summary.filteredResults", {
-            defaultValue: "Filtered Results",
+            defaultValue: "Résultats filtrés",
           })}
           value={documentsLoading ? "..." : filteredDocuments.length}
           description={t("leases.documents.summary.matchingDocuments", {
-            defaultValue: "Matching your current filters",
+            defaultValue: "Correspondant aux filtres actuels",
           })}
           icon={Search}
           iconColor="info"
         />
         <AnalyticsCard
           title={t("leases.documents.summary.categories", {
-            defaultValue: "Categories",
+            defaultValue: "Catégories",
           })}
           value={documentsLoading ? "..." : categoryOptions.length}
           description={t("leases.documents.summary.availableCategories", {
-            defaultValue: "Available document categories",
+            defaultValue: "Catégories de documents disponibles",
           })}
           icon={Folder}
           iconColor="warning"
         />
         <AnalyticsCard
           title={t("leases.documents.summary.recentUploads", {
-            defaultValue: "Recent Uploads",
+            defaultValue: "Téléversements récents",
           })}
           value={documentsLoading ? "..." : recentUploads}
           description={t("leases.documents.summary.last30Days", {
-            defaultValue: "Last 30 days",
+            defaultValue: "30 derniers jours",
           })}
           icon={Upload}
           iconColor="success"
@@ -345,7 +345,7 @@ export default function LeasesDocumentsPage() {
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {t("leases.documents.header.subtitle", {
-                    defaultValue: "Access and manage your lease-related documents",
+                    defaultValue: "Consultez et gérez les documents liés à vos baux",
                   })}
                 </p>
               </div>
@@ -355,7 +355,7 @@ export default function LeasesDocumentsPage() {
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
             <GlobalSearch
               placeholder={t("leases.documents.filters.searchPlaceholder", {
-                defaultValue: "Search documents...",
+                defaultValue: "Rechercher des documents…",
               })}
               initialValue={searchTerm}
               debounceDelay={300}
@@ -363,7 +363,7 @@ export default function LeasesDocumentsPage() {
               isLoading={isSearching}
               className="flex-1 min-w-0"
               ariaLabel={t("leases.documents.filters.searchAriaLabel", {
-                defaultValue: "Search documents",
+                defaultValue: "Rechercher des documents",
               })}
             />
 
@@ -372,14 +372,14 @@ export default function LeasesDocumentsPage() {
                 <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("leases.documents.filters.categoryPlaceholder", {
-                      defaultValue: "Category",
+                      defaultValue: "Catégorie",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("leases.documents.filters.allCategories", {
-                      defaultValue: "All Categories",
+                      defaultValue: "Toutes les catégories",
                     })}
                   </SelectItem>
                   {categoryOptions.map((option) => (
@@ -401,7 +401,7 @@ export default function LeasesDocumentsPage() {
                 <SelectContent>
                   <SelectItem value="all">
                     {t("leases.documents.filters.allTypes", {
-                      defaultValue: "All Types",
+                      defaultValue: "Tous les types",
                     })}
                   </SelectItem>
                   {typeOptions.map((option) => (
@@ -416,14 +416,14 @@ export default function LeasesDocumentsPage() {
                 <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <SelectValue
                     placeholder={t("leases.documents.filters.propertyPlaceholder", {
-                      defaultValue: "Property",
+                      defaultValue: "Bien",
                     })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
                     {t("leases.documents.filters.allProperties", {
-                      defaultValue: "All Properties",
+                      defaultValue: "Tous les biens",
                     })}
                   </SelectItem>
                   {propertyOptions.map((option) => (
@@ -450,7 +450,7 @@ export default function LeasesDocumentsPage() {
                   className="h-10 px-3 text-gray-500 hover:text-gray-700"
                 >
                   <X className="h-4 w-4 mr-1" />
-                  {t("leases.filters.clear", { defaultValue: "Clear" })}
+                  {t("leases.filters.clear", { defaultValue: "Effacer" })}
                 </Button>
               )}
             </div>
@@ -479,14 +479,14 @@ export default function LeasesDocumentsPage() {
             summary?.message ??
             (summary.total === 1
               ? t("leases.documents.toasts.uploadSummarySingular", {
-                  defaultValue: "Uploaded {uploaded} of {total} document",
+                  defaultValue: "{uploaded} document téléversé sur {total}",
                   values: {
                     uploaded: summary.uploaded,
                     total: summary.total,
                   },
                 })
               : t("leases.documents.toasts.uploadSummaryPlural", {
-                  defaultValue: "Uploaded {uploaded} of {total} documents",
+                  defaultValue: "{uploaded} documents téléversés sur {total}",
                   values: {
                     uploaded: summary.uploaded,
                     total: summary.total,
@@ -495,7 +495,7 @@ export default function LeasesDocumentsPage() {
           if (refreshed !== false) {
             showSimpleSuccess(
               t("leases.documents.toasts.uploadCompleteTitle", {
-                defaultValue: "Upload Complete",
+                defaultValue: "Téléversement terminé",
               }),
               message
             );

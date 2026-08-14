@@ -187,7 +187,7 @@ export default function TenantDeleteDialog({
               <div className="text-sm">
                 <p className="font-medium">
                   {t("tenants.deleteDialog.activeLeaseTitle", {
-                    defaultValue: "Active lease detected",
+                    defaultValue: "Bail actif détecté",
                   })}
                 </p>
                 <p className="mt-1">{activeLeaseDeleteMessage}</p>
@@ -288,7 +288,7 @@ export default function TenantDeleteDialog({
           //     <p className="text-sm text-muted-foreground">
           //       Current Status:{" "}
           //       {tenant.tenantStatus?.replace("_", " ").toUpperCase() ||
-          //         "Unknown"}
+          //         "Inconnu"}
           //     </p>
           //   </div>
           // </div>

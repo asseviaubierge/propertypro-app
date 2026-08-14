@@ -141,7 +141,7 @@ export function NetworkErrorAlert({
 }) {
   return (
     <ErrorAlert
-      title="Connection Error"
+      title="Erreur de connexion"
       message="Unable to connect to the server. Please check your internet connection and try again."
       variant="error"
       onRetry={onRetry}
@@ -159,7 +159,7 @@ export function ValidationErrorAlert({
 }) {
   return (
     <ErrorAlert
-      title="Validation Error"
+      title="Erreur de validation"
       message={
         errors.length === 1
           ? errors[0]
@@ -178,7 +178,7 @@ export function PermissionErrorAlert({
 }) {
   return (
     <ErrorAlert
-      title="Permission Denied"
+      title="Autorisation refusée"
       message="You don't have permission to perform this action. Please contact your administrator."
       variant="error"
       onDismiss={onDismiss}
@@ -197,12 +197,12 @@ export function NotFoundErrorAlert({
 }) {
   return (
     <ErrorAlert
-      title="Not Found"
+      title="Introuvable"
       message={`The requested ${resource} could not be found. It may have been deleted or moved.`}
       variant="warning"
       onRetry={onRetry}
       onDismiss={onDismiss}
-      retryText="Refresh"
+      retryText="Actualiser"
     />
   );
 }

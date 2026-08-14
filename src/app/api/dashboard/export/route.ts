@@ -146,10 +146,10 @@ export const POST = withPermissionAndDB("data_export")(
       if (format === "csv") {
         // Convert to CSV format for summary data
         const csvData = [
-          ["Metric", "Value"],
+          ["Metric", "Valeur"],
           ["Total Properties", summary.totalProperties],
-          ["Total Units", summary.totalUnits],
-          ["Total Tenants", summary.totalTenants],
+          ["Total des logements", summary.totalUnits],
+          ["Total des locataires", summary.totalTenants],
           ["Active Tenants", summary.activeTenants],
           ["Total Leases", summary.totalLeases],
           ["Active Leases", summary.activeLeases],
@@ -157,7 +157,7 @@ export const POST = withPermissionAndDB("data_export")(
           ["Open Maintenance", summary.openMaintenance],
           ["Total Payments", summary.totalPayments],
           ["Paid Payments", summary.paidPayments],
-          ["Total Revenue", formatCurrency(summary.totalRevenue)],
+          ["Revenu total", formatCurrency(summary.totalRevenue)],
           ["Maintenance Cost", formatCurrency(summary.totalMaintenanceCost)],
         ];
 

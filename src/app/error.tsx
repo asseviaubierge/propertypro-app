@@ -68,7 +68,7 @@ function getErrorMessage(type: string, error: Error) {
   switch (type) {
     case "network":
       return {
-        title: "Connection Error",
+        title: "Erreur de connexion",
         description: "Unable to connect to the server. Please check your internet connection and try again.",
         suggestion: "Check your network connection or try again in a few moments.",
       };

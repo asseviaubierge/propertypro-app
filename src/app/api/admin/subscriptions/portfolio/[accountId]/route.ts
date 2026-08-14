@@ -9,6 +9,13 @@ export const GET = withPermissionAndDB("system_settings")(
       const { accountId } = await context.params;
       const { snapshot, anomalies } = await calculatePortfolioSnapshot(accountId);
 
+      // La page « Nouveau contrat » n'a besoin que des compteurs.
+      // Ne pas la bloquer sur l'historique des contrats/événements.
+      const snapshotOnly = _req.nextUrl.searchParams.get("snapshotOnly") === "1";
+      if (snapshotOnly) {
+        return createSuccessResponse({ snapshot, anomalies });
+      }
+
       const activeContract = await SubscriptionContract.findOne({
         accountId,
         status: "active",

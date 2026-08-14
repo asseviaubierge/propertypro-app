@@ -408,7 +408,7 @@ export default function PaymentHistoryPage() {
       case PaymentStatus.OVERDUE:
         return (
           <Badge variant="destructive">
-            {t("payments.history.statusBadge.overdue") || "Overdue"}
+            {t("payments.history.statusBadge.overdue") || "En retard"}
           </Badge>
         );
       default:
@@ -606,7 +606,7 @@ export default function PaymentHistoryPage() {
               onSearch={handleSearch}
               isLoading={isSearching}
               className="flex-1 min-w-0"
-              ariaLabel="Search payments"
+              ariaLabel="Rechercher des paiements"
             />
 
             <div className="flex flex-wrap items-center gap-3">

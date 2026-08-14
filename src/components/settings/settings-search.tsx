@@ -56,27 +56,27 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // Profile Settings
     {
       id: "profile-basic",
-      title: "Basic Information",
-      description: "Update your name, email, and contact details",
-      category: "Profile",
+      title: "Informations générales",
+      description: "Modifiez votre nom, e-mail et vos coordonnées",
+      category: "Profil",
       path: "/dashboard/settings?tab=profile",
       keywords: ["name", "email", "phone", "contact", "personal"],
       icon: User,
     },
     {
       id: "profile-emergency",
-      title: "Emergency Contact",
-      description: "Set up emergency contact information",
-      category: "Profile",
+      title: "Contact d’urgence",
+      description: "Configurez votre contact d’urgence",
+      category: "Profil",
       path: "/dashboard/settings?tab=profile&section=emergency",
       keywords: ["emergency", "contact", "family", "relationship"],
       icon: User,
     },
     {
       id: "profile-social",
-      title: "Social Links",
-      description: "Connect your social media profiles",
-      category: "Profile",
+      title: "Réseaux sociaux",
+      description: "Associez vos profils sociaux",
+      category: "Profil",
       path: "/dashboard/settings?tab=profile&section=social",
       keywords: ["social", "linkedin", "twitter", "facebook", "instagram"],
       icon: User,
@@ -85,8 +85,8 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // Notification Settings
     {
       id: "notifications-email",
-      title: "Email Notifications",
-      description: "Configure email notification preferences",
+      title: "Notifications par e-mail",
+      description: "Configurez les notifications par e-mail",
       category: "Notifications",
       path: "/dashboard/settings?tab=notifications&section=email",
       keywords: ["email", "notifications", "alerts", "reminders", "frequency"],
@@ -94,8 +94,8 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     },
     {
       id: "notifications-sms",
-      title: "SMS Notifications",
-      description: "Set up text message notifications",
+      title: "Notifications par SMS",
+      description: "Configurez les notifications par SMS",
       category: "Notifications",
       path: "/dashboard/settings?tab=notifications&section=sms",
       keywords: ["sms", "text", "phone", "mobile", "alerts"],
@@ -103,8 +103,8 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     },
     {
       id: "notifications-push",
-      title: "Push Notifications",
-      description: "Manage browser and app push notifications",
+      title: "Notifications instantanées",
+      description: "Gérez les notifications instantanées",
       category: "Notifications",
       path: "/dashboard/settings?tab=notifications&section=push",
       keywords: ["push", "browser", "app", "desktop", "mobile"],
@@ -112,8 +112,8 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     },
     {
       id: "notifications-quiet",
-      title: "Quiet Hours",
-      description: "Set quiet hours for notifications",
+      title: "Heures silencieuses",
+      description: "Définissez les heures sans notification",
       category: "Notifications",
       path: "/dashboard/settings?tab=notifications&section=quiet",
       keywords: ["quiet", "hours", "sleep", "do not disturb", "schedule"],
@@ -123,36 +123,36 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // Security Settings
     {
       id: "security-password",
-      title: "Password & Authentication",
-      description: "Change password and security settings",
-      category: "Security",
+      title: "Mot de passe",
+      description: "Modifiez le mot de passe et la sécurité",
+      category: "Sécurité",
       path: "/dashboard/settings?tab=security&section=password",
       keywords: ["password", "authentication", "login", "security"],
       icon: Shield,
     },
     {
       id: "security-2fa",
-      title: "Two-Factor Authentication",
-      description: "Enable two-factor authentication for extra security",
-      category: "Security",
+      title: "Double authentification",
+      description: "Renforcez la sécurité du compte",
+      category: "Sécurité",
       path: "/dashboard/settings?tab=security&section=2fa",
       keywords: ["2fa", "two factor", "authentication", "security", "totp"],
       icon: Shield,
     },
     {
       id: "security-devices",
-      title: "Device Management",
-      description: "Manage devices that have access to your account",
-      category: "Security",
+      title: "Appareils connectés",
+      description: "Gérez les appareils ayant accès au compte",
+      category: "Sécurité",
       path: "/dashboard/settings?tab=security&section=devices",
       keywords: ["devices", "sessions", "login", "access", "security"],
       icon: Shield,
     },
     {
       id: "security-audit",
-      title: "Security Audit",
-      description: "Review your account security status",
-      category: "Security",
+      title: "Contrôle de sécurité",
+      description: "Vérifiez la sécurité du compte",
+      category: "Sécurité",
       path: "/dashboard/settings?tab=security&section=audit",
       keywords: ["audit", "security", "review", "status", "report"],
       icon: Shield,
@@ -161,36 +161,36 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // Display Settings
     {
       id: "display-theme",
-      title: "Theme & Appearance",
-      description: "Choose between light, dark, or system theme",
-      category: "Display",
+      title: "Thème et apparence",
+      description: "Choisissez le thème d’affichage",
+      category: "Affichage",
       path: "/dashboard/settings?tab=display&section=theme",
       keywords: ["theme", "dark", "light", "appearance", "mode"],
       icon: Palette,
     },
     {
       id: "display-language",
-      title: "Language & Region",
-      description: "Set your language, timezone, and date format",
-      category: "Display",
+      title: "Langue et région",
+      description: "Réglez la langue, le fuseau et les dates",
+      category: "Affichage",
       path: "/dashboard/settings?tab=display&section=language",
       keywords: ["language", "timezone", "date", "format", "region"],
       icon: Palette,
     },
     {
       id: "display-layout",
-      title: "Layout & Typography",
-      description: "Customize interface layout and text size",
-      category: "Display",
+      title: "Mise en page",
+      description: "Réglez la disposition et la taille du texte",
+      category: "Affichage",
       path: "/dashboard/settings?tab=display&section=layout",
       keywords: ["layout", "typography", "font", "size", "density"],
       icon: Palette,
     },
     {
       id: "display-colors",
-      title: "Color Scheme",
-      description: "Customize the color palette",
-      category: "Display",
+      title: "Palette de couleurs",
+      description: "Personnalisez les couleurs",
+      category: "Affichage",
       path: "/dashboard/settings?tab=display&section=colors",
       keywords: ["colors", "palette", "primary", "secondary", "accent"],
       icon: Palette,
@@ -199,27 +199,27 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // Privacy Settings
     {
       id: "privacy-profile",
-      title: "Profile Visibility",
-      description: "Control who can see your profile information",
-      category: "Privacy",
+      title: "Visibilité du profil",
+      description: "Contrôlez la visibilité de votre profil",
+      category: "Confidentialité",
       path: "/dashboard/settings?tab=privacy&section=profile",
       keywords: ["privacy", "profile", "visibility", "public", "private"],
       icon: Eye,
     },
     {
       id: "privacy-data",
-      title: "Data & Analytics",
-      description: "Manage data collection and sharing preferences",
-      category: "Privacy",
+      title: "Données et analyses",
+      description: "Gérez la collecte et le partage des données",
+      category: "Confidentialité",
       path: "/dashboard/settings?tab=privacy&section=data",
       keywords: ["data", "analytics", "collection", "sharing", "usage"],
       icon: Eye,
     },
     {
       id: "privacy-cookies",
-      title: "Cookie Preferences",
-      description: "Manage cookie and tracking preferences",
-      category: "Privacy",
+      title: "Préférences des cookies",
+      description: "Gérez les cookies et le suivi",
+      category: "Confidentialité",
       path: "/dashboard/settings?tab=privacy&section=cookies",
       keywords: ["cookies", "tracking", "analytics", "marketing", "essential"],
       icon: Eye,
@@ -228,27 +228,27 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     // System Settings (Admin only)
     {
       id: "system-branding",
-      title: "Branding & Logo",
-      description: "Customize system branding and appearance",
-      category: "System",
+      title: "Identité et logo",
+      description: "Personnalisez l’identité de la plateforme",
+      category: "Système",
       path: "/dashboard/settings?tab=system&section=branding",
       keywords: ["branding", "logo", "company", "colors", "favicon"],
       icon: Database,
     },
     {
       id: "system-email",
-      title: "Email Configuration",
-      description: "Configure SMTP settings for system emails",
-      category: "System",
+      title: "Configuration des e-mails",
+      description: "Configurez l’envoi des e-mails",
+      category: "Système",
       path: "/dashboard/settings?tab=system&section=email",
       keywords: ["smtp", "email", "configuration", "server", "mail"],
       icon: Database,
     },
     {
       id: "system-payment",
-      title: "Payment Settings",
-      description: "Configure payment gateways and billing",
-      category: "System",
+      title: "Paramètres des paiements",
+      description: "Configurez les paiements et la facturation",
+      category: "Système",
       path: "/dashboard/settings?tab=system&section=payment",
       keywords: ["payment", "stripe", "paypal", "billing", "gateway"],
       icon: Database,
@@ -287,7 +287,7 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
     return groups;
   }, [filteredSettings]);
 
-  const categories = ["Profile", "Notifications", "Security", "Display", "Privacy", "System"];
+  const categories = ["Profil", "Notifications", "Sécurité", "Affichage", "Confidentialité", "Système"];
 
   const handleSettingClick = (setting: SettingsItem) => {
     setIsOpen(false);
@@ -308,13 +308,13 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
             className="w-full justify-start text-muted-foreground"
           >
             <Search className="h-4 w-4 mr-2" />
-            Search settings...
+            Rechercher dans les paramètres…
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-96 p-0" align="start">
           <Command>
             <CommandInput
-              placeholder="Search settings..."
+              placeholder="Rechercher dans les paramètres…"
               value={searchQuery}
               onValueChange={setSearchQuery}
             />
@@ -346,7 +346,7 @@ export default function SettingsSearch({ onNavigate }: SettingsSearchProps) {
             </div>
 
             <CommandList>
-              <CommandEmpty>No settings found.</CommandEmpty>
+              <CommandEmpty>Aucun paramètre trouvé.</CommandEmpty>
               
               {Object.entries(groupedSettings).map(([category, settings]) => (
                 <CommandGroup key={category} heading={category}>
