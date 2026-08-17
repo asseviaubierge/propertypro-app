@@ -21,6 +21,7 @@ import { getCompanyInfoServer } from "@/lib/utils/company-info";
 import { buildPrintableInvoiceFromLease } from "@/lib/invoice/invoice-builders";
 import { resolveInvoiceIssuer } from "@/lib/invoice/issuer-resolver";
 import { formatCurrency } from "@/lib/utils/formatting";
+import { canAccessInvoice } from "@/lib/invoice-access";
 
 // ============================================================================
 // POST /api/invoices/email - Send invoice PDF via email
@@ -33,35 +34,34 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
       return createErrorResponse(error!, 400);
     }
 
-    const { leaseId, invoiceId, to, subject, message, invoiceNumber } = body;
+    const {
+      leaseId,
+      invoiceId,
+      to: requestedRecipient,
+      tenantEmail,
+      subject,
+      message,
+      invoiceNumber,
+    } = body;
 
-    if (!to || !subject || !message) {
+    if (!subject || !message) {
       return createErrorResponse(
-        "Missing required fields: to, subject, message",
+        "L’objet et le message sont obligatoires",
         400
       );
     }
 
     if (!leaseId && !invoiceId) {
-      return createErrorResponse(
-        "Either leaseId or invoiceId is required",
-        400
-      );
+      return createErrorResponse("Une facture ou un bail est obligatoire", 400);
     }
 
     // Validate lease ID
     if (leaseId && !isValidObjectId(leaseId)) {
-      return createErrorResponse("Invalid lease ID", 400);
+      return createErrorResponse("Identifiant de bail invalide", 400);
     }
 
     if (invoiceId && !isValidObjectId(invoiceId)) {
-      return createErrorResponse("Invalid invoice ID", 400);
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(to)) {
-      return createErrorResponse("Invalid email address", 400);
+      return createErrorResponse("Identifiant de facture invalide", 400);
     }
 
     // Find the lease to verify it exists and get additional context
@@ -83,13 +83,34 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
         .populate("propertyId", "name address ownerId managerId units");
 
       if (!invoice) {
-        return createErrorResponse("Invoice not found", 404);
+        return createErrorResponse("Facture introuvable", 404);
       }
     } else if (leaseId) {
       invoice = await Invoice.findOne({ leaseId })
         .sort({ issueDate: -1 })
         .populate("tenantId", "firstName lastName email")
         .populate("propertyId", "name address ownerId managerId units");
+    }
+
+    if (invoice && !(await canAccessInvoice(user, invoice))) {
+      return createErrorResponse("Accès refusé à cette facture", 403);
+    }
+
+    // L’adresse enregistrée sur la facture est prioritaire. `tenantEmail`
+    // reste accepté pour les anciennes pages qui utilisaient ce nom de champ.
+    const to = String(
+      invoice?.tenantId?.email ||
+        lease?.tenantId?.email ||
+        requestedRecipient ||
+        tenantEmail ||
+        ""
+    ).trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(to)) {
+      return createErrorResponse(
+        "L’adresse e-mail du locataire est absente ou invalide",
+        400
+      );
     }
 
     // Initialize email service
@@ -191,11 +212,11 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
         ? formatCurrency(amountDue, currencyCode)
         : undefined;
     const dueDateText = dueDate
-      ? ` due on ${dueDate.toLocaleDateString()}`
+      ? `, à régler avant le ${dueDate.toLocaleDateString("fr-FR")}`
       : "";
     const enhancedMessage =
       formattedAmount && message && !message.includes(formattedAmount)
-        ? `${message}\n\nTotal due: ${formattedAmount}${dueDateText}`
+        ? `${message}\n\nMontant à régler : ${formattedAmount}${dueDateText}`
         : message;
 
     const emailContent = buildInvoiceEmailHtml({
@@ -228,7 +249,7 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
     if (emailSent) {
       return createSuccessResponse(
         {
-          message: "Invoice email sent successfully",
+          message: "Facture envoyée par e-mail",
           to,
           subject,
           fileName,
@@ -236,13 +257,13 @@ export const POST = withPermissionAndDB("financial_management")(async (user: any
           invoiceId,
           sentAt: new Date().toISOString(),
         },
-        "Invoice emailed successfully"
+        "Facture envoyée par e-mail avec succès"
       );
     } else {
-      return createErrorResponse("Failed to send email", 500);
+      return createErrorResponse("Échec de l’envoi de l’e-mail", 500);
     }
   } catch (error) {
     console.error("Failed to send invoice email:", error);
-    return handleApiError(error, "Failed to send invoice email");
+    return handleApiError(error, "Impossible d’envoyer la facture par e-mail");
   }
 });

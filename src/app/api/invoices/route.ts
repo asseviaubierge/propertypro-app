@@ -173,6 +173,7 @@ export const GET = withPermissionAndDB("financial_management")(async (user: Auth
                 firstName: 1,
                 lastName: 1,
                 email: 1,
+                phone: 1,
                 avatar: 1,
                 deletedAt: 1,
               })
@@ -392,7 +393,7 @@ export const POST = withPermissionAndDB("financial_management")(
 
     // Populate the response
     const populatedInvoice = await Invoice.findById(invoice._id)
-      .populate("tenantId", "firstName lastName email")
+      .populate("tenantId", "firstName lastName email phone")
       .populate({
   path: "propertyId",
   select: "name address ownerId",

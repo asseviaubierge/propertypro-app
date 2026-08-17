@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 import { Search, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -188,9 +189,10 @@ export function ConversationList({
                       hasUnread ? "font-bold" : "font-medium"
                     )}
                   >
-                    {others.length > 0
-                      ? others.map((p) => p.name).join(", ")
-                      : "Conversation sans nom"}
+                    {isGroup
+                      ? conversation.name ||
+                        `${others.length} participant${others.length > 1 ? "s" : ""}`
+                      : first?.name || "Conversation sans nom"}
                   </p>
                 </div>
 
@@ -218,8 +220,8 @@ export function ConversationList({
                     <span className="text-[11px] text-muted-foreground whitespace-nowrap shrink-0">
                       · {formatDistanceToNow(
                         new Date(conversation.lastActivityAt),
-                        { addSuffix: false }
-                      ).replace("about ", "")}
+                        { addSuffix: false, locale: fr }
+                      )}
                     </span>
                   )}
                 </div>

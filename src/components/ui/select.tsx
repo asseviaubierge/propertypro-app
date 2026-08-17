@@ -36,14 +36,14 @@ const SelectTrigger = React.forwardRef<
     data-size={size}
     className={cn(
       "data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground",
-      "flex w-full items-center justify-between gap-2 rounded-md border-2 border-gray-200 bg-white px-3 py-2 text-sm",
+      "flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded-md border-2 border-gray-200 bg-white px-3 py-2 text-sm",
       "shadow-sm transition-all duration-200 outline-none whitespace-nowrap",
       "hover:border-gray-300 hover:shadow-md",
       "focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg",
       "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-50",
       "dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-400/20",
       "data-[size=default]:h-10 data-[size=sm]:h-8",
-      "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
+      "*:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:max-w-full *:data-[slot=select-value]:truncate *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
       "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
       className
     )}
@@ -78,7 +78,7 @@ const SelectContent = React.forwardRef<
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
+          "max-w-[calc(100vw-1.5rem)] p-1",
           position === "popper" &&
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
         )}
@@ -112,7 +112,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     data-slot="select-item"
     className={cn(
-      "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+      "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full min-w-0 cursor-default items-center gap-2 overflow-hidden rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:min-w-0 *:[span]:last:max-w-full *:[span]:last:truncate *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
       className
     )}
     {...props}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { format } from "date-fns";
 import {
   ArrowLeft,
   BellOff,
@@ -123,6 +122,14 @@ export function MessagesClient({ userId }: MessagesClientProps) {
     );
   }, [selectedConversation]);
 
+  const conversationTitle = useMemo(() => {
+    if (!selectedConversation) return "";
+    if (isGroupChat) {
+      return selectedConversation.name || "Conversation de groupe";
+    }
+    return otherParticipant?.name || "Utilisateur";
+  }, [isGroupChat, otherParticipant, selectedConversation]);
+
   const whatsappUrl = useMemo(() => {
     if (!otherParticipant || isGroupChat) return null;
     return buildWhatsAppUrl(
@@ -171,7 +178,10 @@ export function MessagesClient({ userId }: MessagesClientProps) {
   function groupByMonth<T extends { message: Message }>(items: T[]) {
     const groups: Record<string, T[]> = {};
     for (const item of items) {
-      const key = format(new Date(item.message.createdAt), "MMMM yyyy");
+      const key = formatDate(new Date(item.message.createdAt), {
+        month: "long",
+        year: "numeric",
+      });
       if (!groups[key]) groups[key] = [];
       groups[key].push(item);
     }
@@ -252,7 +262,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
 
   return (
     <>
-      <div className="grid h-[calc(100dvh-8rem)] min-h-[480px] grid-cols-1 overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm md:h-[calc(100vh-7rem)] lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_300px]">
+      <div className="messaging-shell fixed inset-x-3 bottom-[82px] top-[76px] grid min-h-0 grid-cols-1 overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm md:static md:h-[calc(100vh-7rem)] md:min-h-[480px] lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_300px]">
         {/* ============ LEFT: Conversations ============ */}
         <div className={cn("flex-col overflow-hidden border-r border-border/50 bg-card", selectedConversationId ? "hidden lg:flex" : "flex")}>
           <div className="px-4 py-3 shrink-0">
@@ -300,7 +310,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
           {selectedConversation ? (
             <>
               {/* Header */}
-              <div className="px-4 py-2.5 border-b border-border/50 bg-card shrink-0">
+              <div className="border-b border-border/50 bg-card px-2 py-2.5 shrink-0 sm:px-4">
                 <div className="flex items-center justify-between">
                   <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                     <Button
@@ -312,7 +322,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                     >
                       <ArrowLeft className="h-4 w-4" />
                     </Button>
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex min-w-0 items-center gap-2.5">
                       <div className="relative">
                         <Avatar className="h-9 w-9">
                           {otherParticipant?.avatar ? (
@@ -340,22 +350,22 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                           <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-card" />
                         )}
                       </div>
-                      <div>
-                        <h2 className="text-sm font-semibold leading-tight">
-                          {isGroupChat
-                            ? selectedConversation.participants
-                                .filter((p) => p.id !== userId)
-                                .map((p) => p.name)
-                                .join(", ") || "Groupe"
-                            : otherParticipant?.name || "Utilisateur"}
+                      <div className="min-w-0">
+                        <h2
+                          className="max-w-[8.5rem] truncate text-sm font-semibold leading-tight min-[340px]:max-w-[13rem] sm:max-w-none"
+                          title={conversationTitle}
+                        >
+                          {conversationTitle}
                         </h2>
-                        <p className="text-[11px] text-green-600 dark:text-green-400 font-medium">
-                          En ligne
+                        <p className="truncate text-[11px] font-medium text-green-600 dark:text-green-400">
+                          {isGroupChat
+                            ? `${selectedConversation.participants.length} participants`
+                            : "En ligne"}
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex shrink-0 items-center gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -369,7 +379,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                      className="hidden h-8 w-8 rounded-full text-blue-600 hover:bg-blue-50 min-[340px]:inline-flex dark:text-blue-400 dark:hover:bg-blue-950/50"
                       title="Appel vidéo"
                     >
                       <Video className="h-4 w-4" />
@@ -379,7 +389,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 p-4 overflow-y-auto bg-muted/20">
+              <div className="flex flex-1 overflow-y-auto bg-muted/20 p-2.5 sm:p-4">
                 <MessageThread
                   messages={messages}
                   loading={messagesLoading}
@@ -389,7 +399,7 @@ export function MessagesClient({ userId }: MessagesClientProps) {
               </div>
 
               {/* Input */}
-              <div className="px-4 py-3 border-t border-border/50 bg-card shrink-0">
+              <div className="border-t border-border/50 bg-card px-2.5 py-2.5 shrink-0 sm:px-4 sm:py-3">
                 <MessageInput
                   conversationId={selectedConversation.id}
                   onMessageSent={(msg) => {
@@ -665,7 +675,11 @@ export function MessagesClient({ userId }: MessagesClientProps) {
                             {url}
                           </p>
                           <p className="text-[10px] text-muted-foreground">
-                            {format(new Date(message.createdAt), "MMM d, yyyy")}
+                            {formatDate(new Date(message.createdAt), {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
                           </p>
                         </div>
                       </a>

@@ -1,12 +1,25 @@
 import { Types } from "mongoose";
 import { Conversation, Lease, Property, Tenant, User } from "@/models";
-import { getScopedPropertyIds, type ScopeUser } from "@/lib/property-scope";
+import type { ScopeUser } from "@/lib/property-scope";
+import { getScopedTenantIds } from "@/lib/tenant-scope";
 
 const MESSAGING_ROLES = ["admin", "super_admin", "manager", "tenant"] as const;
 
 function stringId(value: unknown): string {
   if (!value) return "";
   if (typeof value === "string") return value;
+  // Les ObjectId Mongoose exposent eux-mêmes une propriété `_id`. Il faut
+  // donc les convertir avant de traiter les documents peuplés, sinon la
+  // lecture de certains baux d'un gestionnaire boucle jusqu'à provoquer
+  // « Maximum call stack size exceeded ».
+  if (
+    typeof value === "object" &&
+    value &&
+    "toHexString" in value &&
+    typeof (value as { toHexString?: unknown }).toHexString === "function"
+  ) {
+    return (value as { toHexString: () => string }).toHexString();
+  }
   if (typeof value === "object" && value && "_id" in value) {
     return stringId((value as { _id?: unknown })._id);
   }
@@ -123,15 +136,12 @@ export async function getAllowedMessagingUserIds(user: ScopeUser): Promise<strin
   }
 
   if (user.isManager) {
-    const propertyIds = await getScopedPropertyIds(user);
-    if (!propertyIds?.length) return [...allowed];
-
-    const leaseTenantIds = await Lease.distinct("tenantId", {
-      propertyId: { $in: propertyIds },
-      deletedAt: null,
-    });
-
-    const tenantObjectIds = validObjectIds(leaseTenantIds);
+    // Réutilise le même périmètre que les pages Locataires : comptes créés
+    // par ce gestionnaire + locataires liés aux baux de ses propriétés.
+    // Cela couvre aussi les locataires historiques dont le bail stocke l'ID
+    // du profil Tenant au lieu de l'ID User.
+    const scopedTenantIds = await getScopedTenantIds(user);
+    const tenantObjectIds = validObjectIds(scopedTenantIds ?? []);
     if (!tenantObjectIds.length) return [...allowed];
 
     // Certaines données historiques stockent l'ID du profil Tenant dans le bail,

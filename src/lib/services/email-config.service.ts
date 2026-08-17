@@ -60,7 +60,7 @@ export function getEnvEmailConfig(): ResolvedEmailConfig {
     process.env.EMAIL_SERVER_PASSWORD || process.env.SMTP_PASS || "";
   const fromEmail =
     process.env.EMAIL_FROM || process.env.SMTP_FROM || user || "";
-  const fromName = process.env.APP_NAME || "PropertyPro";
+  const fromName = process.env.APP_NAME || "GESTION E-IMMO";
   const replyTo =
     process.env.SUPPORT_EMAIL || process.env.CONTACT_EMAIL || undefined;
 

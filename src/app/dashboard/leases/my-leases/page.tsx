@@ -263,13 +263,13 @@ export default function MyLeasesPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="tenant-account-page min-w-0 space-y-3 sm:space-y-6">
+      <div className="mobile-page-header flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
             <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-xl font-bold tracking-tight">
               {t("leases.myLeases.header.title")}
             </h1>
@@ -278,13 +278,13 @@ export default function MyLeasesPage() {
             </p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="flex items-center border rounded-lg p-1">
+        <div className="grid w-full grid-cols-[1fr_auto] items-center gap-2 sm:flex sm:w-auto sm:items-center sm:gap-3">
+          <div className="flex min-w-0 items-center rounded-lg border p-1">
             <Button
               variant={viewMode === "cards" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("cards")}
-              className="h-8 sm:px-3"
+              className="h-8 flex-1 sm:flex-none sm:px-3"
               aria-label={t("leases.view.cards")}
             >
               <Grid3X3 className="h-4 w-4" />
@@ -293,7 +293,7 @@ export default function MyLeasesPage() {
               variant={viewMode === "table" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("table")}
-              className="h-8 sm:px-3"
+              className="h-8 flex-1 sm:flex-none sm:px-3"
               aria-label={t("leases.view.table")}
             >
               <List className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default function MyLeasesPage() {
             variant="outline"
             size="sm"
             onClick={fetchLeases}
-            className="gap-2"
+            className="gap-2 whitespace-nowrap px-3"
           >
             <RefreshCw className="h-4 w-4" />
             {t("leases.actions.refresh")}
@@ -345,14 +345,14 @@ export default function MyLeasesPage() {
         />
       </AnalyticsCardGrid>
 
-      <Card className="gap-2">
-        <CardHeader>
+      <Card className="mobile-app-section gap-2">
+        <CardHeader className="px-3 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-2">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
                 <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {t("leases.header.title")}
                 </h2>
@@ -384,7 +384,7 @@ export default function MyLeasesPage() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
+          <div className="mobile-filter-panel flex flex-col gap-2 rounded-xl border border-gray-200/60 bg-gray-50/50 p-2.5 dark:border-gray-700/60 dark:bg-gray-800/50 sm:p-4 lg:flex-row lg:items-center lg:gap-4">
             <GlobalSearch
               placeholder={t("leases.filters.searchPlaceholder")}
               initialValue={searchTerm}
@@ -395,9 +395,9 @@ export default function MyLeasesPage() {
               ariaLabel={t("leases.myLeases.filters.searchAriaLabel")}
             />
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[140px]">
                   <SelectValue placeholder={t("leases.filters.status")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -430,7 +430,7 @@ export default function MyLeasesPage() {
                   setSortOrder(so as "asc" | "desc");
                 }}
               >
-                <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[160px]">
                   <SelectValue placeholder={t("leases.filters.sort")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -474,7 +474,7 @@ export default function MyLeasesPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           {loading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (

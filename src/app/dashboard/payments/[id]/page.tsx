@@ -42,9 +42,11 @@ import {
   XCircle,
   Clock,
   RefreshCw,
+  MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { PaymentStatus, PaymentType, PaymentMethod } from "@/types";
+import { shareDocumentViaWhatsApp } from "@/lib/whatsapp";
 
 interface PaymentDetails {
   _id: string;
@@ -217,13 +219,58 @@ export default function PaymentDetailsPage({
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-US", {
+    return new Date(dateString).toLocaleString("fr-FR", {
       year: "numeric",
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const paymentStatusLabel = (value: PaymentStatus) => {
+    const labels: Record<string, string> = {
+      paid: "Payé",
+      pending: "En attente",
+      overdue: "En retard",
+      failed: "Échoué",
+      refunded: "Remboursé",
+    };
+    return labels[String(value).toLowerCase()] || "Inconnu";
+  };
+
+  const paymentTypeLabel = (value: PaymentType) => {
+    const labels: Record<string, string> = {
+      rent: "Loyer",
+      security_deposit: "Garantie",
+      late_fee: "Pénalité de retard",
+      utility: "Charges",
+      maintenance: "Maintenance",
+      other: "Autre",
+    };
+    return labels[String(value).toLowerCase()] || "Paiement";
+  };
+
+  const handleReceiptWhatsApp = async () => {
+    if (!payment?.tenantId?.phone) {
+      toast.error("Le numéro WhatsApp du locataire n’est pas renseigné.");
+      return;
+    }
+    try {
+      const tenantName = `${payment.tenantId.firstName || ""} ${payment.tenantId.lastName || ""}`.trim();
+      const result = await shareDocumentViaWhatsApp({
+        phone: payment.tenantId.phone,
+        documentUrl: `/api/payments/${payment._id}/receipt`,
+        fileName: `recu-${payment._id.slice(-8).toUpperCase()}.pdf`,
+        title: `Reçu ${payment._id.slice(-8).toUpperCase()}`,
+        message: `Bonjour ${tenantName}, voici votre reçu de paiement transmis depuis GESTION E-IMMO.`,
+      });
+      if (result === "unavailable") throw new Error("Numéro WhatsApp invalide");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible de partager le reçu."
+      );
+    }
   };
 
   if (isLoading) {
@@ -322,12 +369,18 @@ export default function PaymentDetailsPage({
                 </Link>
               </DropdownMenuItem>
               {payment.status === PaymentStatus.PAID && (
-                <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/payments/${payment._id}/receipt`}>
-                    <FileText className="mr-1 h-4 w-4" />
-                    {t("payments.detail.header.viewReceipt")}
-                  </Link>
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/dashboard/payments/${payment._id}/receipt`}>
+                      <FileText className="mr-1 h-4 w-4" />
+                      {t("payments.detail.header.viewReceipt")}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleReceiptWhatsApp}>
+                    <MessageCircle className="mr-2 h-4 w-4 text-green-600" />
+                    Envoyer le reçu par WhatsApp
+                  </DropdownMenuItem>
+                </>
               )}
               <DropdownMenuSeparator />
               {/* <DropdownMenuItem
@@ -362,7 +415,7 @@ export default function PaymentDetailsPage({
               {formatCurrency(payment.amount)}
             </div>
             <p className="text-xs text-muted-foreground capitalize">
-              {payment.type.replace("_", " ")}
+              {paymentTypeLabel(payment.type)}
             </p>
           </CardContent>
         </Card>
@@ -380,7 +433,7 @@ export default function PaymentDetailsPage({
               className="text-sm"
             >
               <StatusIcon className="h-3 w-3 mr-1" />
-              {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+              {paymentStatusLabel(payment.status)}
             </Badge>
             <p className="text-xs text-muted-foreground mt-2">
               {t("payments.detail.overview.due")}: {formatDate(payment.dueDate)}

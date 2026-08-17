@@ -71,7 +71,7 @@ interface MaintenanceRequestWithPopulated
 export default function TenantMaintenanceRequestsPage() {
   const { data: session } = useSession();
   const { isTenant } = useAuthorization();
-  const { t } = useLocalizationContext();
+  const { t, formatDate: formatLocalizedDate } = useLocalizationContext();
   const [maintenanceRequests, setMaintenanceRequests] = useState<
     MaintenanceRequestWithPopulated[]
   >([]);
@@ -111,7 +111,10 @@ export default function TenantMaintenanceRequestsPage() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch maintenance requests");
+        const payload = await response.json().catch(() => null);
+        throw new Error(
+          payload?.error || t("maintenance.myRequests.toasts.loadError")
+        );
       }
 
       const data = await response.json();
@@ -163,13 +166,50 @@ export default function TenantMaintenanceRequestsPage() {
     )
   ).length;
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatRequestDate = (dateString: string) => {
+    return formatLocalizedDate(new Date(dateString), {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
   };
+
+  const categoryLabel = (category?: string) => {
+    const keyByValue: Record<string, string> = {
+      Plumbing: "plumbing",
+      Electrical: "electrical",
+      HVAC: "hvac",
+      Appliances: "appliances",
+      Flooring: "flooring",
+      Painting: "painting",
+      Roofing: "roofing",
+      Windows: "windows",
+      Doors: "doors",
+      Landscaping: "landscaping",
+      Cleaning: "cleaning",
+      "Pest Control": "pestControl",
+      "General Repair": "generalRepair",
+      Emergency: "emergency",
+      Autre: "other",
+    };
+    const key = category ? keyByValue[category] : undefined;
+    return key ? t(`maintenance.categories.${key}`) : category || "—";
+  };
+
+  const statusLabel = (requestStatus: MaintenanceStatus) => {
+    const key =
+      requestStatus === MaintenanceStatus.IN_PROGRESS
+        ? "inProgress"
+        : String(requestStatus).toLowerCase();
+    return t(`maintenance.status.${key}`, {
+      defaultValue: String(requestStatus).replaceAll("_", " "),
+    });
+  };
+
+  const priorityLabel = (priority: MaintenancePriority) =>
+    t(`maintenance.form.priority.${String(priority).toLowerCase()}`, {
+      defaultValue: String(priority),
+    });
 
   const getPriorityColor = (priority: MaintenancePriority) => {
     switch (priority) {
@@ -263,8 +303,8 @@ export default function TenantMaintenanceRequestsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div className="tenant-account-page min-w-0 space-y-3 sm:space-y-6">
+      <div className="mobile-page-header flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
             <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -279,11 +319,11 @@ export default function TenantMaintenanceRequestsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
           <Button
             variant="outline"
             size="sm"
-            className="gap-2"
+            className="w-full gap-2 px-2 sm:w-auto sm:px-3"
             onClick={handleRefresh}
             disabled={loading}
           >
@@ -295,7 +335,7 @@ export default function TenantMaintenanceRequestsPage() {
             {t("maintenance.myRequests.error.tryAgain")}
           </Button>
           <Link href="/dashboard/maintenance/new">
-            <Button size="sm" className="gap-2">
+            <Button size="sm" className="w-full gap-2 px-2 sm:w-auto sm:px-3">
               <Plus className="h-4 w-4" />
               {t("maintenance.myRequests.header.newRequest")}
             </Button>
@@ -350,8 +390,8 @@ export default function TenantMaintenanceRequestsPage() {
         />
       </AnalyticsCardGrid>
 
-      <Card className="gap-2">
-        <CardHeader>
+      <Card className="mobile-app-section gap-2">
+        <CardHeader className="px-3 sm:px-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
               <Wrench className="h-5 w-5 text-blue-600 dark:text-blue-400" />
@@ -366,7 +406,7 @@ export default function TenantMaintenanceRequestsPage() {
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
+          <div className="mobile-filter-panel flex flex-col gap-2 rounded-xl border border-gray-200/60 bg-gray-50/50 p-2.5 dark:border-gray-700/60 dark:bg-gray-800/50 sm:p-4 lg:flex-row lg:items-center lg:gap-4">
             <GlobalSearch
               placeholder={t(
                 "maintenance.myRequests.filters.searchPlaceholder"
@@ -379,9 +419,9 @@ export default function TenantMaintenanceRequestsPage() {
               ariaLabel={t("maintenance.myRequests.filters.search")}
             />
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[160px]">
                   <SelectValue
                     placeholder={t(
                       "maintenance.myRequests.filters.statusPlaceholder"
@@ -408,7 +448,7 @@ export default function TenantMaintenanceRequestsPage() {
               </Select>
 
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[160px]">
                   <SelectValue
                     placeholder={t(
                       "maintenance.myRequests.filters.priorityPlaceholder"
@@ -435,7 +475,7 @@ export default function TenantMaintenanceRequestsPage() {
               </Select>
 
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[160px] h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-[160px]">
                   <SelectValue
                     placeholder={t(
                       "maintenance.myRequests.filters.categoryPlaceholder"
@@ -446,10 +486,10 @@ export default function TenantMaintenanceRequestsPage() {
                   <SelectItem value="all">
                     {t("maintenance.myRequests.filters.allCategories")}
                   </SelectItem>
-                  <SelectItem value="Plumbing">Plumbing</SelectItem>
-                  <SelectItem value="Electrical">Electrical</SelectItem>
-                  <SelectItem value="HVAC">HVAC</SelectItem>
-                  <SelectItem value="Appliances">Appliances</SelectItem>
+                  <SelectItem value="Plumbing">{categoryLabel("Plumbing")}</SelectItem>
+                  <SelectItem value="Electrical">{categoryLabel("Electrical")}</SelectItem>
+                  <SelectItem value="HVAC">CVC</SelectItem>
+                  <SelectItem value="Appliances">{categoryLabel("Appliances")}</SelectItem>
                   <SelectItem value="Autre">Autre</SelectItem>
                 </SelectContent>
               </Select>
@@ -476,7 +516,7 @@ export default function TenantMaintenanceRequestsPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           {loading ? (
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
@@ -526,7 +566,72 @@ export default function TenantMaintenanceRequestsPage() {
                 )}
             </div>
           ) : (
-            <div className="rounded-md border">
+            <>
+              <div className="grid gap-3 md:hidden">
+                {filteredRequests.map((request) => (
+                  <article
+                    key={request._id.toString()}
+                    className="min-w-0 rounded-xl border bg-card p-3 shadow-sm"
+                  >
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-semibold" title={request.title}>
+                          {request.title}
+                        </h3>
+                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                          {request.description}
+                        </p>
+                      </div>
+                      <Badge variant={getPriorityColor(request.priority)} className="shrink-0">
+                        {priorityLabel(request.priority)}
+                      </Badge>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                      <div className="min-w-0">
+                        <span className="text-muted-foreground">Propriété</span>
+                        <p className="truncate font-medium" title={request.propertyId?.name}>
+                          {request.propertyId?.name || "Non renseignée"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Statut</span>
+                        <div className="mt-0.5 flex min-w-0 items-center gap-1">
+                          {getStatusIcon(request.status)}
+                          <span className="truncate font-medium">{statusLabel(request.status)}</span>
+                        </div>
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-muted-foreground">Attribuée à</span>
+                        <p className="truncate font-medium">
+                          {request.assignedTo
+                            ? `${request.assignedTo.firstName} ${request.assignedTo.lastName}`
+                            : t("maintenance.myRequests.table.unassigned")}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Créée le</span>
+                        <p className="font-medium">
+                          {formatRequestDate(
+                            typeof request.createdAt === "string"
+                              ? request.createdAt
+                              : request.createdAt.toISOString()
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button asChild variant="outline" size="sm" className="mt-3 w-full whitespace-nowrap">
+                      <Link href={`/dashboard/maintenance/${request._id}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        {t("maintenance.myRequests.table.view")}
+                      </Link>
+                    </Button>
+                  </article>
+                ))}
+              </div>
+
+              <div className="hidden max-w-full overflow-x-auto rounded-md border md:block">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -577,14 +682,14 @@ export default function TenantMaintenanceRequestsPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={getPriorityColor(request.priority)}>
-                          {request.priority}
+                          {priorityLabel(request.priority)}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {getStatusIcon(request.status)}
                           <Badge variant={getStatusColor(request.status)}>
-                            {request.status.replace("_", " ")}
+                            {statusLabel(request.status)}
                           </Badge>
                         </div>
                       </TableCell>
@@ -604,7 +709,7 @@ export default function TenantMaintenanceRequestsPage() {
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">
-                            {formatDate(
+                            {formatRequestDate(
                               typeof request.createdAt === "string"
                                 ? request.createdAt
                                 : request.createdAt.toISOString()
@@ -624,7 +729,8 @@ export default function TenantMaintenanceRequestsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

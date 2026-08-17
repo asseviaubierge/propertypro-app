@@ -732,6 +732,7 @@ export default function DashboardPage() {
       <AnalyticsCardGrid>
         <AnalyticsCard
           title={t("dashboard.cards.totalProperties.title")}
+          mobileTitle="Propriétés"
           value={overview?.totalProperties ?? 0}
           description={t("dashboard.cards.totalProperties.description")}
           icon={Building2}
@@ -739,6 +740,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.occupancyRate.title")}
+          mobileTitle="Occupation"
           value={formatPercentage(overview?.occupancyRate ?? 0)}
           description={t("dashboard.cards.occupancyRate.description", {
             values: {
@@ -751,6 +753,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.monthlyRevenue.title")}
+          mobileTitle="Revenu"
           value={formatCurrency(overview?.monthlyRevenue ?? 0)}
           description={t("dashboard.cards.monthlyRevenue.description")}
           icon={DollarSign}
@@ -758,6 +761,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.collectionRate.title")}
+          mobileTitle="Recouvrement"
           value={formatPercentage(overview?.collectionRate ?? 0)}
           description={t("dashboard.cards.collectionRate.description")}
           icon={Target}
@@ -765,6 +769,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.activeTenants.title")}
+          mobileTitle="Locataires"
           value={overview?.activeTenants ?? 0}
           description={t("dashboard.cards.activeTenants.description", {
             values: { count: overview?.pendingApplications ?? 0 },
@@ -774,6 +779,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.maintenanceRequests.title")}
+          mobileTitle="Maintenance"
           value={maintenance?.open ?? 0}
           description={t("dashboard.cards.maintenanceRequests.description", {
             values: { count: maintenance?.urgent ?? 0 },
@@ -783,6 +789,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.vacantUnits.title")}
+          mobileTitle="Unités libres"
           value={vacantUnits}
           description={t("dashboard.cards.vacantUnits.description", {
             values: { rate: formatPercentage(vacancyRate) },
@@ -792,6 +799,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.averageRent.title")}
+          mobileTitle="Loyer moyen"
           value={formatCurrency(overview?.averageRent ?? 0)}
           description={t("dashboard.cards.averageRent.description")}
           icon={DollarSign}
@@ -799,6 +807,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.leaseRenewals.title")}
+          mobileTitle="Renouvellements"
           value={overview?.expiringLeases ?? 0}
           description={t("dashboard.cards.leaseRenewals.description")}
           icon={FileText}
@@ -806,6 +815,7 @@ export default function DashboardPage() {
         />
         <AnalyticsCard
           title={t("dashboard.cards.recentEvents.title")}
+          mobileTitle="Événements"
           value={recentActivities.length}
           description={t("dashboard.cards.recentEvents.description", {
             values: { count: urgentActivityCount },

@@ -34,25 +34,6 @@ interface Property {
   }>;
 }
 
-interface PropertyApiResponse {
-  _id: string;
-  name: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-  };
-  isMultiUnit?: boolean;
-  units?: Array<{
-    _id: string;
-    unitNumber: string;
-    unitType: string;
-    status: string;
-    currentTenantId?: string;
-    currentLeaseId?: string;
-  }>;
-}
-
 interface Tenant {
   id: string;
   name: string;
@@ -83,10 +64,19 @@ interface LeaseItem {
     name?: string;
     address?: any;
     isMultiUnit?: boolean;
+    type?: string;
   } | null;
   unitId?: string;
+  unit?: {
+    unitNumber?: string;
+    unitType?: string;
+    type?: string;
+  } | null;
   status?: string;
 }
+
+const getLeasePropertyId = (lease?: LeaseItem | null) =>
+  lease?.propertyId?._id ? String(lease.propertyId._id) : undefined;
 
 const isActiveLeaseStatus = (status?: string) =>
   (status || "").toLowerCase() === LeaseStatus.ACTIVE;
@@ -131,7 +121,7 @@ export default function NewMaintenanceRequestPage() {
         const propertiesData = await propertiesRes.json();
         setProperties(
           Array.isArray(propertiesData.data)
-            ? propertiesData.data.map((property: PropertyApiResponse) => ({
+            ? propertiesData.data.map((property: any) => ({
                 id: property._id,
                 name: property.name,
                 address: `${property.address.street}, ${property.address.city}, ${property.address.state}`,
@@ -157,7 +147,7 @@ export default function NewMaintenanceRequestPage() {
                   name:
                     `${tenant.firstName || ""} ${
                       tenant.lastName || ""
-                    }`.trim() || "Unknown Tenant",
+                    }`.trim() || "Locataire",
                   email: tenant.email || "",
                   propertyName:
                     tenant.currentLeaseId?.propertyId?.name ||
@@ -193,13 +183,14 @@ export default function NewMaintenanceRequestPage() {
 
         const activeLeases = leases.filter((l) => isActiveLeaseStatus(l.status));
         const candidateLeases = activeLeases.length > 0 ? activeLeases : leases;
+        const currentLease = data?.data?.currentLease as LeaseItem | null;
 
         setHasActiveLease(leases.some((l) => isActiveLeaseStatus(l.status)));
         if (!leases.some((l) => isActiveLeaseStatus(l.status))) {
           toast.error(
             t("maintenance.new.toasts.noActiveLease", {
               defaultValue:
-                "You can't submit a request because you have no active leases.",
+                "Vous ne pouvez pas envoyer de demande sans bail actif.",
             }),
           );
         }
@@ -212,8 +203,13 @@ export default function NewMaintenanceRequestPage() {
               .filter((value): value is string => Boolean(value)),
           ),
         );
+        const currentPropertyId = getLeasePropertyId(currentLease);
         const propertyId =
-          uniquePropertyIds.length === 1 ? uniquePropertyIds[0] : undefined;
+          currentPropertyId && uniquePropertyIds.includes(currentPropertyId)
+            ? currentPropertyId
+            : uniquePropertyIds.length === 1
+              ? uniquePropertyIds[0]
+              : undefined;
         const uniqueUnitIds = propertyId
           ? Array.from(
               new Set(
@@ -224,36 +220,29 @@ export default function NewMaintenanceRequestPage() {
               ),
             )
           : [];
-        const unitId = uniqueUnitIds.length === 1 ? uniqueUnitIds[0] : undefined;
+        const currentUnitId =
+          currentLease && getLeasePropertyId(currentLease) === propertyId
+            ? currentLease.unitId
+            : undefined;
+        const unitId =
+          currentUnitId && uniqueUnitIds.includes(currentUnitId)
+            ? currentUnitId
+            : uniqueUnitIds.length === 1
+              ? uniqueUnitIds[0]
+              : undefined;
 
-        // Build map of propertyId -> set of unitIds leased by this tenant
-        const propertyUnitMap = new Map<string, Set<string>>();
-        for (const lease of leases) {
-          const pid = lease?.propertyId?._id as string | undefined;
-          const uid = lease?.unitId as string | undefined;
-          if (!pid) continue;
-          if (!propertyUnitMap.has(pid)) propertyUnitMap.set(pid, new Set());
-          if (uid) propertyUnitMap.get(pid)!.add(uid);
-        }
+        // Les propriétés autorisées proviennent directement des baux du
+        // locataire. Aucune route « propriétés du gestionnaire » n'est
+        // appelée ici : elle refuserait légitimement l'accès au Locataire et
+        // viderait alors le sélecteur.
+        const leasesForForm = activeLeases.length > 0 ? activeLeases : leases;
+        const propertyMap = new Map<string, Property>();
 
-        // Fetch property details (including units) and filter units to tenant’s leased units
-        const propertyIds = Array.from(propertyUnitMap.keys());
-        const propertyResponses = await Promise.all(
-          propertyIds.map((pid) => fetch(`/api/properties/${pid}`)),
-        );
-        const propertiesData = await Promise.all(
-          propertyResponses.map(async (r) => {
-            const j = await r.json();
-            return r.ok ? j.data : null;
-          }),
-        );
+        for (const lease of leasesForForm) {
+          const pid = getLeasePropertyId(lease);
+          if (!pid || !lease.propertyId) continue;
 
-        const tenantProperties: Property[] = [];
-        for (let i = 0; i < propertyIds.length; i++) {
-          const pid = propertyIds[i];
-          const p = propertiesData[i];
-          if (!p) continue;
-          const address = p?.address as any;
+          const address = lease.propertyId.address;
           const addressStr =
             typeof address === "string"
               ? address
@@ -263,22 +252,41 @@ export default function NewMaintenanceRequestPage() {
                     .join(", ")
                 : "";
 
-          // Filter units to only those leased by tenant for this property
-          const leasedUnitIds = propertyUnitMap.get(pid)!;
-          const filteredUnits = Array.isArray(p?.units)
-            ? p.units.filter((u: any) => leasedUnitIds.has(u._id?.toString()))
-            : [];
+          if (!propertyMap.has(pid)) {
+            propertyMap.set(pid, {
+              id: pid,
+              name: lease.propertyId.name || "Propriété",
+              address: addressStr,
+              isMultiUnit: Boolean(lease.propertyId.isMultiUnit || lease.unitId),
+              units: [],
+            });
+          }
 
-          tenantProperties.push({
-            id: pid,
-            name: p?.name || "",
-            address: addressStr,
-            isMultiUnit: !!p?.isMultiUnit || filteredUnits.length > 0,
-            units: filteredUnits,
-          });
+          const property = propertyMap.get(pid)!;
+          if (
+            lease.unitId &&
+            !property.units?.some((unit) => unit._id === lease.unitId)
+          ) {
+            property.units = [
+              ...(property.units ?? []),
+              {
+                _id: lease.unitId,
+                unitNumber:
+                  lease.unit?.unitNumber || lease.unitId.slice(-6).toUpperCase(),
+                unitType:
+                  lease.unit?.unitType ||
+                  lease.unit?.type ||
+                  lease.propertyId.type ||
+                  "Logement",
+                status: "occupied",
+                currentTenantId: tenantId,
+                currentLeaseId: lease._id,
+              },
+            ];
+          }
         }
 
-        setProperties(tenantProperties);
+        setProperties([...propertyMap.values()]);
 
         setTenants([
           {
@@ -318,8 +326,8 @@ export default function NewMaintenanceRequestPage() {
       if (isTenant && !hasActiveLease) {
         toast.error(
           t("maintenance.new.toasts.noActiveLease", {
-            defaultValue:
-              "You can't submit a request because you have no active leases.",
+              defaultValue:
+                "Vous ne pouvez pas envoyer de demande sans bail actif.",
           }),
         );
         return;
@@ -382,11 +390,11 @@ export default function NewMaintenanceRequestPage() {
   };
 
   return (
-    <div className="flex w-full justify-center">
-      <div className="space-y-6 max-w-240 w-full">
+    <div className="tenant-account-page flex w-full justify-center">
+      <div className="w-full max-w-240 space-y-3 sm:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="mobile-page-header flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-2xl font-bold tracking-tight bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               {t("maintenance.new.header.title")}
             </h1>
@@ -397,7 +405,7 @@ export default function NewMaintenanceRequestPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="hover:bg-blue-50 hover:text-blue-600 border transition-colors"
+            className="w-full border hover:bg-blue-50 hover:text-blue-600 sm:w-auto"
             onClick={() =>
               router.push(
                 isTenant
@@ -424,7 +432,7 @@ export default function NewMaintenanceRequestPage() {
               <CardDescription>
                 {t("maintenance.tenant.form.noLeases.description", {
                   defaultValue:
-                    "You need an active lease to submit maintenance requests.",
+                    "Un bail actif est nécessaire pour envoyer une demande de maintenance.",
                 })}
               </CardDescription>
             </CardHeader>
@@ -432,7 +440,7 @@ export default function NewMaintenanceRequestPage() {
               <p className="text-sm text-muted-foreground">
                 {t("maintenance.new.noActiveLease.help", {
                   defaultValue:
-                    "Please contact your property manager or review your leases.",
+                    "Contactez votre gestionnaire ou consultez vos baux.",
                 })}
               </p>
             </CardContent>
@@ -446,7 +454,7 @@ export default function NewMaintenanceRequestPage() {
           showPropertyTenantSection={true}
           showAssignmentSchedulingSection={!isTenant}
           showAssigneeField={false}
-          defaultAssigneeLabel="E-IMMO — Staff Gestion E-Immo"
+          defaultAssigneeLabel="E-IMMO — Équipe Gestion E-Immo"
           submitLabel={t("maintenance.form.buttons.submitRequest")}
           submitDisabled={isTenant && !hasActiveLease}
           properties={properties}

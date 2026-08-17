@@ -886,9 +886,10 @@ export default function LeasesPage() {
           </h1>
           <p className="text-xs leading-4 text-muted-foreground sm:text-base">{t("leases.header.subtitle")}</p>
         </div>
-        <Button className="h-11 w-full justify-center px-3 text-xs sm:h-9 sm:w-auto sm:text-sm" size="sm" onClick={() => router.push("/dashboard/leases/new")}>
+        <Button className="h-10 w-full justify-center px-3 text-xs whitespace-nowrap sm:h-9 sm:w-auto sm:text-sm" size="sm" onClick={() => router.push("/dashboard/leases/new")}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("leases.actions.createLease")}
+          <span className="sm:hidden">Nouveau bail</span>
+          <span className="hidden sm:inline">{t("leases.actions.createLease")}</span>
         </Button>
       </div>
 

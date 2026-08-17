@@ -7,10 +7,11 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Printer, Download } from "lucide-react";
+import { ArrowLeft, Printer, Download, MessageCircle } from "lucide-react";
 import { PaymentStatus, PaymentType, PaymentMethod } from "@/types";
 import { PaymentReceipt } from "@/components/payments/payment-receipt";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
+import { shareDocumentViaWhatsApp } from "@/lib/whatsapp";
 
 interface PaymentDetails {
   _id: string;
@@ -24,12 +25,16 @@ interface PaymentDetails {
   notes?: string;
   tenantId: {
     _id: string;
-    userId: {
+    userId?: {
       firstName: string;
       lastName: string;
       email: string;
       phone?: string;
     };
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
   };
   propertyId: {
     _id: string;
@@ -164,27 +169,46 @@ export default function PaymentReceiptPage({
   const handleDownloadPDF = async () => {
     try {
       if (!payment) return;
-
-      // In a real implementation, you would call an API endpoint that generates a PDF
-      // For now, we'll simulate the download
+      const response = await fetch(`/api/payments/${payment._id}/receipt`, {
+        cache: "no-store",
+      });
+      if (!response.ok) throw new Error("Reçu indisponible");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `recu-${payment._id.slice(-8).toUpperCase()}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(url);
       toast.success(t("payments.receipt.toasts.downloadSuccess"));
-
-      // Example implementation:
-      // const response = await fetch(`/api/payments/${payment._id}/receipt/pdf`);
-      // if (response.ok) {
-      //   const blob = await response.blob();
-      //   const url = window.URL.createObjectURL(blob);
-      //   const a = document.createElement("a");
-      //   a.href = url;
-      //   a.download = `receipt-${payment._id.slice(-8)}.pdf`;
-      //   document.body.appendChild(a);
-      //   a.click();
-      //   window.URL.revokeObjectURL(url);
-      //   document.body.removeChild(a);
-      // }
     } catch (error) {
       console.error("Error downloading PDF:", error);
       toast.error(t("payments.receipt.toasts.downloadFailed"));
+    }
+  };
+
+  const handleWhatsApp = async () => {
+    const contact = payment?.tenantId?.userId || payment?.tenantId;
+    if (!contact?.phone) {
+      toast.error("Le numéro WhatsApp du locataire n’est pas renseigné.");
+      return;
+    }
+    try {
+      const tenantName = `${contact.firstName || ""} ${contact.lastName || ""}`.trim();
+      const result = await shareDocumentViaWhatsApp({
+        phone: contact.phone,
+        documentUrl: `/api/payments/${payment._id}/receipt`,
+        fileName: `recu-${payment._id.slice(-8).toUpperCase()}.pdf`,
+        title: `Reçu ${payment._id.slice(-8).toUpperCase()}`,
+        message: `Bonjour ${tenantName}, voici votre reçu de paiement transmis depuis GESTION E-IMMO.`,
+      });
+      if (result === "unavailable") throw new Error("Numéro WhatsApp invalide");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Impossible de partager le reçu."
+      );
     }
   };
 
@@ -244,9 +268,9 @@ export default function PaymentReceiptPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Link href={`/dashboard/payments/${payment._id}`}>
@@ -266,7 +290,7 @@ export default function PaymentReceiptPage({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:items-center">
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-2" />
             {t("payments.receipt.header.printButton")}
@@ -274,6 +298,10 @@ export default function PaymentReceiptPage({
           <Button variant="outline" onClick={handleDownloadPDF}>
             <Download className="h-4 w-4 mr-2" />
             {t("payments.receipt.header.downloadButton")}
+          </Button>
+          <Button variant="outline" className="text-green-700" onClick={handleWhatsApp}>
+            <MessageCircle className="h-4 w-4 mr-2" />
+            WhatsApp
           </Button>
         </div>
       </div>

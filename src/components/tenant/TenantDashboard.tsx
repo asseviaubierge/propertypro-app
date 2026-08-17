@@ -303,7 +303,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
   }
 
   return (
-    <div className={`min-w-0 w-full space-y-4 sm:space-y-6 ${className ?? ""}`}>
+    <div className={`tenant-account-page min-w-0 w-full space-y-3 sm:space-y-6 ${className ?? ""}`}>
       {/* Header */}
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
@@ -347,6 +347,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
       <AnalyticsCardGrid className="md:grid-cols-2 lg:grid-cols-4">
         <AnalyticsCard
           title={t("dashboard.tenant.activeLeases")}
+          mobileTitle="Baux actifs"
           value={dashboardData.summary?.activeLeases ?? 0}
           description={t("dashboard.tenant.totalLeases", {
             values: { count: dashboardData.summary?.totalLeases ?? 0 },
@@ -356,6 +357,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
         />
         <AnalyticsCard
           title={t("dashboard.tenant.outstandingPayments")}
+          mobileTitle="Impayés"
           value={dashboardData.summary?.overduePayments ?? 0}
           description={t("dashboard.tenant.totalPayments", {
             values: { count: dashboardData.summary?.totalPayments ?? 0 },
@@ -365,6 +367,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
         />
         <AnalyticsCard
           title={t("dashboard.tenant.maintenanceRequests")}
+          mobileTitle="Maintenance"
           value={dashboardData.summary?.openMaintenanceRequests ?? 0}
           description={t("dashboard.tenant.openRequests")}
           icon={Settings}
@@ -372,6 +375,7 @@ export default function TenantDashboard({ className }: TenantDashboardProps) {
         />
         <AnalyticsCard
           title={t("dashboard.tenant.notifications")}
+          mobileTitle="Notifications"
           value={dashboardData.summary?.unreadNotifications ?? 0}
           description={t("dashboard.tenant.unreadMessages")}
           icon={Bell}

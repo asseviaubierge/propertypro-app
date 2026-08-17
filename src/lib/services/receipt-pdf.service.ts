@@ -137,31 +137,33 @@ function normalizePaymentToReceipt(
   // Get tenant info
   const tenantFirstName = payment.tenantId?.firstName || "";
   const tenantLastName = payment.tenantId?.lastName || "";
-  const tenantName = `${tenantFirstName} ${tenantLastName}`.trim() || "Unknown Tenant";
+  const tenantName = `${tenantFirstName} ${tenantLastName}`.trim() || "Locataire non renseigné";
   const tenantEmail = payment.tenantId?.email || "";
 
   // Get property info
-  const propertyName = payment.propertyId?.name || "Unknown Property";
+  const propertyName = payment.propertyId?.name || "Propriété non renseignée";
   let propertyAddress = "";
   if (typeof payment.propertyId?.address === "string") {
     propertyAddress = payment.propertyId.address;
   } else if (payment.propertyId?.address) {
     const addr = payment.propertyId.address;
     const parts = [addr.street, addr.city, addr.state, addr.zipCode].filter(Boolean);
-    propertyAddress = parts.join(", ") || "Address not available";
+    propertyAddress = parts.join(", ") || "Adresse non renseignée";
   } else {
-    propertyAddress = "Address not available";
+    propertyAddress = "Adresse non renseignée";
   }
 
   // Get description
   const description = payment.description ||
-    (payment.type ? `Payment for ${payment.type.replace("_", " ")}` : "Payment received");
+    (payment.type
+      ? `Paiement : ${payment.type.replace(/_/g, " ")}`
+      : "Paiement encaissé");
 
   return {
     receiptNumber,
     paymentId,
     paymentDate,
-    paymentMethod: payment.paymentMethod || "N/A",
+    paymentMethod: payment.paymentMethod || "Non renseigné",
     amount: payment.amount,
     description,
     invoiceApplications: payment.invoiceApplications || [],
@@ -190,4 +192,3 @@ function normalizePaymentToReceipt(
     company: companyInfo,
   };
 }
-

@@ -54,7 +54,7 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     short_name: companyName,
     description:
       "Application complète de gestion immobilière pour propriétaires, gestionnaires et locataires",
-    start_url: "/",
+    start_url: "/auth/login?source=pwa",
     scope: "/",
     display: "standalone",
     display_override: ["standalone", "minimal-ui"],

@@ -84,6 +84,7 @@ export function normalizeConversation(raw: any): Conversation | null {
 
   return {
     id,
+    name: typeof raw.name === "string" ? raw.name : null,
     type: (raw.type === "group" ? "group" : "individual") as "individual" | "group",
     participants,
     lastMessage,
@@ -96,7 +97,7 @@ function normalizeAttachment(raw: any): MessageAttachment | null {
   if (!raw) return null;
   return {
     id: normalizeId(raw._id ?? raw.id ?? raw.fileUrl),
-    fileName: raw.fileName || raw.name || "file",
+    fileName: raw.fileName || raw.name || "fichier",
     fileUrl: raw.fileUrl || raw.url || "",
     fileType: raw.fileType || inferFileType(raw.mimeType || raw.type || ""),
     fileSize: typeof raw.fileSize === "number" ? raw.fileSize : raw.size ?? 0,

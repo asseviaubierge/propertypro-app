@@ -29,7 +29,7 @@ export const GET = withPermissionAndDB("payment_portal")(
       const { id } = await params;
 
       if (!isValidObjectId(id)) {
-        return createErrorResponse("Invalid payment ID", 400);
+        return createErrorResponse("Identifiant de paiement invalide", 400);
       }
 
       // Find the payment and verify it belongs to this tenant
@@ -52,13 +52,13 @@ export const GET = withPermissionAndDB("payment_portal")(
         });
 
       if (!payment) {
-        return createErrorResponse("Payment not found", 404);
+        return createErrorResponse("Paiement introuvable", 404);
       }
 
       // Only allow receipt download for completed payments
       if (payment.status !== PaymentStatus.PAID) {
         return createErrorResponse(
-          "Receipt only available for completed payments",
+          "Le reçu est disponible uniquement pour un paiement encaissé",
           400
         );
       }
@@ -75,7 +75,7 @@ export const GET = withPermissionAndDB("payment_portal")(
       });
     } catch (error) {
       return createErrorResponse(
-        error instanceof Error ? error.message : "Failed to generate receipt",
+        error instanceof Error ? error.message : "Impossible de générer le reçu",
         500
       );
     }

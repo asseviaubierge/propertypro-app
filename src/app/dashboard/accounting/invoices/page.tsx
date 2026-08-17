@@ -48,6 +48,7 @@ import {
   Printer,
   Building2,
   X,
+  MessageCircle,
 } from "lucide-react";
 import {
   downloadCanonicalInvoicePdf,
@@ -65,6 +66,7 @@ import PaymentRecordDialog from "@/components/invoice/PaymentRecordDialog";
 import BulkOperationsDialog from "@/components/invoice/BulkOperationsDialog";
 import { showSimpleError, showSimpleSuccess } from "@/lib/toast-notifications";
 import { useLocalizationContext } from "@/components/providers/LocalizationProvider";
+import { shareDocumentViaWhatsApp } from "@/lib/whatsapp";
 
 interface Facture {
   _id: string;
@@ -74,6 +76,7 @@ interface Facture {
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     avatar?: string;
   } | null;
   propertyId?: {
@@ -580,8 +583,40 @@ export default function FacturesPage() {
       } else {
         throw new Error(data?.error || t("leases.invoices.toasts.emailError"));
       }
-    } catch {
-      showSimpleError("Échec de l'envoi de l'e-mail", t("leases.invoices.toasts.emailError"));
+    } catch (error) {
+      showSimpleError(
+        "Échec de l'envoi de l'e-mail",
+        error instanceof Error ? error.message : t("leases.invoices.toasts.emailError"),
+      );
+    }
+  };
+
+  const handleShareInvoiceWhatsApp = async (inv: Facture) => {
+    if (!inv.tenantId?.phone) {
+      showSimpleError(
+        "WhatsApp indisponible",
+        "Le numéro WhatsApp du locataire n’est pas renseigné.",
+      );
+      return;
+    }
+
+    const tenantName = `${inv.tenantId.firstName || ""} ${inv.tenantId.lastName || ""}`.trim();
+    try {
+      const result = await shareDocumentViaWhatsApp({
+        phone: inv.tenantId.phone,
+        documentUrl: `/api/invoices/${inv._id}/pdf`,
+        fileName: `facture-${inv.invoiceNumber}.pdf`,
+        title: `Facture ${inv.invoiceNumber}`,
+        message: `Bonjour ${tenantName}, voici votre facture ${inv.invoiceNumber} transmise depuis GESTION E-IMMO.`,
+      });
+      if (result === "unavailable") {
+        throw new Error("Numéro WhatsApp invalide");
+      }
+    } catch (error) {
+      showSimpleError(
+        "Échec du partage WhatsApp",
+        error instanceof Error ? error.message : "Impossible de partager la facture.",
+      );
     }
   };
 
@@ -920,6 +955,10 @@ export default function FacturesPage() {
             <DropdownMenuItem onClick={() => handlePrintInvoice(invoice)}>
               <Printer className="mr-2 h-4 w-4" />
               {t("leases.invoices.actions.print")}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleShareInvoiceWhatsApp(invoice)}>
+              <MessageCircle className="mr-2 h-4 w-4 text-green-600" />
+              Envoyer par WhatsApp
             </DropdownMenuItem>
             {!isTenant && (
               <>
@@ -1550,6 +1589,12 @@ export default function FacturesPage() {
                             >
                               <Printer className="mr-2 h-4 w-4" />
                               {t("leases.invoices.actions.print")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleShareInvoiceWhatsApp(invoice)}
+                            >
+                              <MessageCircle className="mr-2 h-4 w-4 text-green-600" />
+                              Envoyer par WhatsApp
                             </DropdownMenuItem>
                             {!isTenant && (
                               <>

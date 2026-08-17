@@ -50,25 +50,25 @@ import { useLocalizationContext } from "@/components/providers/LocalizationProvi
 
 // Form validation schema
 const maintenanceRequestFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title too long"),
+  title: z.string().min(1, "Le titre est obligatoire").max(100, "Le titre est trop long"),
   description: z
     .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(1000, "Description too long"),
-  category: z.string().min(1, "Category is required"),
+    .min(10, "La description doit contenir au moins 10 caractères")
+    .max(1000, "La description est trop longue"),
+  category: z.string().min(1, "La catégorie est obligatoire"),
   priority: z.nativeEnum(MaintenancePriority),
-  propertyId: z.string().min(1, "Property is required"),
+  propertyId: z.string().min(1, "La propriété est obligatoire"),
   unitId: z.string().optional(),
-  tenantId: z.string().min(1, "Tenant is required"),
+  tenantId: z.string().min(1, "Le locataire est obligatoire"),
   assignedTo: z.string().optional(),
-  estimatedCost: z.number().min(0, "Cost cannot be negative").optional(),
+  estimatedCost: z.number().min(0, "Le coût ne peut pas être négatif").optional(),
   scheduledDate: z
     .string()
     .optional()
     .refine((date) => {
       if (!date) return true;
       return !isNaN(Date.parse(date));
-    }, "Invalid date format"),
+    }, "Format de date invalide"),
   images: z.array(z.string()).optional(),
 });
 
@@ -241,7 +241,7 @@ export function MaintenanceRequestForm({
     () =>
       availableUnits.map((unit) => ({
         value: unit._id,
-        label: `Unit ${unit.unitNumber}`,
+        label: `Unité ${unit.unitNumber}`,
         subtitle: `${unit.unitType} • ${getDisplayUnitStatus(unit)}`,
       })),
     [availableUnits, t]
@@ -253,7 +253,7 @@ export function MaintenanceRequestForm({
         label: tenant.name,
         subtitle: tenant.email,
         badge: tenant.unitNumber
-          ? `Unit ${tenant.unitNumber}${
+          ? `Unité ${tenant.unitNumber}${
               tenant.unitType ? ` (${tenant.unitType})` : ""
             }`
           : tenant.leaseStatus
@@ -348,7 +348,7 @@ export function MaintenanceRequestForm({
             id: tenant.id || tenant._id,
             name:
               `${tenant.firstName || ""} ${tenant.lastName || ""}`.trim() ||
-              "Unknown Tenant",
+              "Locataire",
             email: tenant.email || "",
             phone: tenant.phone || "",
             avatar: tenant.avatar,
@@ -398,8 +398,8 @@ export function MaintenanceRequestForm({
           toast.info(
             isOccupiedWithoutActiveLease
               ? t("maintenance.form.toasts.occupiedUnitNoActiveTenant", {
-                  defaultValue:
-                    "This unit is marked occupied, but no active lease-linked tenant was found.",
+                    defaultValue:
+                      "Cette unité est occupée, mais aucun locataire lié à un bail actif n’a été trouvé.",
                 })
               : unitId
               ? t("maintenance.form.toasts.noTenantsFoundForUnit", {
@@ -458,13 +458,34 @@ export function MaintenanceRequestForm({
 
       // Note: Tenant fetching is handled by the dedicated effect below to avoid duplicate calls
 
-      // Clear tenant selection only when property actually changes after initial load
+      // Pour un locataire, le compte connecté reste toujours associé à la
+      // propriété choisie. Pour le personnel, le changement de propriété
+      // réinitialise normalement le locataire afin d'éviter les mélanges.
       if (
+        !isTenantView &&
         hasInitialized &&
         prevPropertyId &&
         prevPropertyId !== watchedPropertyId
       ) {
         form.setValue("tenantId", "");
+      }
+      if (isTenantView) {
+        const tenantId = initialData?.tenantId || tenants[0]?.id || "";
+        if (tenantId && form.getValues("tenantId") !== tenantId) {
+          form.setValue("tenantId", tenantId);
+        }
+
+        const leasedUnits = selectedProperty?.units ?? [];
+        const currentUnitId = form.getValues("unitId");
+        const currentUnitStillMatches = leasedUnits.some(
+          (unit) => unit._id === currentUnitId
+        );
+        if (!currentUnitStillMatches) {
+          form.setValue(
+            "unitId",
+            leasedUnits.length === 1 ? leasedUnits[0]._id : ""
+          );
+        }
       }
       setPrevPropertyId(watchedPropertyId);
     } else {
@@ -483,6 +504,8 @@ export function MaintenanceRequestForm({
     tenants,
     hasInitialized,
     prevPropertyId,
+    isTenantView,
+    initialData?.tenantId,
   ]);
 
   // Update tenant filtering when unit changes

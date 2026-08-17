@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface AnalyticsCardProps {
   title: string;
+  mobileTitle?: string;
   value: string | number;
   description?: string;
   icon?: LucideIcon;
@@ -69,6 +70,7 @@ const financialVariantClasses = {
 
 export function AnalyticsCard({
   title,
+  mobileTitle,
   value,
   description,
   icon: Icon,
@@ -85,7 +87,19 @@ export function AnalyticsCard({
       className={cn("min-w-0 gap-0 py-3 sm:py-4", className)}
     >
       <CardHeader className="flex min-w-0 flex-row items-start justify-between gap-3 space-y-0 px-4 pb-2 sm:px-6">
-        <CardTitle className="min-w-0 break-words text-[13px] font-semibold leading-5 text-foreground sm:text-sm">{title}</CardTitle>
+        <CardTitle
+          className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-4 text-foreground sm:text-sm sm:leading-5"
+          title={title}
+        >
+          {mobileTitle ? (
+            <>
+              <span className="sm:hidden">{mobileTitle}</span>
+              <span className="hidden sm:inline">{title}</span>
+            </>
+          ) : (
+            title
+          )}
+        </CardTitle>
         {Icon && (
           <div className={cn("shrink-0 rounded-lg p-2", iconColorClasses[iconColor])}>
             <Icon className="h-4 w-4" />
@@ -95,7 +109,7 @@ export function AnalyticsCard({
       <CardContent className="min-w-0 px-4 pb-3 sm:px-6 sm:pb-4">
         <div className="whitespace-nowrap text-lg font-bold leading-tight text-foreground sm:text-xl">{value}</div>
         {description && (
-          <p className="mt-1 break-words text-[11px] leading-4 text-muted-foreground sm:text-xs">{description}</p>
+          <p className="mt-1 line-clamp-2 text-[10px] leading-3.5 text-muted-foreground sm:text-xs sm:leading-4">{description}</p>
         )}
         {/* {trend && (
           <div className="flex items-center text-xs mt-2">

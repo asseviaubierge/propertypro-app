@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest } from "next/server";
 import { MaintenanceRequest, Lease, Property } from "@/models";
-import { UserRole, MaintenanceStatus } from "@/types";
+import { MaintenanceStatus } from "@/types";
 import {
   createSuccessResponse,
   createErrorResponse,
@@ -38,19 +38,7 @@ export const GET = withPermissionAndDB("maintenance_requests")(
 
       const tenant = context?.tenantProfile;
       if (!tenant) {
-        return createErrorResponse("Tenant profile unavailable", 500);
-      }
-
-      // Require at least one active lease for this tenant
-      const hasActiveLease = await Lease.exists({
-        $or: [{ tenantId: user.id }, { tenantId: tenant._id }],
-        status: "active",
-      });
-      if (!hasActiveLease) {
-        return createErrorResponse(
-          "You must have an active lease to submit a maintenance request",
-          403
-        );
+        return createErrorResponse("Profil locataire indisponible", 500);
       }
 
       // Build query - try both User ID and Tenant ID approaches
@@ -91,7 +79,7 @@ export const GET = withPermissionAndDB("maintenance_requests")(
         },
       });
     } catch (error) {
-      return handleApiError(error, "Failed to fetch maintenance requests");
+      return handleApiError(error, "Impossible de charger les demandes de maintenance");
     }
   }
 );
@@ -110,7 +98,7 @@ export const POST = withPermissionAndDB("maintenance_requests")(
 
       const tenant = context?.tenantProfile;
       if (!tenant) {
-        return createErrorResponse("Tenant profile unavailable", 500);
+        return createErrorResponse("Profil locataire indisponible", 500);
       }
 
       // If leaseId is provided, validate it and get property info
@@ -147,29 +135,57 @@ export const POST = withPermissionAndDB("maintenance_requests")(
           ? body.contactPhone.trim()
           : undefined;
 
+      let matchedLease: any = null;
+
       if (body.leaseId) {
         const lease = await Lease.findOne({
           _id: body.leaseId,
           $or: [{ tenantId: user.id }, { tenantId: tenant._id }],
+          status: "active",
+          deletedAt: null,
         }).populate("propertyId");
 
         if (!lease) {
-          return createErrorResponse("Lease not found or access denied", 404);
+          return createErrorResponse("Bail actif introuvable ou accès refusé", 404);
         }
 
+        matchedLease = lease;
         propertyId = normalizeId(lease.propertyId?._id) || propertyId;
         unitId = unitId || normalizeId(lease.unitId);
       }
 
       if (!propertyId) {
-        return createErrorResponse("Property ID is required", 400);
+        return createErrorResponse("La propriété est obligatoire", 400);
       }
+
+      // La propriété et l'unité doivent obligatoirement appartenir à un bail
+      // actif du locataire connecté. Le client ne peut donc jamais associer
+      // sa demande à la propriété d'un autre compte.
+      if (!matchedLease) {
+        matchedLease = await Lease.findOne({
+          $or: [{ tenantId: user.id }, { tenantId: tenant._id }],
+          propertyId,
+          status: "active",
+          deletedAt: null,
+          ...(unitId ? { unitId } : {}),
+        });
+      }
+
+      if (!matchedLease) {
+        return createErrorResponse(
+          "Cette propriété ou cette unité n’est pas liée à votre bail actif",
+          403
+        );
+      }
+
+      propertyId = normalizeId(matchedLease.propertyId) || propertyId;
+      unitId = normalizeId(matchedLease.unitId) || unitId;
 
       // Validate unitId if provided
       if (unitId) {
         const property = await Property.findById(propertyId);
         if (!property) {
-          return createErrorResponse("Property not found", 404);
+          return createErrorResponse("Propriété introuvable", 404);
         }
 
         // Check if the unitId exists in the property's units array
@@ -179,7 +195,7 @@ export const POST = withPermissionAndDB("maintenance_requests")(
 
         if (!unitExists) {
           return createErrorResponse(
-            "Invalid unit ID. The unit does not exist in the specified property.",
+            "Cette unité n’existe pas dans la propriété sélectionnée.",
             400
           );
         }
@@ -238,12 +254,12 @@ export const POST = withPermissionAndDB("maintenance_requests")(
 
       return createSuccessResponse(
         maintenanceRequest,
-        "Maintenance request created successfully",
+        "Demande de maintenance créée avec succès",
         undefined,
         201
       );
     } catch (error) {
-      return handleApiError(error, "Failed to create maintenance request");
+      return handleApiError(error, "Impossible de créer la demande de maintenance");
     }
   }
 );

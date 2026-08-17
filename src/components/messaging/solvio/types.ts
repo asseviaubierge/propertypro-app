@@ -19,6 +19,7 @@ export type LastMessage = {
 
 export type Conversation = {
   id: string;
+  name?: string | null;
   type: ConversationType;
   participants: Participant[];
   lastMessage: LastMessage | null;

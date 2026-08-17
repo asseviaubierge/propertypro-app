@@ -509,10 +509,10 @@ export default function TransactionsPage() {
     !!search || typeFilter !== "all" || categoryFilter !== "all";
 
   return (
-    <div className="space-y-4">
+    <div className="tenant-account-page mobile-transactions-page min-w-0 space-y-3 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+      <div className="mobile-page-header flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-xl leading-tight font-bold tracking-tight break-normal sm:text-3xl">
             {t("nav.accounting.transactions", { defaultValue: "Transactions" })}
           </h1>
@@ -525,6 +525,7 @@ export default function TransactionsPage() {
         <Button
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
         >
           <ArrowUpDown className="h-4 w-4 mr-2" />
@@ -579,8 +580,8 @@ export default function TransactionsPage() {
       </AnalyticsCardGrid>
 
       {/* Transactions Table with Integrated Filters */}
-      <Card className="gap-2">
-        <CardHeader>
+      <Card className="mobile-app-section gap-2">
+        <CardHeader className="px-3 sm:px-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-2">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
@@ -603,7 +604,8 @@ export default function TransactionsPage() {
               variant="outline"
               size="sm"
               onClick={handleStatementExport}
-              disabled={loading || isExporting}
+              disabled={loading || isExporting || summary.transactionCount === 0}
+              className="w-full sm:w-auto"
             >
               {isExporting ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -616,7 +618,7 @@ export default function TransactionsPage() {
             </Button>
           </div>
 
-          <div className="flex flex-col gap-4 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-gray-200/60 dark:border-gray-700/60">
+          <div className="mobile-filter-panel flex flex-col gap-2 rounded-xl border border-gray-200/60 bg-gray-50/50 p-2.5 dark:border-gray-700/60 dark:bg-gray-800/50 sm:p-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-3">
               <GlobalSearch
                 placeholder={t("transactions.filters.searchPlaceholder", {
@@ -643,7 +645,7 @@ export default function TransactionsPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-42.5">
                   <SelectValue
                     placeholder={t("transactions.filters.allTypes", {
                       defaultValue: "Tous les types",
@@ -672,7 +674,7 @@ export default function TransactionsPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-42.5 h-10 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <SelectTrigger className="h-10 w-full border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 sm:w-42.5">
                   <SelectValue
                     placeholder={t("transactions.filters.allCategories", {
                       defaultValue: "Toutes les catégories",

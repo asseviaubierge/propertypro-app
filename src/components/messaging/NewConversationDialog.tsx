@@ -55,13 +55,15 @@ interface User {
 interface Property {
   _id: string;
   name: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
+  address:
+    | string
+    | {
+        street?: string;
+        city?: string;
+        state?: string;
+        zipCode?: string;
+        country?: string;
+      };
   fullAddress?: string; // Virtual property from MongoDB
 }
 
@@ -105,8 +107,10 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
     if (property.fullAddress) {
       return property.fullAddress;
     }
+    if (!property.address) return "Adresse non renseignée";
+    if (typeof property.address === "string") return property.address;
     const { street, city, state, zipCode } = property.address;
-    return `${street}, ${city}, ${state} ${zipCode}`;
+    return [street, city, state, zipCode].filter(Boolean).join(", ");
   };
 
   // Load users and properties from API
@@ -121,7 +125,9 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
     try {
       setLoadingUsers(true);
       setUsersError(null);
-      const response = await fetch("/api/conversations/contacts?limit=100");
+      const response = await fetch("/api/conversations/contacts?limit=100", {
+        cache: "no-store",
+      });
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => null);
         throw new Error(
@@ -289,12 +295,12 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   };
 
   const renderTypeSelection = () => (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="min-w-0 space-y-4 overflow-hidden">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         <button
           onClick={() => setConversationType("individual")}
           className={cn(
-            "p-6 rounded-lg border-2  text-left",
+            "rounded-lg border-2 p-4 text-left sm:p-6",
             conversationType === "individual"
               ? "border-blue-500 bg-blue-50"
               : "border-gray-200 hover:border-gray-300"
@@ -312,7 +318,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         <button
           onClick={() => setConversationType("group")}
           className={cn(
-            "p-6 rounded-lg border-2  text-left",
+            "rounded-lg border-2 p-4 text-left sm:p-6",
             conversationType === "group"
               ? "border-blue-500 bg-blue-50"
               : "border-gray-200 hover:border-gray-300"
@@ -342,7 +348,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   );
 
   const renderDetailsForm = () => (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-hidden">
       {conversationType === "group" && (
         <div className="space-y-2">
           <Label htmlFor="conversation-name">
@@ -375,7 +381,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
           {t("messages.newConversation.propertyContext")}
         </Label>
         <Select value={selectedProperty} onValueChange={setSelectedProperty}>
-          <SelectTrigger>
+          <SelectTrigger className="min-w-0 max-w-full overflow-hidden">
             <SelectValue
               placeholder={t("messages.newConversation.propertyPlaceholder")}
             />
@@ -383,11 +389,11 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
           <SelectContent>
             {properties.map((property) => (
               <SelectItem key={property._id} value={property._id}>
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 max-w-full items-center gap-2 overflow-hidden">
                   <Building className="h-4 w-4" />
-                  <div>
-                    <div className="font-medium">{property.name}</div>
-                    <div className="text-sm text-gray-500">
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">{property.name}</div>
+                    <div className="truncate text-sm text-gray-500">
                       {formatAddress(property)}
                     </div>
                   </div>
@@ -401,7 +407,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         )}
       </div>
 
-      <div className="flex justify-between">
+      <div className="grid min-w-0 grid-cols-2 gap-2">
         <Button
           variant="outline"
           onClick={() => {
@@ -424,7 +430,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
   );
 
   const renderParticipantSelection = () => (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4 overflow-hidden">
       {/* Selected Participants */}
       {selectedParticipants.length > 0 && (
         <div className="space-y-2">
@@ -433,12 +439,12 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
               values: { count: selectedParticipants.length },
             })}
           </Label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex min-w-0 flex-wrap gap-2">
             {selectedParticipants.map((participant) => (
               <Badge
                 key={participant._id}
                 variant="secondary"
-                className="flex items-center gap-2 px-3 py-1"
+                className="flex max-w-full min-w-0 items-center gap-2 px-3 py-1"
               >
                 <Avatar className="h-5 w-5">
                   <AvatarImage src={participant.avatar} />
@@ -447,7 +453,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                     {participant.lastName[0]}
                   </AvatarFallback>
                 </Avatar>
-                <span>
+                <span className="truncate">
                   {participant.firstName} {participant.lastName}
                 </span>
                 <button
@@ -483,7 +489,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
       )}
 
       {/* User List */}
-      <ScrollArea className="h-64 border rounded-lg">
+      <ScrollArea className="h-[min(16rem,35dvh)] rounded-lg border">
         <div className="p-2">
           {loadingUsers ? (
             <div className="flex items-center justify-center py-8">
@@ -522,11 +528,11 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
                       {user.lastName[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium text-gray-900">
                       {user.firstName} {user.lastName}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="truncate text-sm text-gray-500">
                       {user.email} • {user.role === "tenant" ? "Locataire" : user.role === "manager" ? "Gestionnaire" : user.role === "admin" || user.role === "super_admin" ? "Super Admin" : user.role}
                     </div>
                   </div>
@@ -542,9 +548,10 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         <p className="text-xs text-destructive">{submissionError}</p>
       )}
 
-      <div className="flex justify-between">
+      <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-[auto_auto] min-[420px]:justify-between">
         <Button
           variant="outline"
+          className="w-full min-[420px]:w-auto"
           onClick={() => {
             setSubmissionError(null);
             setStep("details");
@@ -554,6 +561,7 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
         </Button>
         <Button
           onClick={handleCreateConversation}
+          className="w-full min-[420px]:w-auto"
           disabled={selectedParticipants.length === 0 || loading}
         >
           {loading ? (
@@ -574,8 +582,8 @@ export const NewConversationDialog: React.FC<NewConversationDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-h-[calc(100dvh-1rem)] min-w-0 max-w-2xl overflow-x-hidden overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pr-8 text-left">
           <DialogTitle>
             {step === "type" && t("messages.newConversation.title.type")}
             {step === "details" && t("messages.newConversation.title.details")}

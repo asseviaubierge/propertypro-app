@@ -264,7 +264,65 @@ export default function LeaseTable({
             </div>
           ) : (
             <>
-              <div className="rounded-md border">
+              <div className="grid gap-3 md:hidden">
+                {currentLeases.map((lease) => (
+                  <div
+                    key={lease._id}
+                    className="min-w-0 rounded-xl border bg-background p-3 shadow-sm"
+                  >
+                    <div className="flex min-w-0 items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">
+                          {lease.propertyId.name}
+                        </p>
+                        <p className="mt-0.5 flex min-w-0 items-start gap-1 text-xs text-muted-foreground">
+                          <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
+                          <span className="line-clamp-2">
+                            {formatAddress(lease.propertyId.address)}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="shrink-0">{getStatusBadge(lease)}</div>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <div className="min-w-0 rounded-lg bg-muted/40 p-2">
+                        <p className="text-muted-foreground">
+                          {t("leases.myLeases.table.leasePeriod")}
+                        </p>
+                        <p className="mt-1 font-medium">
+                          {formatDate(lease.startDate)}
+                        </p>
+                        <p className="font-medium">
+                          {formatDate(lease.endDate)}
+                        </p>
+                      </div>
+                      <div className="min-w-0 rounded-lg bg-muted/40 p-2">
+                        <p className="text-muted-foreground">
+                          {t("leases.myLeases.table.monthlyRent")}
+                        </p>
+                        <p className="mt-1 truncate font-semibold">
+                          {formatCurrency(lease.terms.rentAmount)}
+                        </p>
+                        <div className="mt-1">{getDaysDisplay(lease)}</div>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 w-full"
+                      onClick={() => handleAction("view-details", lease)}
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      {t("leases.myLeases.actions.viewDetails")}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="hidden max-w-full overflow-x-auto rounded-md border md:block">
                 <Table>
                   <TableHeader>
                     <TableRow>

@@ -32,12 +32,16 @@ interface PaymentReceiptProps {
     notes?: string;
     tenantId: {
       _id: string;
-      userId: {
+      userId?: {
         firstName: string;
         lastName: string;
         email: string;
         phone?: string;
       };
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      phone?: string;
     };
     propertyId: {
       _id: string;
@@ -84,13 +88,42 @@ export const PaymentReceipt = forwardRef<HTMLDivElement, PaymentReceiptProps>(
     };
 
     const getPaymentTypeLabel = (type: PaymentType) => {
-      return type.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      const labels: Record<string, string> = {
+        rent: "Loyer",
+        security_deposit: "Garantie",
+        late_fee: "Pénalité de retard",
+        utility: "Charges",
+        maintenance: "Maintenance",
+        other: "Autre",
+      };
+      return labels[String(type).toLowerCase()] || "Paiement";
     };
 
     const getPaymentMethodLabel = (method?: PaymentMethod) => {
       if (!method)
         return t("payments.receipt.component.paymentMethod.notSpecified");
-      return method.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase());
+      const labels: Record<string, string> = {
+        cash: "Espèces",
+        bank_transfer: "Virement bancaire",
+        credit_card: "Carte bancaire",
+        debit_card: "Carte de débit",
+        check: "Chèque",
+        mobile_money: "Paiement mobile",
+        paypal: "PayPal",
+        stripe: "Stripe",
+      };
+      return labels[String(method).toLowerCase()] || "Non renseigné";
+    };
+
+    const getStatusLabel = (status: PaymentStatus) => {
+      const labels: Record<string, string> = {
+        paid: "Payé",
+        pending: "En attente",
+        overdue: "En retard",
+        failed: "Échoué",
+        refunded: "Remboursé",
+      };
+      return labels[String(status).toLowerCase()] || "Inconnu";
     };
 
     const defaultCompanyInfo = {
@@ -102,6 +135,7 @@ export const PaymentReceipt = forwardRef<HTMLDivElement, PaymentReceiptProps>(
     };
 
     const company = companyInfo || defaultCompanyInfo;
+    const tenantContact = payment.tenantId?.userId || payment.tenantId;
 
     return (
       <div ref={ref} className="max-w-2xl mx-auto">
@@ -168,8 +202,7 @@ export const PaymentReceipt = forwardRef<HTMLDivElement, PaymentReceiptProps>(
                 }
                 className="text-sm px-4 py-2"
               >
-                {payment.status.charAt(0).toUpperCase() +
-                  payment.status.slice(1)}
+                {getStatusLabel(payment.status)}
               </Badge>
             </div>
 
@@ -183,15 +216,15 @@ export const PaymentReceipt = forwardRef<HTMLDivElement, PaymentReceiptProps>(
                 </h3>
                 <div className="space-y-1 text-sm">
                   <p className="font-medium">
-                    {payment?.tenantId?.userId?.firstName ?? ""}{" "}
-                    {payment?.tenantId?.userId?.lastName ?? ""}
+                    {tenantContact?.firstName ?? ""}{" "}
+                    {tenantContact?.lastName ?? ""}
                   </p>
                   <p className="text-muted-foreground">
-                    {payment?.tenantId?.userId?.email ?? ""}
+                    {tenantContact?.email ?? ""}
                   </p>
-                  {payment?.tenantId?.userId?.phone && (
+                  {tenantContact?.phone && (
                     <p className="text-muted-foreground">
-                      {payment.tenantId.userId.phone}
+                      {tenantContact.phone}
                     </p>
                   )}
                 </div>

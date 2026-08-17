@@ -62,7 +62,7 @@ export const GET = withPermissionAndDB("lease_view", {
       const tenant = context?.tenantProfile;
 
       if (!tenant) {
-        return createErrorResponse("Tenant profile unavailable", 500);
+        return createErrorResponse("Le profil locataire est indisponible", 500);
       }
 
       let allLeases = await Lease.find({

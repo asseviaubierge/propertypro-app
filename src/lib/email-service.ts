@@ -63,6 +63,12 @@ export class EmailService {
     try {
       const { transporter, config } = await this.getTransport();
 
+      if (!config.configured) {
+        throw new Error(
+          "Le service e-mail n’est pas configuré. Renseignez le serveur SMTP dans Administration > Paramètres > E-mail."
+        );
+      }
+
       const mailOptions = {
         from: `${config.fromName || this.appName} <${config.fromEmail}>`,
         to,

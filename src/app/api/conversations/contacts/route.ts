@@ -11,6 +11,8 @@ import { getAllowedMessagingUserIds } from "@/lib/messaging-access";
 
 const ALLOWED_ROLES = ["admin", "super_admin", "manager", "tenant"];
 
+export const dynamic = "force-dynamic";
+
 export const GET = withPermissionAndDB("profile_management")(
   async (user, request: NextRequest) => {
     try {

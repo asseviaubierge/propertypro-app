@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { MessageCircle } from "lucide-react";
+import { shareDocumentViaWhatsApp } from "@/lib/whatsapp";
 
 const unwrap = (j: any) => j?.data ?? j;
 
@@ -49,6 +51,36 @@ export default function ContractReviewPage() {
     }
   }
 
+  async function shareContract() {
+    const account = contract?.accountId || {};
+    const phone = account.whatsappNumber || account.phone;
+    if (!phone) {
+      toast({
+        title: "WhatsApp indisponible",
+        description: "Le numéro WhatsApp du contractant n’est pas renseigné.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const result = await shareDocumentViaWhatsApp({
+        phone,
+        documentUrl: `/api/contracts/${p.id}/pdf`,
+        fileName: `contrat-${contract.contractNumber}.pdf`,
+        title: `Contrat ${contract.contractNumber}`,
+        message: `Bonjour, voici le contrat ${contract.contractNumber} transmis depuis GESTION E-IMMO.`,
+      });
+      if (result === "unavailable") throw new Error("Numéro WhatsApp invalide");
+    } catch (error) {
+      toast({
+        title: "Partage WhatsApp impossible",
+        description: error instanceof Error ? error.message : "Impossible de partager le contrat.",
+        variant: "destructive",
+      });
+    }
+  }
+
   if (error) return <div className="p-4 md:p-8"><div className="rounded-2xl bg-red-50 p-5 text-red-900">{error}</div></div>;
   if (!contract) return <div className="p-4 md:p-8">Chargement du contrat…</div>;
 
@@ -58,9 +90,13 @@ export default function ContractReviewPage() {
       <p className="text-xs font-bold text-red-600">E-IMMO.BJ • DOCUMENT CONTRACTUEL</p>
       <h1 className="mt-1 text-2xl font-bold">{contract.contractNumber}</h1>
       <p className="mt-1 text-sm text-slate-600">Prenez le temps de lire l'intégralité du document avant signature.</p>
-      <div className="mt-4 flex flex-wrap gap-2 print:hidden">
-        <a href={`/api/contracts/${p.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center rounded-md bg-slate-950 px-4 text-sm font-medium text-white">Voir / télécharger le PDF</a>
+      <div className="mt-4 grid grid-cols-1 gap-2 print:hidden min-[380px]:grid-cols-3 sm:flex sm:flex-wrap">
+        <a href={`/api/contracts/${p.id}/pdf`} target="_blank" rel="noreferrer" className="inline-flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-md bg-slate-950 px-3 text-xs font-medium text-white sm:px-4 sm:text-sm">Télécharger le PDF</a>
         <Button variant="outline" onClick={() => window.print()}>Imprimer</Button>
+        <Button variant="outline" className="text-green-700" onClick={shareContract}>
+          <MessageCircle className="mr-2 h-4 w-4" />
+          WhatsApp
+        </Button>
       </div>
       <div className="mt-5 whitespace-pre-wrap rounded-xl border bg-white p-4 text-sm leading-6 sm:p-6">{contract.contractBody}</div>
     </div>
